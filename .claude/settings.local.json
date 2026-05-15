@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest *)",
+      "Read(//c/Users/nicod/proyectos/**)",
+      "Bash(mv sanchezmarian-web/CONTEXTO_PROYECTO.md /tmp/CONTEXTO_PROYECTO.md)",
+      "Bash(mv /tmp/CONTEXTO_PROYECTO.md /c/Users/nicod/proyectos/sanchezmarian-web/CONTEXTO_PROYECTO.md)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001)",
+      "Bash(npx tsc *)",
+      "Bash(node *)",
+      "PowerShell(Get-ChildItem -Recurse -Depth 4 | Where-Object { !$_.FullName.Contains\\('\\\\node_modules\\\\'\\) -and !$_.FullName.Contains\\('\\\\.next\\\\'\\) -and !$_.FullName.Contains\\('\\\\.git\\\\'\\) } | Select-Object -ExpandProperty FullName)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\nicod\\\\proyectos\\\\sanchezmarian-web\\\\components\\\\ui\\\\gradient-heading.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\nicod\\\\proyectos\\\\sanchezmarian-web\\\\components\\\\ui\\\\text-animate.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\nicod\\\\proyectos\\\\sanchezmarian-web\\\\public\\\\file.svg\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\nicod\\\\proyectos\\\\sanchezmarian-web\\\\public\\\\globe.svg\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\nicod\\\\proyectos\\\\sanchezmarian-web\\\\public\\\\next.svg\" -Force)",
+      "PowerShell(cd \"C:\\\\Users\\\\nicod\\\\proyectos\\\\sanchezmarian-web\"; $env:PATH = \"C:\\\\Program Files\\\\nodejs;$env:PATH\"; node node_modules/.bin/next build 2>&1 | Select-Object -Last 30)",
+      "PowerShell(netstat *)"
+    ]
+  }
+}

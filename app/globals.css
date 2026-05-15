@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* ── Paleta Marian Sánchez ── */
+  --color-marino:     #1C2E4A;
+  --color-terracota:  #C1644A;
+  --color-arena:      #F7F4EF;
+  --color-lino:       #D8C9B8;
+  --color-marino-osc: #141E2E;
+  --color-gris-tx:    #5a6070;
+
+  /* ── Tipografía ── */
+  --font-playfair: var(--font-playfair-display);
+  --font-sans:     var(--font-dm-sans);
+  --font-mono:     var(--font-dm-mono);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #1C2E4A;
+}
+
+html {
+  scroll-padding-top: 80px;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee-scroll 32s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
