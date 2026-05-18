@@ -20,7 +20,8 @@ export function Nav() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 24)
+    const getThreshold = () => window.innerHeight * 0.8
+    const handleScroll = () => setIsScrolled(window.scrollY > getThreshold())
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
@@ -28,12 +29,13 @@ export function Nav() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-400",
-        isScrolled ? "bg-bordo-oscuro" : "bg-bordo"
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+        isScrolled
+          ? "bg-bordo shadow-[0_1px_0_0_rgba(201,168,130,0.12)]"
+          : "bg-transparent"
       )}
     >
       <nav className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
-        {/* Logo */}
         <Link
           href="/"
           className="font-playfair text-2xl font-bold italic text-hueso hover:text-dorado transition-colors"
@@ -41,7 +43,6 @@ export function Nav() {
           Marian.
         </Link>
 
-        {/* Desktop links */}
         <ul className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <li key={link.href}>
@@ -51,7 +52,7 @@ export function Nav() {
                   "font-sans text-sm font-medium transition-colors tracking-wide",
                   pathname === link.href
                     ? "text-hueso"
-                    : "text-hueso/55 hover:text-hueso"
+                    : "text-hueso/60 hover:text-hueso"
                 )}
               >
                 {link.label}
@@ -60,7 +61,6 @@ export function Nav() {
           ))}
         </ul>
 
-        {/* CTA + hamburger */}
         <div className="flex items-center gap-3">
           <Link
             href="/contacto"
@@ -79,7 +79,6 @@ export function Nav() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -87,7 +86,7 @@ export function Nav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-bordo-oscuro border-t border-hueso/8 px-6 pb-6 pt-4"
+            className="md:hidden bg-bordo border-t border-hueso/8 px-6 pb-6 pt-4"
           >
             <ul className="flex flex-col gap-4">
               {navLinks.map((link) => (
