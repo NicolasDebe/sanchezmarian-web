@@ -1,13 +1,23 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* ── Paleta Marian Sánchez ── */
-  --color-marino:     #1C2E4A;
-  --color-terracota:  #C1644A;
-  --color-arena:      #F7F4EF;
-  --color-lino:       #D8C9B8;
-  --color-marino-osc: #141E2E;
-  --color-gris-tx:    #5a6070;
+  /* ── Nueva Paleta Marian Sánchez ── */
+  --color-bordo:         #66001F;
+  --color-bordo-oscuro:  #3D000F;
+  --color-bordo-claro:   #8C1A35;
+  --color-hueso:         #FEFCEF;
+  --color-hueso-oscuro:  #FAF6EE;
+  --color-arena:         #F0E8D8;
+  --color-negro-bordo:   #1A0008;
+  --color-gris-bordo:    #4A3040;
+  --color-dorado:        #C9A882;
+
+  /* ── Compat aliases — páginas internas sin refactorizar ── */
+  --color-marino:        #66001F;
+  --color-terracota:     #8C1A35;
+  --color-lino:          #FAF6EE;
+  --color-marino-osc:    #3D000F;
+  --color-gris-tx:       #4A3040;
 
   /* ── Tipografía ── */
   --font-playfair: var(--font-playfair-display);
@@ -16,8 +26,8 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #1C2E4A;
+  --background: #FEFCEF;
+  --foreground: #1A0008;
 }
 
 html {
@@ -37,7 +47,7 @@ body {
 }
 
 .animate-marquee {
-  animation: marquee-scroll 32s linear infinite;
+  animation: marquee-scroll 55s linear infinite;
   will-change: transform;
 }
 

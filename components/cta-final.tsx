@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react"
 import { motion, useInView } from "motion/react"
-import { ArrowRight, Mail, MapPin, Send } from "lucide-react"
+import { Mail, MapPin } from "lucide-react"
+import { PopoverForm, PopoverFormButton, PopoverFormSuccess } from "@/components/ui/popover-form"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
@@ -10,6 +11,7 @@ const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
 export function CtaFinal() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-80px" })
+  const [open, setOpen] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -25,11 +27,8 @@ export function CtaFinal() {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({ nombre: form.nombre, email: form.email, mensaje: form.mensaje }),
       })
-      if (res.ok) {
-        setSent(true)
-      } else {
-        setError(true)
-      }
+      if (res.ok) setSent(true)
+      else setError(true)
     } catch {
       setError(true)
     } finally {
@@ -37,9 +36,59 @@ export function CtaFinal() {
     }
   }
 
+  const formContent = (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
+      {[
+        { id: "pf-nombre", label: "Nombre", type: "text", field: "nombre" as const, placeholder: "Tu nombre" },
+        { id: "pf-email", label: "Email", type: "email", field: "email" as const, placeholder: "tu@email.com" },
+      ].map(({ id, label, type, field, placeholder }) => (
+        <div key={id} className="flex flex-col gap-1">
+          <label htmlFor={id} className="font-mono text-[9px] uppercase tracking-[0.18em] text-bordo/50">
+            {label}
+          </label>
+          <input
+            id={id}
+            type={type}
+            required
+            value={form[field]}
+            onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+            placeholder={placeholder}
+            className="bg-hueso border border-bordo/12 rounded-lg px-3 py-2.5 font-sans text-sm text-negro-bordo placeholder:text-gris-bordo/30 focus:outline-none focus:border-bordo/35 transition-colors"
+          />
+        </div>
+      ))}
+      <div className="flex flex-col gap-1">
+        <label htmlFor="pf-mensaje" className="font-mono text-[9px] uppercase tracking-[0.18em] text-bordo/50">
+          Mensaje
+        </label>
+        <textarea
+          id="pf-mensaje"
+          required
+          rows={3}
+          value={form.mensaje}
+          onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
+          placeholder="Contame en qué puedo ayudarte..."
+          className="bg-hueso border border-bordo/12 rounded-lg px-3 py-2.5 font-sans text-sm text-negro-bordo placeholder:text-gris-bordo/30 focus:outline-none focus:border-bordo/35 transition-colors resize-none"
+        />
+      </div>
+      <PopoverFormButton loading={submitting} text="Enviar consulta" />
+      {error && (
+        <p className="font-mono text-[9px] text-bordo-claro text-center">
+          Error al enviar. Escribime a hola@sanchezmarian.com
+        </p>
+      )}
+      <p className="font-mono text-[9px] text-gris-bordo/40 text-center">Primera consulta gratuita · Sin compromiso</p>
+    </form>
+  )
+
   return (
-    <section id="contacto" ref={ref} className="bg-marino py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+    <section id="contacto" ref={ref} className="bg-bordo py-24 lg:py-32">
+      {/* Dorado top line */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        <div className="w-full h-px bg-dorado/25 mb-16" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
 
         {/* ── IZQUIERDA — texto ── */}
         <div className="flex flex-col gap-7">
@@ -47,7 +96,7 @@ export function CtaFinal() {
             initial={{ opacity: 0, y: 10 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.05 }}
-            className="font-mono text-[11px] uppercase tracking-[0.2em] text-terracota"
+            className="font-mono text-[11px] uppercase tracking-[0.25em] text-dorado/60"
           >
             Hablemos
           </motion.p>
@@ -56,130 +105,70 @@ export function CtaFinal() {
             initial={{ opacity: 0, y: 18 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.65, delay: 0.15, ease: EASE }}
-            className="font-playfair font-bold text-white text-[2.25rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.1]"
+            className="font-playfair font-bold text-hueso text-[2.25rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.1]"
           >
             <span className="block">Tu historia merece</span>
-            <em className="block italic text-terracota">ser escuchada.</em>
+            <em className="block italic text-dorado">ser escuchada.</em>
           </motion.h2>
 
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.28 }}
-            className="font-sans text-white/60 text-base leading-relaxed max-w-[420px]"
+            className="font-sans text-hueso/50 text-base leading-relaxed max-w-[400px]"
           >
-            Completá el formulario y te respondo en menos de 24 horas.
             La primera consulta es gratuita y sin compromiso.
+            Te respondo en menos de 24 horas.
           </motion.p>
 
-          {/* Datos de contacto */}
+          {/* Datos */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.38 }}
-            className="flex flex-col gap-3 mt-2"
+            className="flex flex-col gap-3"
           >
             {[
               { icon: Mail, text: "hola@sanchezmarian.com" },
               { icon: MapPin, text: "Mendoza, Argentina" },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-3">
-                <Icon size={14} className="text-terracota shrink-0" strokeWidth={1.5} />
-                <span className="font-sans text-sm text-white/50">{text}</span>
+                <Icon size={13} className="text-dorado/60 shrink-0" strokeWidth={1.5} />
+                <span className="font-sans text-sm text-hueso/40">{text}</span>
               </div>
             ))}
           </motion.div>
         </div>
 
-        {/* ── DERECHA — formulario ── */}
+        {/* ── DERECHA — PopoverForm ── */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.25, ease: EASE }}
+          className="flex flex-col items-center justify-center relative"
         >
-          {sent ? (
-            <div className="bg-white/5 border border-white/10 rounded-[1.5rem] p-10 flex flex-col items-center text-center gap-5">
-              <div className="w-14 h-14 rounded-full bg-terracota/15 flex items-center justify-center">
-                <Send size={22} className="text-terracota" strokeWidth={1.5} />
-              </div>
-              <h3 className="font-playfair font-bold text-white text-2xl">¡Mensaje enviado!</h3>
-              <p className="font-sans text-white/55 text-sm leading-relaxed max-w-xs">
-                Gracias por escribirme. Te respondo en menos de 24 horas.
-              </p>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="bg-white/5 border border-white/10 rounded-[1.5rem] p-8 flex flex-col gap-5"
-            >
-              {/* Nombre */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="nombre" className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">
-                  Nombre
-                </label>
-                <input
-                  id="nombre"
-                  type="text"
-                  required
-                  value={form.nombre}
-                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                  placeholder="Tu nombre"
-                  className="bg-white/5 border border-white/15 rounded-xl px-4 py-3 font-sans text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-terracota/60 transition-colors"
-                />
-              </div>
+          <p className="font-playfair italic text-hueso/50 text-lg mb-8 text-center">
+            ¿Lista para aparecer en los medios?
+          </p>
 
-              {/* Email */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="email" className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="tu@email.com"
-                  className="bg-white/5 border border-white/15 rounded-xl px-4 py-3 font-sans text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-terracota/60 transition-colors"
-                />
-              </div>
+          <PopoverForm
+            open={open}
+            setOpen={setOpen}
+            showSuccess={sent}
+            title="Consulta gratis"
+            width="min(380px, calc(100vw - 48px))"
+            openChild={formContent}
+            successChild={
+              <PopoverFormSuccess
+                title="¡Mensaje enviado!"
+                description="Gracias por escribirme. Te respondo en menos de 24 horas."
+              />
+            }
+          />
 
-              {/* Mensaje */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="mensaje" className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">
-                  Mensaje
-                </label>
-                <textarea
-                  id="mensaje"
-                  required
-                  rows={4}
-                  value={form.mensaje}
-                  onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
-                  placeholder="Contame en qué puedo ayudarte..."
-                  className="bg-white/5 border border-white/15 rounded-xl px-4 py-3 font-sans text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-terracota/60 transition-colors resize-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="mt-1 inline-flex items-center justify-center gap-2 bg-terracota text-white px-6 py-3.5 rounded-full font-sans text-sm font-semibold hover:bg-terracota/90 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {submitting ? "Enviando…" : "Enviar consulta"}
-                {!submitting && <ArrowRight size={15} strokeWidth={2.5} />}
-              </button>
-
-              {error && (
-                <p className="font-mono text-[10px] text-terracota/80 text-center">
-                  Hubo un error al enviar. Intentá de nuevo o escribime directo a hola@sanchezmarian.com
-                </p>
-              )}
-
-              <p className="font-mono text-[10px] text-white/25 text-center leading-relaxed">
-                Primera consulta gratuita · Sin compromiso · Respuesta en 24 hs
-              </p>
-            </form>
-          )}
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-hueso/20 mt-8">
+            30 min · Gratis · Sin compromiso
+          </p>
         </motion.div>
 
       </div>

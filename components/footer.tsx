@@ -10,7 +10,7 @@ const NAV_LINKS = [
 
 function IconLinkedin() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
       <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
       <rect x="2" y="9" width="4" height="12" />
       <circle cx="4" cy="4" r="2" />
@@ -20,7 +20,7 @@ function IconLinkedin() {
 
 function IconInstagram() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
@@ -35,21 +35,24 @@ const SOCIAL = [
 
 export function Footer() {
   return (
-    <footer className="bg-marino-osc pt-16 pb-8">
+    <footer className="bg-bordo-oscuro pt-14 pb-8">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
 
+        {/* Dorado top divider */}
+        <div className="w-full h-px bg-dorado/25 mb-12" />
+
         {/* Top row */}
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-10 pb-12 border-b border-white/8">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-10 pb-10 border-b border-hueso/6">
 
           {/* Logo + tagline */}
           <div className="flex flex-col gap-3">
             <Link
               href="/"
-              className="font-playfair text-2xl font-bold italic text-white hover:text-terracota transition-colors w-fit"
+              className="font-playfair text-2xl font-bold italic text-hueso hover:text-dorado transition-colors w-fit"
             >
               Marian.
             </Link>
-            <p className="font-sans text-xs text-white/35 leading-relaxed max-w-[220px]">
+            <p className="font-sans text-xs text-hueso/30 leading-relaxed max-w-[200px]">
               Consultora de comunicación estratégica.
               <br />Mendoza, Argentina.
             </p>
@@ -62,7 +65,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="font-sans text-sm text-white/45 hover:text-white transition-colors"
+                    className="font-sans text-sm text-hueso/35 hover:text-hueso/70 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -81,7 +84,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/45 hover:border-terracota/50 hover:text-terracota transition-colors"
+                  className="w-9 h-9 rounded-full border border-hueso/12 flex items-center justify-center text-hueso/35 hover:border-dorado/40 hover:text-dorado transition-colors"
                 >
                   <Icon />
                 </a>
@@ -89,7 +92,7 @@ export function Footer() {
             </div>
             <Link
               href="/contacto"
-              className="inline-flex items-center gap-2 bg-terracota/15 border border-terracota/30 text-terracota px-5 py-2.5 rounded-full font-sans text-xs font-medium hover:bg-terracota hover:text-white hover:border-terracota transition-all"
+              className="inline-flex items-center gap-2 bg-hueso/6 border border-hueso/12 text-hueso/50 px-5 py-2.5 rounded-full font-sans text-xs font-medium hover:bg-hueso hover:text-bordo hover:border-hueso transition-all"
             >
               Consulta gratis
             </Link>
@@ -99,11 +102,11 @@ export function Footer() {
 
         {/* Bottom row */}
         <div className="pt-7 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="font-mono text-[10px] text-white/25 tracking-wide">
+          <p className="font-mono text-[10px] text-hueso/20 tracking-wide">
             © {new Date().getFullYear()} Mariana Sánchez. Todos los derechos reservados.
           </p>
-          <p className="font-mono text-[10px] text-white/20 tracking-wide">
-            Diseñado y desarrollado con intención.
+          <p className="font-mono text-[10px] text-hueso/15 tracking-wide">
+            Diseñado con intención.
           </p>
         </div>
 
