@@ -6,13 +6,13 @@ import { CtaFinal } from "@/components/cta-final"
 import { MediaGrid } from "./media-grid"
 
 export const metadata: Metadata = {
-  title: "En medios — Marian Sánchez",
+  title: "Casos de éxito — Marian Sánchez",
   description:
     "Portfolio de apariciones en medios: La Nación, Infobae, Los Andes, MDZ Online, Clarín y más. Resultados reales para clientes reales.",
   openGraph: {
-    title: "En medios — Marian Sánchez",
+    title: "Casos de éxito — Marian Sánchez",
     description:
-      "50+ apariciones en medios nacionales y provinciales. Portfolio de resultados de GB Consulting.",
+      "100+ apariciones en medios nacionales y provinciales. Portfolio de resultados de GB Consulting.",
     url: "https://sanchezmarian.com/en-medios",
   },
 }
@@ -23,10 +23,10 @@ export default function EnMediosPage() {
       <Nav />
 
       <PageHero
-        eyebrow="En medios"
+        eyebrow="Casos de éxito"
         title="Historias que"
         titleAccent="llegaron a los medios."
-        subtitle="50+ apariciones en medios nacionales, provinciales y locales. Cada una, el resultado de una estrategia bien construida."
+        subtitle="100+ apariciones en medios nacionales, provinciales y locales. Cada una, el resultado de una estrategia bien construida."
       />
 
       {/* Stats rápidas */}
@@ -34,10 +34,10 @@ export default function EnMediosPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { n: "50+", label: "Apariciones totales" },
+              { n: "100+", label: "Apariciones totales" },
               { n: "15+", label: "Medios distintos" },
               { n: "4", label: "Formatos: digital, gráfico, radio, TV" },
-              { n: "8 años", label: "Construyendo relaciones" },
+              { n: "10+ años", label: "Construyendo relaciones" },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <p className="font-playfair font-bold text-white text-3xl sm:text-4xl">{s.n}</p>

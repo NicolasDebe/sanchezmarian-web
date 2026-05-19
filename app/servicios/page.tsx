@@ -9,11 +9,11 @@ import { CtaFinal } from "@/components/cta-final"
 export const metadata: Metadata = {
   title: "Servicios — Marian Sánchez",
   description:
-    "Prensa y medios, copywriting, asesoría estratégica y social media. Descubrí cómo puedo ayudarte a comunicar mejor.",
+    "Prensa y Comunicación, Comunicación Estratégica y Relaciones Públicas. Descubrí cómo puedo ayudarte a posicionarte en los medios.",
   openGraph: {
     title: "Servicios — Marian Sánchez",
     description:
-      "Prensa y medios, copywriting, asesoría estratégica y social media.",
+      "Prensa y Comunicación, Comunicación Estratégica y Relaciones Públicas.",
     url: "https://sanchezmarian.com/servicios",
   },
 }
@@ -21,10 +21,10 @@ export const metadata: Metadata = {
 const SERVICIOS = [
   {
     num: "01",
-    name: "Prensa y medios",
-    tagline: "Tu historia, en los medios que importan.",
+    name: "Prensa y Comunicación",
+    tagline: "Tu historia en los medios que importan.",
     description:
-      "Gestiono el vínculo con periodistas y medios para conseguir notas, entrevistas y apariciones que posicionan tu marca o tu nombre. No es una base de datos de emails — son relaciones construidas durante 8 años.",
+      "Gestión orgánica de presencia en medios para transformar tus hitos, lanzamientos o novedades en contenido de valor periodístico. Con más de una década de experiencia en el ecosistema de medios de Mendoza, me encargo de que tu mensaje llegue al periodista adecuado, en el momento justo y con el enfoque correcto.",
     includes: [
       "Estrategia de relaciones con medios locales, provinciales y nacionales",
       "Redacción de gacetillas y comunicados de prensa",
@@ -43,19 +43,19 @@ const SERVICIOS = [
   },
   {
     num: "02",
-    name: "Copywriting",
-    tagline: "Cada palabra, pensada para tu audiencia.",
+    name: "Comunicación Estratégica",
+    tagline: "Tu plan de comunicación, alineado a tus objetivos reales.",
     description:
-      "Redacto textos que comunican quién sos y convencen a quien tiene que convencerse. Desde el titular de tu web hasta el pie de página de tu newsletter: todo con voz propia y coherencia de mensaje.",
+      "Diseño de planes de comunicación a medida — mensuales, trimestrales o anuales — según las necesidades de cada etapa de tu proyecto. Analizamos qué historia contar, a quién hablarle y cómo hacerlo, alineando cada acción con tus objetivos de negocio o posicionamiento personal.",
     includes: [
-      "Textos para sitio web (home, servicios, about, landing pages)",
-      "Copy para redes sociales y campañas",
-      "Newsletters y email marketing",
-      "Materiales de prensa: bio profesional, kit de marca",
-      "Guía de tono y voz de marca",
+      "Diagnóstico de comunicación actual",
+      "Definición de posicionamiento y mensajes clave",
+      "Plan de comunicación mensual, trimestral o anual",
+      "Selección de canales y medios prioritarios",
+      "Acompañamiento y ajuste de estrategia",
     ],
     forWho:
-      "Quienes necesitan una voz clara, coherente y diferenciada en todos sus canales.",
+      "Negocios en crecimiento que necesitan comunicar ese crecimiento de forma ordenada y profesional.",
     sectionBg: "bg-marino-osc",
     textColor: "text-white",
     boxBg: "bg-white/6",
@@ -65,47 +65,25 @@ const SERVICIOS = [
   },
   {
     num: "03",
-    name: "Asesoría estratégica",
-    tagline: "Un plan de comunicación para tus objetivos reales.",
+    name: "Relaciones Públicas",
+    tagline: "Reputación y vínculos que construyen visibilidad sostenida.",
     description:
-      "Diseñamos juntos la estrategia de comunicación de tu marca o proyecto. Antes de salir a comunicar, definimos qué historia contás, a quién le hablás y con qué mensajes clave.",
+      "Gestión de relaciones institucionales y networking para fortalecer la reputación de marcas y personas. Actúo como nexo estratégico para generar alianzas, coordinar presencia en eventos clave y facilitar el contacto con actores relevantes.",
     includes: [
-      "Diagnóstico de comunicación actual",
-      "Definición de posicionamiento y mensajes clave",
-      "Plan de comunicación a 90 días",
-      "Selección de canales y medios prioritarios",
-      "Acompañamiento mensual y ajuste de estrategia",
+      "Gestión de relaciones institucionales y con medios",
+      "Representación y networking en eventos clave",
+      "Coordinación de alianzas estratégicas",
+      "Manejo de imagen y reputación pública",
+      "Acompañamiento continuo y construcción de vínculos",
     ],
     forWho:
-      "Negocios en crecimiento que necesitan comunicar ese crecimiento de forma ordenada y profesional.",
+      "Marcas y personas que buscan construir confianza y visibilidad sostenida en el tiempo.",
     sectionBg: "bg-arena",
     textColor: "text-marino",
     boxBg: "bg-white/70",
     borderColor: "border-marino/8",
     checkColor: "text-terracota",
     accentText: "text-gris-tx",
-  },
-  {
-    num: "04",
-    name: "Social Media",
-    tagline: "Presencia que construye autoridad.",
-    description:
-      "Gestión y estrategia de redes sociales con foco en posicionamiento y comunidad. No publicamos por publicar: cada contenido refuerza tu comunicación global y construye tu autoridad online.",
-    includes: [
-      "Estrategia de contenidos por canal",
-      "Calendario editorial mensual",
-      "Producción de copies y orientación visual",
-      "Gestión de Instagram y LinkedIn",
-      "Métricas mensuales y optimización continua",
-    ],
-    forWho:
-      "Marcas y profesionales que quieren que sus redes respalden su posicionamiento en medios.",
-    sectionBg: "bg-marino",
-    textColor: "text-white",
-    boxBg: "bg-white/6",
-    borderColor: "border-white/10",
-    checkColor: "text-terracota",
-    accentText: "text-white/60",
   },
 ]
 
@@ -118,7 +96,7 @@ export default function ServiciosPage() {
         eyebrow="Servicios"
         title="Lo que hacemos"
         titleAccent="juntos."
-        subtitle="Cuatro servicios diseñados para construir tu presencia donde tiene que estar: en los medios y en la mente de tu audiencia."
+        subtitle="Tres servicios diseñados para construir tu presencia donde tiene que estar: en los medios y en la mente de tu audiencia."
       />
 
       {SERVICIOS.map((s) => (

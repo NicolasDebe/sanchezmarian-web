@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils"
 const navLinks = [
   { label: "Servicios", href: "/servicios" },
   { label: "Sobre mí", href: "/sobre-marian" },
-  { label: "En medios", href: "/en-medios" },
-  { label: "Blog", href: "/blog" },
+  { label: "Casos de éxito", href: "/en-medios" },
+  { label: "Novedades", href: "/blog" },
 ]
 
 export function Nav() {
@@ -66,7 +66,7 @@ export function Nav() {
             href="/contacto"
             className="hidden md:inline-flex items-center gap-2 bg-hueso text-bordo px-5 py-2.5 rounded-full font-sans text-sm font-medium hover:bg-arena transition-colors"
           >
-            Consulta gratis
+            Conversemos
           </Link>
 
           <button
@@ -109,7 +109,7 @@ export function Nav() {
               onClick={() => setIsMenuOpen(false)}
               className="mt-5 block w-full text-center bg-hueso text-bordo px-5 py-3 rounded-full font-sans text-sm font-medium"
             >
-              Consulta gratis
+              Conversemos
             </Link>
           </motion.div>
         )}

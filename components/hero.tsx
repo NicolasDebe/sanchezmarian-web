@@ -70,8 +70,10 @@ export function Hero() {
               transition={{ duration: 0.55, ease: EASE, delay: 0.78 }}
               className="font-sans text-hueso/80 text-base sm:text-[1.05rem] leading-relaxed max-w-[480px]"
             >
-              Ayudo a marcas y profesionales a aparecer en los medios que importan.
-              Comunicación estratégica con relaciones reales con periodistas.
+              Saber qué historia contar, a quién y en qué momento.
+              Conecto tu marca personal o empresarial con el ecosistema
+              de medios de Mendoza de forma natural, aportando valor
+              al periodista y visibilidad estratégica a tu proyecto.
             </motion.p>
 
             <motion.div

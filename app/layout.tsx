@@ -27,23 +27,23 @@ const BASE_URL = "https://sanchezmarian.com"
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "Marian Sánchez — Consultora de comunicación estratégica",
+  title: "Marian Sánchez — Estratega de comunicación · Mendoza",
   description:
-    "Consultora de comunicación y prensa en Mendoza. Ayudo a marcas y profesionales a aparecer en los medios que importan.",
+    "Conecto tu marca con los medios que importan. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
   openGraph: {
     type: "website",
     url: BASE_URL,
     siteName: "Marian Sánchez",
-    title: "Marian Sánchez — Consultora de comunicación estratégica",
+    title: "Marian Sánchez — Estratega de comunicación · Mendoza",
     description:
-      "Consultora de comunicación y prensa en Mendoza. Ayudo a marcas y profesionales a aparecer en los medios que importan.",
+      "Conecto tu marca con los medios que importan. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
     locale: "es_AR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Marian Sánchez — Consultora de comunicación estratégica",
+    title: "Marian Sánchez — Estratega de comunicación · Mendoza",
     description:
-      "Consultora de comunicación y prensa en Mendoza. Ayudo a marcas y profesionales a aparecer en los medios que importan.",
+      "Conecto tu marca con los medios que importan. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
   },
   alternates: {
     canonical: BASE_URL,

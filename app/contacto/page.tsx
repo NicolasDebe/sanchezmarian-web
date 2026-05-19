@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Mail, MapPin, Clock, MessageCircle } from "lucide-react"
+import { Mail, MapPin, MessageCircle } from "lucide-react"
 import { Nav } from "@/components/nav"
 import { Footer } from "@/components/footer"
 import { PageHero } from "@/components/page-hero"
@@ -8,10 +8,10 @@ import { ContactForm } from "@/components/contact-form"
 export const metadata: Metadata = {
   title: "Contacto — Marian Sánchez",
   description:
-    "Agendá una consulta gratis. Hablemos sobre tu estrategia de comunicación en menos de 24 horas.",
+    "Conversemos sobre tu estrategia de comunicación. Hablemos sobre cómo posicionar tu proyecto en los medios.",
   openGraph: {
     title: "Contacto — Marian Sánchez",
-    description: "Primera consulta gratuita y sin compromiso. Respondemos en menos de 24 horas.",
+    description: "Conversemos sobre tu proyecto y cómo puedo ayudarte a comunicarlo.",
     url: "https://sanchezmarian.com/contacto",
   },
 }
@@ -44,7 +44,7 @@ export default function ContactoPage() {
         eyebrow="Contacto"
         title="Hablemos sobre"
         titleAccent="tu historia."
-        subtitle="La primera consulta es gratuita y sin compromiso. Respondé en menos de 24 horas."
+        subtitle="Conversemos sobre tu proyecto y cómo puedo ayudarte a comunicarlo."
       />
 
       {/* Contacto principal */}
@@ -76,12 +76,6 @@ export default function ContactoPage() {
                   icon: MapPin,
                   label: "Ubicación",
                   value: "Mendoza, Argentina",
-                  href: null,
-                },
-                {
-                  icon: Clock,
-                  label: "Respuesta",
-                  value: "Menos de 24 horas hábiles",
                   href: null,
                 },
                 {

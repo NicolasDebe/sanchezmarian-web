@@ -77,7 +77,6 @@ export function CtaFinal() {
           Error al enviar. Escribime a hola@sanchezmarian.com
         </p>
       )}
-      <p className="font-mono text-[9px] text-gris-bordo/40 text-center">Primera consulta gratuita · Sin compromiso</p>
     </form>
   )
 
@@ -98,7 +97,7 @@ export function CtaFinal() {
             transition={{ duration: 0.5, delay: 0.05 }}
             className="font-mono text-[11px] uppercase tracking-[0.25em] text-dorado/60"
           >
-            Hablemos
+            Hagamos que las cosas pasen.
           </motion.p>
 
           <motion.h2
@@ -107,8 +106,8 @@ export function CtaFinal() {
             transition={{ duration: 0.65, delay: 0.15, ease: EASE }}
             className="font-playfair font-bold text-hueso text-[2.25rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.1]"
           >
-            <span className="block">Tu historia merece</span>
-            <em className="block italic text-dorado">ser escuchada.</em>
+            <span className="block">Creo en el valor de las buenas historias</span>
+            <em className="block italic text-dorado">y en el poder de las conexiones reales.</em>
           </motion.h2>
 
           <motion.p
@@ -117,8 +116,9 @@ export function CtaFinal() {
             transition={{ duration: 0.5, delay: 0.28 }}
             className="font-sans text-hueso/50 text-base leading-relaxed max-w-[400px]"
           >
-            La primera consulta es gratuita y sin compromiso.
-            Te respondo en menos de 24 horas.
+            Si buscás posicionar tu proyecto
+            de forma orgánica y estratégica,
+            me encantaría escucharte.
           </motion.p>
 
           {/* Datos */}
@@ -148,27 +148,23 @@ export function CtaFinal() {
           className="flex flex-col items-center justify-center relative"
         >
           <p className="font-playfair italic text-hueso/50 text-lg mb-8 text-center">
-            ¿Lista para aparecer en los medios?
+            Conversemos.
           </p>
 
           <PopoverForm
             open={open}
             setOpen={setOpen}
             showSuccess={sent}
-            title="Consulta gratis"
+            title="Escribime →"
             width="min(380px, calc(100vw - 48px))"
             openChild={formContent}
             successChild={
               <PopoverFormSuccess
                 title="¡Mensaje enviado!"
-                description="Gracias por escribirme. Te respondo en menos de 24 horas."
+                description="Gracias por escribirme. Me comunico a la brevedad."
               />
             }
           />
-
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-hueso/20 mt-8">
-            30 min · Gratis · Sin compromiso
-          </p>
         </motion.div>
 
       </div>

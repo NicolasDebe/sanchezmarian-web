@@ -7,10 +7,10 @@ import { AnimatedNumber } from "@/components/ui/animated-number"
 const EASE = [0.22, 1, 0.36, 1] as const
 
 const STATS = [
-  { value: 50, suffix: "+", label: "apariciones en medios" },
-  { value: 30, suffix: "+", label: "clientes" },
-  { value: 8,  suffix: "",  label: "años de experiencia" },
-  { value: 4,  suffix: "",  label: "servicios" },
+  { value: 100, suffix: "+", label: "apariciones en medios" },
+  { value: 10,  suffix: "+", label: "clientes" },
+  { value: 10,  suffix: "+", label: "años de experiencia" },
+  { value: 3,   suffix: "",  label: "servicios" },
 ]
 
 function StatItem({

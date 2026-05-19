@@ -12,9 +12,8 @@ const TAGS = [
   "Comunicación estratégica",
   "Prensa y medios",
   "Marca personal",
+  "Relaciones Públicas",
   "Mendoza, Argentina",
-  "Copywriting",
-  "Social Media",
 ]
 
 export function Bio() {
@@ -86,7 +85,7 @@ export function Bio() {
             className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.5rem] leading-[1.15]"
           >
             <span className="block">Mariana Sánchez,</span>
-            <em className="block italic text-bordo-claro">consultora de comunicación.</em>
+            <em className="block italic text-bordo-claro">estratega de comunicación.</em>
           </motion.h2>
 
           <motion.div
@@ -96,14 +95,18 @@ export function Bio() {
             className="flex flex-col gap-4 font-sans text-gris-bordo text-base leading-relaxed max-w-[480px]"
           >
             <p>
-              Soy consultora de comunicación y prensa, y dueña de GB Consulting en Mendoza.
-              Trabajo con marcas, empresas y profesionales que quieren construir una
-              presencia real en los medios que importan.
+              Saber qué historia contar, a quién y en qué momento.
+              Conecto tu marca personal o empresarial con el ecosistema
+              de medios de Mendoza de forma natural, aportando valor
+              al periodista y visibilidad estratégica a tu proyecto.
             </p>
             <p>
-              Mi diferencial es simple: tengo relaciones genuinas con periodistas y sé
-              exactamente qué historia contar para que la tuya sea la que se publique.
-              Más de 50 apariciones en medios avalan ese trabajo.
+              Mi nombre es Marian Sánchez y ayudo a empresas y marcas
+              personales a transformar su propósito en noticias,
+              conectando su propuesta de valor con los canales de
+              comunicación adecuados. Llevo más de una década
+              construyendo vínculos reales con los protagonistas
+              de los medios locales.
             </p>
           </motion.div>
 

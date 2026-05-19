@@ -2,8 +2,7 @@ const ITEMS = [
   "Comunicación estratégica",
   "Prensa y medios",
   "Marca personal",
-  "Copywriting",
-  "Social Media",
+  "Relaciones Públicas",
   "Asesoría 360°",
 ]
 

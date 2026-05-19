@@ -3,8 +3,8 @@ import Link from "next/link"
 const NAV_LINKS = [
   { label: "Servicios", href: "/servicios" },
   { label: "Sobre mí", href: "/sobre-marian" },
-  { label: "En medios", href: "/en-medios" },
-  { label: "Blog", href: "/blog" },
+  { label: "Casos de éxito", href: "/en-medios" },
+  { label: "Novedades", href: "/blog" },
   { label: "Contacto", href: "/contacto" },
 ]
 
@@ -94,7 +94,7 @@ export function Footer() {
               href="/contacto"
               className="inline-flex items-center gap-2 bg-hueso/6 border border-hueso/12 text-hueso/50 px-5 py-2.5 rounded-full font-sans text-xs font-medium hover:bg-hueso hover:text-bordo hover:border-hueso transition-all"
             >
-              Consulta gratis
+              Conversemos
             </Link>
           </div>
 

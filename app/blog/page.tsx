@@ -5,11 +5,11 @@ import { PageHero } from "@/components/page-hero"
 import { BlogGrid } from "./blog-grid"
 
 export const metadata: Metadata = {
-  title: "Blog — Marian Sánchez",
+  title: "Novedades — Marian Sánchez",
   description:
-    "Artículos sobre comunicación estratégica, prensa, copywriting y social media. Herramientas prácticas para marcas y profesionales.",
+    "Artículos sobre comunicación estratégica, prensa y marca personal. Herramientas prácticas para marcas y profesionales.",
   openGraph: {
-    title: "Blog — Marian Sánchez",
+    title: "Novedades — Marian Sánchez",
     description:
       "Artículos sobre comunicación estratégica, prensa y marca personal.",
     url: "https://sanchezmarian.com/blog",
@@ -22,10 +22,10 @@ export default function BlogPage() {
       <Nav />
 
       <PageHero
-        eyebrow="Blog"
+        eyebrow="Novedades"
         title="Comunicación"
         titleAccent="sin vueltas."
-        subtitle="Artículos prácticos sobre prensa, copywriting, redes y todo lo que necesitás saber para comunicar mejor tu marca o proyecto."
+        subtitle="Artículos prácticos sobre prensa, comunicación estratégica y todo lo que necesitás saber para comunicar mejor tu marca o proyecto."
       />
 
       <section className="bg-white py-20 lg:py-28">

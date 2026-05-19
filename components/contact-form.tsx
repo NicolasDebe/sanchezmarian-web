@@ -106,9 +106,6 @@ export function ContactForm() {
         </p>
       )}
 
-      <p className="font-mono text-[10px] text-gris-tx/50 text-center leading-relaxed">
-        Primera consulta gratuita · Sin compromiso · Respuesta en 24 hs
-      </p>
     </form>
   )
 }

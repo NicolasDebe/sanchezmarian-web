@@ -10,31 +10,24 @@ const EASE = [0.22, 1, 0.36, 1] as const
 const SERVICIOS_DATA = [
   {
     num: "01",
-    name: "Prensa y medios",
-    short: "Aparecé en los medios que importan.",
+    name: "Prensa y Comunicación",
+    short: "Tu historia en los medios que importan.",
     description:
-      "Gestiono el vínculo con periodistas y medios para conseguir notas, entrevistas y apariciones que posicionan tu marca o tu nombre. Trabajo con medios locales, provinciales y nacionales.",
+      "Gestión orgánica de presencia en medios para transformar tus hitos, lanzamientos o novedades en contenido de valor periodístico. Con más de una década de experiencia en el ecosistema de medios de Mendoza, me encargo de que tu mensaje llegue al periodista adecuado, en el momento justo y con el enfoque correcto para garantizar una difusión efectiva y real.",
   },
   {
     num: "02",
-    name: "Copywriting",
-    short: "Textos que comunican quién sos.",
+    name: "Comunicación Estratégica",
+    short: "Tu plan de comunicación, desde cero.",
     description:
-      "Redacto textos para web, redes, newsletters y materiales de prensa. Cada palabra está pensada para tu audiencia y para transmitir tu propuesta de valor con claridad.",
+      "Diseño de planes de comunicación a medida — mensuales, trimestrales o anuales — según las necesidades de cada etapa de tu proyecto. Analizamos qué historia contar, a quién hablarle y cómo hacerlo, alineando cada acción con tus objetivos de negocio o posicionamiento personal.",
   },
   {
     num: "03",
-    name: "Asesoría estratégica",
-    short: "Tu estrategia de comunicación, desde cero.",
+    name: "Relaciones Públicas",
+    short: "Reputación y vínculos que perduran.",
     description:
-      "Diseñamos juntos el plan de comunicación de tu marca o proyecto. Desde la identidad narrativa hasta los canales y mensajes clave — todo alineado a tus objetivos reales.",
-  },
-  {
-    num: "04",
-    name: "Social Media",
-    short: "Presencia coherente que genera autoridad.",
-    description:
-      "Gestión y estrategia de redes sociales con foco en posicionamiento y comunidad. Contenido que refuerza tu comunicación en medios y construye tu autoridad online.",
+      "Gestión de relaciones institucionales y networking para fortalecer la reputación de marcas y personas. Actúo como nexo estratégico para generar alianzas, coordinar presencia en eventos clave y facilitar el contacto con actores relevantes. Un trabajo constante que construye confianza y visibilidad sostenida en el tiempo.",
   },
 ]
 
@@ -158,28 +151,12 @@ export function Servicios() {
             </span>
 
             <h3 className="font-playfair font-bold text-hueso text-[1.5rem] leading-snug">
-              Consultá gratis y armamos tu estrategia juntos.
+              ¿Querés aparecer en los medios?
             </h3>
 
             <p className="font-sans text-hueso/50 text-sm leading-relaxed">
-              Una charla de 30 minutos para entender tu situación y
-              ver exactamente cómo puedo ayudarte.
+              Conversemos sobre tu proyecto.
             </p>
-
-            {/* Mini stats */}
-            <div className="grid grid-cols-2 gap-3 py-1">
-              {[
-                { n: "30 min", label: "Consulta gratis" },
-                { n: "100%", label: "Sin compromiso" },
-              ].map((item) => (
-                <div key={item.label} className="bg-hueso/6 border border-hueso/8 rounded-xl px-4 py-3">
-                  <p className="font-playfair font-bold text-hueso text-xl">{item.n}</p>
-                  <p className="font-mono text-[10px] uppercase tracking-wide text-hueso/35 mt-0.5">
-                    {item.label}
-                  </p>
-                </div>
-              ))}
-            </div>
 
             {/* Dorado separator */}
             <div className="h-px bg-dorado/20" />
@@ -188,7 +165,7 @@ export function Servicios() {
               href="#contacto"
               className="inline-flex items-center justify-center gap-2 bg-hueso text-bordo px-5 py-3.5 rounded-full font-sans text-sm font-medium hover:bg-arena active:scale-[0.98] transition-all"
             >
-              Agendá una consulta
+              Conversemos
               <ArrowRight size={14} strokeWidth={2} />
             </Link>
           </div>
