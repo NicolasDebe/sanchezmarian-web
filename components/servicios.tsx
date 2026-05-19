@@ -20,14 +20,14 @@ const SERVICIOS_DATA = [
     name: "Comunicación Estratégica",
     short: "Tu plan de comunicación, desde cero.",
     description:
-      "Diseño de planes de comunicación a medida — mensuales, trimestrales o anuales — según las necesidades de cada etapa de tu proyecto. Analizamos qué historia contar, a quién hablarle y cómo hacerlo, alineando cada acción con tus objetivos de negocio o posicionamiento personal.",
+      "Diseño de planes de comunicación a medida — mensuales, trimestrales o anuales — según las necesidades específicas de cada etapa de tu proyecto. Analizamos qué historia contar, a quién hablarle y cómo hacerlo. Definimos el tono, el relato y los canales ideales para que cada acción de comunicación esté alineada con tus objetivos de negocio o posicionamiento personal.",
   },
   {
     num: "03",
     name: "Relaciones Públicas",
     short: "Reputación y vínculos que perduran.",
     description:
-      "Gestión de relaciones institucionales y networking para fortalecer la reputación de marcas y personas. Actúo como nexo estratégico para generar alianzas, coordinar presencia en eventos clave y facilitar el contacto con actores relevantes. Un trabajo constante que construye confianza y visibilidad sostenida en el tiempo.",
+      "Vínculos que construyen comunidad. Gestión de relaciones institucionales y networking para fortalecer la reputación de marcas y personas. Actúo como nexo estratégico para generar alianzas, coordinar la presencia en eventos clave y facilitar el contacto con actores relevantes de la sociedad. Un trabajo de relacionamiento constante que busca crear confianza y visibilidad sostenida en el tiempo.",
   },
 ]
 

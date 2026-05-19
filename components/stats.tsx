@@ -1,8 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 import { motion, useInView } from "motion/react"
-import { AnimatedNumber } from "@/components/ui/animated-number"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -10,7 +9,7 @@ const STATS = [
   { value: 100, suffix: "+", label: "apariciones en medios" },
   { value: 10,  suffix: "+", label: "clientes" },
   { value: 10,  suffix: "+", label: "años de experiencia" },
-  { value: 3,   suffix: "",  label: "servicios" },
+  { value: 3,   suffix: "",  label: "servicios especializados" },
 ]
 
 function StatItem({
@@ -26,11 +25,6 @@ function StatItem({
 }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-60px" })
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    if (isInView) setCount(value)
-  }, [isInView, value])
 
   return (
     <motion.div
@@ -41,13 +35,7 @@ function StatItem({
       className="flex flex-col items-center text-center px-6 py-4"
     >
       <p className="font-playfair font-bold text-negro-bordo leading-none text-[4rem] sm:text-[4.5rem] lg:text-[5rem] tabular-nums">
-        <AnimatedNumber
-          value={count}
-          stiffness={55}
-          damping={18}
-          mass={1}
-          format={(n) => String(Math.floor(n))}
-        />
+        {value}
         <span className="text-dorado">{suffix}</span>
       </p>
       <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.22em] text-gris-bordo/60">

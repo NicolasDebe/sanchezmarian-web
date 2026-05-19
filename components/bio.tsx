@@ -52,8 +52,8 @@ export function Bio() {
               transition={{ delay: 0.7, duration: 0.4, ease: EASE }}
               className="absolute -bottom-5 -right-4 lg:-right-8 bg-bordo text-hueso px-5 py-4 rounded-2xl shadow-xl"
             >
-              <p className="font-mono text-[10px] uppercase tracking-widest text-hueso/45 mb-0.5">Desde</p>
-              <p className="font-playfair font-bold text-2xl leading-none">2016</p>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-hueso/45 mb-1.5">Más de una</p>
+              <p className="font-playfair font-bold text-xl leading-none">década</p>
               <p className="font-sans text-xs text-hueso/60 mt-0.5">en comunicación</p>
             </motion.div>
           </div>
@@ -107,6 +107,15 @@ export function Bio() {
               comunicación adecuados. Llevo más de una década
               construyendo vínculos reales con los protagonistas
               de los medios locales.
+            </p>
+            <p>
+              Mi enfoque no se limita a la difusión masiva; se basa
+              en el vínculo real. Entiendo el ADN de cada cliente
+              para identificar exactamente qué periodista o medio
+              está buscando esa historia. Diseño estrategias
+              personalizadas, adaptadas a las necesidades de cada
+              proyecto, porque cada marca tiene un ritmo, un tono
+              y un objetivo diferente.
             </p>
           </motion.div>
 

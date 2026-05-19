@@ -2,8 +2,7 @@
 
 import { useRef, useState } from "react"
 import { motion, useInView } from "motion/react"
-import { Mail, MapPin } from "lucide-react"
-import { PopoverForm, PopoverFormButton, PopoverFormSuccess } from "@/components/ui/popover-form"
+import { Mail, MapPin, ArrowRight } from "lucide-react"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
@@ -11,7 +10,6 @@ const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
 export function CtaFinal() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-80px" })
-  const [open, setOpen] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -36,50 +34,6 @@ export function CtaFinal() {
     }
   }
 
-  const formContent = (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
-      {[
-        { id: "pf-nombre", label: "Nombre", type: "text", field: "nombre" as const, placeholder: "Tu nombre" },
-        { id: "pf-email", label: "Email", type: "email", field: "email" as const, placeholder: "tu@email.com" },
-      ].map(({ id, label, type, field, placeholder }) => (
-        <div key={id} className="flex flex-col gap-1">
-          <label htmlFor={id} className="font-mono text-[9px] uppercase tracking-[0.18em] text-bordo/50">
-            {label}
-          </label>
-          <input
-            id={id}
-            type={type}
-            required
-            value={form[field]}
-            onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-            placeholder={placeholder}
-            className="bg-hueso border border-bordo/12 rounded-lg px-3 py-2.5 font-sans text-sm text-negro-bordo placeholder:text-gris-bordo/30 focus:outline-none focus:border-bordo/35 transition-colors"
-          />
-        </div>
-      ))}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="pf-mensaje" className="font-mono text-[9px] uppercase tracking-[0.18em] text-bordo/50">
-          Mensaje
-        </label>
-        <textarea
-          id="pf-mensaje"
-          required
-          rows={3}
-          value={form.mensaje}
-          onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
-          placeholder="Contame en qué puedo ayudarte..."
-          className="bg-hueso border border-bordo/12 rounded-lg px-3 py-2.5 font-sans text-sm text-negro-bordo placeholder:text-gris-bordo/30 focus:outline-none focus:border-bordo/35 transition-colors resize-none"
-        />
-      </div>
-      <PopoverFormButton loading={submitting} text="Enviar consulta" />
-      {error && (
-        <p className="font-mono text-[9px] text-bordo-claro text-center">
-          Error al enviar. Escribime a hola@sanchezmarian.com
-        </p>
-      )}
-    </form>
-  )
-
   return (
     <section id="contacto" ref={ref} className="bg-bordo py-24 lg:py-32">
       {/* Dorado top line */}
@@ -87,7 +41,7 @@ export function CtaFinal() {
         <div className="w-full h-px bg-dorado/25 mb-16" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
 
         {/* ── IZQUIERDA — texto ── */}
         <div className="flex flex-col gap-7">
@@ -116,12 +70,11 @@ export function CtaFinal() {
             transition={{ duration: 0.5, delay: 0.28 }}
             className="font-sans text-hueso/50 text-base leading-relaxed max-w-[400px]"
           >
-            Si buscás posicionar tu proyecto
-            de forma orgánica y estratégica,
+            Si buscás posicionar tu proyecto de forma orgánica y estratégica,
             me encantaría escucharte.
           </motion.p>
 
-          {/* Datos */}
+          {/* Datos de contacto */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -140,31 +93,89 @@ export function CtaFinal() {
           </motion.div>
         </div>
 
-        {/* ── DERECHA — PopoverForm ── */}
+        {/* ── DERECHA — formulario inline ── */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.25, ease: EASE }}
-          className="flex flex-col items-center justify-center relative"
         >
-          <p className="font-playfair italic text-hueso/50 text-lg mb-8 text-center">
-            Conversemos.
-          </p>
+          {sent ? (
+            <div className="flex flex-col gap-4 py-12 text-center">
+              <p className="font-playfair italic text-hueso/70 text-xl">¡Mensaje enviado!</p>
+              <p className="font-sans text-hueso/50 text-sm leading-relaxed">
+                Gracias por escribirme. Me comunico a la brevedad.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              <p className="font-playfair italic text-hueso/50 text-lg mb-1">
+                Conversemos.
+              </p>
 
-          <PopoverForm
-            open={open}
-            setOpen={setOpen}
-            showSuccess={sent}
-            title="Escribime →"
-            width="min(380px, calc(100vw - 48px))"
-            openChild={formContent}
-            successChild={
-              <PopoverFormSuccess
-                title="¡Mensaje enviado!"
-                description="Gracias por escribirme. Me comunico a la brevedad."
-              />
-            }
-          />
+              {/* Nombre */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="cf-nombre" className="font-mono text-[9px] uppercase tracking-[0.18em] text-hueso/40">
+                  Nombre
+                </label>
+                <input
+                  id="cf-nombre"
+                  type="text"
+                  required
+                  value={form.nombre}
+                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                  placeholder="Tu nombre"
+                  className="bg-transparent border border-hueso/15 rounded-lg px-4 py-3 font-sans text-sm text-hueso placeholder:text-hueso/25 focus:outline-none focus:border-hueso/40 transition-colors"
+                />
+              </div>
+
+              {/* Email */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="cf-email" className="font-mono text-[9px] uppercase tracking-[0.18em] text-hueso/40">
+                  Email
+                </label>
+                <input
+                  id="cf-email"
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="tu@email.com"
+                  className="bg-transparent border border-hueso/15 rounded-lg px-4 py-3 font-sans text-sm text-hueso placeholder:text-hueso/25 focus:outline-none focus:border-hueso/40 transition-colors"
+                />
+              </div>
+
+              {/* Mensaje */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="cf-mensaje" className="font-mono text-[9px] uppercase tracking-[0.18em] text-hueso/40">
+                  Mensaje
+                </label>
+                <textarea
+                  id="cf-mensaje"
+                  required
+                  rows={4}
+                  value={form.mensaje}
+                  onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
+                  placeholder="Contame en qué puedo ayudarte..."
+                  className="bg-transparent border border-hueso/15 rounded-lg px-4 py-3 font-sans text-sm text-hueso placeholder:text-hueso/25 focus:outline-none focus:border-hueso/40 transition-colors resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="mt-1 inline-flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-3.5 rounded-full font-sans text-sm font-medium hover:bg-arena active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submitting ? "Enviando…" : "Escribime"}
+                {!submitting && <ArrowRight size={14} strokeWidth={2} />}
+              </button>
+
+              {error && (
+                <p className="font-mono text-[9px] text-dorado/70 text-center">
+                  Error al enviar. Escribime a hola@sanchezmarian.com
+                </p>
+              )}
+            </form>
+          )}
         </motion.div>
 
       </div>

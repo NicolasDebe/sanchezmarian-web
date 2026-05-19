@@ -1,9 +1,10 @@
 const ITEMS = [
-  "Comunicación estratégica",
-  "Prensa y medios",
-  "Marca personal",
+  "Prensa y Comunicación",
+  "Comunicación Estratégica",
   "Relaciones Públicas",
-  "Asesoría 360°",
+  "Estrategia de medios",
+  "Vínculos reales",
+  "Visibilidad orgánica",
 ]
 
 const DOT = (

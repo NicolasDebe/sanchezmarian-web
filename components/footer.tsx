@@ -53,8 +53,7 @@ export function Footer() {
               Marian.
             </Link>
             <p className="font-sans text-xs text-hueso/30 leading-relaxed max-w-[200px]">
-              Consultora de comunicación estratégica.
-              <br />Mendoza, Argentina.
+              Estratega de comunicación · Mendoza, Argentina.
             </p>
           </div>
 

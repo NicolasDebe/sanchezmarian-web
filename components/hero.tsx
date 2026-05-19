@@ -37,7 +37,7 @@ export function Hero() {
               transition={{ duration: 0.55, ease: EASE, delay: 0.3 }}
               className="font-mono text-[11px] uppercase tracking-[0.28em] text-hueso/70"
             >
-              Consultora de comunicación · Mendoza, AR
+              Estratega de comunicación · Mendoza, AR
             </motion.p>
 
             <h1 className="font-playfair font-bold text-hueso leading-[1.0] text-[2.75rem] sm:text-[3.75rem] lg:text-[4.75rem]">
@@ -48,7 +48,7 @@ export function Hero() {
                   animate={{ y: 0 }}
                   transition={{ duration: 0.8, ease: EASE, delay: 0.45 }}
                 >
-                  Tu historia merece
+                  Tu historia merece estar
                 </motion.span>
               </span>
               <span className="block overflow-hidden">
@@ -58,7 +58,6 @@ export function Hero() {
                   animate={{ y: 0 }}
                   transition={{ duration: 0.8, ease: EASE, delay: 0.62 }}
                 >
-                  estar{" "}
                   <em className="italic">en los medios.</em>
                 </motion.span>
               </span>
