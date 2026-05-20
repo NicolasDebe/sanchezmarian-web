@@ -8,11 +8,11 @@ import { PageHero } from "@/components/page-hero"
 export const metadata: Metadata = {
   title: "Sobre Marian — Marian Sánchez",
   description:
-    "Consultora de comunicación y prensa en Mendoza. 8 años construyendo relaciones con periodistas y resultados reales para mis clientes.",
+    "Estratega de comunicación con más de 10 años de experiencia. Conecto marcas y profesionales con los medios que importan en Mendoza y Argentina.",
   openGraph: {
     title: "Sobre Marian — Marian Sánchez",
     description:
-      "Consultora de comunicación y prensa en Mendoza. 8 años de experiencia, 50+ apariciones en medios.",
+      "Estratega de comunicación con más de 10 años de experiencia. Conecto marcas y profesionales con los medios que importan en Mendoza y Argentina.",
     url: "https://sanchezmarian.com/sobre-marian",
   },
 }
@@ -36,7 +36,7 @@ const TIMELINE = [
   {
     year: "2022",
     title: "Más de 30 clientes activos",
-    body: "GB Consulting llegó a los 30 clientes activos y 50+ apariciones en medios documentadas. Un hito que confirmó que el enfoque de relaciones reales funciona.",
+    body: "GB Consulting superó los 10 clientes activos y 100+ apariciones en medios documentadas. Un hito que confirmó que el enfoque de relaciones reales funciona.",
   },
   {
     year: "2024",
@@ -72,8 +72,8 @@ export default function SobreMarianPage() {
       <PageHero
         eyebrow="Sobre Marian"
         title="Mariana Sánchez,"
-        titleAccent="consultora de comunicación."
-        subtitle="8 años construyendo relaciones con periodistas y resultados reales para marcas y profesionales en Argentina."
+        titleAccent="estratega de comunicación."
+        subtitle="Más de una década construyendo relaciones con periodistas y resultados reales para marcas y profesionales en Argentina."
       />
 
       {/* Bio principal */}
@@ -93,8 +93,8 @@ export default function SobreMarianPage() {
               </div>
             </div>
             <div className="absolute -bottom-4 -right-2 lg:-right-6 bg-marino text-white px-5 py-4 rounded-2xl shadow-xl">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-white/50 mb-0.5">Desde</p>
-              <p className="font-playfair font-bold text-2xl leading-none">2016</p>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-white/50 mb-0.5">Más de una</p>
+              <p className="font-playfair font-bold text-2xl leading-none">década</p>
               <p className="font-sans text-xs text-white/70 mt-0.5">en comunicación</p>
             </div>
           </div>
@@ -103,22 +103,34 @@ export default function SobreMarianPage() {
           <div className="flex flex-col gap-7">
             <div className="flex flex-col gap-4 font-sans text-gris-tx text-base leading-relaxed">
               <p>
-                Soy consultora de comunicación y prensa, y fundadora de GB Consulting en Mendoza, Argentina. Trabajo con marcas, empresas y profesionales que quieren construir una presencia real en los medios que importan.
+                Saber qué historia contar, a quién y en qué momento. Conecto tu
+                marca personal o empresarial con el ecosistema de medios de Mendoza
+                de forma natural, aportando valor al periodista y visibilidad
+                estratégica a tu proyecto.
               </p>
               <p>
-                Mi diferencial es concreto: tengo relaciones genuinas con periodistas y sé exactamente qué historia contar para que la tuya sea la que se publique. No es magia ni suerte — es estrategia, método y ocho años de trabajo consistente.
+                Mi nombre es Marian Sánchez y ayudo a empresas y marcas personales
+                a transformar su propósito en noticias, conectando su propuesta de
+                valor con los canales de comunicación adecuados. Llevo más de una
+                década construyendo vínculos reales con los protagonistas de los
+                medios locales.
               </p>
               <p>
-                Cada cliente que trabaja conmigo recibe atención directa, sin intermediarios. Defino la estrategia, ejecuto las acciones y te presento los resultados. Simple, claro y medible.
+                Mi enfoque no se limita a la difusión masiva; se basa en el vínculo
+                real. Entiendo el ADN de cada cliente para identificar exactamente
+                qué periodista o medio de comunicación está buscando esa historia.
+                Diseño estrategias personalizadas, adaptadas a las necesidades de
+                cada proyecto, porque cada marca tiene un ritmo, un tono y un
+                objetivo diferente.
               </p>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 py-6 border-y border-marino/10">
               {[
-                { n: "50+", label: "Apariciones en medios" },
-                { n: "30+", label: "Clientes activos" },
-                { n: "8 años", label: "De experiencia" },
+                { n: "100+", label: "Apariciones en medios" },
+                { n: "10+", label: "Clientes activos" },
+                { n: "10+ años", label: "De experiencia" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
                   <p className="font-playfair font-bold text-marino text-2xl lg:text-3xl">{stat.n}</p>
