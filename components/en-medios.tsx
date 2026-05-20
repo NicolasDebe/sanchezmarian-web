@@ -123,7 +123,7 @@ export function EnMedias() {
             className="shrink-0"
           >
             <Link
-              href="/en-medios"
+              href="/casos-de-exito"
               className="inline-flex items-center gap-2 font-sans text-sm font-medium text-negro-bordo hover:text-bordo-claro transition-colors group"
             >
               Ver todas las apariciones

@@ -3,7 +3,7 @@ import Link from "next/link"
 const NAV_LINKS = [
   { label: "Servicios", href: "/servicios" },
   { label: "Sobre mí", href: "/sobre-marian" },
-  { label: "Casos de éxito", href: "/en-medios" },
+  { label: "Casos de éxito", href: "/casos-de-exito" },
   { label: "Novedades", href: "/blog" },
   { label: "Contacto", href: "/contacto" },
 ]

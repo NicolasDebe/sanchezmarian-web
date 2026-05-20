@@ -13,11 +13,11 @@ export const metadata: Metadata = {
     title: "Casos de éxito — Marian Sánchez",
     description:
       "100+ apariciones en medios nacionales y provinciales. Portfolio de resultados de GB Consulting.",
-    url: "https://sanchezmarian.com/en-medios",
+    url: "https://sanchezmarian.com/casos-de-exito",
   },
 }
 
-export default function EnMediosPage() {
+export default function CasosDeExitoPage() {
   return (
     <main>
       <Nav />

@@ -1,9 +1,6 @@
 "use client"
 
-import { useRef } from "react"
-import { motion, useInView } from "motion/react"
-
-const EASE = [0.22, 1, 0.36, 1] as const
+import { useEffect, useRef, useState } from "react"
 
 const STATS = [
   { value: 100, suffix: "+", label: "apariciones en medios" },
@@ -23,16 +20,31 @@ function StatItem({
   label: string
   delay: number
 }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-60px" })
+  const ref = useRef<HTMLDivElement>(null)
+  const [revealed, setRevealed] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) { setRevealed(true); io.disconnect() }
+      },
+      { rootMargin: "-60px" }
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, ease: EASE, delay }}
       className="flex flex-col items-center text-center px-6 py-4"
+      style={{
+        opacity: 1,
+        transform: revealed ? "translateY(0)" : "translateY(14px)",
+        transition: `transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}s`,
+      }}
     >
       <p className="font-playfair font-bold text-negro-bordo leading-none text-[4rem] sm:text-[4.5rem] lg:text-[5rem] tabular-nums">
         {value}
@@ -41,7 +53,7 @@ function StatItem({
       <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.22em] text-gris-bordo/60">
         {label}
       </p>
-    </motion.div>
+    </div>
   )
 }
 
