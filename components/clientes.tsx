@@ -5,19 +5,11 @@ import { motion, useInView } from "motion/react"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
-// TODO: reemplazar por logos reales cuando Marian los envíe
 const CLIENTES = [
-  "Bolsa de Comercio de Mendoza",
+  "Capilla Carlo Acutis",
   "Colegio Notarial de Mendoza",
-  "Grupo Presidente",
-  "Capilla Carlos Acutis",
-  "Dra. Elina Meneo",
   "Escuela de Vendimia Chakaymanta",
-  "QuienVino App",
-  "Agrocosecha",
-  "Eugenia Bizzoto / Fuerza Silenciosa",
-  "Cluster Mendoza Regenera",
-  "Flor Mouradian, Psicóloga",
+  "Marca Personal",
 ]
 
 function Track() {

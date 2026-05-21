@@ -17,7 +17,11 @@
       "Bash(Remove-Item \"C:\\\\Users\\\\nicod\\\\proyectos\\\\sanchezmarian-web\\\\public\\\\globe.svg\" -Force)",
       "Bash(Remove-Item \"C:\\\\Users\\\\nicod\\\\proyectos\\\\sanchezmarian-web\\\\public\\\\next.svg\" -Force)",
       "PowerShell(cd \"C:\\\\Users\\\\nicod\\\\proyectos\\\\sanchezmarian-web\"; $env:PATH = \"C:\\\\Program Files\\\\nodejs;$env:PATH\"; node node_modules/.bin/next build 2>&1 | Select-Object -Last 30)",
-      "PowerShell(netstat *)"
+      "PowerShell(netstat *)",
+      "Bash(npx next *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
