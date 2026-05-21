@@ -67,9 +67,9 @@ export function Hero() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, ease: EASE, delay: 0.78 }}
-              className="font-sans text-[14px] sm:text-[16px] font-normal leading-[1.7] text-hueso/75 max-w-[520px] mb-10"
+              className="font-sans text-[16px] font-normal leading-[1.7] text-hueso/75 max-w-[520px] mb-10"
             >
-              Saber qué historia contar, a quién y en qué momento. Conecto tu marca personal o empresarial con el ecosistema de medios de Mendoza de forma natural, aportando valor al periodista y visibilidad estratégica a tu proyecto.
+              Conecto tu marca personal o empresarial con el ecosistema de medios de Mendoza de forma natural, aportando valor al periodista y visibilidad estratégica a tu proyecto.
             </motion.p>
 
             <motion.div

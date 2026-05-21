@@ -1,8 +1,20 @@
 "use client"
 
 import { useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import { AnimatePresence, motion, useInView } from "motion/react"
 import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
+
+// TODO: reemplazar por número WA Business real
+const WA_HREF = "https://wa.me/5492614000000?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
+
+function IconWA() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.38 1.26 4.79L2 22l5.41-1.36c1.35.74 2.9 1.16 4.63 1.16 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.52 14.08c-.23.65-1.35 1.25-1.85 1.32-.49.07-1.08.1-1.73-.11-.4-.13-.9-.3-1.55-.59-2.73-1.18-4.5-3.92-4.64-4.1-.13-.18-1.09-1.45-1.09-2.77 0-1.31.69-1.96.93-2.22.24-.26.53-.32.7-.32.18 0 .35.01.5.02.17.01.39-.06.61.47.23.55.77 1.88.84 2.02.07.14.12.3.02.48-.1.18-.15.29-.3.45-.14.16-.3.35-.42.47-.14.14-.29.29-.12.57.17.28.75 1.24 1.6 2.01 1.1 1 2.02 1.31 2.3 1.45.29.14.45.12.62-.07.17-.19.72-.84.91-1.13.19-.28.39-.24.65-.14.26.1 1.67.79 1.96.93.29.14.48.21.55.33.07.12.07.66-.16 1.3z" />
+    </svg>
+  )
+}
 
 /*
  * Cult-UI review:
@@ -28,8 +40,8 @@ const INPUT_FOCUS_STYLE = {
 
 export function CtaFinal() {
   const ref = useRef(null)
+  const router = useRouter()
   const isInView = useInView(ref, { once: true, margin: "-80px" })
-  const [sent, setSent] = useState(false)
   const [error, setError] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({ nombre: "", email: "", mensaje: "" })
@@ -45,7 +57,7 @@ export function CtaFinal() {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({ nombre: form.nombre, email: form.email, mensaje: form.mensaje }),
       })
-      if (res.ok) setSent(true)
+      if (res.ok) router.push("/gracias")
       else setError(true)
     } catch {
       setError(true)
@@ -126,50 +138,7 @@ export function CtaFinal() {
               border: "1px solid rgba(254,252,239,0.12)",
             }}
           >
-            <AnimatePresence mode="popLayout" initial={false}>
-              {sent ? (
-                /* ── Estado success ── */
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, y: -20, filter: "blur(4px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ type: "spring", duration: 0.5, bounce: 0 }}
-                  className="flex flex-col items-center justify-center gap-5 py-14 text-center"
-                >
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-                    style={{ border: "1px solid rgba(201,168,130,0.35)" }}
-                  >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      className="text-dorado"
-                    >
-                      <path
-                        d="M4 10.5L8 14.5L16 6"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <p className="font-playfair italic text-hueso text-2xl">¡Gracias!</p>
-                  <p className="font-sans text-hueso/60 text-sm leading-relaxed max-w-[240px]">
-                    Tu mensaje llegó. Pronto nos ponemos en contacto.
-                  </p>
-                </motion.div>
-              ) : (
-                /* ── Estado idle / loading ── */
-                <motion.form
-                  key="form"
-                  exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
-                  transition={{ type: "spring", duration: 0.35, bounce: 0 }}
-                  onSubmit={handleSubmit}
-                  className="flex flex-col gap-5"
-                >
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                   {/* Nombre */}
                   <div className="flex flex-col gap-2">
                     <label
@@ -271,14 +240,26 @@ export function CtaFinal() {
                     </AnimatePresence>
                   </button>
 
+                  {/* WhatsApp — alternativa secundaria */}
+                  <div className="flex items-center justify-center gap-2 mt-1">
+                    <span className="font-sans text-xs text-hueso/35">¿Preferís WhatsApp?</span>
+                    <a
+                      href={WA_HREF}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 font-sans text-xs font-medium text-hueso/50 hover:text-hueso transition-colors"
+                    >
+                      <IconWA />
+                      Escribime por acá
+                    </a>
+                  </div>
+
                   {error && (
                     <p className="font-mono text-[9px] text-dorado/70 text-center">
                       Error al enviar. Escribime a hola@sanchezmarian.com
                     </p>
                   )}
-                </motion.form>
-              )}
-            </AnimatePresence>
+            </form>
           </div>
         </motion.div>
 

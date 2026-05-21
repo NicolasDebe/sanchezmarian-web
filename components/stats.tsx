@@ -21,14 +21,14 @@ function StatItem({
   delay: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [revealed, setRevealed] = useState(false)
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) { setRevealed(true); io.disconnect() }
+        if (entry.isIntersecting) { setVisible(true); io.disconnect() }
       },
       { rootMargin: "-60px" }
     )
@@ -41,9 +41,9 @@ function StatItem({
       ref={ref}
       className="flex flex-col items-center text-center px-6 py-4"
       style={{
-        opacity: 1,
-        transform: revealed ? "translateY(0)" : "translateY(14px)",
-        transition: `transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}s`,
+        opacity: visible ? 1 : 0.35,
+        transform: visible ? "translateY(0)" : "translateY(14px)",
+        transition: `opacity 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}s, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}s`,
       }}
     >
       <p className="font-playfair font-bold text-negro-bordo leading-none text-[4rem] sm:text-[4.5rem] lg:text-[5rem] tabular-nums">

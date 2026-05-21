@@ -8,11 +8,11 @@ import { PageHero } from "@/components/page-hero"
 export const metadata: Metadata = {
   title: "Sobre Marian — Marian Sánchez",
   description:
-    "Estratega de comunicación con más de 10 años de experiencia. Conecto marcas y profesionales con los medios que importan en Mendoza y Argentina.",
+    "Estratega de comunicación en Mendoza. Más de 10 años construyendo relaciones reales con periodistas. 100+ apariciones en medios.",
   openGraph: {
     title: "Sobre Marian — Marian Sánchez",
     description:
-      "Estratega de comunicación con más de 10 años de experiencia. Conecto marcas y profesionales con los medios que importan en Mendoza y Argentina.",
+      "Estratega de comunicación en Mendoza. 100+ apariciones en medios documentadas.",
     url: "https://sanchezmarian.com/sobre-marian",
   },
 }
@@ -24,22 +24,21 @@ const HITOS = [
   "Metodología probada, orgánica y replicable",
 ]
 
-const VALUES = [
+const PILARES = [
   {
-    title: "Relaciones reales",
-    body: "No trabajo con bases de datos frías. Mis contactos con periodistas son vínculos genuinos, construidos con el tiempo y la confianza.",
+    eyebrow: "Construcción",
+    title: "Relaciones reales con periodistas",
+    body: "Mis contactos no son números en una base de datos. Son vínculos genuinos construidos durante más de una década en los medios de Mendoza. Conozco quiénes son, qué buscan, y cómo presentar tu marca para que se convierta en una noticia de valor.",
   },
   {
-    title: "Estrategia antes de publicidad",
-    body: "Antes de hablar con un periodista, definimos qué historia contar. El mensaje correcto multiplica el impacto de cada acción.",
+    eyebrow: "Estrategia",
+    title: "Mensaje correcto en el momento preciso",
+    body: "No creo en soluciones estándar. Antes de hablar con un periodista, trabajamos juntos para definir qué historia contar y a quién. El mensaje bien diseñado multiplica los resultados y garantiza que tu voz llegue a la audiencia indicada.",
   },
   {
-    title: "Honestidad sobre resultados",
-    body: "Te digo exactamente qué es posible con tu presupuesto y tu situación. Sin promesas vacías, con compromiso real.",
-  },
-  {
-    title: "Resultados documentados",
-    body: "Cada aparición en medios, nota y entrevista queda registrada. Vas a ver exactamente el impacto de lo que hacemos juntos.",
+    eyebrow: "Resultados",
+    title: "Impacto medible y documentado",
+    body: "Lo que no se mide, no se puede mejorar. Cada aparición en medios, nota y entrevista queda registrada. Recibís un clipping detallado con análisis de impacto y proyecciones para las próximas etapas de crecimiento.",
   },
 ]
 
@@ -50,7 +49,7 @@ export default function SobreMarianPage() {
 
       <PageHero
         eyebrow="Sobre Marian"
-        title="Mariana Sánchez,"
+        title="Marian Sánchez,"
         titleAccent="estratega de comunicación."
         subtitle="Más de una década construyendo relaciones con periodistas y resultados reales para marcas y profesionales en Argentina."
       />
@@ -82,17 +81,18 @@ export default function SobreMarianPage() {
           <div className="flex flex-col gap-7">
             <div className="flex flex-col gap-4 font-sans text-gris-tx text-base leading-relaxed">
               <p>
-                Saber qué historia contar, a quién y en qué momento. Conecto tu
-                marca personal o empresarial con el ecosistema de medios de Mendoza
-                de forma natural, aportando valor al periodista y visibilidad
-                estratégica a tu proyecto.
-              </p>
-              <p>
                 Mi nombre es Marian Sánchez y ayudo a empresas y marcas personales
                 a transformar su propósito en noticias, conectando su propuesta de
                 valor con los canales de comunicación adecuados. Llevo más de una
                 década construyendo vínculos reales con los protagonistas de los
                 medios locales.
+              </p>
+              <p>
+                Mi enfoque no se limita a la difusión masiva; se basa en el vínculo
+                real. Entiendo el ADN de cada cliente para identificar exactamente
+                qué periodista o medio de comunicación está buscando esa historia.
+                Diseño estrategias personalizadas, adaptadas a las necesidades de cada
+                proyecto, porque cada marca tiene un ritmo, un tono y un objetivo diferente.
               </p>
               <p>
                 Entiendo la comunicación como una sinergia donde todas las partes
@@ -124,7 +124,7 @@ export default function SobreMarianPage() {
               href="/contacto"
               className="inline-flex items-center gap-2 bg-terracota text-white px-6 py-3.5 rounded-full font-sans text-sm font-semibold hover:bg-terracota/90 transition-colors group w-fit"
             >
-              Hablar con Marian
+              Conversemos
               <ArrowRight size={15} strokeWidth={2.5} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -157,28 +157,47 @@ export default function SobreMarianPage() {
         </div>
       </section>
 
-      {/* Valores */}
-      <section className="bg-marino-osc py-24 lg:py-32">
+      {/* Tres Pilares */}
+      <section className="bg-hueso-oscuro py-24 lg:py-32">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-terracota mb-5">
-            Valores
-          </p>
-          <h2 className="font-playfair font-bold text-white text-[2rem] sm:text-[2.75rem] leading-[1.1] mb-14 max-w-xl">
-            <span className="block">En qué creo</span>
-            <em className="block italic text-terracota">cuando trabajo.</em>
-          </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {VALUES.map((v, i) => (
-              <div key={v.title} className="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col gap-3">
-                <span className="font-mono text-[10px] uppercase tracking-widest text-terracota/70">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="font-playfair font-bold text-white text-xl">{v.title}</h3>
-                <p className="font-sans text-white/55 text-sm leading-relaxed">{v.body}</p>
+          {/* Header centrado */}
+          <div className="text-center mb-16 lg:mb-20">
+            <h2 className="font-playfair font-bold italic text-negro-bordo text-[2.75rem] sm:text-[3.25rem] lg:text-[2.75rem] leading-[1.1] mb-4">
+              El diferencial
+            </h2>
+            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-bordo">
+              En qué creo cuando trabajo
+            </p>
+          </div>
+
+          {/* Tres columnas */}
+          <div className="grid grid-cols-1 lg:grid-cols-3">
+            {PILARES.map((pilar, i) => (
+              <div key={pilar.eyebrow} className="relative px-0 lg:px-10 py-10 lg:py-0">
+                {/* Línea vertical entre columnas */}
+                {i < PILARES.length - 1 && (
+                  <span className="hidden lg:block absolute right-0 top-0 w-px h-full bg-dorado/40" />
+                )}
+
+                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-bordo mb-5">
+                  {pilar.eyebrow}
+                </p>
+                <h3 className="font-playfair italic font-bold text-negro-bordo text-[1.5rem] leading-snug mb-5">
+                  {pilar.title}
+                </h3>
+                <p className="font-sans text-gris-bordo text-[14px] leading-relaxed">
+                  {pilar.body}
+                </p>
+
+                {/* Separador horizontal en mobile */}
+                {i < PILARES.length - 1 && (
+                  <span className="lg:hidden block w-full h-px bg-dorado/30 mt-10" />
+                )}
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
@@ -189,7 +208,7 @@ export default function SobreMarianPage() {
             ¿Trabajamos juntos?
           </h2>
           <p className="font-sans text-gris-tx text-base leading-relaxed mb-8 max-w-md mx-auto">
-            La primera consulta es gratuita. En 30 minutos podemos ver exactamente cómo puedo ayudarte.
+            Conversemos sobre tu proyecto y encontremos la mejor forma de trabajar juntos.
           </p>
           <Link
             href="/contacto"

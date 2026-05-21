@@ -22,7 +22,6 @@ const TAGS = [
   "Comunicación estratégica",
   "Prensa y medios",
   "Relaciones Públicas",
-  "Marca personal",
   "Mendoza, Argentina",
 ]
 
@@ -104,12 +103,6 @@ export function Bio() {
           {/* Párrafos */}
           <div className="flex flex-col gap-4 font-sans text-gris-bordo text-base leading-[1.8] max-w-[480px]">
             <p>
-              Saber qué historia contar, a quién y en qué momento.
-              Conecto tu marca personal o empresarial con el ecosistema
-              de medios de Mendoza de forma natural, aportando valor
-              al periodista y visibilidad estratégica a tu proyecto.
-            </p>
-            <p>
               Mi nombre es Marian Sánchez y ayudo a empresas y marcas
               personales a transformar su propósito en noticias,
               conectando su propuesta de valor con los canales de
@@ -125,6 +118,14 @@ export function Bio() {
               personalizadas, adaptadas a las necesidades de cada
               proyecto, porque cada marca tiene un ritmo, un tono y un
               objetivo diferente.
+            </p>
+            <p>
+              Entiendo la comunicación como una sinergia donde todas las
+              partes ganan. Mi metodología no solo busca el beneficio del
+              cliente, sino que se enfoca en brindar un valor agregado al
+              periodista. Al entregar contenido de calidad, chequeado y de
+              interés genuino, facilito la labor informativa de los medios,
+              generando una relación de respeto y colaboración que perdura.
             </p>
           </div>
 

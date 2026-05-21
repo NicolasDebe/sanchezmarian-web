@@ -1,96 +1,179 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowRight, Send } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { ArrowRight } from "lucide-react"
 
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
+// TODO: reemplazar por número WA Business real
+const WA_HREF = "https://wa.me/5492614000000?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
+
+function IconWA() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.38 1.26 4.79L2 22l5.41-1.36c1.35.74 2.9 1.16 4.63 1.16 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.52 14.08c-.23.65-1.35 1.25-1.85 1.32-.49.07-1.08.1-1.73-.11-.4-.13-.9-.3-1.55-.59-2.73-1.18-4.5-3.92-4.64-4.1-.13-.18-1.09-1.45-1.09-2.77 0-1.31.69-1.96.93-2.22.24-.26.53-.32.7-.32.18 0 .35.01.5.02.17.01.39-.06.61.47.23.55.77 1.88.84 2.02.07.14.12.3.02.48-.1.18-.15.29-.3.45-.14.16-.3.35-.42.47-.14.14-.29.29-.12.57.17.28.75 1.24 1.6 2.01 1.1 1 2.02 1.31 2.3 1.45.29.14.45.12.62-.07.17-.19.72-.84.91-1.13.19-.28.39-.24.65-.14.26.1 1.67.79 1.96.93.29.14.48.21.55.33.07.12.07.66-.16 1.3z" />
+    </svg>
+  )
+}
+
+const LABEL = "font-mono text-[10px] uppercase tracking-[0.15em] text-gris-tx"
+const INPUT_BASE = "bg-white border rounded-xl px-4 py-3 font-sans text-sm text-marino placeholder:text-gris-tx/40 focus:outline-none transition-colors w-full"
+const INPUT_OK = "border-marino/15 focus:border-terracota/60"
+const INPUT_ERR = "border-bordo/60 focus:border-bordo/60"
+
+function fieldValidate(name: string, value: string): string {
+  if (name === "nombre") {
+    if (!value.trim()) return "El nombre es requerido."
+    if (value.trim().length < 2) return "Mínimo 2 caracteres."
+  }
+  if (name === "email") {
+    if (!value.trim()) return "El email es requerido."
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return "Ingresá un email válido."
+  }
+  if (name === "mensaje") {
+    if (!value.trim()) return "El mensaje es requerido."
+    if (value.trim().length < 10) return "Mínimo 10 caracteres."
+  }
+  return ""
+}
 
 export function ContactForm() {
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState(false)
+  const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
-  const [form, setForm] = useState({ nombre: "", email: "", mensaje: "" })
+  const [serverError, setServerError] = useState(false)
+  const [form, setForm] = useState({
+    nombre: "",
+    email: "",
+    empresa: "",
+    etapa: "",
+    mensaje: "",
+  })
+  const [errors, setErrors] = useState({ nombre: "", email: "", mensaje: "" })
+
+  const handleBlur = (name: "nombre" | "email" | "mensaje") =>
+    setErrors((prev) => ({ ...prev, [name]: fieldValidate(name, form[name]) }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const nombreErr = fieldValidate("nombre", form.nombre)
+    const emailErr = fieldValidate("email", form.email)
+    const mensajeErr = fieldValidate("mensaje", form.mensaje)
+    setErrors({ nombre: nombreErr, email: emailErr, mensaje: mensajeErr })
+    if (nombreErr || emailErr || mensajeErr) return
+
     setSubmitting(true)
-    setError(false)
+    setServerError(false)
     try {
       const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ nombre: form.nombre, email: form.email, mensaje: form.mensaje }),
+        body: JSON.stringify({
+          nombre: form.nombre,
+          email: form.email,
+          empresa: form.empresa || undefined,
+          etapa: form.etapa || undefined,
+          mensaje: form.mensaje,
+        }),
       })
-      if (res.ok) setSent(true)
-      else setError(true)
+      if (res.ok) router.push("/gracias")
+      else setServerError(true)
     } catch {
-      setError(true)
+      setServerError(true)
     } finally {
       setSubmitting(false)
     }
   }
 
-  if (sent) {
-    return (
-      <div className="flex flex-col items-center text-center gap-5 py-12">
-        <div className="w-14 h-14 rounded-full bg-terracota/10 flex items-center justify-center">
-          <Send size={22} className="text-terracota" strokeWidth={1.5} />
-        </div>
-        <h3 className="font-playfair font-bold text-marino text-2xl">¡Mensaje enviado!</h3>
-        <p className="font-sans text-gris-tx text-sm leading-relaxed max-w-xs">
-          Gracias por escribirme. Te respondo en menos de 24 horas.
-        </p>
-      </div>
-    )
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+
+      {/* Nombre */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="cf-nombre" className="font-mono text-[10px] uppercase tracking-[0.15em] text-gris-tx">
-          Nombre
-        </label>
+        <label htmlFor="cf-nombre" className={LABEL}>Nombre</label>
         <input
           id="cf-nombre"
           type="text"
-          required
           value={form.nombre}
           onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+          onBlur={() => handleBlur("nombre")}
           placeholder="Tu nombre"
-          className="bg-white border border-marino/15 rounded-xl px-4 py-3 font-sans text-sm text-marino placeholder:text-gris-tx/40 focus:outline-none focus:border-terracota/60 transition-colors"
+          className={`${INPUT_BASE} ${errors.nombre ? INPUT_ERR : INPUT_OK}`}
         />
+        {errors.nombre && <p className="font-mono text-[10px] text-bordo">{errors.nombre}</p>}
       </div>
 
+      {/* Email */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="cf-email" className="font-mono text-[10px] uppercase tracking-[0.15em] text-gris-tx">
-          Email
-        </label>
+        <label htmlFor="cf-email" className={LABEL}>Email</label>
         <input
           id="cf-email"
           type="email"
-          required
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
+          onBlur={() => handleBlur("email")}
           placeholder="tu@email.com"
-          className="bg-white border border-marino/15 rounded-xl px-4 py-3 font-sans text-sm text-marino placeholder:text-gris-tx/40 focus:outline-none focus:border-terracota/60 transition-colors"
+          className={`${INPUT_BASE} ${errors.email ? INPUT_ERR : INPUT_OK}`}
+        />
+        {errors.email && <p className="font-mono text-[10px] text-bordo">{errors.email}</p>}
+      </div>
+
+      {/* Empresa (opcional) */}
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="cf-empresa" className={LABEL}>
+          Empresa u organización{" "}
+          <span className="normal-case tracking-normal opacity-50 font-sans text-[10px]">(opcional)</span>
+        </label>
+        <input
+          id="cf-empresa"
+          type="text"
+          value={form.empresa}
+          onChange={(e) => setForm({ ...form, empresa: e.target.value })}
+          placeholder="Nombre de tu empresa o proyecto"
+          className={`${INPUT_BASE} ${INPUT_OK}`}
         />
       </div>
 
+      {/* Etapa del proyecto */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="cf-mensaje" className="font-mono text-[10px] uppercase tracking-[0.15em] text-gris-tx">
-          Mensaje
-        </label>
+        <label htmlFor="cf-etapa" className={LABEL}>¿En qué etapa está tu proyecto?</label>
+        <select
+          id="cf-etapa"
+          value={form.etapa}
+          onChange={(e) => setForm({ ...form, etapa: e.target.value })}
+          className={`${INPUT_BASE} ${INPUT_OK} cursor-pointer`}
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a6070' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "right 14px center",
+            paddingRight: "2.5rem",
+            appearance: "none",
+          }}
+        >
+          <option value="">Seleccioná una opción</option>
+          <option value="idea">Tengo una idea</option>
+          <option value="marcha">Estoy en marcha</option>
+          <option value="reposicionamiento">Necesito reposicionarme</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+
+      {/* Mensaje */}
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="cf-mensaje" className={LABEL}>Mensaje</label>
         <textarea
           id="cf-mensaje"
-          required
           rows={5}
           value={form.mensaje}
           onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
+          onBlur={() => handleBlur("mensaje")}
           placeholder="Contame en qué puedo ayudarte..."
-          className="bg-white border border-marino/15 rounded-xl px-4 py-3 font-sans text-sm text-marino placeholder:text-gris-tx/40 focus:outline-none focus:border-terracota/60 transition-colors resize-none"
+          className={`${INPUT_BASE} ${errors.mensaje ? INPUT_ERR : INPUT_OK} resize-none`}
         />
+        {errors.mensaje && <p className="font-mono text-[10px] text-bordo">{errors.mensaje}</p>}
       </div>
 
+      {/* Submit */}
       <button
         type="submit"
         disabled={submitting}
@@ -100,12 +183,25 @@ export function ContactForm() {
         {!submitting && <ArrowRight size={15} strokeWidth={2.5} />}
       </button>
 
-      {error && (
-        <p className="font-mono text-[10px] text-terracota/80 text-center">
+      {/* WhatsApp — alternativa secundaria */}
+      <div className="flex items-center justify-center gap-2">
+        <span className="font-sans text-xs text-gris-tx/45">¿Preferís WhatsApp?</span>
+        <a
+          href={WA_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 font-sans text-xs font-medium text-gris-tx/60 hover:text-marino transition-colors"
+        >
+          <IconWA />
+          Escribime por acá
+        </a>
+      </div>
+
+      {serverError && (
+        <p className="font-mono text-[10px] text-bordo/80 text-center">
           Hubo un error al enviar. Intentá de nuevo o escribime a hola@sanchezmarian.com
         </p>
       )}
-
     </form>
   )
 }

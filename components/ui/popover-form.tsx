@@ -134,7 +134,7 @@ const useClickOutside = (
 
 export function PopoverFormSuccess({
   title = "¡Mensaje enviado!",
-  description = "Te respondo en menos de 24 horas.",
+  description = "Gracias por escribirme. Te contacto pronto.",
 }) {
   return (
     <div className="flex flex-col items-center gap-3 text-center">

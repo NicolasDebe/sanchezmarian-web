@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "¿La primera consulta es realmente gratis?",
-    a: "Sí, siempre. Es una charla de 30 minutos para entender tu situación y ver si puedo ayudarte. Sin compromisos ni presiones.",
+    q: "¿Cómo empezamos a trabajar juntos?",
+    a: "Agendamos una sesión para conocernos, entender tu proyecto y ver cómo puedo ayudarte a comunicarlo.",
   },
   {
     q: "¿Con qué tipo de clientes trabajás?",
@@ -80,8 +80,8 @@ export default function ContactoPage() {
                 },
                 {
                   icon: MessageCircle,
-                  label: "Primera consulta",
-                  value: "Gratuita y sin compromiso",
+                  label: "Disponibilidad",
+                  value: "Agendar sesión",
                   href: null,
                 },
               ].map(({ icon: Icon, label, value, href }) => (

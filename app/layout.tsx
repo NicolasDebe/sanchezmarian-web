@@ -68,7 +68,7 @@ const jsonLd = {
     "Prensa y medios",
     "Copywriting",
     "Social Media",
-    "Marca personal",
+    "Relaciones Públicas",
   ],
   worksFor: {
     "@type": "Organization",

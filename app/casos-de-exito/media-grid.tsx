@@ -10,135 +10,110 @@ const TYPE_COLORS: Record<string, string> = {
   TV: "bg-marino-osc/8 text-marino-osc",
 }
 
+// PLACEHOLDER — reemplazar por clipping real cuando Marian lo envíe
 const MEDIOS = [
-  // 2024
   {
     medio: "La Nación",
     type: "Gráfico",
-    headline: "Cómo construir una marca personal sólida en el mercado actual",
+    sector: "Empresas & Agro",
+    cliente: "Grupo Presidente",
+    headline: "Grupo Presidente expande operaciones en el mercado vitivinícola mendocino.",
     year: "2024",
     month: "Nov",
   },
   {
     medio: "MDZ Online",
     type: "Digital",
-    headline: "Las claves para que tu negocio aparezca en los medios que importan",
+    sector: "Empresas & Agro",
+    cliente: "Bolsa de Comercio",
+    headline: "La Bolsa de Comercio de Mendoza impulsa la transformación digital del sector.",
     year: "2024",
     month: "Sep",
   },
   {
     medio: "Los Andes",
     type: "Gráfico",
-    headline: "Consultoras mendocinas que transforman la comunicación empresarial",
+    sector: "Marcas Personales",
+    cliente: "Dra. Elina Meneo",
+    headline: "La Dra. Elina Meneo y su enfoque innovador en la medicina preventiva regional.",
     year: "2024",
     month: "Ago",
   },
   {
     medio: "Infobae",
     type: "Digital",
-    headline: "Estrategias de prensa para emprendedores y profesionales independientes",
+    sector: "Marcas Personales",
+    cliente: "QuienVino",
+    headline: "QuienVino: la plataforma mendocina que está redefiniendo el turismo del vino.",
     year: "2024",
     month: "Jul",
   },
-  // 2023
   {
     medio: "Radio Nihuil",
     type: "Radio",
-    headline: "Comunicación estratégica: cómo hablarle a tu audiencia ideal",
+    sector: "Instituciones & Eventos",
+    cliente: "Capilla Acutis",
+    headline: "La Capilla Acutis y su propuesta cultural en el corazón de Mendoza.",
     year: "2023",
     month: "Dic",
   },
   {
     medio: "Diario UNO",
     type: "Digital",
-    headline: "El rol de la comunicación en el crecimiento de las PyMEs mendocinas",
+    sector: "Empresas & Agro",
+    cliente: "Agrocosecha",
+    headline: "Agrocosecha apuesta por la trazabilidad y la comunicación transparente en el agro.",
     year: "2023",
     month: "Oct",
   },
-  {
-    medio: "El Sol",
-    type: "Digital",
-    headline: "Prensa y redes: cómo construir autoridad desde Mendoza",
-    year: "2023",
-    month: "Ago",
-  },
-  {
-    medio: "Mendoza Online",
-    type: "Digital",
-    headline: "GB Consulting: comunicación estratégica para negocios que crecen",
-    year: "2023",
-    month: "Jun",
-  },
-  // 2022
-  {
-    medio: "Clarín",
-    type: "Digital",
-    headline: "Las herramientas de comunicación que todo profesional independiente necesita",
-    year: "2022",
-    month: "Nov",
-  },
-  {
-    medio: "Los Andes",
-    type: "Gráfico",
-    headline: "Mujeres que construyen empresas de comunicación en el interior del país",
-    year: "2022",
-    month: "Sep",
-  },
-  {
-    medio: "Radio Nacional Mendoza",
-    type: "Radio",
-    headline: "El poder del storytelling en la comunicación empresarial",
-    year: "2022",
-    month: "Jul",
-  },
-  {
-    medio: "Canal 9 Mendoza",
-    type: "TV",
-    headline: "Emprendedoras mendocinas: historias de negocios exitosos",
-    year: "2022",
-    month: "May",
-  },
-  // 2021
-  {
-    medio: "El Cronista",
-    type: "Digital",
-    headline: "Comunicación de crisis: cómo proteger tu marca en tiempos de incertidumbre",
-    year: "2021",
-    month: "Nov",
-  },
-  {
-    medio: "MDZ Online",
-    type: "Digital",
-    headline: "Reinvención digital: comunicación en el nuevo ecosistema post-pandemia",
-    year: "2021",
-    month: "Ago",
-  },
-  {
-    medio: "Diario UNO",
-    type: "Gráfico",
-    headline: "Mendoza como polo de servicios creativos y de comunicación",
-    year: "2021",
-    month: "Mar",
-  },
 ]
 
-const FILTERS = ["Todos", "Digital", "Gráfico", "Radio", "TV"]
+const SECTOR_FILTERS = ["Todos", "Empresas & Agro", "Marcas Personales", "Instituciones & Eventos"]
+const FORMAT_FILTERS = ["Todos", "Digital", "Gráfico", "Radio", "TV"]
 
 export function MediaGrid() {
-  const [active, setActive] = useState("Todos")
+  const [activeSector, setActiveSector] = useState("Todos")
+  const [activeFormat, setActiveFormat] = useState("Todos")
 
-  const filtered = active === "Todos" ? MEDIOS : MEDIOS.filter((m) => m.type === active)
+  const filtered = MEDIOS.filter((m) => {
+    const sectorMatch = activeSector === "Todos" || m.sector === activeSector
+    const formatMatch = activeFormat === "Todos" || m.type === activeFormat
+    return sectorMatch && formatMatch
+  })
 
   return (
     <div>
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-2 mb-10">
-        {FILTERS.map((f) => (
+      {/* Fila 1 — Filtros por sector */}
+      <div className="flex flex-wrap gap-2 mb-3">
+        <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gris-tx/40 self-center mr-1">
+          Sector
+        </span>
+        {SECTOR_FILTERS.map((f) => (
           <button
             key={f}
-            onClick={() => setActive(f)}
+            onClick={() => setActiveSector(f)}
             className={`font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-2 rounded-full border transition-all ${
-              active === f
+              activeSector === f
+                ? "bg-bordo text-hueso border-bordo"
+                : "bg-white text-marino/60 border-marino/15 hover:border-marino/40 hover:text-marino"
+            }`}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {/* Fila 2 — Filtros por formato */}
+      <div className="flex flex-wrap gap-2 mb-10">
+        <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gris-tx/40 self-center mr-1">
+          Formato
+        </span>
+        {FORMAT_FILTERS.map((f) => (
+          <button
+            key={f}
+            onClick={() => setActiveFormat(f)}
+            className={`font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-2 rounded-full border transition-all ${
+              activeFormat === f
                 ? "bg-marino text-white border-marino"
                 : "bg-white text-marino/60 border-marino/15 hover:border-marino/40 hover:text-marino"
             }`}
@@ -147,7 +122,7 @@ export function MediaGrid() {
           </button>
         ))}
         <span className="ml-auto font-mono text-[10px] text-gris-tx/50 self-center">
-          {filtered.length} apariciones
+          {filtered.length} gestiones
         </span>
       </div>
 
@@ -158,10 +133,15 @@ export function MediaGrid() {
             key={`${item.medio}-${i}`}
             className="group bg-white border border-marino/10 rounded-2xl p-6 flex flex-col gap-4 hover:border-marino/25 hover:shadow-[0_8px_30px_-8px_rgba(28,46,74,0.12)] transition-all duration-300"
           >
-            <div className="flex items-center justify-between">
-              <p className="font-playfair font-bold text-marino text-lg">{item.medio}</p>
+            {/* Cliente eyebrow */}
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-bordo/70">
+              Gestión para {item.cliente}
+            </p>
+
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-playfair font-bold text-marino text-lg leading-snug">{item.medio}</p>
               <span
-                className={`font-mono text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full ${
+                className={`font-mono text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full shrink-0 ${
                   TYPE_COLORS[item.type] ?? "bg-lino text-marino"
                 }`}
               >
@@ -184,6 +164,12 @@ export function MediaGrid() {
           </article>
         ))}
       </div>
+
+      {filtered.length === 0 && (
+        <p className="font-sans text-gris-tx/50 text-sm text-center py-16">
+          No hay gestiones para esta combinación de filtros.
+        </p>
+      )}
     </div>
   )
 }

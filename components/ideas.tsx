@@ -8,28 +8,28 @@ const EASE = [0.22, 1, 0.36, 1] as const
 const PASOS = [
   {
     num: "01",
-    title: "Definición del relato y audiencia",
-    body: "Trabajamos puertas adentro para definir qué historia vamos a contar y a quién le vamos a hablar. Un mensaje bien diseñado multiplica los resultados.",
+    title: "Definición del relato",
+    body: "Qué historia contar y a quién.",
   },
   {
     num: "02",
     title: "Diseño de la estrategia",
-    body: "Creo un plan de comunicación a medida — orgánico, mixto o comercial — según la naturaleza de tu producto o servicio. Una vez aprobada la estrategia, comienzo con la acción.",
+    body: "Plan de comunicación personalizado.",
   },
   {
     num: "03",
-    title: "Gestión de contenidos y relacionamiento",
-    body: "Coordino el material necesario y activo mi red de contactos construida durante más de una década en los medios de Mendoza, gestionando de forma personal el interés de los periodistas en tu temática.",
+    title: "Gestión y relacionamiento",
+    body: "Activo mi red en medios de Mendoza.",
   },
   {
     num: "04",
     title: "Monitoreo",
-    body: "Superviso cada interacción de la campaña. Si tu proyecto requiere servicios complementarios, actúo como nexo con un ecosistema de colegas profesionales para asegurar coherencia en toda la comunicación.",
+    body: "Superviso cada interacción de la campaña.",
   },
   {
     num: "05",
-    title: "Análisis de impacto y proyecciones",
-    body: "Entrego un clipping de prensa detallado con la medición de impacto de cada aparición, nota y entrevista. No solo verás dónde saliste — analizaremos los resultados y definiremos las próximas etapas juntos.",
+    title: "Análisis de impacto",
+    body: "Entrego resultados medibles y claros.",
   },
 ]
 
@@ -56,55 +56,54 @@ export function Ideas() {
             initial={{ opacity: 0, y: 18 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.65, delay: 0.15, ease: EASE }}
-            className="font-playfair font-bold text-negro-bordo text-[2.25rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.1] max-w-[640px] mb-6"
+            className="font-playfair font-bold text-negro-bordo text-[2.25rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.1] max-w-[640px]"
           >
             Saber qué decir,{" "}
             <em className="italic text-bordo-claro">a quién y cuándo.</em>
           </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.28 }}
-            className="font-sans text-gris-bordo text-base leading-relaxed max-w-[520px]"
-          >
-            No se trata solo de aparecer en los medios, sino de hacerlo con el
-            mensaje correcto, en el momento preciso y ante la audiencia indicada.
-          </motion.p>
         </div>
 
-        {/* ── 5 pasos — grid 2-3 ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
-          {PASOS.map((paso, i) => (
-            <motion.div
-              key={paso.num}
-              initial={{ opacity: 0, y: 24 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.25 + i * 0.12, ease: EASE }}
-              className="flex flex-col gap-5"
-            >
-              <span className="font-playfair italic text-bordo text-[2.5rem] font-bold leading-none">
-                {paso.num}
-              </span>
+        {/* ── Stepper vertical ── */}
+        <div className="max-w-2xl mx-auto">
+          {PASOS.map((paso, i) => {
+            const isLast = i === PASOS.length - 1
+            return (
+              <motion.div
+                key={paso.num}
+                initial={{ opacity: 0, x: -20 }}
+                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.55, delay: 0.2 + i * 0.1, ease: EASE }}
+                className="flex gap-8"
+              >
+                {/* Columna izquierda — número + línea conectora */}
+                <div className="flex flex-col items-center shrink-0 w-12">
+                  <span className="font-playfair italic font-bold text-bordo text-[2rem] leading-none">
+                    {paso.num}
+                  </span>
+                  {!isLast && (
+                    <div className="flex-1 w-px bg-dorado/50 my-3 min-h-[2.5rem]" />
+                  )}
+                </div>
 
-              <div className="w-10 h-px bg-dorado" />
-
-              <p className="font-sans font-semibold text-negro-bordo text-base">
-                {paso.title}
-              </p>
-
-              <p className="font-sans text-gris-bordo text-sm leading-relaxed">
-                {paso.body}
-              </p>
-            </motion.div>
-          ))}
+                {/* Columna derecha — contenido */}
+                <div className={`flex flex-col gap-1 ${isLast ? "" : "pb-10"}`}>
+                  <p className="font-sans font-semibold text-negro-bordo text-base">
+                    {paso.title}
+                  </p>
+                  <p className="font-sans text-gris-bordo text-sm leading-relaxed">
+                    {paso.body}
+                  </p>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
 
         {/* ── Separador dorado inferior ── */}
         <motion.div
           initial={{ scaleX: 0, originX: 0 }}
           animate={isInView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.9, ease: EASE, delay: 0.6 }}
+          transition={{ duration: 0.9, ease: EASE, delay: 0.7 }}
           className="w-full h-px bg-dorado/25 mt-20 lg:mt-24"
         />
 

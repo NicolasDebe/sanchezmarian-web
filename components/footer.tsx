@@ -4,7 +4,7 @@ const NAV_LINKS = [
   { label: "Servicios", href: "/servicios" },
   { label: "Sobre mí", href: "/sobre-marian" },
   { label: "Casos de éxito", href: "/casos-de-exito" },
-  { label: "Novedades", href: "/blog" },
+  { label: "Sala de Prensa", href: "/blog" },
   { label: "Contacto", href: "/contacto" },
 ]
 
@@ -28,9 +28,10 @@ function IconInstagram() {
   )
 }
 
+// TODO: Marian debe confirmar URLs reales de Instagram y LinkedIn
 const SOCIAL = [
-  { label: "LinkedIn", href: "https://linkedin.com", Icon: IconLinkedin },
-  { label: "Instagram", href: "https://instagram.com", Icon: IconInstagram },
+  { label: "LinkedIn", href: "https://linkedin.com/in/PENDIENTE", Icon: IconLinkedin },
+  { label: "Instagram", href: "https://instagram.com/PENDIENTE", Icon: IconInstagram },
 ]
 
 export function Footer() {
@@ -55,6 +56,12 @@ export function Footer() {
             <p className="font-sans text-xs text-hueso/30 leading-relaxed max-w-[200px]">
               Estratega de comunicación · Mendoza, Argentina.
             </p>
+            <a
+              href="mailto:sanchezmariana15@gmail.com"
+              className="font-mono text-[10px] text-hueso/35 hover:text-hueso/70 transition-colors tracking-wide"
+            >
+              sanchezmariana15@gmail.com
+            </a>
           </div>
 
           {/* Nav links */}
@@ -101,8 +108,16 @@ export function Footer() {
 
         {/* Bottom row */}
         <div className="pt-7 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="font-mono text-[10px] text-hueso/20 tracking-wide">
-            © {new Date().getFullYear()} Mariana Sánchez. Todos los derechos reservados.
+          <p className="font-mono text-[10px] text-hueso/20 tracking-wide flex items-center gap-2 flex-wrap">
+            © {new Date().getFullYear()} Mariana Sánchez
+            <span className="text-hueso/10">·</span>
+            <Link href="/privacidad" className="hover:text-hueso/40 transition-colors">
+              Privacidad
+            </Link>
+            <span className="text-hueso/10">·</span>
+            <Link href="/terminos" className="hover:text-hueso/40 transition-colors">
+              Términos
+            </Link>
           </p>
           <p className="font-mono text-[10px] text-hueso/15 tracking-wide">
             Diseñado con intención.

@@ -34,6 +34,8 @@ const SERVICIOS = [
     ],
     forWho:
       "Marcas, profesionales y emprendedores que quieren posicionarse como referentes en su industria.",
+    ctaLabel: "Quiero gestionar mi prensa",
+    ctaHref: "/contacto?servicio=prensa",
     sectionBg: "bg-white",
     textColor: "text-marino",
     boxBg: "bg-arena",
@@ -56,6 +58,8 @@ const SERVICIOS = [
     ],
     forWho:
       "Negocios en crecimiento que necesitan comunicar ese crecimiento de forma ordenada y profesional.",
+    ctaLabel: "Necesito un plan estratégico",
+    ctaHref: "/contacto?servicio=estrategia",
     sectionBg: "bg-marino-osc",
     textColor: "text-white",
     boxBg: "bg-white/6",
@@ -78,12 +82,42 @@ const SERVICIOS = [
     ],
     forWho:
       "Marcas y personas que buscan construir confianza y visibilidad sostenida en el tiempo.",
+    ctaLabel: "Quiero fortalecer mis relaciones públicas",
+    ctaHref: "/contacto?servicio=rrpp",
     sectionBg: "bg-arena",
     textColor: "text-marino",
     boxBg: "bg-white/70",
     borderColor: "border-marino/8",
     checkColor: "text-terracota",
     accentText: "text-gris-tx",
+  },
+]
+
+const PASOS = [
+  {
+    num: "01",
+    title: "Definición del relato y audiencia",
+    body: "Qué historia contar y a quién dirigirla.",
+  },
+  {
+    num: "02",
+    title: "Diseño de la estrategia",
+    body: "Plan de comunicación a medida para tu proyecto.",
+  },
+  {
+    num: "03",
+    title: "Gestión de contenidos y relacionamiento",
+    body: "Activo mi red de contactos en medios de Mendoza.",
+  },
+  {
+    num: "04",
+    title: "Monitoreo",
+    body: "Superviso cada interacción y ajusto en tiempo real.",
+  },
+  {
+    num: "05",
+    title: "Análisis de impacto y proyecciones",
+    body: "Clipping detallado con resultados medibles y próximas etapas.",
   },
 ]
 
@@ -101,9 +135,8 @@ export default function ServiciosPage() {
 
       {SERVICIOS.map((s) => (
         <section key={s.num} className={`${s.sectionBg} py-24 lg:py-28`}>
-          <div
-            className={`max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start`}
-          >
+          <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+
             {/* Left — info */}
             <div className="flex flex-col gap-6">
               <span className={`font-mono text-[11px] uppercase tracking-widest ${s.accentText} opacity-60`}>
@@ -132,14 +165,14 @@ export default function ServiciosPage() {
               </div>
 
               <Link
-                href="/contacto"
+                href={s.ctaHref}
                 className={`inline-flex items-center gap-2 font-sans text-sm font-semibold group transition-colors w-fit ${
                   s.sectionBg === "bg-white" || s.sectionBg === "bg-arena"
                     ? "text-marino hover:text-terracota"
                     : "text-white/70 hover:text-white"
                 }`}
               >
-                Consultar por este servicio
+                {s.ctaLabel}
                 <ArrowRight
                   size={14}
                   strokeWidth={2.5}
@@ -171,6 +204,65 @@ export default function ServiciosPage() {
           </div>
         </section>
       ))}
+
+      {/* Mi método de trabajo — Stepper vertical */}
+      <section className="bg-hueso py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+
+          {/* Header */}
+          <div className="mb-14 lg:mb-16">
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-bordo mb-4">
+              Cómo trabajo
+            </p>
+            <h2 className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.5rem] lg:text-[2.75rem] leading-[1.1]">
+              Mi método de trabajo
+            </h2>
+          </div>
+
+          {/* Stepper */}
+          <div className="max-w-2xl">
+            {PASOS.map((paso, i) => {
+              const isLast = i === PASOS.length - 1
+              return (
+                <div key={paso.num} className="flex gap-8">
+                  {/* Número + línea conectora */}
+                  <div className="flex flex-col items-center shrink-0 w-12">
+                    <span className="font-playfair italic font-bold text-bordo text-[2rem] leading-none">
+                      {paso.num}
+                    </span>
+                    {!isLast && (
+                      <div className="flex-1 w-px bg-dorado/50 my-3 min-h-[2.5rem]" />
+                    )}
+                  </div>
+
+                  {/* Contenido */}
+                  <div className={`flex flex-col gap-1 ${isLast ? "" : "pb-10"}`}>
+                    <p className="font-sans font-semibold text-negro-bordo text-base">
+                      {paso.title}
+                    </p>
+                    <p className="font-sans text-gris-bordo text-sm leading-relaxed">
+                      {paso.body}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Diferencial ganar-ganar */}
+          <div className="mt-16 max-w-2xl border-l-[3px] border-bordo bg-arena rounded-r-xl px-8 py-7">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-bordo mb-4">
+              ¿Por qué este método funciona?
+            </p>
+            <p className="font-sans text-gris-tx text-base leading-relaxed">
+              Porque cuento con el respaldo de años de relación diaria con los protagonistas
+              de los medios locales. Conozco qué buscan los periodistas y sé cómo presentar
+              tu marca para que se convierta en una noticia de valor.
+            </p>
+          </div>
+
+        </div>
+      </section>
 
       <CtaFinal />
       <Footer />

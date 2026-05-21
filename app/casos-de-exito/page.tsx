@@ -35,7 +35,7 @@ export default function CasosDeExitoPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { n: "100+", label: "Apariciones totales" },
-              { n: "15+", label: "Medios distintos" },
+              { n: "10+", label: "Medios distintos" },
               { n: "4", label: "Formatos: digital, gráfico, radio, TV" },
               { n: "10+ años", label: "Construyendo relaciones" },
             ].map((s) => (
