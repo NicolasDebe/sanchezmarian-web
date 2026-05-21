@@ -63,32 +63,14 @@ export function Hero() {
               </span>
             </h1>
 
-            <motion.div
+            <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, ease: EASE, delay: 0.78 }}
-              className="font-sans text-hueso/80 text-base sm:text-[1.05rem] leading-relaxed max-w-[480px] flex flex-col gap-4"
+              className="font-sans text-[14px] sm:text-[16px] font-normal leading-[1.7] text-hueso/75 max-w-[520px] mb-10"
             >
-              <p>
-                En un mundo saturado de información, la relevancia no se compra,
-                se construye. Mi nombre es Marian Sánchez y ayudo a empresas y
-                marcas personales a transformar su propósito en noticias, conectando
-                su propuesta de valor con los canales de comunicación adecuados.
-              </p>
-              <p>
-                Mi enfoque no se limita a la difusión masiva; se basa en el vínculo
-                real. Creo firmemente en la conexión orgánica: entiendo el ADN de
-                cada cliente para identificar exactamente qué periodista o medio de
-                comunicación está buscando esa historia. Mi trabajo es actuar como
-                un puente estratégico, asegurando que tu mensaje llegue a quien
-                realmente debe escucharlo.
-              </p>
-              <p>
-                No creo en las soluciones estándar. Cada marca tiene un ritmo,
-                un tono y un objetivo diferente. Por eso, diseño estrategias
-                personalizadas, adaptadas a las necesidades actuales de tu proyecto.
-              </p>
-            </motion.div>
+              Saber qué historia contar, a quién y en qué momento. Conecto tu marca personal o empresarial con el ecosistema de medios de Mendoza de forma natural, aportando valor al periodista y visibilidad estratégica a tu proyecto.
+            </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 10 }}

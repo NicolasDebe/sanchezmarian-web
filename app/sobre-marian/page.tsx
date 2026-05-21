@@ -17,32 +17,11 @@ export const metadata: Metadata = {
   },
 }
 
-const TIMELINE = [
-  {
-    year: "2016",
-    title: "Primeros pasos",
-    body: "Comencé a trabajar en comunicación corporativa en Mendoza, construyendo las primeras relaciones con periodistas y aprendiendo desde adentro cómo funcionan los medios.",
-  },
-  {
-    year: "2018",
-    title: "Fundación de GB Consulting",
-    body: "Creé mi propia consultora para ofrecer un servicio más personalizado. El foco: comunicación estratégica con resultados medibles para marcas y profesionales.",
-  },
-  {
-    year: "2020",
-    title: "Expansión nacional",
-    body: "Incorporé clientes de alcance nacional y amplié la red de medios a nivel argentino, consolidando la metodología de trabajo que uso hasta hoy.",
-  },
-  {
-    year: "2022",
-    title: "Más de 30 clientes activos",
-    body: "GB Consulting superó los 10 clientes activos y 100+ apariciones en medios documentadas. Un hito que confirmó que el enfoque de relaciones reales funciona.",
-  },
-  {
-    year: "2024",
-    title: "Referente en Mendoza",
-    body: "Reconocida como una de las consultoras de comunicación de referencia en Mendoza. Hoy sigo acompañando a marcas y profesionales que quieren estar donde tiene que estar su historia.",
-  },
+const HITOS = [
+  "Más de una década en comunicación",
+  "100+ apariciones en medios documentadas",
+  "10+ clientes transformados y en crecimiento",
+  "Metodología probada, orgánica y replicable",
 ]
 
 const VALUES = [
@@ -116,12 +95,12 @@ export default function SobreMarianPage() {
                 medios locales.
               </p>
               <p>
-                Mi enfoque no se limita a la difusión masiva; se basa en el vínculo
-                real. Entiendo el ADN de cada cliente para identificar exactamente
-                qué periodista o medio de comunicación está buscando esa historia.
-                Diseño estrategias personalizadas, adaptadas a las necesidades de
-                cada proyecto, porque cada marca tiene un ritmo, un tono y un
-                objetivo diferente.
+                Entiendo la comunicación como una sinergia donde todas las partes
+                ganan. Mi metodología no solo busca el beneficio del cliente, sino
+                que se enfoca en brindar un valor agregado al periodista. Al entregar
+                contenido de calidad, chequeado y de interés genuino, facilito la
+                labor informativa de los medios, generando una relación de respeto y
+                colaboración que perdura en el tiempo.
               </p>
             </div>
 
@@ -152,32 +131,26 @@ export default function SobreMarianPage() {
         </div>
       </section>
 
-      {/* Trayectoria */}
+      {/* Hitos de impacto */}
       <section className="bg-arena py-24 lg:py-32">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-terracota mb-5">
-            Trayectoria
+            Hitos de impacto
           </p>
           <h2 className="font-playfair font-bold text-marino text-[2rem] sm:text-[2.75rem] leading-[1.1] mb-16 max-w-xl">
-            <span className="block">El camino hasta</span>
-            <em className="block italic text-terracota">acá.</em>
+            <span className="block">Resultados que</span>
+            <em className="block italic text-terracota">hablan solos.</em>
           </h2>
 
-          <div className="relative flex flex-col gap-0">
-            {/* Línea vertical */}
-            <div className="absolute left-[88px] top-0 bottom-0 w-px bg-marino/15 hidden sm:block" />
-
-            {TIMELINE.map((item, i) => (
-              <div key={item.year} className="flex flex-col sm:flex-row gap-4 sm:gap-10 pb-12 last:pb-0">
-                <div className="flex-shrink-0 w-[88px] flex flex-col items-end sm:pr-10">
-                  <span className="font-playfair font-bold text-terracota text-xl">{item.year}</span>
-                </div>
-                <div className="relative flex-1 pb-2">
-                  {/* Dot */}
-                  <div className="absolute -left-[2.85rem] top-[7px] w-2.5 h-2.5 rounded-full bg-terracota hidden sm:block" />
-                  <h3 className="font-playfair font-bold text-marino text-lg mb-2">{item.title}</h3>
-                  <p className="font-sans text-gris-tx text-sm leading-relaxed">{item.body}</p>
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {HITOS.map((hito) => (
+              <div
+                key={hito}
+                className="bg-hueso-oscuro border-l-[3px] border-bordo rounded-xl p-6 text-center transition-transform duration-200 hover:-translate-y-1"
+              >
+                <p className="font-sans text-negro-bordo text-sm leading-relaxed font-medium">
+                  {hito}
+                </p>
               </div>
             ))}
           </div>
@@ -222,7 +195,7 @@ export default function SobreMarianPage() {
             href="/contacto"
             className="inline-flex items-center gap-2 bg-terracota text-white px-8 py-4 rounded-full font-sans text-sm font-semibold hover:bg-terracota/90 transition-colors group"
           >
-            Agendá una consulta gratis
+            Conversemos
             <ArrowRight size={15} strokeWidth={2.5} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
