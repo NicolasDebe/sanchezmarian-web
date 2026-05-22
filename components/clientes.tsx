@@ -1,54 +1,83 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import Image from "next/image"
-import { motion, useInView } from "motion/react"
+import { motion, useInView, AnimatePresence } from "motion/react"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
 const LOGOS = [
-  { src: "/images/logos/logo-chakaymanta.png",      alt: "Esc. Vendimia Chakaymanta" },
-  { src: "/images/logos/logo-mendoza-regenera.png",  alt: "Cluster Mendoza Regenera" },
-  { src: "/images/logos/logo-quienvino.png",         alt: "QuienVino App" },
-  { src: "/images/logos/logo-mfmc.png",              alt: "María Florencia Mouradian" },
-  { src: "/images/logos/logo-colegio-notarial.png",  alt: "Colegio Notarial de Mendoza" },
   { src: "/images/logos/logo-capilla-acutis.png",    alt: "Capilla Carlo Acutis" },
+  { src: "/images/logos/logo-colegio-notarial.png",  alt: "Colegio Notarial de Mendoza" },
   { src: "/images/logos/logo-bolsa-comercio.jpg",    alt: "Bolsa de Comercio de Mendoza" },
-  { src: "/images/logos/logo-fuerza-silenciosa.jpg", alt: "Fuerza Silenciosa" },
-  { src: "/images/logos/logo-agrocosecha.png",       alt: "Agrocosecha" },
   { src: "/images/logos/logo-presidente.png",        alt: "Grupo Presidente" },
+  { src: "/images/logos/logo-quienvino.png",         alt: "QuienVino App" },
+  { src: "/images/logos/logo-agrocosecha.png",       alt: "Agrocosecha" },
+  { src: "/images/logos/logo-chakaymanta.png",       alt: "Esc. Vendimia Chakaymanta" },
+  { src: "/images/logos/logo-mendoza-regenera.png",  alt: "Cluster Mendoza Regenera" },
+  { src: "/images/logos/logo-fuerza-silenciosa.jpg", alt: "Fuerza Silenciosa" },
   { src: "/images/logos/logo-meneo.png",             alt: "Dra. María Elina Meneo" },
+  { src: "/images/logos/logo-mfmc.png",              alt: "María Florencia Mouradian" },
 ]
 
-function Track() {
+function RotatingCard({ initialIndex, delay }: { initialIndex: number; delay: number }) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % LOGOS.length)
+      }, 3000)
+    }, delay)
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
+  }, [delay])
+
+  const logo = LOGOS[currentIndex]
+
   return (
-    <div className="flex items-center shrink-0" aria-hidden>
-      {LOGOS.map((logo) => (
-        <div
+    <div
+      className="w-[260px] h-[160px] lg:w-[320px] lg:h-[200px]"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#FFFFFF",
+        border: "1px solid rgba(102,0,31,0.1)",
+        borderRadius: 12,
+        padding: "48px 56px",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+        flexShrink: 0,
+        overflow: "hidden",
+      }}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
           key={logo.src}
-          className="flex items-center"
-          style={{ paddingLeft: 40, paddingRight: 40 }}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.4 } }}
+          transition={{ duration: 0.5, ease: EASE }}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
         >
           <Image
             src={logo.src}
             alt={logo.alt}
-            height={0}
-            width={0}
-            sizes="160px"
+            width={220}
+            height={130}
             style={{
-              height: undefined,
+              maxWidth: 220,
+              maxHeight: 130,
               width: "auto",
-              background: "transparent",
+              height: "auto",
+              objectFit: "contain",
             }}
-            className="
-              h-[55px] lg:h-[80px] w-auto
-              grayscale opacity-60
-              hover:grayscale-0 hover:opacity-100 hover:scale-105
-              transition-all duration-[400ms] ease-in-out
-            "
           />
-        </div>
-      ))}
+        </motion.div>
+      </AnimatePresence>
     </div>
   )
 }
@@ -60,15 +89,16 @@ export function Clientes() {
   return (
     <section
       ref={ref}
-      className="bg-white overflow-hidden"
+      className="overflow-hidden"
       style={{
+        background: "#FFFFFF",
         paddingTop: "clamp(60px, 6vw, 80px)",
         paddingBottom: "clamp(60px, 6vw, 80px)",
         borderTop: "1px solid rgba(201, 168, 130, 0.3)",
         borderBottom: "1px solid rgba(201, 168, 130, 0.3)",
       }}
     >
-      {/* Header centrado */}
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -77,15 +107,10 @@ export function Clientes() {
       >
         <p
           className="font-mono uppercase mb-3"
-          style={{
-            fontSize: 11,
-            letterSpacing: "0.15em",
-            color: "var(--color-bordo, #66001F)",
-          }}
+          style={{ fontSize: 11, letterSpacing: "0.15em", color: "var(--color-bordo, #66001F)" }}
         >
           Clientes
         </p>
-
         <motion.div
           initial={{ scaleX: 0 }}
           animate={isInView ? { scaleX: 1 } : {}}
@@ -98,60 +123,30 @@ export function Clientes() {
             transformOrigin: "center",
           }}
         />
-
         <h2
           className="font-playfair font-bold leading-[1.15] mb-3"
-          style={{
-            fontSize: "clamp(28px, 4vw, 36px)",
-            color: "var(--color-negro-bordo)",
-          }}
+          style={{ fontSize: "clamp(28px, 4vw, 36px)", color: "var(--color-negro-bordo)" }}
         >
           Marcas que{" "}
           <em style={{ fontStyle: "italic", color: "var(--color-bordo, #66001F)" }}>
             confían en mi
           </em>
         </h2>
-
-        <p
-          className="font-sans"
-          style={{
-            fontSize: 14,
-            color: "var(--color-gris-bordo)",
-          }}
-        >
+        <p className="font-sans" style={{ fontSize: 14, color: "var(--color-gris-bordo)" }}>
           100+ apariciones en medios nacionales y provinciales.
         </p>
       </motion.div>
 
-      {/* Marquee infinito */}
+      {/* Cards */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={isInView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="relative"
-        aria-label="Clientes de Marian Sánchez"
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6, ease: EASE, delay: 0.35 }}
+        className="flex items-center justify-center flex-wrap gap-5 px-6"
       >
-        {/* Fade izquierda */}
-        <div
-          className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10"
-          style={{ background: "linear-gradient(to right, #ffffff, transparent)" }}
-        />
-        {/* Fade derecha */}
-        <div
-          className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10"
-          style={{ background: "linear-gradient(to left, #ffffff, transparent)" }}
-        />
-
-        <div
-          className="flex py-4"
-          style={{
-            animation: "marquee-scroll 35s linear infinite",
-            willChange: "transform",
-          }}
-        >
-          <Track />
-          <Track />
-        </div>
+        <RotatingCard initialIndex={0} delay={0} />
+        <RotatingCard initialIndex={4} delay={1000} />
+        <RotatingCard initialIndex={8} delay={2000} />
       </motion.div>
     </section>
   )
