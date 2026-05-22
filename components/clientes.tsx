@@ -1,27 +1,46 @@
 "use client"
 
 import { useRef, useState } from "react"
+import Image from "next/image"
 import { motion, useInView } from "motion/react"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
-const CLIENTES = [
-  "Capilla Carlo Acutis",
-  "Colegio Notarial de Mendoza",
-  "Escuela de Vendimia Chakaymanta",
-  "Marca Personal",
+const LOGOS = [
+  { src: "/images/logos/logo-chakaymanta.png",     alt: "Esc. Vendimia Chakaymanta" },
+  { src: "/images/logos/logo-mendoza-regenera.png", alt: "Cluster Mendoza Regenera" },
+  { src: "/images/logos/logo-quienvino.png",        alt: "QuienVino App" },
+  { src: "/images/logos/logo-mfmc.png",             alt: "María Florencia Mouradian" },
+  { src: "/images/logos/logo-colegio-notarial.png", alt: "Colegio Notarial de Mendoza" },
+  { src: "/images/logos/logo-capilla-acutis.png",   alt: "Capilla Carlo Acutis" },
+  { src: "/images/logos/logo-bolsa-comercio.jpg",   alt: "Bolsa de Comercio de Mendoza" },
+  { src: "/images/logos/logo-fuerza-silenciosa.jpg",alt: "Fuerza Silenciosa" },
+  { src: "/images/logos/logo-agrocosecha.png",      alt: "Agrocosecha" },
+  { src: "/images/logos/logo-presidente.png",       alt: "Grupo Presidente" },
+  { src: "/images/logos/logo-meneo.png",            alt: "Dra. María Elina Meneo" },
 ]
 
 function Track() {
   return (
     <div className="flex items-center shrink-0" aria-hidden>
-      {CLIENTES.map((name) => (
-        <span key={name} className="flex items-center">
-          <span className="font-sans text-sm font-medium text-negro-bordo whitespace-nowrap px-8 cursor-default select-none grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-            {name}
-          </span>
-          <span className="text-dorado/40 text-xs pointer-events-none select-none">·</span>
-        </span>
+      {LOGOS.map((logo) => (
+        <div key={logo.src} className="flex items-center px-10">
+          <Image
+            src={logo.src}
+            alt={logo.alt}
+            height={0}
+            width={0}
+            sizes="120px"
+            className="
+              h-[32px] w-auto
+              lg:h-[40px]
+              grayscale opacity-50
+              hover:grayscale-0 hover:opacity-100
+              transition-all duration-300
+            "
+            style={{ height: undefined }}
+          />
+        </div>
       ))}
     </div>
   )
@@ -53,7 +72,7 @@ export function Clientes() {
           style={{ transformOrigin: "center" }}
         />
         <h2 className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.25rem] leading-[1.15] mb-3">
-          Marcas que confiaron en Marian.
+          Marcas que confían en mi
         </h2>
         <p className="font-sans text-gris-bordo text-sm">
           100+ apariciones en medios nacionales y provinciales.
@@ -84,7 +103,7 @@ export function Clientes() {
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           style={{
-            animation: "marquee-scroll 30s linear infinite",
+            animation: "marquee-scroll 35s linear infinite",
             animationPlayState: paused ? "paused" : "running",
             willChange: "transform",
           }}
