@@ -90,8 +90,8 @@ export function EnMedias() {
               transition={{ duration: 0.65, delay: 0.18, ease: EASE }}
               className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.5rem] lg:text-[2.75rem] leading-[1.1] mb-4"
             >
-              <span className="block">Historias que llegaron</span>
-              <em className="block italic text-bordo">a los medios.</em>
+              <span className="block">100+ apariciones reales</span>
+              <em className="block italic text-bordo">en medios.</em>
             </motion.h2>
 
             <motion.p
@@ -100,8 +100,9 @@ export function EnMedias() {
               transition={{ duration: 0.5, delay: 0.28 }}
               className="font-sans text-gris-bordo text-sm leading-relaxed max-w-[440px]"
             >
-              +100 gestiones de prensa realizadas para marcas, empresas y profesionales
-              que confiaron en mi visión.
+              100+ apariciones en medios nacionales y provinciales. Una selección de
+              gestiones de prensa realizadas para marcas, empresas y profesionales que
+              confiaron en mi visión.
             </motion.p>
           </div>
 
