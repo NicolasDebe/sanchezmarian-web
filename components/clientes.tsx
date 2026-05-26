@@ -9,7 +9,7 @@ const EASE = [0.22, 1, 0.36, 1] as const
 const LOGOS = [
   { src: "/images/logos/logo-capilla-acutis.png",    alt: "Capilla Carlo Acutis" },
   { src: "/images/logos/logo-colegio-notarial.png",  alt: "Colegio Notarial de Mendoza" },
-  { src: "/images/logos/logo-bolsa-comercio.jpg",    alt: "Bolsa de Comercio de Mendoza" },
+  { src: "/images/logos/logo-bolsa-comercio.png",    alt: "Bolsa de Comercio de Mendoza" },
   { src: "/images/logos/logo-presidente.png",        alt: "Grupo Presidente" },
   { src: "/images/logos/logo-quienvino.png",         alt: "QuienVino App" },
   { src: "/images/logos/logo-agrocosecha.png",       alt: "Agrocosecha" },

@@ -11,7 +11,6 @@ const navLinks = [
   { label: "Servicios", href: "/servicios" },
   { label: "Sobre mí", href: "/sobre-marian" },
   { label: "Casos de éxito", href: "/casos-de-exito" },
-  { label: "Sala de Prensa", href: "/blog" },
 ]
 
 export function Nav() {
