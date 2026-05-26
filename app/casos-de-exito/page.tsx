@@ -30,13 +30,15 @@ export default function CasosDeExitoPage() {
             Casos de éxito
           </p>
           <h1 className="font-playfair font-bold text-negro-bordo leading-[1.1] text-[2.75rem] sm:text-[3.75rem] lg:text-[5rem] max-w-3xl mb-6">
-            56 apariciones{" "}
+            100+ apariciones{" "}
             <em className="italic text-bordo">reales</em>{" "}
             en medios.
           </h1>
           <p className="font-sans text-gris-bordo text-base sm:text-lg leading-relaxed max-w-xl">
-            Una selección de gestiones de prensa realizadas para marcas, empresas y profesionales
-            que confiaron en mi visión.
+            100+ apariciones en medios nacionales y provinciales.
+            Una selección de gestiones de prensa realizadas para
+            marcas, empresas y profesionales que confiaron en
+            mi visión.
           </p>
         </div>
       </section>
