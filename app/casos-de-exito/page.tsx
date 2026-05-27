@@ -8,20 +8,20 @@ import { CasosClient } from "./casos-client"
 export const metadata: Metadata = {
   title: "Casos de éxito — Marian Sánchez",
   description:
-    "56 apariciones verificadas en medios nacionales e internacionales. La Nación, Clarín, Infobae, Vatican News, Los Andes y más. Resultados reales para clientes reales.",
+    "100+ apariciones en medios nacionales e internacionales. La Nación, Clarín, Infobae, Vatican News, Los Andes y más. Resultados reales para clientes reales.",
   openGraph: {
     title: "Casos de éxito — Marian Sánchez",
     description:
-      "56 apariciones verificadas en medios nacionales e internacionales. Portfolio de gestiones de GB Consulting.",
+      "100+ apariciones en medios nacionales e internacionales. Portfolio de gestiones de GB Consulting.",
     url: "https://sanchezmarian.com/casos-de-exito",
   },
 }
 
 const STATS = [
-  { n: "56", label: "apariciones verificadas" },
+  { n: "100+", label: "apariciones verificadas" },
   { n: "30+", label: "medios distintos" },
   { n: "5", label: "formatos cubiertos" },
-  { n: "4", label: "clientes con cobertura" },
+  { n: "15", label: "clientes activos" },
 ] as const
 
 export default function CasosDeExitoPage() {

@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
+import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import { ExternalLink, ChevronDown } from "lucide-react"
 import { CLIPPINGS, CATEGORIAS, type Categoria } from "@/data/clippings"
@@ -32,7 +33,7 @@ type ClienteData = ClienteBase & {
   mediosCount: number
 }
 
-// ─── Client config (order: by apariciones desc, then alpha) ──────────────────
+// ─── Client config ────────────────────────────────────────────────────────────
 
 const CLIENTES_CONFIG: ClienteBase[] = [
   {
@@ -46,7 +47,7 @@ const CLIENTES_CONFIG: ClienteBase[] = [
   {
     id: "esc-vendimia-chakaymanta",
     nombre: "Esc. Vendimia Chakaymanta",
-    logo: null,
+    logo: "/images/logos/logo-chakaymanta.png",
     descripcion:
       "Del barrio La Favorita al Martín Fierro Nacional de la Danza y al Festival de Cosquín.",
     categoria: "Cultura & Educación",
@@ -54,7 +55,7 @@ const CLIENTES_CONFIG: ClienteBase[] = [
   {
     id: "colegio-notarial-mendoza",
     nombre: "Colegio Notarial de Mendoza",
-    logo: null,
+    logo: "/images/logos/logo-colegio-notarial.png",
     descripcion:
       "Lanzamiento del Observatorio Estadístico del Mercado Inmobiliario y digitalización de escrituras.",
     categoria: "Empresas & Instituciones",
@@ -62,7 +63,7 @@ const CLIENTES_CONFIG: ClienteBase[] = [
   {
     id: "dra-elina-meneo",
     nombre: "Dra. Elina Meneo",
-    logo: null,
+    logo: "/images/logos/logo-meneo.png",
     descripcion:
       "Posicionamiento en medios de la terapia de regresión a vidas pasadas en Mendoza.",
     categoria: "Marcas Personales",
@@ -70,7 +71,7 @@ const CLIENTES_CONFIG: ClienteBase[] = [
   {
     id: "bolsa-comercio",
     nombre: "Bolsa de Comercio de Mendoza",
-    logo: null,
+    logo: "/images/logos/logo-bolsa-comercio.png",
     descripcion: "Representación institucional del comercio mendocino.",
     categoria: null,
     enCamino: true,
@@ -86,7 +87,7 @@ const CLIENTES_CONFIG: ClienteBase[] = [
   {
     id: "flor-mouradian",
     nombre: "Flor Mouradian, Psicóloga",
-    logo: null,
+    logo: "/images/logos/logo-mfmc.png",
     descripcion: "Marca personal en el sector salud mental.",
     categoria: null,
     enCamino: true,
@@ -94,7 +95,7 @@ const CLIENTES_CONFIG: ClienteBase[] = [
   {
     id: "agrocosecha",
     nombre: "Agrocosecha",
-    logo: null,
+    logo: "/images/logos/logo-agrocosecha.png",
     descripcion: "Comunicación estratégica en el sector agropecuario.",
     categoria: null,
     enCamino: true,
@@ -102,7 +103,7 @@ const CLIENTES_CONFIG: ClienteBase[] = [
   {
     id: "grupo-presidente",
     nombre: "Grupo Presidente",
-    logo: null,
+    logo: "/images/logos/logo-presidente.png",
     descripcion: "Comunicación corporativa y relaciones con medios.",
     categoria: null,
     enCamino: true,
@@ -110,7 +111,7 @@ const CLIENTES_CONFIG: ClienteBase[] = [
   {
     id: "mendoza-regenera",
     nombre: "Mendoza Regenera",
-    logo: null,
+    logo: "/images/logos/logo-mendoza-regenera.png",
     descripcion: "Comunicación ambiental y regenerativa.",
     categoria: null,
     enCamino: true,
@@ -125,7 +126,6 @@ const CLIENTES_CONFIG: ClienteBase[] = [
   },
 ]
 
-// Maps clipping.cliente → cliente.id
 const NOMBRE_A_ID: Record<string, string> = {
   "Capilla Carlo Acutis": "capilla-carlo-acutis",
   "Esc. Vendimia Chakaymanta": "esc-vendimia-chakaymanta",
@@ -135,7 +135,7 @@ const NOMBRE_A_ID: Record<string, string> = {
 
 const ROW_COLS = "160px 80px 100px 1fr 50px 32px"
 
-// ─── Logo avatar ──────────────────────────────────────────────────────────────
+// ─── Logo avatar — usa next/image con fallback a inicial ──────────────────────
 
 function LogoAvatar({
   logo,
@@ -148,8 +148,9 @@ function LogoAvatar({
 }) {
   const [err, setErr] = useState(false)
   const radius = size <= 48 ? 10 : 12
+  const innerSize = size - 16
 
-  const wrap: React.CSSProperties = {
+  const wrapStyle: React.CSSProperties = {
     width: size,
     height: size,
     minWidth: size,
@@ -163,20 +164,21 @@ function LogoAvatar({
 
   if (logo && !err) {
     return (
-      <div style={wrap}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+      <div style={wrapStyle}>
+        <Image
           src={logo}
           alt={nombre}
+          width={innerSize}
+          height={innerSize}
           onError={() => setErr(true)}
-          style={{ width: "100%", height: "100%", objectFit: "contain", padding: 8 }}
+          style={{ objectFit: "contain" }}
         />
       </div>
     )
   }
 
   return (
-    <div style={wrap}>
+    <div style={wrapStyle}>
       <span
         style={{
           fontFamily: "var(--font-playfair)",
@@ -265,7 +267,7 @@ function FilterPill({
   )
 }
 
-// ─── Aparicion row (desktop table) ───────────────────────────────────────────
+// ─── Aparicion row (desktop table, inside accordion) ─────────────────────────
 
 function AparicionRow({ medio, formato, alcance, titular, año, link }: Aparicion) {
   const rowStyle: React.CSSProperties = {
@@ -282,12 +284,8 @@ function AparicionRow({ medio, formato, alcance, titular, año, link }: Aparicio
       <span className="font-sans font-medium text-sm" style={{ color: "var(--color-negro-bordo)" }}>
         {medio}
       </span>
-      <span>
-        <FBadge text={formato} />
-      </span>
-      <span>
-        <ABadge text={alcance} />
-      </span>
+      <span><FBadge text={formato} /></span>
+      <span><ABadge text={alcance} /></span>
       <span
         className="font-sans text-sm"
         style={{
@@ -306,11 +304,7 @@ function AparicionRow({ medio, formato, alcance, titular, año, link }: Aparicio
       </span>
       <span className="flex justify-end items-center">
         {link && (
-          <ExternalLink
-            size={14}
-            strokeWidth={1.5}
-            style={{ color: "rgba(102,0,31,0.25)", transition: "opacity 0.15s" }}
-          />
+          <ExternalLink size={14} strokeWidth={1.5} style={{ color: "rgba(102,0,31,0.25)" }} />
         )}
       </span>
     </>
@@ -329,14 +323,10 @@ function AparicionRow({ medio, formato, alcance, titular, año, link }: Aparicio
       </a>
     )
   }
-  return (
-    <div className="hidden sm:grid" style={rowStyle}>
-      {inner}
-    </div>
-  )
+  return <div className="hidden sm:grid" style={rowStyle}>{inner}</div>
 }
 
-// ─── Aparicion card (mobile) ──────────────────────────────────────────────────
+// ─── Aparicion card (mobile, inside accordion) ────────────────────────────────
 
 function AparicionCard({ medio, formato, alcance, titular, año, link }: Aparicion) {
   const cardContent = (
@@ -364,9 +354,7 @@ function AparicionCard({ medio, formato, alcance, titular, año, link }: Aparici
         {titular}
       </p>
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[11px]" style={{ color: "rgba(74,48,64,0.4)" }}>
-          {año}
-        </span>
+        <span className="font-mono text-[11px]" style={{ color: "rgba(74,48,64,0.4)" }}>{año}</span>
         {link && <ExternalLink size={13} strokeWidth={1.5} style={{ color: "rgba(102,0,31,0.4)" }} />}
       </div>
     </div>
@@ -380,6 +368,82 @@ function AparicionCard({ medio, formato, alcance, titular, año, link }: Aparici
     )
   }
   return <div className="sm:hidden">{cardContent}</div>
+}
+
+// ─── Aparicion flat row (modo categoría) ──────────────────────────────────────
+
+function AparicionFlatRow({
+  cliente,
+  medio,
+  formato,
+  alcance,
+  titular,
+  año,
+  link,
+}: {
+  cliente: string
+  medio: string
+  formato: string
+  alcance: string
+  titular: string
+  año: number
+  link: string
+}) {
+  const content = (
+    <div className="py-4" style={{ borderBottom: "1px solid rgba(102,0,31,0.06)" }}>
+      <p
+        className="font-mono text-[11px] uppercase mb-2"
+        style={{ color: "rgba(102,0,31,0.5)", letterSpacing: "0.15em" }}
+      >
+        {cliente}
+      </p>
+      <div className="flex items-start gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+            <span className="font-sans font-medium text-sm" style={{ color: "var(--color-negro-bordo)" }}>
+              {medio}
+            </span>
+            <FBadge text={formato} />
+            <ABadge text={alcance} />
+          </div>
+          <p
+            className="font-sans text-sm leading-snug"
+            style={{
+              color: "var(--color-gris-bordo)",
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            } as React.CSSProperties}
+          >
+            {titular}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0 pt-0.5">
+          <span className="font-mono text-[11px]" style={{ color: "rgba(74,48,64,0.4)" }}>
+            {año}
+          </span>
+          {link && (
+            <ExternalLink size={14} strokeWidth={1.5} style={{ color: "rgba(102,0,31,0.25)" }} />
+          )}
+        </div>
+      </div>
+    </div>
+  )
+
+  if (link) {
+    return (
+      <a
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block transition-colors hover:bg-[rgba(102,0,31,0.02)]"
+      >
+        {content}
+      </a>
+    )
+  }
+  return <>{content}</>
 }
 
 // ─── Client block (accordion) ─────────────────────────────────────────────────
@@ -445,11 +509,7 @@ function ClientBlock({
             {cliente.enCamino && (
               <span
                 className="inline-block font-mono text-[10px] uppercase mt-2 px-3 py-1 rounded-full"
-                style={{
-                  background: "var(--color-arena)",
-                  color: "var(--color-gris-bordo)",
-                  letterSpacing: "0.1em",
-                }}
+                style={{ background: "var(--color-arena)", color: "var(--color-gris-bordo)", letterSpacing: "0.1em" }}
               >
                 En camino
               </span>
@@ -465,19 +525,14 @@ function ClientBlock({
                 apariciones · {cliente.mediosCount} medios
               </p>
               <div className="flex gap-1 mt-2 justify-end flex-wrap">
-                {cliente.formatos.map((f) => (
-                  <FBadge key={f} text={f} />
-                ))}
+                {cliente.formatos.map((f) => <FBadge key={f} text={f} />)}
               </div>
             </div>
           )}
 
           <div
             className="ml-6 shrink-0 self-center"
-            style={{
-              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s ease",
-            }}
+            style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}
           >
             <ChevronDown size={20} style={{ color: "rgba(102,0,31,0.3)" }} />
           </div>
@@ -507,43 +562,28 @@ function ClientBlock({
             {cliente.enCamino && (
               <span
                 className="inline-block font-mono text-[10px] uppercase mt-2 px-3 py-1 rounded-full"
-                style={{
-                  background: "var(--color-arena)",
-                  color: "var(--color-gris-bordo)",
-                  letterSpacing: "0.1em",
-                }}
+                style={{ background: "var(--color-arena)", color: "var(--color-gris-bordo)", letterSpacing: "0.1em" }}
               >
                 En camino
               </span>
             )}
             {!cliente.enCamino && cliente.apariciones.length > 0 && (
               <div className="mt-2">
-                <p
-                  className="font-playfair leading-none"
-                  style={{ fontSize: 28, color: "var(--color-bordo)" }}
-                >
+                <p className="font-playfair leading-none" style={{ fontSize: 28, color: "var(--color-bordo)" }}>
                   {cliente.apariciones.length}
-                  <span
-                    className="font-mono text-[10px] ml-2"
-                    style={{ color: "rgba(74,48,64,0.6)" }}
-                  >
+                  <span className="font-mono text-[10px] ml-2" style={{ color: "rgba(74,48,64,0.6)" }}>
                     apariciones
                   </span>
                 </p>
                 <div className="flex gap-1 mt-2 flex-wrap">
-                  {cliente.formatos.map((f) => (
-                    <FBadge key={f} text={f} />
-                  ))}
+                  {cliente.formatos.map((f) => <FBadge key={f} text={f} />)}
                 </div>
               </div>
             )}
           </div>
           <div
             className="absolute top-0 right-0"
-            style={{
-              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s ease",
-            }}
+            style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}
           >
             <ChevronDown size={18} style={{ color: "rgba(102,0,31,0.3)" }} />
           </div>
@@ -562,25 +602,14 @@ function ClientBlock({
             style={{ overflow: "hidden" }}
           >
             <div style={{ padding: "0 36px 32px" }}>
-              {/* Separator */}
-              <div
-                style={{
-                  height: 1,
-                  background: "rgba(201,168,130,0.2)",
-                  marginBottom: 24,
-                }}
-              />
+              <div style={{ height: 1, background: "rgba(201,168,130,0.2)", marginBottom: 24 }} />
 
               {cliente.enCamino ? (
-                <p
-                  className="font-sans text-sm italic"
-                  style={{ color: "var(--color-gris-bordo)" }}
-                >
+                <p className="font-sans text-sm italic" style={{ color: "var(--color-gris-bordo)" }}>
                   Los casos de este cliente están en desarrollo.
                 </p>
               ) : (
                 <>
-                  {/* Table header — desktop */}
                   <div
                     className="hidden sm:grid font-mono text-[10px] uppercase pb-3"
                     style={{
@@ -598,7 +627,6 @@ function ClientBlock({
                     <span />
                   </div>
 
-                  {/* Apariciones */}
                   {cliente.apariciones.map((ap) => (
                     <React.Fragment key={ap.id}>
                       <AparicionRow {...ap} />
@@ -606,13 +634,9 @@ function ClientBlock({
                     </React.Fragment>
                   ))}
 
-                  {/* Footer count */}
                   <p
                     className="font-mono text-[11px] mt-4 pt-4"
-                    style={{
-                      color: "rgba(74,48,64,0.4)",
-                      borderTop: "1px solid rgba(201,168,130,0.15)",
-                    }}
+                    style={{ color: "rgba(74,48,64,0.4)", borderTop: "1px solid rgba(201,168,130,0.15)" }}
                   >
                     {cliente.apariciones.length} apariciones en {cliente.mediosCount} medios distintos
                   </p>
@@ -654,20 +678,11 @@ export function CasosClient() {
     })
   }, [])
 
-  const catCounts = useMemo<Record<string, number>>(() => {
-    const counts: Record<string, number> = { Todos: CLIPPINGS.length }
-    CATEGORIAS.forEach((cat) => {
-      counts[cat] = CLIPPINGS.filter((c) => c.categoria === cat).length
-    })
-    return counts
-  }, [])
-
-  const visibleClientes = useMemo(() => {
-    if (activeFilter === "Todos") return allClientes
-    return allClientes.filter(
-      (c) => c.categoria === activeFilter && c.apariciones.length > 0
-    )
-  }, [allClientes, activeFilter])
+  // Apariciones planas para el modo categoría
+  const flatApariciones = useMemo(() => {
+    if (activeFilter === "Todos") return []
+    return CLIPPINGS.filter((c) => c.categoria === activeFilter)
+  }, [activeFilter])
 
   const FILTERS = ["Todos", ...CATEGORIAS] as const
 
@@ -684,14 +699,11 @@ export function CasosClient() {
           borderBottom: "1px solid rgba(102,0,31,0.06)",
         }}
       >
-        <div
-          className="flex gap-2 overflow-x-auto pb-1"
-          style={{ scrollbarWidth: "none" }}
-        >
+        <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
           {FILTERS.map((f) => (
             <FilterPill
               key={f}
-              label={`${f} (${catCounts[f] ?? 0})`}
+              label={f}
               active={activeFilter === f}
               onClick={() => setActiveFilter(f)}
             />
@@ -699,27 +711,51 @@ export function CasosClient() {
         </div>
       </div>
 
-      {/* ── Blocks with filter transition ── */}
+      {/* ── Contenido: acordeón (Todos) o lista plana (categoría) ── */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={activeFilter}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="pt-10 flex flex-col gap-4"
-        >
-          {visibleClientes.map((cliente) => (
-            <ClientBlock
-              key={cliente.id}
-              cliente={cliente}
-              isOpen={openClient === cliente.id}
-              onToggle={() =>
-                setOpenClient((prev) => (prev === cliente.id ? "" : cliente.id))
-              }
-            />
-          ))}
-        </motion.div>
+        {activeFilter === "Todos" ? (
+          <motion.div
+            key="accordion"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="pt-10 flex flex-col gap-4"
+          >
+            {allClientes.map((cliente) => (
+              <ClientBlock
+                key={cliente.id}
+                cliente={cliente}
+                isOpen={openClient === cliente.id}
+                onToggle={() =>
+                  setOpenClient((prev) => (prev === cliente.id ? "" : cliente.id))
+                }
+              />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            key={activeFilter}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="pt-6"
+          >
+            {flatApariciones.map((ap) => (
+              <AparicionFlatRow
+                key={ap.id}
+                cliente={ap.cliente}
+                medio={ap.medio}
+                formato={ap.formato}
+                alcance={ap.alcance}
+                titular={ap.titular}
+                año={ap.año}
+                link={ap.link}
+              />
+            ))}
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   )
