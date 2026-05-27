@@ -562,10 +562,10 @@ export const CLIPPINGS: Clipping[] = [
     link: "https://www.unidiversidad.com.ar/mendoza-presenta-por-primera-vez-a-dos-mujeres-en-el-rubro-solista-de-malambo-femenino-en-cosquin",
   },
 
-  // ─── MARCA PERSONAL / RVP (8) ─────────────────────────────────────────────
+  // ─── DRA. ELINA MENEO / RVP (8) ─────────────────────────────────────────────
   {
     id: 49,
-    cliente: "Marca Personal",
+    cliente: "Dra. Elina Meneo",
     medio: "El Sol",
     formato: "Digital",
     alcance: "Local",
@@ -577,7 +577,7 @@ export const CLIPPINGS: Clipping[] = [
   },
   {
     id: 50,
-    cliente: "Marca Personal",
+    cliente: "Dra. Elina Meneo",
     medio: "El Nueve",
     formato: "Digital",
     alcance: "Local",
@@ -588,7 +588,7 @@ export const CLIPPINGS: Clipping[] = [
   },
   {
     id: 51,
-    cliente: "Marca Personal",
+    cliente: "Dra. Elina Meneo",
     medio: "Mendovoz",
     formato: "Digital",
     alcance: "Local",
@@ -599,7 +599,7 @@ export const CLIPPINGS: Clipping[] = [
   },
   {
     id: 52,
-    cliente: "Marca Personal",
+    cliente: "Dra. Elina Meneo",
     medio: "Los Andes",
     formato: "Digital",
     alcance: "Local",
@@ -610,7 +610,7 @@ export const CLIPPINGS: Clipping[] = [
   },
   {
     id: 53,
-    cliente: "Marca Personal",
+    cliente: "Dra. Elina Meneo",
     medio: "Canal 9 — Cada Tarde",
     formato: "TV",
     alcance: "Local",
@@ -621,7 +621,7 @@ export const CLIPPINGS: Clipping[] = [
   },
   {
     id: 54,
-    cliente: "Marca Personal",
+    cliente: "Dra. Elina Meneo",
     medio: "MDZ Online",
     formato: "Digital",
     alcance: "Local",
@@ -632,7 +632,7 @@ export const CLIPPINGS: Clipping[] = [
   },
   {
     id: 55,
-    cliente: "Marca Personal",
+    cliente: "Dra. Elina Meneo",
     medio: "Revista Voilà",
     formato: "Digital",
     alcance: "Local",
@@ -643,7 +643,7 @@ export const CLIPPINGS: Clipping[] = [
   },
   {
     id: 56,
-    cliente: "Marca Personal",
+    cliente: "Dra. Elina Meneo",
     medio: "Ciudadano News",
     formato: "Streaming",
     alcance: "Local",
