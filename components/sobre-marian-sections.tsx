@@ -1,251 +1,393 @@
 "use client"
 
-import { motion } from "motion/react"
+import { useRef } from "react"
+import { motion, useInView } from "motion/react"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
 import {
-  fadeUp, fadeLeft, fadeRight, revealCard,
+  fadeUp, fadeLeft, fadeRight,
   fadeUpStagger, viewportOnce,
 } from "@/lib/animations"
 
-const HITOS = [
-  "Más de una década en comunicación",
-  "100+ apariciones en medios documentadas",
-  "10+ clientes transformados y en crecimiento",
-  "Metodología probada, orgánica y replicable",
-]
-
-const PILARES = [
-  {
-    eyebrow: "Construcción",
-    title: "Relaciones reales con periodistas",
-    body: "Mis contactos no son números en una base de datos. Son vínculos genuinos construidos durante más de una década en los medios de Mendoza. Conozco quiénes son, qué buscan, y cómo presentar tu marca para que se convierta en una noticia de valor.",
-  },
-  {
-    eyebrow: "Estrategia",
-    title: "Mensaje correcto en el momento preciso",
-    body: "No creo en soluciones estándar. Antes de hablar con un periodista, trabajamos juntos para definir qué historia contar y a quién. El mensaje bien diseñado multiplica los resultados y garantiza que tu voz llegue a la audiencia indicada.",
-  },
-  {
-    eyebrow: "Resultados",
-    title: "Impacto medible y documentado",
-    body: "Lo que no se mide, no se puede mejorar. Cada aparición en medios, nota y entrevista queda registrada. Recibís un clipping detallado con análisis de impacto y proyecciones para las próximas etapas de crecimiento.",
-  },
-]
-
-export function SobreMarianSections() {
+/* ═══════════════════════════════════════════════════════════════
+   BLOQUE 1 — HERO EDITORIAL
+═══════════════════════════════════════════════════════════════ */
+function HeroEditorial() {
   return (
-    <>
-      {/* ── Bio principal ── */}
-      <section className="bg-white py-24 lg:py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+    <section className="min-h-screen w-full overflow-hidden bg-hueso">
+      <div className="flex flex-col lg:grid lg:grid-cols-[55fr_45fr] min-h-screen">
 
-          {/* Foto placeholder */}
-          <motion.div
-            variants={fadeLeft}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="relative"
-          >
-            <div className="absolute top-5 left-5 w-full aspect-[3/4] max-w-[420px] rounded-[2rem] border-2 border-lino pointer-events-none" />
-            <div className="relative w-full max-w-[420px] aspect-[3/4] rounded-[2rem] rounded-tr-[4rem] overflow-hidden bg-lino">
-              <div className="w-full h-full flex flex-col items-center justify-center gap-4 opacity-40">
-                <div className="w-24 h-24 rounded-full bg-marino/30" />
-                <div className="w-32 h-3 rounded-full bg-marino/20" />
-                <p className="font-mono text-xs text-marino/50 uppercase tracking-widest mt-1">
-                  Foto · Marian
-                </p>
-              </div>
-            </div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85, rotate: -2 }}
-              whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-              viewport={viewportOnce}
-              transition={{ delay: 0.4, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute -bottom-4 -right-2 lg:-right-6 bg-marino text-white px-5 py-4 rounded-2xl shadow-xl"
+        {/* Photo — sangra por el borde izquierdo, sin padding-left */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="h-[60vh] lg:h-auto overflow-hidden bg-arena rounded-b-[40px] lg:rounded-b-none lg:rounded-r-[40px]"
+        />
+
+        {/* Texto — centrado verticalmente */}
+        <motion.div
+          variants={fadeUpStagger}
+          initial="hidden"
+          animate="visible"
+          className="flex items-center px-8 lg:px-16 xl:px-20 py-16 lg:py-0"
+        >
+          <div className="flex flex-col gap-6 max-w-[420px]">
+            <motion.p
+              variants={fadeUp}
+              className="font-mono text-[10px] uppercase tracking-[0.25em] text-bordo"
             >
-              <p className="font-mono text-[10px] uppercase tracking-widest text-white/50 mb-0.5">Más de una</p>
-              <p className="font-playfair font-bold text-2xl leading-none">década</p>
-              <p className="font-sans text-xs text-white/70 mt-0.5">en comunicación</p>
-            </motion.div>
-          </motion.div>
-
-          {/* Texto */}
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="flex flex-col gap-7"
-          >
-            <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-tx text-base leading-relaxed">
-              <p>
-                Mi nombre es Marian Sánchez y ayudo a empresas y marcas personales
-                a transformar su propósito en noticias, conectando su propuesta de
-                valor con los canales de comunicación adecuados. Llevo más de una
-                década construyendo vínculos reales con los protagonistas de los
-                medios locales.
-              </p>
-              <p>
-                Mi enfoque no se limita a la difusión masiva; se basa en el vínculo
-                real. Entiendo el ADN de cada cliente para identificar exactamente
-                qué periodista o medio de comunicación está buscando esa historia.
-                Diseño estrategias personalizadas, adaptadas a las necesidades de cada
-                proyecto, porque cada marca tiene un ritmo, un tono y un objetivo diferente.
-              </p>
-              <p>
-                Entiendo la comunicación como una sinergia donde todas las partes
-                ganan. Mi metodología no solo busca el beneficio del cliente, sino
-                que se enfoca en brindar un valor agregado al periodista. Al entregar
-                contenido de calidad, chequeado y de interés genuino, facilito la
-                labor informativa de los medios, generando una relación de respeto y
-                colaboración que perdura en el tiempo.
-              </p>
-            </motion.div>
-
-            <motion.div variants={fadeUp} className="grid grid-cols-3 gap-4 py-6 border-y border-marino/10">
-              {[
-                { n: "100+", label: "Apariciones en medios" },
-                { n: "10+", label: "Clientes activos" },
-                { n: "10+ años", label: "De experiencia" },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <p className="font-playfair font-bold text-marino text-2xl lg:text-3xl">{stat.n}</p>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-gris-tx/60 mt-1">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </motion.div>
-
-            <motion.div variants={fadeUp}>
-              <Link
-                href="/contacto"
-                className="inline-flex items-center gap-2 bg-terracota text-white px-6 py-3.5 rounded-full font-sans text-sm font-semibold hover:bg-terracota/90 transition-colors group w-fit"
-              >
-                Conversemos
-                <ArrowRight size={15} strokeWidth={2.5} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── Hitos de impacto ── */}
-      <section className="bg-arena py-24 lg:py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-          >
-            <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.22em] text-terracota mb-5">
-              Hitos de impacto
+              Sobre Marian
             </motion.p>
-            <motion.h2 variants={fadeUp} className="font-playfair font-bold text-marino text-[2rem] sm:text-[2.75rem] leading-[1.1] mb-16 max-w-xl">
-              <span className="block">Resultados que</span>
-              <em className="block italic text-terracota">hablan solos.</em>
-            </motion.h2>
-          </motion.div>
-
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
-          >
-            {HITOS.map((hito) => (
-              <motion.div
-                key={hito}
-                variants={revealCard}
-                className="bg-hueso-oscuro border-l-[3px] border-bordo rounded-xl p-6 text-center transition-transform duration-200 hover:-translate-y-1"
-              >
-                <p className="font-sans text-negro-bordo text-sm leading-relaxed font-medium">
-                  {hito}
-                </p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── Tres Pilares ── */}
-      <section className="bg-hueso-oscuro py-24 lg:py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="text-center mb-16 lg:mb-20"
-          >
-            <motion.h2 variants={fadeUp} className="font-playfair font-bold italic text-negro-bordo text-[2.75rem] sm:text-[3.25rem] lg:text-[2.75rem] leading-[1.1] mb-4">
-              El diferencial
-            </motion.h2>
-            <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.22em] text-bordo">
-              En qué creo cuando trabajo
+            <motion.div variants={fadeUp} className="w-10 h-px bg-dorado" />
+            <motion.h1
+              variants={fadeUp}
+              className="font-playfair font-bold text-negro-bordo text-[2.5rem] sm:text-[3rem] lg:text-[48px] leading-[1.05]"
+            >
+              <span className="block">Saber qué historia contar,</span>
+              <em className="block italic text-bordo">a quién y en qué momento.</em>
+            </motion.h1>
+            <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo">
+              Estratega de comunicación. Mendoza, Argentina.
             </motion.p>
-          </motion.div>
+          </div>
+        </motion.div>
 
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="grid grid-cols-1 lg:grid-cols-3"
-          >
-            {PILARES.map((pilar, i) => (
-              <motion.div key={pilar.eyebrow} variants={fadeUp} className="relative px-0 lg:px-10 py-10 lg:py-0">
-                {i < PILARES.length - 1 && (
-                  <span className="hidden lg:block absolute right-0 top-0 w-px h-full bg-dorado/40" />
-                )}
-                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-bordo mb-5">
-                  {pilar.eyebrow}
-                </p>
-                <h3 className="font-playfair italic font-bold text-negro-bordo text-[1.5rem] leading-snug mb-5">
-                  {pilar.title}
-                </h3>
-                <p className="font-sans text-gris-bordo text-[14px] leading-relaxed">
-                  {pilar.body}
-                </p>
-                {i < PILARES.length - 1 && (
-                  <span className="lg:hidden block w-full h-px bg-dorado/30 mt-10" />
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BLOQUE 2 — MANIFIESTO
+═══════════════════════════════════════════════════════════════ */
+const FRASES = [
+  <>
+    Conecto tu marca con el ecosistema de medios de forma natural, aportando{" "}
+    <em className="italic text-bordo">valor al periodista</em> y visibilidad estratégica a tu proyecto.
+  </>,
+  <>
+    Mi enfoque no se limita a la difusión masiva; se basa en el{" "}
+    <em className="italic text-bordo">vínculo real.</em>
+  </>,
+  <>
+    Cada marca tiene{" "}
+    <em className="italic text-bordo">un ritmo, un tono y un objetivo diferente.</em>
+  </>,
+]
+
+function Manifiesto() {
+  return (
+    <section className="bg-hueso py-[160px]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+
+        <div className="flex flex-col gap-12">
+          {FRASES.map((frase, i) => (
+            <motion.p
+              key={i}
+              className="font-playfair font-bold text-negro-bordo text-[28px] sm:text-[32px] lg:text-[36px] leading-[1.3]"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.65, delay: i * 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {frase}
+            </motion.p>
+          ))}
         </div>
-      </section>
 
-      {/* ── CTA ── */}
-      <section className="bg-white py-20 lg:py-24">
+        <motion.p
+          className="font-mono text-[11px] text-gris-bordo mt-10 text-right"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: FRASES.length * 0.2 + 0.3 }}
+        >
+          — Marian Sánchez
+        </motion.p>
+
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BLOQUE 3 — TRAYECTORIA
+═══════════════════════════════════════════════════════════════ */
+const HITOS = [
+  { year: "2016", desc: "Primeros pasos en comunicación y medios en Mendoza" },
+  { year: "2019", desc: "Fundación de GB Consulting como consultora independiente" },
+  { year: "2023", desc: "100+ apariciones en medios gestionadas" },
+  { year: "2026", desc: "Consolidación como estratega con red nacional e internacional" },
+]
+
+const TRAY_LINE_DUR = 1.5
+
+function Trayectoria() {
+  const ref    = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "-80px" })
+
+  return (
+    <section className="bg-hueso-oscuro py-[120px]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+
+        {/* Header */}
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className="max-w-7xl mx-auto px-6 lg:px-12 text-center"
+          className="text-center mb-16"
         >
-          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-marino text-[2rem] sm:text-[2.5rem] leading-[1.1] mb-5">
-            ¿Trabajamos juntos?
-          </motion.h2>
-          <motion.p variants={fadeUp} className="font-sans text-gris-tx text-base leading-relaxed mb-8 max-w-md mx-auto">
-            Conversemos sobre tu proyecto y encontremos la mejor forma de trabajar juntos.
+          <motion.p variants={fadeUp} className="font-mono text-[10px] uppercase tracking-[0.25em] text-bordo mb-4">
+            Trayectoria
           </motion.p>
-          <motion.div variants={fadeUp}>
-            <Link
-              href="/contacto"
-              className="inline-flex items-center gap-2 bg-terracota text-white px-8 py-4 rounded-full font-sans text-sm font-semibold hover:bg-terracota/90 transition-colors group"
-            >
-              Conversemos
-              <ArrowRight size={15} strokeWidth={2.5} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </motion.div>
+          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[40px] leading-[1.1]">
+            Una década construyendo{" "}
+            <em className="italic text-bordo">vínculos.</em>
+          </motion.h2>
         </motion.div>
-      </section>
+
+        {/* ─── DESKTOP: horizontal ─── */}
+        <div ref={ref} className="hidden md:block">
+
+          {/* Años */}
+          <div className="grid grid-cols-4 mb-5">
+            {HITOS.map((h, i) => (
+              <motion.p
+                key={h.year}
+                className="text-center font-mono text-[12px] text-bordo"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: inView ? 1 : 0 }}
+                transition={{ duration: 0.4, delay: inView ? i * 0.3 + 0.3 : 0 }}
+              >
+                {h.year}
+              </motion.p>
+            ))}
+          </div>
+
+          {/* Línea + puntos */}
+          <div className="relative py-[5px] mb-5">
+            {/* Track */}
+            <div
+              className="absolute left-0 right-0 h-px bg-dorado/30"
+              style={{ top: "calc(50% - 0.5px)" }}
+            />
+            {/* Fill animado */}
+            <motion.div
+              className="absolute left-0 right-0 h-px bg-dorado/60 origin-left"
+              style={{ top: "calc(50% - 0.5px)" }}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: inView ? 1 : 0 }}
+              transition={{ duration: TRAY_LINE_DUR, ease: "easeOut" }}
+            />
+            {/* Puntos */}
+            <div className="grid grid-cols-4 relative z-10">
+              {HITOS.map((h, i) => (
+                <div key={h.year} className="flex justify-center">
+                  <motion.div
+                    className="w-2 h-2 rounded-full bg-bordo"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: inView ? 1 : 0 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 20,
+                      delay: inView ? ((i + 1) / HITOS.length) * TRAY_LINE_DUR : 0,
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Descripciones */}
+          <div className="grid grid-cols-4 gap-4">
+            {HITOS.map((h, i) => (
+              <motion.p
+                key={h.year}
+                className="text-center font-sans text-[13px] text-gris-bordo leading-relaxed max-w-[180px] mx-auto"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 8 }}
+                transition={{ duration: 0.4, delay: inView ? i * 0.3 + 0.6 : 0 }}
+              >
+                {h.desc}
+              </motion.p>
+            ))}
+          </div>
+
+        </div>
+
+        {/* ─── MOBILE: vertical ─── */}
+        <div className="md:hidden relative pl-8">
+          {/* Track */}
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-dorado/30" />
+          {/* Fill animado */}
+          <motion.div
+            className="absolute left-0 top-0 w-px bg-dorado/60 origin-top"
+            style={{ height: "100%" }}
+            initial={{ scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 2, ease: "easeOut" }}
+          />
+
+          <div className="flex flex-col gap-10 relative z-10">
+            {HITOS.map((h, i) => (
+              <motion.div
+                key={h.year}
+                className="relative"
+                initial={{ opacity: 0, x: -12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.12 }}
+              >
+                {/* Punto sobre la línea */}
+                <div className="absolute -left-[35px] top-[3px] w-2 h-2 rounded-full bg-bordo" />
+                <p className="font-mono text-[12px] text-bordo mb-1">{h.year}</p>
+                <p className="font-sans text-[13px] text-gris-bordo leading-relaxed">{h.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BLOQUE 4 — DIFERENCIAL (zigzag)
+═══════════════════════════════════════════════════════════════ */
+const DIFERENCIAL = [
+  {
+    num: "01",
+    frase: "Relaciones, no contactos.",
+    body: "Mis contactos no son números en una base de datos. Son vínculos genuinos construidos durante más de una década en los medios de Mendoza.",
+  },
+  {
+    num: "02",
+    frase: "Estrategia antes que acción.",
+    body: "Antes de hablar con un periodista, trabajamos juntos para definir qué historia contar y a quién. El mensaje bien diseñado multiplica los resultados.",
+  },
+  {
+    num: "03",
+    frase: "Impacto que se mide.",
+    body: "Cada aparición en medios queda registrada con análisis de impacto. No solo verás dónde saliste — analizaremos los resultados y definiremos las próximas etapas juntos.",
+  },
+]
+
+function DiferencialZigzag() {
+  return (
+    <section className="bg-hueso py-[120px]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col">
+
+        {DIFERENCIAL.map((item, i) => {
+          const visualLeft = i % 2 === 1
+
+          const Visual = (
+            <div className="lg:w-[45%] flex items-center justify-center py-12 lg:py-0 shrink-0">
+              <div className="relative flex items-center justify-center w-full max-w-[320px] mx-auto" style={{ aspectRatio: "1" }}>
+                <span
+                  className="absolute font-playfair font-bold text-bordo select-none pointer-events-none"
+                  style={{ fontSize: 200, opacity: 0.04, lineHeight: 1 }}
+                  aria-hidden
+                >
+                  {item.num}
+                </span>
+                <p className="relative font-playfair italic text-[24px] text-bordo text-center leading-snug px-6">
+                  "{item.frase}"
+                </p>
+              </div>
+            </div>
+          )
+
+          const Text = (
+            <motion.div
+              variants={visualLeft ? fadeRight : fadeLeft}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+              className="lg:w-[55%] flex flex-col gap-4 py-4"
+            >
+              <h3 className="font-sans font-semibold text-[18px] text-negro-bordo leading-snug">
+                {item.frase}
+              </h3>
+              <p className="font-sans text-[14px] text-gris-bordo leading-relaxed max-w-[480px]">
+                {item.body}
+              </p>
+            </motion.div>
+          )
+
+          return (
+            <div key={item.num}>
+              <div className="flex flex-col lg:flex-row lg:items-center lg:gap-16">
+                {visualLeft ? <>{Visual}{Text}</> : <>{Text}{Visual}</>}
+              </div>
+
+              {i < DIFERENCIAL.length - 1 && (
+                <div className="flex justify-center my-10">
+                  <div className="w-[60px] h-px bg-dorado/20" />
+                </div>
+              )}
+            </div>
+          )
+        })}
+
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BLOQUE 5 — CTA CIERRE
+═══════════════════════════════════════════════════════════════ */
+function CtaCierre() {
+  return (
+    <section className="bg-bordo py-[100px]">
+      <motion.div
+        variants={fadeUpStagger}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportOnce}
+        className="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col items-center text-center gap-6"
+      >
+        <motion.h2
+          variants={fadeUp}
+          className="font-playfair font-bold text-hueso text-[3rem] sm:text-[52px] leading-[1.05]"
+        >
+          ¿Trabajamos juntos?
+        </motion.h2>
+        <motion.p
+          variants={fadeUp}
+          className="font-sans text-[14px]"
+          style={{ color: "rgba(254,252,239,0.6)" }}
+        >
+          Conversemos sobre tu proyecto.
+        </motion.p>
+        <motion.div variants={fadeUp}>
+          <Link
+            href="/contacto"
+            className="inline-flex items-center gap-2 bg-hueso text-bordo font-sans text-[15px] font-semibold px-8 py-4 rounded-full hover:bg-arena active:scale-[0.98] transition-all"
+          >
+            Conversemos →
+          </Link>
+        </motion.div>
+      </motion.div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPORT
+═══════════════════════════════════════════════════════════════ */
+export function SobreMarianSections() {
+  return (
+    <>
+      <HeroEditorial />
+      <Manifiesto />
+      <Trayectoria />
+      <DiferencialZigzag />
+      <CtaCierre />
     </>
   )
 }
