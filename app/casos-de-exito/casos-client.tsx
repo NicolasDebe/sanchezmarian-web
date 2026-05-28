@@ -4,10 +4,11 @@ import React, { useState, useMemo, useRef, useEffect } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
-import { ExternalLink, ArrowRight, ChevronDown } from "lucide-react"
+import { ArrowRight, ChevronDown } from "lucide-react"
 import { CLIPPINGS, type Clipping } from "@/data/clippings"
 import { fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
+import { DestacadasRotativo } from "@/components/destacadas-rotativo"
 
 // ─── Hero stats ───────────────────────────────────────────────────────────────
 
@@ -18,7 +19,12 @@ const STATS = [
   { n: "15",   label: "clientes activos" },
 ] as const
 
-const FEATURED_IDS = [1, 10, 2] as const // La Nación, Vatican News, Clarín
+// 12 apariciones rotativas — 4 grupos × 3 cards
+// Grupo 1: La Nación · Vatican News · Los Andes (Notarial)
+// Grupo 2: Clarín · Los Andes (Vendimia Martín Fierro) · Canal 9 (Notarial)
+// Grupo 3: Los Andes Cosquín · El Sol (Meneo) · Constructiva Online
+// Grupo 4: MDZ Online (Vendimia) · Canal 9 Cada Tarde (Meneo) · Infobae
+const ROTATIVO_IDS = [1, 10, 25, 2, 35, 28, 44, 49, 30, 36, 53, 9] as const
 
 const FORMAT_BORDER: Record<string, string> = {
   Digital:   "var(--color-bordo)",
@@ -546,78 +552,6 @@ function ToggleAllButton({
 
 // ─── Featured card (Bloque 2) ─────────────────────────────────────────────────
 
-function FeaturedCard({ c }: { c: Clipping }) {
-  const [hov, setHov] = useState(false)
-
-  return (
-    <a
-      href={c.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="relative flex flex-col gap-4 h-full"
-      style={{
-        padding: 32,
-        borderRadius: 16,
-        textDecoration: "none",
-        minHeight: 240,
-        background: hov ? "rgba(254,252,239,0.10)" : "rgba(254,252,239,0.06)",
-        border: `1px solid ${hov ? "rgba(254,252,239,0.3)" : "rgba(254,252,239,0.1)"}`,
-        transform: hov ? "translateY(-6px)" : "translateY(0px)",
-        transition: "all 0.2s ease",
-      }}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-    >
-      <ExternalLink
-        size={16}
-        strokeWidth={1.5}
-        className="absolute"
-        style={{
-          top: 32,
-          right: 32,
-          color: "var(--color-hueso)",
-          opacity: hov ? 1 : 0.3,
-          transition: "opacity 0.2s",
-        }}
-      />
-      <span
-        className="font-mono uppercase w-fit"
-        style={{
-          fontSize: 9,
-          padding: "3px 10px",
-          borderRadius: 999,
-          background: "rgba(201,168,130,0.15)",
-          color: "var(--color-dorado)",
-          letterSpacing: "0.1em",
-        }}
-      >
-        {c.alcance}
-      </span>
-      <span
-        className="font-mono uppercase"
-        style={{ fontSize: 12, letterSpacing: "0.15em", color: "rgba(254,252,239,0.6)" }}
-      >
-        {c.medio}
-      </span>
-      <p
-        className="font-playfair flex-1"
-        style={{ fontSize: 20, color: "var(--color-hueso)", lineHeight: 1.3 }}
-      >
-        {c.titular}
-      </p>
-      <span className="font-sans" style={{ fontSize: 12, color: "rgba(254,252,239,0.4)" }}>
-        {c.cliente}
-      </span>
-      <span
-        className="font-mono absolute"
-        style={{ bottom: 32, right: 32, fontSize: 11, color: "var(--color-dorado)" }}
-      >
-        {c.año}
-      </span>
-    </a>
-  )
-}
-
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export function CasosClient() {
@@ -651,8 +585,8 @@ export function CasosClient() {
     }
   }
 
-  const featured = useMemo(
-    () => FEATURED_IDS.map((id) => CLIPPINGS.find((c) => c.id === id)!),
+  const rotativo = useMemo(
+    () => ROTATIVO_IDS.map((id) => CLIPPINGS.find((c) => c.id === id)!),
     []
   )
 
@@ -771,7 +705,7 @@ export function CasosClient() {
         </div>
       </section>
 
-      {/* ── BLOQUE 2 — CASOS DESTACADOS ───────────────────────────────────── */}
+      {/* ── BLOQUE 2 — APARICIONES DESTACADAS (rotativo) ─────────────────── */}
       <section className="bg-bordo" style={{ paddingTop: 100, paddingBottom: 100 }}>
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <motion.p
@@ -784,23 +718,7 @@ export function CasosClient() {
           >
             Apariciones destacadas
           </motion.p>
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="flex gap-4 overflow-x-auto no-scrollbar pb-4 lg:pb-0 lg:grid lg:grid-cols-3 lg:overflow-visible"
-          >
-            {featured.map((c) => (
-              <motion.div
-                key={c.id}
-                variants={revealCard}
-                className="min-w-[300px] sm:min-w-[360px] lg:min-w-0 shrink-0 lg:shrink"
-              >
-                <FeaturedCard c={c} />
-              </motion.div>
-            ))}
-          </motion.div>
+          <DestacadasRotativo apariciones={rotativo} />
         </div>
       </section>
 

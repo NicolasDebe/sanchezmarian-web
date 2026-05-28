@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { AnimatePresence, motion } from "motion/react"
@@ -14,33 +14,13 @@ const navLinks = [
 ]
 
 export function Nav() {
-  const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
 
-  useEffect(() => {
-    const getThreshold = () => window.innerHeight * 0.8
-    const handleScroll = () => setIsScrolled(window.scrollY > getThreshold())
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
   return (
     <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-        isScrolled
-          ? "shadow-[0_1px_0_0_rgba(201,168,130,0.12)]"
-          : "bg-transparent"
-      )}
-      style={
-        isScrolled
-          ? {
-              background:
-                "radial-gradient(ellipse at 50% 50%, rgba(140,26,53,0.35) 0%, transparent 70%), var(--color-bordo)",
-            }
-          : undefined
-      }
+      className="sticky top-0 z-50"
+      style={{ background: "var(--color-bordo)" }}
     >
       <nav className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
         <Link
@@ -86,6 +66,7 @@ export function Nav() {
         </div>
       </nav>
 
+      {/* Mobile menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -93,8 +74,8 @@ export function Nav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden border-t border-hueso/8 px-6 pb-6 pt-4"
-            style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(140,26,53,0.35) 0%, transparent 70%), var(--color-bordo)" }}
+            className="md:hidden border-t border-hueso/10 px-6 pb-6 pt-4"
+            style={{ background: "var(--color-bordo)" }}
           >
             <ul className="flex flex-col gap-4">
               {navLinks.map((link) => (
