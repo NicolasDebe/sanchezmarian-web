@@ -1,17 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion } from "motion/react"
 import Link from "next/link"
 import {
   fadeUp, fadeLeft, fadeRight, revealCard,
   fadeUpStagger, viewportOnce,
 } from "@/lib/animations"
-
-/* ─── helpers ────────────────────────────────────────────────── */
-function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
-}
 
 /* ─── data ───────────────────────────────────────────────────── */
 const PRENSA_INCLUDES = [
@@ -21,7 +16,6 @@ const PRENSA_INCLUDES = [
   "Asesoría para responder consultas periodísticas",
   "Seguimiento de publicaciones y reporte mensual",
 ]
-
 const ESTRATEGIA_INCLUDES = [
   "Diagnóstico de comunicación actual",
   "Definición de posicionamiento y mensajes clave",
@@ -29,7 +23,6 @@ const ESTRATEGIA_INCLUDES = [
   "Selección de canales y medios prioritarios",
   "Acompañamiento y ajuste de estrategia",
 ]
-
 const RRPP_INCLUDES = [
   "Gestión de relaciones institucionales y con medios",
   "Representación y networking en eventos clave",
@@ -37,32 +30,29 @@ const RRPP_INCLUDES = [
   "Manejo de imagen y reputación pública",
   "Acompañamiento continuo y construcción de vínculos",
 ]
-
 const PASOS = ["Diagnóstico", "Posicionamiento", "Plan", "Canales", "Acompañamiento"]
 
+// Network: 8 nodes at radius ~130 around center (200,170) in viewBox 400×340
 const NET_NODES = [
-  { x: 300, y: 70,  label: "Periodista" },
-  { x: 185, y: 32,  label: "Medio" },
-  { x: 75,  y: 78,  label: "Institución" },
-  { x: 42,  y: 170, label: "Alianza" },
-  { x: 65,  y: 268, label: "Evento" },
-  { x: 175, y: 318, label: "Periodista" },
-  { x: 305, y: 295, label: "Medio" },
-  { x: 358, y: 195, label: "Institución" },
-  { x: 322, y: 115, label: "Alianza" },
-  { x: 125, y: 58,  label: "Evento" },
-  { x: 52,  y: 235, label: "Red local" },
-  { x: 268, y: 328, label: "Partner" },
+  { x: 330, y: 170, label: "Alianzas" },
+  { x: 292, y: 78,  label: "Eventos" },
+  { x: 200, y: 40,  label: "Networking" },
+  { x: 108, y: 78,  label: "Confianza" },
+  { x: 70,  y: 170, label: "Reputación" },
+  { x: 108, y: 262, label: "Instituciones" },
+  { x: 200, y: 300, label: "Vínculos" },
+  { x: 292, y: 262, label: "Comunidad" },
 ]
 const NET_CX = 200
-const NET_CY = 185
+const NET_CY = 170
+const CENTER_LINES = [0, 2, 4, 5, 6]          // 5 of 8 nodes get center lines
+const NODE_CONNECTIONS = [[0,1],[2,3],[5,6],[7,0]] as const // inter-node edges
 
-/* ─── shared components ─────────────────────────────────────── */
+/* ─── shared ─────────────────────────────────────────────────── */
 function IncludesList({ items, dark = false }: { items: string[]; dark?: boolean }) {
   const border = dark ? "border-dorado/30" : "border-dorado/25"
   const label  = dark ? "text-hueso/40"    : "text-gris-bordo/50"
   const text   = dark ? "text-hueso/70"    : "text-gris-bordo"
-
   return (
     <div>
       <p className={`font-mono text-[10px] uppercase tracking-[0.2em] mb-0 ${label}`}>
@@ -79,97 +69,80 @@ function IncludesList({ items, dark = false }: { items: string[]; dark?: boolean
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BLOQUE 1 — HERO
+   CAMBIO 1 — HERO: 3 columnas simultáneas
 ═══════════════════════════════════════════════════════════════ */
 const HERO_CARDS = [
   {
-    id: "servicio-01",
+    id: "01",
     num: "01",
     name: "Prensa y Comunicación",
-    bgVar: "var(--color-bordo)",
-    colorVar: "var(--color-hueso)",
-    border: "none",
+    desc: "Gacetillas, entrevistas y relaciones con periodistas para posicionarte como referente.",
   },
   {
-    id: "servicio-02",
+    id: "02",
     num: "02",
     name: "Comunicación Estratégica",
-    bgVar: "var(--color-arena)",
-    colorVar: "var(--color-negro-bordo)",
-    border: "none",
+    desc: "Planes de comunicación mensuales, trimestrales o anuales según tu etapa.",
   },
   {
-    id: "servicio-03",
+    id: "03",
     num: "03",
     name: "Relaciones Públicas",
-    bgVar: "var(--color-hueso)",
-    colorVar: "var(--color-negro-bordo)",
-    border: "1px solid var(--color-dorado)",
+    desc: "Networking, alianzas e imagen institucional para construir reputación sólida.",
   },
 ]
 
 function HeroServicios() {
   return (
-    <section className="bg-hueso pt-28 pb-[120px]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-16 items-center">
+    <section className="bg-hueso py-[60px] pt-[100px]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
 
-        {/* Left 60% */}
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
           animate="visible"
-          className="flex flex-col"
+          className="mb-10"
         >
-          <motion.p
-            variants={fadeUp}
-            className="font-mono text-[10px] uppercase tracking-[0.25em] text-bordo mb-4"
-          >
+          <motion.p variants={fadeUp} className="font-mono text-[10px] uppercase tracking-[0.25em] text-bordo mb-4">
             Servicios
           </motion.p>
-
           <motion.div variants={fadeUp} className="w-10 h-px bg-dorado mb-6" />
-
           <motion.h1
             variants={fadeUp}
-            className="font-playfair font-bold text-negro-bordo text-[2.5rem] sm:text-[3rem] lg:text-[56px] leading-[1.05] mb-6"
+            className="font-playfair font-bold text-negro-bordo text-[2.5rem] sm:text-[3rem] lg:text-[56px] leading-[1.05] mb-4"
           >
             <span className="block">Tres formas de llevar</span>
             <em className="block italic text-bordo">tu historia a los medios.</em>
           </motion.h1>
-
-          <motion.p
-            variants={fadeUp}
-            className="font-sans text-[15px] text-gris-bordo max-w-[460px] leading-relaxed"
-          >
+          <motion.p variants={fadeUp} className="font-sans text-[15px] text-gris-bordo max-w-[460px] leading-relaxed">
             Cada servicio se adapta a una etapa distinta de tu proyecto. Podés elegir uno o combinarlos.
           </motion.p>
         </motion.div>
 
-        {/* Right 40% — stacked cards */}
         <motion.div
-          variants={fadeRight}
+          variants={fadeUpStagger}
           initial="hidden"
           animate="visible"
-          className="relative h-[240px] hidden lg:block"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
-          {HERO_CARDS.map((card, i) => (
-            <motion.button
-              key={card.id}
-              onClick={() => scrollToId(card.id)}
-              className="absolute inset-0 rounded-2xl px-7 py-6 flex flex-col justify-between cursor-pointer text-left"
-              style={{
-                backgroundColor: card.bgVar,
-                color: card.colorVar,
-                border: card.border,
-                zIndex: 30 - i * 10,
-              }}
-              initial={{ y: i * 16, x: i * 8 }}
-              whileHover={{ y: i * 16 - 12, x: i * 8 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            >
-              <span className="font-mono text-[10px] opacity-40">{card.num}</span>
-              <span className="font-playfair font-bold text-[20px] leading-tight">{card.name}</span>
-            </motion.button>
+          {HERO_CARDS.map((card) => (
+            <motion.div key={card.id} variants={revealCard}>
+              <Link
+                href={`#${card.id}`}
+                className="group block bg-hueso border border-dorado rounded-2xl p-10 hover:-translate-y-2 transition-all duration-300 hover:shadow-[0_8px_32px_rgba(102,0,31,0.08)]"
+              >
+                <p className="font-mono text-[10px] text-bordo/40 mb-4">{card.num}</p>
+                <p className="font-playfair font-bold text-negro-bordo text-[24px] leading-tight mb-3">
+                  {card.name}
+                </p>
+                <p className="font-sans text-[14px] text-gris-bordo leading-relaxed mb-6">
+                  {card.desc}
+                </p>
+                <span className="inline-flex items-center border border-bordo text-bordo font-sans text-[13px] px-4 py-2 rounded-lg group-hover:bg-bordo group-hover:text-hueso transition-all duration-200">
+                  Ver detalle →
+                </span>
+              </Link>
+            </motion.div>
           ))}
         </motion.div>
 
@@ -179,14 +152,62 @@ function HeroServicios() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BLOQUE 2 — PRENSA Y COMUNICACIÓN
+   CAMBIO 2 — TYPEWRITER para "Redacción"
+═══════════════════════════════════════════════════════════════ */
+const WORD = "Redacción"
+
+function TypewriterSuffix() {
+  const [text, setText]           = useState("")
+  const [showCursor, setShow]     = useState(false)
+  const [cursorOn, setCursorOn]   = useState(false)
+  const [done, setDone]           = useState(false)
+
+  useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = []
+
+    WORD.split("").forEach((_, i) => {
+      timers.push(setTimeout(() => setText(WORD.slice(0, i + 1)), i * 50))
+    })
+
+    const afterType = WORD.length * 50
+
+    // show cursor immediately after typing
+    timers.push(setTimeout(() => { setShow(true); setCursorOn(true) }, afterType + 50))
+    // blink 1
+    timers.push(setTimeout(() => setCursorOn(false), afterType + 350))
+    timers.push(setTimeout(() => setCursorOn(true),  afterType + 650))
+    // blink 2
+    timers.push(setTimeout(() => setCursorOn(false), afterType + 950))
+    timers.push(setTimeout(() => setCursorOn(true),  afterType + 1250))
+    // hide cursor permanently
+    timers.push(setTimeout(() => { setShow(false); setDone(true) }, afterType + 1600))
+
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
+  if (!text && !done) return null
+
+  return (
+    <em className="font-playfair italic text-dorado not-italic" style={{ fontStyle: "italic" }}>
+      {" · "}{text}
+      {showCursor && (
+        <span
+          className="inline-block w-[2px] h-[20px] bg-dorado ml-0.5 align-text-bottom"
+          style={{ opacity: cursorOn ? 1 : 0, transition: "opacity 0.1s" }}
+        />
+      )}
+    </em>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BLOQUE 2 — PRENSA Y COMUNICACIÓN  (id="01")
 ═══════════════════════════════════════════════════════════════ */
 function ServicioPrensaSection() {
   return (
-    <section id="servicio-01" className="bg-bordo py-24 lg:py-32">
+    <section id="01" className="bg-bordo py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-12 lg:gap-16 items-start">
 
-        {/* Left */}
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
@@ -201,23 +222,18 @@ function ServicioPrensaSection() {
           >
             01
           </span>
-
           <motion.span variants={fadeUp} className="font-mono text-[10px] uppercase tracking-[0.2em] text-hueso/50 relative z-10">
             Servicio principal
           </motion.span>
-
           <motion.h2 variants={fadeUp} className="font-playfair font-bold text-hueso text-[40px] leading-[1.1] relative z-10">
-            Prensa y Comunicación
+            Prensa y Comunicación<TypewriterSuffix />
           </motion.h2>
-
           <motion.p variants={fadeUp} className="font-sans text-[14px] text-hueso/75 leading-[1.8] max-w-[520px] relative z-10">
             Gestión orgánica de presencia en medios para transformar tus hitos, lanzamientos o
             novedades en contenido de valor periodístico. Con más de una década de experiencia
             en el ecosistema de medios de Mendoza, me encargo de que tu mensaje llegue al
-            periodista adecuado, en el momento justo y con el enfoque correcto para garantizar
-            una difusión efectiva y real.
+            periodista adecuado, en el momento justo y con el enfoque correcto.
           </motion.p>
-
           <motion.p variants={fadeUp} className="font-sans text-[13px] relative z-10">
             <span className="font-semibold text-hueso">Para quién: </span>
             <span className="text-hueso/60">
@@ -226,28 +242,18 @@ function ServicioPrensaSection() {
           </motion.p>
         </motion.div>
 
-        {/* Right — card */}
         <motion.div
           variants={revealCard}
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
           className="rounded-2xl p-8 flex flex-col gap-6"
-          style={{
-            background: "rgba(254,252,239,0.06)",
-            border: "1px solid rgba(254,252,239,0.1)",
-          }}
+          style={{ background: "rgba(254,252,239,0.06)", border: "1px solid rgba(254,252,239,0.1)" }}
         >
           <IncludesList items={PRENSA_INCLUDES} dark />
-
           <div className="mt-2">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-dorado mb-3">
-              Caso real
-            </p>
-            <div
-              className="rounded-lg p-4"
-              style={{ background: "rgba(254,252,239,0.04)" }}
-            >
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-dorado mb-3">Caso real</p>
+            <div className="rounded-lg p-4" style={{ background: "rgba(254,252,239,0.04)" }}>
               <p className="font-mono text-[9px] uppercase tracking-widest text-hueso/50 mb-2">
                 MDZ Online · Colegio Notarial de Mendoza
               </p>
@@ -265,57 +271,70 @@ function ServicioPrensaSection() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BLOQUE 3 — COMUNICACIÓN ESTRATÉGICA
+   CAMBIO 3 — ESTRATEGIA: diagrama animado con highlight cíclico
 ═══════════════════════════════════════════════════════════════ */
-function ProcesodiagramaEstrategia() {
+function AnimatedSteps() {
+  const [active, setActive] = useState(0)
+
+  useEffect(() => {
+    const iv = setInterval(() => setActive(p => (p + 1) % PASOS.length), 2000)
+    return () => clearInterval(iv)
+  }, [])
+
   return (
-    <div className="flex flex-col max-w-[340px]">
-      {PASOS.map((paso, i) => (
-        <div key={paso} className="flex items-stretch gap-4">
-          <div className="flex flex-col items-center w-5 shrink-0">
-            <div
-              className={`w-[6px] h-[6px] rounded-full mt-[18px] shrink-0 ${
-                i === 0 ? "bg-bordo" : "bg-dorado/30"
-              }`}
-            />
-            {i < PASOS.length - 1 && (
-              <div className="flex-1 w-px bg-dorado/25 my-1" />
-            )}
-          </div>
-          <div
-            className={`flex-1 mb-3 px-3 py-3 rounded-lg font-sans text-[12px] text-negro-bordo ${
-              i === 0
-                ? "border border-bordo bg-hueso"
-                : "border border-dorado/20 bg-hueso"
-            }`}
-          >
-            {i === 0 && (
-              <span className="inline-block w-[6px] h-[6px] rounded-full bg-bordo mr-2 align-middle" />
-            )}
-            {paso}
-          </div>
+    <div
+      className="bg-hueso border border-dorado rounded-2xl p-[50px] min-h-[400px] flex flex-col justify-center"
+    >
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gris-bordo/50 mb-8">
+        Proceso de trabajo
+      </p>
+
+      <div className="flex items-stretch gap-5">
+        {/* Vertical animated line */}
+        <div className="relative w-[2px] self-stretch shrink-0">
+          <div className="absolute inset-0 bg-dorado/10 rounded-full" />
+          <motion.div
+            className="absolute top-0 left-0 right-0 bg-bordo rounded-full origin-top"
+            animate={{ scaleY: (active + 1) / PASOS.length }}
+            transition={{ duration: 1.8, ease: "linear" }}
+          />
         </div>
-      ))}
+
+        {/* Steps */}
+        <div className="flex flex-col justify-between flex-1 gap-3">
+          {PASOS.map((paso, i) => (
+            <motion.div
+              key={paso}
+              animate={{
+                opacity: i === active ? 1 : 0.4,
+                x:       i === active ? 6 : 0,
+              }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className={`pl-4 py-3 rounded-lg font-sans text-[13px] border-l-2 transition-colors duration-300 ${
+                i === active
+                  ? "border-l-bordo text-negro-bordo"
+                  : "border-l-dorado/20 text-gris-bordo"
+              }`}
+              style={i === active ? { background: "rgba(102,0,31,0.05)" } : {}}
+            >
+              {paso}
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
 
 function ServicioEstrategiaSection() {
   return (
-    <section id="servicio-02" className="bg-hueso-oscuro py-24 lg:py-32">
+    <section id="02" className="bg-hueso-oscuro py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[45fr_55fr] gap-12 lg:gap-16 items-center">
 
-        {/* Left — process diagram */}
-        <motion.div
-          variants={fadeLeft}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-        >
-          <ProcesodiagramaEstrategia />
+        <motion.div variants={fadeLeft} initial="hidden" whileInView="visible" viewport={viewportOnce}>
+          <AnimatedSteps />
         </motion.div>
 
-        {/* Right — text */}
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
@@ -330,27 +349,22 @@ function ServicioEstrategiaSection() {
           >
             02
           </span>
-
           <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[40px] leading-[1.1] relative z-10">
             Comunicación Estratégica
           </motion.h2>
-
           <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo leading-[1.8] max-w-[520px] relative z-10">
             Diseño de planes de comunicación a medida — mensuales, trimestrales o anuales —
             según las necesidades de cada etapa de tu proyecto. Analizamos qué historia contar,
             a quién hablarle y cómo hacerlo, alineando cada acción con tus objetivos de negocio
             o posicionamiento personal.
           </motion.p>
-
           <motion.div variants={fadeUp} className="relative z-10">
             <IncludesList items={ESTRATEGIA_INCLUDES} />
           </motion.div>
-
           <motion.p variants={fadeUp} className="font-sans text-[13px] relative z-10">
             <span className="font-semibold text-negro-bordo">Para quién: </span>
             <span className="text-gris-bordo">
-              Negocios en crecimiento que necesitan comunicar ese crecimiento de forma
-              ordenada y profesional.
+              Negocios en crecimiento que necesitan comunicar ese crecimiento de forma ordenada y profesional.
             </span>
           </motion.p>
         </motion.div>
@@ -361,97 +375,177 @@ function ServicioEstrategiaSection() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BLOQUE 4 — RELACIONES PÚBLICAS
+   CAMBIO 4 — RRPP: network animation con Marian al centro
 ═══════════════════════════════════════════════════════════════ */
-const nodeVariants = {
-  hidden:  { scale: 0, opacity: 0 },
-  visible: { scale: 1, opacity: 0.85, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const } },
+// Label offsets so text doesn't overlap circles
+const LABEL_OFFSETS: Record<number, { dx: number; dy: number; anchor: string }> = {
+  0: { dx:  18, dy:  4,  anchor: "start"  }, // right
+  1: { dx:   4, dy: -14, anchor: "middle" }, // top-right
+  2: { dx:   0, dy: -14, anchor: "middle" }, // top
+  3: { dx:  -4, dy: -14, anchor: "middle" }, // top-left
+  4: { dx: -18, dy:  4,  anchor: "end"    }, // left
+  5: { dx:  -4, dy:  18, anchor: "middle" }, // bottom-left
+  6: { dx:   0, dy:  18, anchor: "middle" }, // bottom
+  7: { dx:   4, dy:  18, anchor: "middle" }, // bottom-right
 }
 
-const netContainerVariants = {
-  hidden:   {},
-  visible:  { transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
-}
+function NetworkAnimation() {
+  const [phase, setPhase] = useState(0)
+  const [hovered, setHovered] = useState<number | null>(null)
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
-function NetworkDiagram() {
-  const [active, setActive] = useState<number | null>(null)
+  useEffect(() => {
+    function clear() {
+      timersRef.current.forEach(clearTimeout)
+      timersRef.current = []
+    }
+    function add(fn: () => void, ms: number) {
+      timersRef.current.push(setTimeout(fn, ms))
+    }
+    function cycle() {
+      clear()
+      setPhase(0)
+      add(() => setPhase(1), 400)   // center appears
+      add(() => setPhase(2), 3400)  // nodes appear
+      add(() => setPhase(3), 6200)  // center→node lines
+      add(() => setPhase(4), 8200)  // inter-node lines
+      add(cycle, 12000)             // loop
+    }
+    cycle()
+    return clear
+  }, [])
+
+  const isNodeLine = (ni: number) =>
+    CENTER_LINES.includes(ni) && (
+      hovered === null || hovered === ni
+        ? phase >= 3
+        : phase >= 3
+    )
 
   return (
-    <div className="relative w-full">
-      <motion.svg
-        viewBox="0 0 400 360"
+    <div className="relative w-full select-none">
+      <svg
+        viewBox="0 0 400 340"
         className="w-full overflow-visible"
         aria-hidden="true"
-        variants={netContainerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
       >
-        {/* Lines */}
-        {NET_NODES.map((node, i) => (
-          <line
-            key={`l${i}`}
-            x1={NET_CX} y1={NET_CY}
-            x2={node.x} y2={node.y}
-            stroke="var(--color-dorado)"
-            strokeWidth="0.5"
-            opacity="0.2"
-          />
-        ))}
+        {/* Center→node lines */}
+        {CENTER_LINES.map((ni, li) => {
+          const n = NET_NODES[ni]
+          const highlighted = hovered === ni
+          return (
+            <motion.line
+              key={`cl${ni}`}
+              x1={NET_CX} y1={NET_CY}
+              x2={n.x}    y2={n.y}
+              stroke={highlighted ? "var(--color-bordo)" : "var(--color-dorado)"}
+              strokeWidth={highlighted ? 1.5 : 1.5}
+              animate={{
+                pathLength: phase >= 3 ? 1 : 0,
+                opacity:    phase >= 3 ? (highlighted ? 0.8 : 0.4) : 0,
+              }}
+              transition={{
+                pathLength: { duration: 0.6, delay: phase >= 3 ? li * 0.15 : 0, ease: "easeOut" },
+                opacity:    { duration: 0.3, delay: phase >= 3 ? li * 0.15 : 0 },
+              }}
+            />
+          )
+        })}
 
-        {/* Outer nodes */}
-        {NET_NODES.map((node, i) => (
-          <motion.circle
-            key={`n${i}`}
-            cx={node.x}
-            cy={node.y}
-            r={8}
-            fill="var(--color-arena)"
-            stroke="var(--color-dorado)"
-            strokeWidth="1"
-            variants={nodeVariants}
-            style={{ cursor: "pointer" }}
-            onMouseEnter={() => setActive(i)}
-            onMouseLeave={() => setActive(null)}
-          />
-        ))}
+        {/* Inter-node lines */}
+        {NODE_CONNECTIONS.map(([ai, bi], li) => {
+          const a = NET_NODES[ai]
+          const b = NET_NODES[bi]
+          const highlighted = hovered === ai || hovered === bi
+          return (
+            <motion.line
+              key={`nl${li}`}
+              x1={a.x} y1={a.y}
+              x2={b.x} y2={b.y}
+              stroke={highlighted ? "var(--color-bordo)" : "var(--color-dorado)"}
+              strokeWidth={1.5}
+              animate={{
+                pathLength: phase >= 4 ? 1 : 0,
+                opacity:    phase >= 4 ? (highlighted ? 0.8 : 0.35) : 0,
+              }}
+              transition={{
+                pathLength: { duration: 0.5, delay: phase >= 4 ? li * 0.2 : 0, ease: "easeOut" },
+                opacity:    { duration: 0.3, delay: phase >= 4 ? li * 0.2 : 0 },
+              }}
+            />
+          )
+        })}
 
-        {/* Center node */}
-        <circle cx={NET_CX} cy={NET_CY} r={12} fill="var(--color-bordo)" opacity="0.9" />
-        <text
-          x={NET_CX} y={NET_CY}
+        {/* Peripheral nodes */}
+        {NET_NODES.map((node, i) => {
+          const lbl = LABEL_OFFSETS[i]
+          return (
+            <g
+              key={`n${i}`}
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+              style={{ cursor: "default" }}
+            >
+              <motion.circle
+                cx={node.x} cy={node.y} r={18}
+                fill="var(--color-hueso)"
+                stroke={hovered === i ? "var(--color-bordo)" : "var(--color-dorado)"}
+                strokeWidth={hovered === i ? 1.5 : 1}
+                animate={{ scale: phase >= 2 ? 1 : 0, opacity: phase >= 2 ? 1 : 0 }}
+                transition={{
+                  scale:   { type: "spring", stiffness: 220, damping: 18, delay: phase >= 2 ? i * 0.2 : 0.05 },
+                  opacity: { duration: 0.3, delay: phase >= 2 ? i * 0.2 : 0 },
+                }}
+                style={{ originX: `${node.x}px`, originY: `${node.y}px` }}
+              />
+              <motion.text
+                x={node.x + lbl.dx * 1.4}
+                y={node.y + lbl.dy * 1.4}
+                textAnchor={lbl.anchor as "start" | "middle" | "end"}
+                fill="var(--color-gris-bordo)"
+                fontSize="9"
+                fontFamily="var(--font-dm-mono), monospace"
+                animate={{ opacity: phase >= 2 ? 0.7 : 0 }}
+                transition={{ duration: 0.3, delay: phase >= 2 ? i * 0.2 + 0.1 : 0 }}
+              >
+                {node.label}
+              </motion.text>
+            </g>
+          )
+        })}
+
+        {/* Center node — Marian */}
+        <motion.circle
+          cx={NET_CX} cy={NET_CY} r={40}
+          fill="var(--color-bordo)"
+          animate={{ scale: phase >= 1 ? 1 : 0, opacity: phase >= 1 ? 1 : 0 }}
+          transition={{ type: "spring", stiffness: 180, damping: 20 }}
+          style={{ originX: `${NET_CX}px`, originY: `${NET_CY}px` }}
+        />
+        <motion.text
+          x={NET_CX} y={NET_CY + 2}
           textAnchor="middle"
-          dominantBaseline="middle"
+          dominantBaseline="central"
           fill="var(--color-hueso)"
-          fontSize="8"
-          fontFamily="var(--font-dm-mono), monospace"
+          fontSize="32"
+          fontFamily="var(--font-playfair), serif"
+          fontStyle="italic"
+          fontWeight="bold"
+          animate={{ opacity: phase >= 1 ? 1 : 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
         >
           M
-        </text>
-      </motion.svg>
-
-      {active !== null && (
-        <div
-          className="absolute pointer-events-none font-mono text-[9px] text-negro-bordo bg-hueso border border-dorado/30 px-2 py-1 rounded-md whitespace-nowrap z-10"
-          style={{
-            left:      `${(NET_NODES[active].x / 400) * 100}%`,
-            top:       `${(NET_NODES[active].y / 360) * 100}%`,
-            transform: "translate(-50%, -170%)",
-          }}
-        >
-          {NET_NODES[active].label}
-        </div>
-      )}
+        </motion.text>
+      </svg>
     </div>
   )
 }
 
 function ServicioRRPPSection() {
   return (
-    <section id="servicio-03" className="bg-hueso py-24 lg:py-32">
+    <section id="03" className="bg-hueso py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-12 lg:gap-16 items-start">
 
-        {/* Left — text */}
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
@@ -466,17 +560,14 @@ function ServicioRRPPSection() {
           >
             03
           </span>
-
           <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[40px] leading-[1.1] relative z-10">
             Relaciones Públicas
           </motion.h2>
-
           <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo leading-[1.8] max-w-[520px] relative z-10">
             Gestión de relaciones institucionales y networking para fortalecer la reputación de
             marcas y personas. Actúo como nexo estratégico para generar alianzas, coordinar
             presencia en eventos clave y facilitar el contacto con actores relevantes.
           </motion.p>
-
           <motion.p variants={fadeUp} className="font-sans text-[13px] relative z-10">
             <span className="font-semibold text-negro-bordo">Para quién: </span>
             <span className="text-gris-bordo">
@@ -485,7 +576,6 @@ function ServicioRRPPSection() {
           </motion.p>
         </motion.div>
 
-        {/* Right — network + includes */}
         <motion.div
           variants={fadeRight}
           initial="hidden"
@@ -493,7 +583,7 @@ function ServicioRRPPSection() {
           viewport={viewportOnce}
           className="flex flex-col gap-8"
         >
-          <NetworkDiagram />
+          <NetworkAnimation />
           <IncludesList items={RRPP_INCLUDES} />
         </motion.div>
 
@@ -503,30 +593,12 @@ function ServicioRRPPSection() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BLOQUE 5 — COMPARACIÓN RÁPIDA
+   CAMBIO 5 — COMPARACIÓN: "Conversemos →"
 ═══════════════════════════════════════════════════════════════ */
 const COMPARACION = [
-  {
-    num: "01",
-    name: "Prensa y Comunicación",
-    frase: "Quiero salir en los medios.",
-    duracion: "Campañas puntuales o mensuales",
-    featured: true,
-  },
-  {
-    num: "02",
-    name: "Comunicación Estratégica",
-    frase: "Necesito un plan de comunicación.",
-    duracion: "Trimestral o anual",
-    featured: false,
-  },
-  {
-    num: "03",
-    name: "Relaciones Públicas",
-    frase: "Quiero construir red y reputación.",
-    duracion: "Acompañamiento continuo",
-    featured: false,
-  },
+  { num: "01", name: "Prensa y Comunicación",    frase: "Quiero salir en los medios.",           duracion: "Campañas puntuales o mensuales", featured: true  },
+  { num: "02", name: "Comunicación Estratégica", frase: "Necesito un plan de comunicación.",      duracion: "Trimestral o anual",             featured: false },
+  { num: "03", name: "Relaciones Públicas",       frase: "Quiero construir red y reputación.",    duracion: "Acompañamiento continuo",        featured: false },
 ]
 
 function ComparacionSection() {
@@ -571,26 +643,21 @@ function ComparacionSection() {
                   Más solicitado
                 </span>
               )}
-
               <div>
                 <p className="font-sans font-semibold text-[16px] text-negro-bordo mb-1">{s.name}</p>
                 <p className="font-sans text-[13px] text-gris-bordo italic">{s.frase}</p>
               </div>
-
               <div className="h-px bg-dorado/20" />
-
               <div>
-                <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gris-bordo/50">
-                  Duración típica
-                </span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gris-bordo/50">Duración típica</span>
                 <p className="font-sans text-[13px] text-gris-bordo mt-1">{s.duracion}</p>
               </div>
-
+              {/* CAMBIO 5: "Conversemos →" */}
               <Link
                 href="/contacto"
                 className="mt-auto inline-flex items-center justify-center border border-bordo text-bordo font-sans text-[13px] px-4 py-2.5 rounded-lg hover:bg-bordo hover:text-hueso transition-all duration-200"
               >
-                Consultar →
+                Conversemos →
               </Link>
             </motion.div>
           ))}
@@ -602,40 +669,7 @@ function ComparacionSection() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BLOQUE 6 — CTA CIERRE
-═══════════════════════════════════════════════════════════════ */
-function CtaCierreSection() {
-  return (
-    <section className="bg-bordo py-20 lg:py-24">
-      <motion.div
-        variants={fadeUpStagger}
-        initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
-        className="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col items-center text-center gap-8"
-      >
-        <motion.h2
-          variants={fadeUp}
-          className="font-playfair font-bold text-hueso text-[2.5rem] sm:text-[44px] leading-[1.1] max-w-2xl"
-        >
-          ¿Querés aparecer en los medios?
-        </motion.h2>
-
-        <motion.div variants={fadeUp}>
-          <Link
-            href="/contacto"
-            className="inline-flex items-center gap-2 bg-hueso text-bordo font-sans text-[15px] font-semibold px-8 py-4 rounded-full hover:bg-arena active:scale-[0.98] transition-all"
-          >
-            Conversemos →
-          </Link>
-        </motion.div>
-      </motion.div>
-    </section>
-  )
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   EXPORT
+   EXPORT — CAMBIO 6: sin CtaCierreSection
 ═══════════════════════════════════════════════════════════════ */
 export function ServiciosPageSections() {
   return (
@@ -645,7 +679,6 @@ export function ServiciosPageSections() {
       <ServicioEstrategiaSection />
       <ServicioRRPPSection />
       <ComparacionSection />
-      <CtaCierreSection />
     </>
   )
 }
