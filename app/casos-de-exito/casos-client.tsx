@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
 import { ExternalLink, ArrowRight, ChevronDown } from "lucide-react"
 import { CLIPPINGS, type Clipping } from "@/data/clippings"
-import { fadeUp, fadeLeft, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
+import { fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 
 // ─── Hero stats ───────────────────────────────────────────────────────────────
@@ -27,29 +27,6 @@ const FORMAT_BORDER: Record<string, string> = {
   Radio:     "var(--color-gris-bordo)",
   Streaming: "var(--color-bordo-claro)",
 }
-
-const MEDIA_ROWS = [
-  {
-    label: "Internacional",
-    medios: ["Vatican News", "L'Osservatore Romano", "ACI Prensa", "Bio Bio Chile", "Vida Nueva"],
-  },
-  {
-    label: "Nacional",
-    medios: ["La Nación", "Clarín", "Infobae", "Cadena 3", "Diario Popular"],
-  },
-  {
-    label: "Regional",
-    medios: ["La Gaceta", "La Voz del Interior", "Entorno Económico"],
-  },
-  {
-    label: "Local",
-    medios: [
-      "Los Andes", "MDZ Online", "Canal 7", "Canal 9", "El Sol", "Diario UNO", "Mendovoz",
-      "Ciudadano News", "Punto a Punto", "MEMO", "617 News", "NDI", "Señal U",
-      "Mendoza Post", "Mendoza Today", "El Editor", "Diario Vox", "Revista Voilà", "Constructiva Online",
-    ],
-  },
-] as const
 
 // ─── Timeline config ──────────────────────────────────────────────────────────
 
@@ -72,7 +49,7 @@ const TIMELINE_CLIENTES: TimelineCliente[] = [
   { id: "agrocosecha",       label: "Agrocosecha",               key: "Agrocosecha",                   logo: "/images/logos/logo-agrocosecha.png",       inicial: "A" },
   { id: "fuerza-silenciosa", label: "Fuerza Silenciosa",         key: "Fuerza Silenciosa",             logo: "/images/logos/logo-fuerza-silenciosa.jpg", inicial: "F" },
   { id: "mendoza-regenera",  label: "Mendoza Regenera",          key: "Mendoza Regenera",              logo: "/images/logos/logo-mendoza-regenera.png",  inicial: "M" },
-  { id: "flor-mouradian",    label: "Flor Mouradian",            key: "Flor Mouradian",                logo: null,                                       inicial: "F" },
+  { id: "flor-mouradian",    label: "Flor Mouradian",            key: "Flor Mouradian",                logo: "/images/logos/logo-mfmc.png",              inicial: "F" },
 ]
 
 const EASE = [0.16, 1, 0.3, 1] as const
@@ -415,14 +392,14 @@ function TimelineClientBlock({
           {config.logo ? (
             <div
               className="shrink-0 flex items-center justify-center"
-              style={{ width: 48, height: 48 }}
+              style={{ width: 72, height: 72 }}
             >
               <Image
                 src={config.logo}
                 alt={`Logo ${config.label}`}
-                width={48}
-                height={48}
-                style={{ objectFit: "contain", borderRadius: 4 }}
+                width={72}
+                height={72}
+                style={{ objectFit: "contain", borderRadius: 6 }}
               />
             </div>
           ) : (
@@ -430,11 +407,11 @@ function TimelineClientBlock({
             <div
               className="shrink-0 flex items-center justify-center rounded-full font-mono font-bold"
               style={{
-                width: 48,
-                height: 48,
+                width: 72,
+                height: 72,
                 background: "var(--color-arena)",
                 color: "var(--color-bordo)",
-                fontSize: 18,
+                fontSize: 24,
               }}
             >
               {config.inicial}
@@ -895,73 +872,7 @@ export function CasosClient() {
         </div>
       </section>
 
-      {/* ── BLOQUE 4 — MAPA DE MEDIOS ─────────────────────────────────────── */}
-      <section className="bg-hueso" style={{ paddingTop: 80, paddingBottom: 80 }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="mb-10"
-          >
-            <motion.h2
-              variants={fadeUp}
-              className="font-playfair font-bold text-negro-bordo"
-              style={{ fontSize: "clamp(24px, 3vw, 32px)" }}
-            >
-              Medios alcanzados
-            </motion.h2>
-            <motion.p
-              variants={fadeUp}
-              className="font-sans text-gris-bordo mt-3"
-              style={{ fontSize: 13 }}
-            >
-              Presencia verificada en medios locales, provinciales, nacionales e internacionales.
-            </motion.p>
-          </motion.div>
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="flex flex-col"
-          >
-            {MEDIA_ROWS.map((row, ri) => (
-              <motion.div
-                key={row.label}
-                variants={fadeLeft}
-                className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-8 py-5 sm:py-6"
-                style={
-                  ri < MEDIA_ROWS.length - 1
-                    ? { borderBottom: "1px solid rgba(201,168,130,0.15)" }
-                    : undefined
-                }
-              >
-                <span
-                  className="font-mono uppercase text-bordo sm:w-[110px] sm:shrink-0"
-                  style={{ fontSize: 9, letterSpacing: "0.18em", opacity: 0.5 }}
-                >
-                  {row.label}
-                </span>
-                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-6 gap-y-2">
-                  {row.medios.map((m) => (
-                    <span
-                      key={m}
-                      className="font-mono text-gris-bordo transition-all duration-150 cursor-default hover:text-bordo hover:opacity-100"
-                      style={{ fontSize: 11, opacity: 0.5 }}
-                    >
-                      {m}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── BLOQUE 5 — CTA ────────────────────────────────────────────────── */}
+      {/* ── BLOQUE 4 — CTA ────────────────────────────────────────────────── */}
       <section className="bg-bordo" style={{ paddingTop: 100, paddingBottom: 100 }}>
         <motion.div
           variants={fadeUpStagger}
