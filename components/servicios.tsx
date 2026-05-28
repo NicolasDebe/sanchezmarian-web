@@ -1,171 +1,111 @@
 "use client"
 
-import { useState } from "react"
-import { AnimatePresence, motion } from "motion/react"
-import { ArrowRight, Plus } from "lucide-react"
+import { motion } from "motion/react"
 import Link from "next/link"
-import { fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
+import { fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
 
-const SPRING = { type: "spring" as const, stiffness: 200, damping: 20 }
-
-const SERVICIOS = [
+const RESULTADOS = [
   {
     num: "01",
-    name: "Prensa y Comunicación",
-    short: "Tu historia en los medios que importan.",
-    description:
-      "Gestión orgánica de presencia en medios para transformar tus hitos, lanzamientos o novedades en contenido de valor periodístico. Con más de una década de experiencia en el ecosistema de medios de Mendoza, me encargo de que tu mensaje llegue al periodista adecuado, en el momento justo y con el enfoque correcto para garantizar una difusión efectiva y real.",
+    resultado: "Tu historia en los medios que importan.",
+    servicio: "Prensa y Comunicación",
   },
   {
     num: "02",
-    name: "Comunicación Estratégica",
-    short: "Tu plan de comunicación, desde cero.",
-    description:
-      "Diseño de planes de comunicación a medida — mensuales, trimestrales o anuales — según las necesidades de cada etapa de tu proyecto. Analizamos qué historia contar, a quién hablarle y cómo hacerlo, alineando cada acción con tus objetivos de negocio o posicionamiento personal.",
+    resultado: "Una estrategia alineada a cada etapa de tu proyecto.",
+    servicio: "Comunicación Estratégica",
   },
   {
     num: "03",
-    name: "Relaciones Públicas",
-    short: "Reputación y vínculos que perduran.",
-    description:
-      "Vínculos que construyen comunidad. Gestión de relaciones institucionales y networking para fortalecer la reputación de marcas y personas. Actúo como nexo estratégico para generar alianzas, coordinar presencia en eventos clave y facilitar el contacto con actores relevantes.",
+    resultado: "Reputación construida sobre vínculos reales.",
+    servicio: "Relaciones Públicas",
   },
 ]
 
 export function Servicios() {
-  const [activeIndex, setActiveIndex] = useState(0)
-
   return (
-    <section id="servicios" className="bg-hueso py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-12 lg:gap-16 items-start">
+    <section id="servicios" className="bg-hueso py-[140px]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
 
-        {/* ── IZQUIERDA 60% — acordeón ── */}
+        {/* Header */}
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
+          className="mb-[80px]"
         >
           <motion.p
             variants={fadeUp}
-            className="font-mono text-[11px] uppercase tracking-[0.25em] text-bordo mb-4"
+            className="font-mono text-[10px] uppercase tracking-[0.25em] text-bordo mb-4"
           >
             Servicios
           </motion.p>
 
-          <motion.div
-            variants={fadeUp}
-            className="w-10 h-px bg-dorado mb-7"
-          />
+          <motion.div variants={fadeUp} className="w-10 h-px bg-dorado mb-6" />
 
           <motion.h2
             variants={fadeUp}
-            className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.4rem] lg:text-[3rem] leading-[1.1] mb-10"
+            className="font-playfair font-bold text-negro-bordo text-[52px] leading-[1.0] mb-6"
           >
-            <span className="block">Lo que hacemos</span>
-            <em className="block italic text-bordo">juntos.</em>
+            <span className="block">Lo que lográs</span>
+            <em className="block italic text-bordo">trabajando juntos.</em>
           </motion.h2>
 
-          <motion.div variants={fadeUp}>
-            {SERVICIOS.map((s, i) => {
-              const isOpen = activeIndex === i
-              return (
-                <div key={s.num} className={i > 0 ? "border-t border-dorado/25" : ""}>
-                  <button
-                    onClick={() => setActiveIndex(i)}
-                    aria-expanded={isOpen}
-                    className="w-full flex items-center justify-between gap-4 py-5 text-left group cursor-pointer"
-                  >
-                    <div className="flex items-center gap-5">
-                      <span className="font-mono text-[11px] text-bordo/40 w-6 shrink-0 tabular-nums">
-                        {s.num}
-                      </span>
-                      <div>
-                        <p
-                          className={`font-sans font-medium text-[1.1rem] transition-colors duration-200 ${
-                            isOpen
-                              ? "text-bordo"
-                              : "text-negro-bordo/70 group-hover:text-negro-bordo"
-                          }`}
-                        >
-                          {s.name}
-                        </p>
-                        {!isOpen && (
-                          <p className="font-sans text-xs text-gris-bordo/45 mt-0.5 hidden sm:block">
-                            {s.short}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <motion.span
-                      animate={{ rotate: isOpen ? 45 : 0 }}
-                      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                      className={`shrink-0 transition-colors ${
-                        isOpen
-                          ? "text-bordo"
-                          : "text-gris-bordo/30 group-hover:text-gris-bordo/60"
-                      }`}
-                    >
-                      <Plus size={18} strokeWidth={1.5} />
-                    </motion.span>
-                  </button>
-
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        key="content"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={SPRING}
-                        className="overflow-hidden"
-                      >
-                        <p className="font-sans text-gris-bordo text-sm leading-relaxed pb-6 pl-11 pr-2">
-                          {s.description}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )
-            })}
-            <div className="border-t border-dorado/25" />
-          </motion.div>
+          <motion.p
+            variants={fadeUp}
+            className="font-sans text-[14px] text-gris-bordo max-w-[420px] leading-relaxed"
+          >
+            No vendés servicios de comunicación. Vendés resultados: visibilidad,
+            confianza y presencia en los medios que importan.
+          </motion.p>
         </motion.div>
 
-        {/* ── DERECHA 40% — CTA card sticky ── */}
+        {/* Grid de resultados */}
         <motion.div
-          variants={revealCard}
+          variants={fadeUpStagger}
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className="lg:sticky lg:top-32"
+          className="grid grid-cols-1 lg:grid-cols-3"
         >
-          <div
-            className="bg-bordo rounded-2xl p-8 lg:p-9 flex flex-col gap-6"
-            style={{
-              background: "radial-gradient(ellipse at 75% 60%, rgba(140,26,53,0.35) 0%, transparent 65%), var(--color-bordo)",
-            }}
-          >
-            <h3 className="font-playfair font-bold text-hueso text-[1.5rem] leading-snug">
-              ¿Querés aparecer en los medios?
-            </h3>
-
-            <p className="font-sans text-hueso/75 text-sm leading-relaxed">
-              Conversemos sobre tu proyecto.
-            </p>
-
-            <div className="h-px bg-dorado/20" />
-
-            <Link
-              href="#contacto"
-              className="inline-flex items-center justify-center gap-2 bg-hueso text-bordo px-5 py-3.5 rounded-full font-sans text-sm font-medium hover:bg-arena active:scale-[0.98] transition-all"
+          {RESULTADOS.map((r) => (
+            <motion.div
+              key={r.num}
+              variants={fadeUp}
+              className="group pt-8 lg:pr-12 cursor-default"
             >
-              Conversemos
-              <ArrowRight size={14} strokeWidth={2} />
-            </Link>
-          </div>
+              <div className="w-full h-px bg-dorado/20 mb-8" />
+
+              <span className="block font-mono text-[10px] text-bordo opacity-30 group-hover:opacity-100 transition-opacity duration-300 mb-4">
+                {r.num}
+              </span>
+
+              <p className="font-playfair font-bold text-negro-bordo text-[28px] leading-[1.1] transition-transform duration-300 ease-out group-hover:-translate-y-1">
+                {r.resultado}
+              </p>
+
+              <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-gris-bordo/50 mt-4">
+                {r.servicio}
+              </span>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Link centrado */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="mt-16 flex justify-center"
+        >
+          <Link
+            href="/servicios"
+            className="font-sans text-[14px] text-bordo relative inline-block after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-bordo after:transition-all after:duration-300 hover:after:w-full"
+          >
+            Ver en detalle cómo trabajamos →
+          </Link>
         </motion.div>
 
       </div>
