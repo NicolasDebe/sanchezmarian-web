@@ -7,6 +7,7 @@ import {
   fadeUp, fadeLeft, fadeRight, revealCard,
   fadeUpStagger, viewportOnce,
 } from "@/lib/animations"
+import { TimelineRelacionesPublicas } from "@/components/timeline-relaciones-publicas"
 
 /* ─── data ───────────────────────────────────────────────────── */
 const PRENSA_INCLUDES = [
@@ -23,30 +24,7 @@ const ESTRATEGIA_INCLUDES = [
   "Selección de canales y medios prioritarios",
   "Acompañamiento y ajuste de estrategia",
 ]
-const RRPP_INCLUDES = [
-  "Gestión de relaciones institucionales y con medios",
-  "Representación y networking en eventos clave",
-  "Coordinación de alianzas estratégicas",
-  "Manejo de imagen y reputación pública",
-  "Acompañamiento continuo y construcción de vínculos",
-]
 const PASOS = ["Diagnóstico", "Posicionamiento", "Plan", "Canales", "Acompañamiento"]
-
-// Network: 8 nodes at radius ~130 around center (200,170) in viewBox 400×340
-const NET_NODES = [
-  { x: 330, y: 170, label: "Alianzas" },
-  { x: 292, y: 78,  label: "Eventos" },
-  { x: 200, y: 40,  label: "Networking" },
-  { x: 108, y: 78,  label: "Confianza" },
-  { x: 70,  y: 170, label: "Reputación" },
-  { x: 108, y: 262, label: "Instituciones" },
-  { x: 200, y: 300, label: "Vínculos" },
-  { x: 292, y: 262, label: "Comunidad" },
-]
-const NET_CX = 200
-const NET_CY = 170
-const CENTER_LINES = [0, 2, 4, 5, 6]          // 5 of 8 nodes get center lines
-const NODE_CONNECTIONS = [[0,1],[2,3],[5,6],[7,0]] as const // inter-node edges
 
 /* ─── shared ─────────────────────────────────────────────────── */
 function IncludesList({ items, dark = false }: { items: string[]; dark?: boolean }) {
@@ -375,218 +353,35 @@ function ServicioEstrategiaSection() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CAMBIO 4 — RRPP: network animation con Marian al centro
+   BLOQUE 4 — RELACIONES PÚBLICAS  (id="03")
 ═══════════════════════════════════════════════════════════════ */
-// Label offsets so text doesn't overlap circles
-const LABEL_OFFSETS: Record<number, { dx: number; dy: number; anchor: string }> = {
-  0: { dx:  18, dy:  4,  anchor: "start"  }, // right
-  1: { dx:   4, dy: -14, anchor: "middle" }, // top-right
-  2: { dx:   0, dy: -14, anchor: "middle" }, // top
-  3: { dx:  -4, dy: -14, anchor: "middle" }, // top-left
-  4: { dx: -18, dy:  4,  anchor: "end"    }, // left
-  5: { dx:  -4, dy:  18, anchor: "middle" }, // bottom-left
-  6: { dx:   0, dy:  18, anchor: "middle" }, // bottom
-  7: { dx:   4, dy:  18, anchor: "middle" }, // bottom-right
-}
-
-function NetworkAnimation() {
-  const [phase, setPhase] = useState(0)
-  const [hovered, setHovered] = useState<number | null>(null)
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
-
-  useEffect(() => {
-    function clear() {
-      timersRef.current.forEach(clearTimeout)
-      timersRef.current = []
-    }
-    function add(fn: () => void, ms: number) {
-      timersRef.current.push(setTimeout(fn, ms))
-    }
-    function cycle() {
-      clear()
-      setPhase(0)
-      add(() => setPhase(1), 400)   // center appears
-      add(() => setPhase(2), 3400)  // nodes appear
-      add(() => setPhase(3), 6200)  // center→node lines
-      add(() => setPhase(4), 8200)  // inter-node lines
-      add(cycle, 12000)             // loop
-    }
-    cycle()
-    return clear
-  }, [])
-
-  const isNodeLine = (ni: number) =>
-    CENTER_LINES.includes(ni) && (
-      hovered === null || hovered === ni
-        ? phase >= 3
-        : phase >= 3
-    )
-
-  return (
-    <div className="relative w-full select-none">
-      <svg
-        viewBox="0 0 400 340"
-        className="w-full overflow-visible"
-        aria-hidden="true"
-      >
-        {/* Center→node lines */}
-        {CENTER_LINES.map((ni, li) => {
-          const n = NET_NODES[ni]
-          const highlighted = hovered === ni
-          return (
-            <motion.line
-              key={`cl${ni}`}
-              x1={NET_CX} y1={NET_CY}
-              x2={n.x}    y2={n.y}
-              stroke={highlighted ? "var(--color-bordo)" : "var(--color-dorado)"}
-              strokeWidth={highlighted ? 1.5 : 1.5}
-              animate={{
-                pathLength: phase >= 3 ? 1 : 0,
-                opacity:    phase >= 3 ? (highlighted ? 0.8 : 0.4) : 0,
-              }}
-              transition={{
-                pathLength: { duration: 0.6, delay: phase >= 3 ? li * 0.15 : 0, ease: "easeOut" },
-                opacity:    { duration: 0.3, delay: phase >= 3 ? li * 0.15 : 0 },
-              }}
-            />
-          )
-        })}
-
-        {/* Inter-node lines */}
-        {NODE_CONNECTIONS.map(([ai, bi], li) => {
-          const a = NET_NODES[ai]
-          const b = NET_NODES[bi]
-          const highlighted = hovered === ai || hovered === bi
-          return (
-            <motion.line
-              key={`nl${li}`}
-              x1={a.x} y1={a.y}
-              x2={b.x} y2={b.y}
-              stroke={highlighted ? "var(--color-bordo)" : "var(--color-dorado)"}
-              strokeWidth={1.5}
-              animate={{
-                pathLength: phase >= 4 ? 1 : 0,
-                opacity:    phase >= 4 ? (highlighted ? 0.8 : 0.35) : 0,
-              }}
-              transition={{
-                pathLength: { duration: 0.5, delay: phase >= 4 ? li * 0.2 : 0, ease: "easeOut" },
-                opacity:    { duration: 0.3, delay: phase >= 4 ? li * 0.2 : 0 },
-              }}
-            />
-          )
-        })}
-
-        {/* Peripheral nodes */}
-        {NET_NODES.map((node, i) => {
-          const lbl = LABEL_OFFSETS[i]
-          return (
-            <g
-              key={`n${i}`}
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-              style={{ cursor: "default" }}
-            >
-              <motion.circle
-                cx={node.x} cy={node.y} r={18}
-                fill="var(--color-hueso)"
-                stroke={hovered === i ? "var(--color-bordo)" : "var(--color-dorado)"}
-                strokeWidth={hovered === i ? 1.5 : 1}
-                animate={{ scale: phase >= 2 ? 1 : 0, opacity: phase >= 2 ? 1 : 0 }}
-                transition={{
-                  scale:   { type: "spring", stiffness: 220, damping: 18, delay: phase >= 2 ? i * 0.2 : 0.05 },
-                  opacity: { duration: 0.3, delay: phase >= 2 ? i * 0.2 : 0 },
-                }}
-                style={{ originX: `${node.x}px`, originY: `${node.y}px` }}
-              />
-              <motion.text
-                x={node.x + lbl.dx * 1.4}
-                y={node.y + lbl.dy * 1.4}
-                textAnchor={lbl.anchor as "start" | "middle" | "end"}
-                fill="var(--color-gris-bordo)"
-                fontSize="9"
-                fontFamily="var(--font-dm-mono), monospace"
-                animate={{ opacity: phase >= 2 ? 0.7 : 0 }}
-                transition={{ duration: 0.3, delay: phase >= 2 ? i * 0.2 + 0.1 : 0 }}
-              >
-                {node.label}
-              </motion.text>
-            </g>
-          )
-        })}
-
-        {/* Center node — Marian */}
-        <motion.circle
-          cx={NET_CX} cy={NET_CY} r={40}
-          fill="var(--color-bordo)"
-          animate={{ scale: phase >= 1 ? 1 : 0, opacity: phase >= 1 ? 1 : 0 }}
-          transition={{ type: "spring", stiffness: 180, damping: 20 }}
-          style={{ originX: `${NET_CX}px`, originY: `${NET_CY}px` }}
-        />
-        <motion.text
-          x={NET_CX} y={NET_CY + 2}
-          textAnchor="middle"
-          dominantBaseline="central"
-          fill="var(--color-hueso)"
-          fontSize="32"
-          fontFamily="var(--font-playfair), serif"
-          fontStyle="italic"
-          fontWeight="bold"
-          animate={{ opacity: phase >= 1 ? 1 : 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-        >
-          M
-        </motion.text>
-      </svg>
-    </div>
-  )
-}
-
 function ServicioRRPPSection() {
   return (
-    <section id="03" className="bg-hueso py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-12 lg:gap-16 items-start">
-
+    <section id="03" className="bg-hueso py-24 lg:py-28">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative">
+        <span
+          className="absolute -top-2 left-6 lg:left-12 font-mono leading-none text-bordo select-none pointer-events-none"
+          style={{ fontSize: 120, opacity: 0.04 }}
+          aria-hidden
+        >
+          03
+        </span>
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className="flex flex-col gap-6 relative"
+          className="relative z-10 max-w-[640px]"
         >
-          <span
-            className="absolute -top-2 left-0 font-mono leading-none text-bordo select-none pointer-events-none"
-            style={{ fontSize: 120, opacity: 0.04 }}
-            aria-hidden
-          >
-            03
-          </span>
-          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[40px] leading-[1.1] relative z-10">
+          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[40px] leading-[1.1] mb-5">
             Relaciones Públicas
           </motion.h2>
-          <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo leading-[1.8] max-w-[520px] relative z-10">
+          <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo leading-[1.8]">
             Gestión de relaciones institucionales y networking para fortalecer la reputación de
             marcas y personas. Actúo como nexo estratégico para generar alianzas, coordinar
             presencia en eventos clave y facilitar el contacto con actores relevantes.
           </motion.p>
-          <motion.p variants={fadeUp} className="font-sans text-[13px] relative z-10">
-            <span className="font-semibold text-negro-bordo">Para quién: </span>
-            <span className="text-gris-bordo">
-              Marcas y personas que buscan construir confianza y visibilidad sostenida en el tiempo.
-            </span>
-          </motion.p>
         </motion.div>
-
-        <motion.div
-          variants={fadeRight}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-          className="flex flex-col gap-8"
-        >
-          <NetworkAnimation />
-          <IncludesList items={RRPP_INCLUDES} />
-        </motion.div>
-
       </div>
     </section>
   )
@@ -678,6 +473,7 @@ export function ServiciosPageSections() {
       <ServicioPrensaSection />
       <ServicioEstrategiaSection />
       <ServicioRRPPSection />
+      <TimelineRelacionesPublicas />
       <ComparacionSection />
     </>
   )
