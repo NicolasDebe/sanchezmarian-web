@@ -4,8 +4,8 @@ import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AnimatePresence, motion, useInView } from "motion/react"
 import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
+import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 
-// TODO: reemplazar por número WA Business real
 const WA_HREF = "https://wa.me/5492614000000?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
 
 function IconWA() {
@@ -16,14 +16,6 @@ function IconWA() {
   )
 }
 
-/*
- * Cult-UI review:
- * - PopoverForm: widget flotante activado por botón, colores hardcodeados
- *   (bg-muted, dark:bg-[#121212], botón con gradiente azul) — no aplica.
- * Patrón extraído: AnimatePresence mode="popLayout" con blur+y para idle→success.
- */
-
-const EASE = [0.22, 1, 0.36, 1] as const
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
 
 const INPUT_CLASS =
@@ -39,9 +31,7 @@ const INPUT_FOCUS_STYLE = {
 }
 
 export function CtaFinal() {
-  const ref = useRef(null)
   const router = useRouter()
-  const isInView = useInView(ref, { once: true, margin: "-80px" })
   const [error, setError] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({ nombre: "", email: "", mensaje: "" })
@@ -72,64 +62,75 @@ export function CtaFinal() {
   })
 
   return (
-    <section id="contacto" ref={ref} className="bg-bordo py-24 lg:py-32">
+    <section
+      id="contacto"
+      className="py-24 lg:py-32"
+      style={{
+        background: "radial-gradient(ellipse at 25% 40%, rgba(140,26,53,0.35) 0%, transparent 65%), var(--color-bordo)",
+      }}
+    >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
 
         {/* ── IZQUIERDA — texto ── */}
         <motion.div
-          initial={{ opacity: 0, x: -24 }}
-          animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.75, delay: 0.1, ease: EASE }}
+          variants={fadeLeft}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
           className="flex flex-col gap-7"
         >
-          {/* Eyebrow */}
-          <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-hueso/60">
-            Hagamos que las cosas pasen.
-          </p>
-
-          {/* Línea dorada */}
           <motion.div
-            initial={{ scaleX: 0, originX: 0 }}
-            animate={isInView ? { scaleX: 1 } : {}}
-            transition={{ duration: 0.55, ease: EASE, delay: 0.28 }}
-            className="w-10 h-px bg-dorado"
-          />
+            variants={fadeUpStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="flex flex-col gap-7"
+          >
+            <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.25em] text-hueso/60">
+              Hagamos que las cosas pasen.
+            </motion.p>
 
-          {/* Título */}
-          <h2 className="font-playfair font-bold text-hueso text-[2.5rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.0]">
-            <span className="block">Creo en el valor de las buenas historias</span>
-            <em className="block italic text-dorado">y en el poder de las conexiones reales.</em>
-          </h2>
+            <motion.div
+              variants={fadeUp}
+              className="w-10 h-px bg-dorado"
+            />
 
-          {/* Subtítulo */}
-          <p className="font-sans italic text-[0.9375rem] text-hueso/65">
-            Conversemos.
-          </p>
+            <motion.h2
+              variants={fadeUp}
+              className="font-playfair font-bold text-hueso text-[2.5rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.0]"
+            >
+              <span className="block">Creo en el valor de las buenas historias</span>
+              <em className="block italic text-dorado">y en el poder de las conexiones reales.</em>
+            </motion.h2>
 
-          {/* Descripción */}
-          <p className="font-sans text-[0.9375rem] text-hueso/65 leading-[1.7] max-w-[420px]">
-            Si buscás posicionar tu proyecto de forma orgánica y estratégica,
-            me encantaría escucharte.
-          </p>
+            <motion.p variants={fadeUp} className="font-sans italic text-[0.9375rem] text-hueso/65">
+              Conversemos.
+            </motion.p>
 
-          {/* Datos de contacto */}
-          <div className="flex flex-col gap-3 pt-1">
-            <div className="flex items-center gap-3">
-              <Mail size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
-              <span className="font-sans text-sm text-hueso/80">hola@sanchezmarian.com</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <MapPin size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
-              <span className="font-sans text-sm text-hueso/60">Mendoza, Argentina</span>
-            </div>
-          </div>
+            <motion.p variants={fadeUp} className="font-sans text-[0.9375rem] text-hueso/65 leading-[1.7] max-w-[420px]">
+              Si buscás posicionar tu proyecto de forma orgánica y estratégica,
+              me encantaría escucharte.
+            </motion.p>
+
+            <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">
+              <div className="flex items-center gap-3">
+                <Mail size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
+                <span className="font-sans text-sm text-hueso/80">hola@sanchezmarian.com</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <MapPin size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
+                <span className="font-sans text-sm text-hueso/60">Mendoza, Argentina</span>
+              </div>
+            </motion.div>
+          </motion.div>
         </motion.div>
 
         {/* ── DERECHA — card formulario ── */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.75, delay: 0.25, ease: EASE }}
+          variants={revealCard}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
         >
           <div
             className="rounded-[20px] p-10"
@@ -139,126 +140,121 @@ export function CtaFinal() {
             }}
           >
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                  {/* Nombre */}
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="cf-nombre"
-                      className="font-sans text-[11px] uppercase tracking-[0.16em] text-hueso/50"
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="cf-nombre"
+                  className="font-sans text-[11px] uppercase tracking-[0.16em] text-hueso/50"
+                >
+                  Nombre
+                </label>
+                <input
+                  id="cf-nombre"
+                  type="text"
+                  required
+                  value={form.nombre}
+                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                  onFocus={() => setFocused("nombre")}
+                  onBlur={() => setFocused(null)}
+                  placeholder="Tu nombre"
+                  className={INPUT_CLASS}
+                  style={fieldStyle("nombre")}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="cf-email"
+                  className="font-sans text-[11px] uppercase tracking-[0.16em] text-hueso/50"
+                >
+                  Email
+                </label>
+                <input
+                  id="cf-email"
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onFocus={() => setFocused("email")}
+                  onBlur={() => setFocused(null)}
+                  placeholder="tu@email.com"
+                  className={INPUT_CLASS}
+                  style={fieldStyle("email")}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="cf-mensaje"
+                  className="font-sans text-[11px] uppercase tracking-[0.16em] text-hueso/50"
+                >
+                  Mensaje
+                </label>
+                <textarea
+                  id="cf-mensaje"
+                  required
+                  rows={4}
+                  value={form.mensaje}
+                  onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
+                  onFocus={() => setFocused("mensaje")}
+                  onBlur={() => setFocused(null)}
+                  placeholder="Contame en qué puedo ayudarte..."
+                  className={`${INPUT_CLASS} resize-none`}
+                  style={fieldStyle("mensaje")}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="mt-1 w-full flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-3.5 rounded-lg font-sans text-sm font-semibold hover:bg-arena active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+              >
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {submitting ? (
+                    <motion.span
+                      key="loading"
+                      initial={{ opacity: 0, y: -12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 12 }}
+                      transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+                      className="flex items-center gap-2"
                     >
-                      Nombre
-                    </label>
-                    <input
-                      id="cf-nombre"
-                      type="text"
-                      required
-                      value={form.nombre}
-                      onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                      onFocus={() => setFocused("nombre")}
-                      onBlur={() => setFocused(null)}
-                      placeholder="Tu nombre"
-                      className={INPUT_CLASS}
-                      style={fieldStyle("nombre")}
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="cf-email"
-                      className="font-sans text-[11px] uppercase tracking-[0.16em] text-hueso/50"
+                      <Loader size={13} className="animate-spin" />
+                      Enviando…
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="idle"
+                      initial={{ opacity: 0, y: -12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 12 }}
+                      transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+                      className="flex items-center gap-2"
                     >
-                      Email
-                    </label>
-                    <input
-                      id="cf-email"
-                      type="email"
-                      required
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      onFocus={() => setFocused("email")}
-                      onBlur={() => setFocused(null)}
-                      placeholder="tu@email.com"
-                      className={INPUT_CLASS}
-                      style={fieldStyle("email")}
-                    />
-                  </div>
-
-                  {/* Mensaje */}
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="cf-mensaje"
-                      className="font-sans text-[11px] uppercase tracking-[0.16em] text-hueso/50"
-                    >
-                      Mensaje
-                    </label>
-                    <textarea
-                      id="cf-mensaje"
-                      required
-                      rows={4}
-                      value={form.mensaje}
-                      onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
-                      onFocus={() => setFocused("mensaje")}
-                      onBlur={() => setFocused(null)}
-                      placeholder="Contame en qué puedo ayudarte..."
-                      className={`${INPUT_CLASS} resize-none`}
-                      style={fieldStyle("mensaje")}
-                    />
-                  </div>
-
-                  {/* Botón submit */}
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="mt-1 w-full flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-3.5 rounded-lg font-sans text-sm font-semibold hover:bg-arena active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
-                  >
-                    <AnimatePresence mode="popLayout" initial={false}>
-                      {submitting ? (
-                        <motion.span
-                          key="loading"
-                          initial={{ opacity: 0, y: -12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 12 }}
-                          transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-                          className="flex items-center gap-2"
-                        >
-                          <Loader size={13} className="animate-spin" />
-                          Enviando…
-                        </motion.span>
-                      ) : (
-                        <motion.span
-                          key="idle"
-                          initial={{ opacity: 0, y: -12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 12 }}
-                          transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-                          className="flex items-center gap-2"
-                        >
-                          Escribime
-                          <ArrowRight size={14} strokeWidth={2} />
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </button>
-
-                  {/* WhatsApp — alternativa secundaria */}
-                  <div className="flex items-center justify-center gap-2 mt-1">
-                    <span className="font-sans text-xs text-hueso/35">¿Preferís WhatsApp?</span>
-                    <a
-                      href={WA_HREF}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 font-sans text-xs font-medium text-hueso/50 hover:text-hueso transition-colors"
-                    >
-                      <IconWA />
-                      Escribime por acá
-                    </a>
-                  </div>
-
-                  {error && (
-                    <p className="font-mono text-[9px] text-dorado/70 text-center">
-                      Error al enviar. Escribime a hola@sanchezmarian.com
-                    </p>
+                      Escribime
+                      <ArrowRight size={14} strokeWidth={2} />
+                    </motion.span>
                   )}
+                </AnimatePresence>
+              </button>
+
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <span className="font-sans text-xs text-hueso/35">¿Preferís WhatsApp?</span>
+                <a
+                  href={WA_HREF}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 font-sans text-xs font-medium text-hueso/50 hover:text-hueso transition-colors"
+                >
+                  <IconWA />
+                  Escribime por acá
+                </a>
+              </div>
+
+              {error && (
+                <p className="font-mono text-[9px] text-dorado/70 text-center">
+                  Error al enviar. Escribime a hola@sanchezmarian.com
+                </p>
+              )}
             </form>
           </div>
         </motion.div>

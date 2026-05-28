@@ -1,459 +1,390 @@
 "use client"
 
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useRef, useEffect } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
-import { ExternalLink, ChevronDown } from "lucide-react"
-import { CLIPPINGS, CATEGORIAS, type Categoria } from "@/data/clippings"
+import Link from "next/link"
+import { ExternalLink, ArrowRight, ChevronDown } from "lucide-react"
+import { CLIPPINGS, type Clipping } from "@/data/clippings"
+import { fadeUp, fadeLeft, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
+import { TextureOverlay } from "@/components/ui/texture-overlay"
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Hero stats ───────────────────────────────────────────────────────────────
 
-type Aparicion = {
-  id: number
-  medio: string
-  formato: string
-  alcance: string
-  titular: string
-  año: number
-  link: string
+const STATS = [
+  { n: "100+", label: "apariciones verificadas" },
+  { n: "30+",  label: "medios distintos" },
+  { n: "5",    label: "formatos cubiertos" },
+  { n: "15",   label: "clientes activos" },
+] as const
+
+const FEATURED_IDS = [1, 10, 2] as const // La Nación, Vatican News, Clarín
+
+const FORMAT_BORDER: Record<string, string> = {
+  Digital:   "var(--color-bordo)",
+  Gráfico:   "var(--color-negro-bordo)",
+  TV:        "var(--color-dorado)",
+  Radio:     "var(--color-gris-bordo)",
+  Streaming: "var(--color-bordo-claro)",
 }
 
-type ClienteBase = {
+const MEDIA_ROWS = [
+  {
+    label: "Internacional",
+    medios: ["Vatican News", "L'Osservatore Romano", "ACI Prensa", "Bio Bio Chile", "Vida Nueva"],
+  },
+  {
+    label: "Nacional",
+    medios: ["La Nación", "Clarín", "Infobae", "Cadena 3", "Diario Popular"],
+  },
+  {
+    label: "Regional",
+    medios: ["La Gaceta", "La Voz del Interior", "Entorno Económico"],
+  },
+  {
+    label: "Local",
+    medios: [
+      "Los Andes", "MDZ Online", "Canal 7", "Canal 9", "El Sol", "Diario UNO", "Mendovoz",
+      "Ciudadano News", "Punto a Punto", "MEMO", "617 News", "NDI", "Señal U",
+      "Mendoza Post", "Mendoza Today", "El Editor", "Diario Vox", "Revista Voilà", "Constructiva Online",
+    ],
+  },
+] as const
+
+// ─── Timeline config ──────────────────────────────────────────────────────────
+
+type TimelineCliente = {
   id: string
-  nombre: string
+  label: string
+  key: string
   logo: string | null
-  descripcion: string
-  categoria: Categoria | null
-  enCamino?: boolean
+  inicial: string
 }
 
-type ClienteData = ClienteBase & {
-  apariciones: Aparicion[]
-  formatos: string[]
-  mediosCount: number
-}
-
-// ─── Client config ────────────────────────────────────────────────────────────
-
-const CLIENTES_CONFIG: ClienteBase[] = [
-  {
-    id: "capilla-carlo-acutis",
-    nombre: "Capilla Carlo Acutis",
-    logo: "/images/logos/logo-capilla-acutis.png",
-    descripcion:
-      "Construcción de la primera capilla del mundo dedicada a Carlo Acutis en Chacras de Coria, Mendoza.",
-    categoria: "Instituciones & Eventos",
-  },
-  {
-    id: "esc-vendimia-chakaymanta",
-    nombre: "Esc. Vendimia Chakaymanta",
-    logo: "/images/logos/logo-chakaymanta.png",
-    descripcion:
-      "Del barrio La Favorita al Martín Fierro Nacional de la Danza y al Festival de Cosquín.",
-    categoria: "Cultura & Educación",
-  },
-  {
-    id: "colegio-notarial-mendoza",
-    nombre: "Colegio Notarial de Mendoza",
-    logo: "/images/logos/logo-colegio-notarial.png",
-    descripcion:
-      "Lanzamiento del Observatorio Estadístico del Mercado Inmobiliario y digitalización de escrituras.",
-    categoria: "Empresas & Instituciones",
-  },
-  {
-    id: "dra-elina-meneo",
-    nombre: "Dra. Elina Meneo",
-    logo: "/images/logos/logo-meneo.png",
-    descripcion:
-      "Posicionamiento en medios de la terapia de regresión a vidas pasadas en Mendoza.",
-    categoria: "Marcas Personales",
-  },
-  {
-    id: "bolsa-comercio",
-    nombre: "Bolsa de Comercio de Mendoza",
-    logo: "/images/logos/logo-bolsa-comercio.png",
-    descripcion: "Representación institucional del comercio mendocino.",
-    categoria: null,
-    enCamino: true,
-  },
-  {
-    id: "fuerza-silenciosa",
-    nombre: "Fuerza Silenciosa",
-    logo: "/images/logos/logo-fuerza-silenciosa.jpg",
-    descripcion: "Visibilidad y posicionamiento de marca.",
-    categoria: null,
-    enCamino: true,
-  },
-  {
-    id: "flor-mouradian",
-    nombre: "Flor Mouradian, Psicóloga",
-    logo: "/images/logos/logo-mfmc.png",
-    descripcion: "Marca personal en el sector salud mental.",
-    categoria: null,
-    enCamino: true,
-  },
-  {
-    id: "agrocosecha",
-    nombre: "Agrocosecha",
-    logo: "/images/logos/logo-agrocosecha.png",
-    descripcion: "Comunicación estratégica en el sector agropecuario.",
-    categoria: null,
-    enCamino: true,
-  },
-  {
-    id: "grupo-presidente",
-    nombre: "Grupo Presidente",
-    logo: "/images/logos/logo-presidente.png",
-    descripcion: "Comunicación corporativa y relaciones con medios.",
-    categoria: null,
-    enCamino: true,
-  },
-  {
-    id: "mendoza-regenera",
-    nombre: "Mendoza Regenera",
-    logo: "/images/logos/logo-mendoza-regenera.png",
-    descripcion: "Comunicación ambiental y regenerativa.",
-    categoria: null,
-    enCamino: true,
-  },
-  {
-    id: "quienvino-app",
-    nombre: "QuienVino App",
-    logo: "/images/logos/logo-quienvino.png",
-    descripcion: "Plataforma digital para el ecosistema vitivinícola.",
-    categoria: null,
-    enCamino: true,
-  },
+const TIMELINE_CLIENTES: TimelineCliente[] = [
+  { id: "bolsa-comercio",    label: "Bolsa de Comercio",         key: "Bolsa de Comercio de Mendoza",  logo: "/images/logos/logo-bolsa-comercio.png",    inicial: "B" },
+  { id: "colegio-notarial",  label: "Colegio Notarial",          key: "Colegio Notarial de Mendoza",   logo: "/images/logos/logo-colegio-notarial.png",  inicial: "N" },
+  { id: "grupo-presidente",  label: "Grupo Presidente",          key: "Grupo Presidente",              logo: "/images/logos/logo-presidente.png",        inicial: "P" },
+  { id: "capilla-acutis",    label: "Capilla Carlo Acutis",      key: "Capilla Carlo Acutis",          logo: "/images/logos/logo-capilla-acutis.png",    inicial: "C" },
+  { id: "dra-meneo",         label: "Dra. Elina Meneo",          key: "Dra. Elina Meneo",              logo: "/images/logos/logo-meneo.png",             inicial: "M" },
+  { id: "chakaymanta",       label: "Esc. Vendimia Chakaymanta", key: "Esc. Vendimia Chakaymanta",     logo: "/images/logos/logo-chakaymanta.png",       inicial: "E" },
+  { id: "quienvino",         label: "QuienVino App",             key: "QuienVino App",                 logo: "/images/logos/logo-quienvino.png",         inicial: "Q" },
+  { id: "agrocosecha",       label: "Agrocosecha",               key: "Agrocosecha",                   logo: "/images/logos/logo-agrocosecha.png",       inicial: "A" },
+  { id: "fuerza-silenciosa", label: "Fuerza Silenciosa",         key: "Fuerza Silenciosa",             logo: "/images/logos/logo-fuerza-silenciosa.jpg", inicial: "F" },
+  { id: "mendoza-regenera",  label: "Mendoza Regenera",          key: "Mendoza Regenera",              logo: "/images/logos/logo-mendoza-regenera.png",  inicial: "M" },
+  { id: "flor-mouradian",    label: "Flor Mouradian",            key: "Flor Mouradian",                logo: null,                                       inicial: "F" },
 ]
 
-const NOMBRE_A_ID: Record<string, string> = {
-  "Capilla Carlo Acutis": "capilla-carlo-acutis",
-  "Esc. Vendimia Chakaymanta": "esc-vendimia-chakaymanta",
-  "Colegio Notarial de Mendoza": "colegio-notarial-mendoza",
-  "Dra. Elina Meneo": "dra-elina-meneo",
-}
+const EASE = [0.16, 1, 0.3, 1] as const
 
-const ROW_COLS = "160px 80px 100px 1fr 50px 32px"
+// ─── Timeline layout constants ────────────────────────────────────────────────
 
-// ─── Logo avatar — usa next/image con fallback a inicial ──────────────────────
+const COLS = 3
+const ROW_H = 220      // px per grid row
+const LINE_Y = 185     // y of zigzag line within each row (below cards)
+const GAP = 24         // column gap
 
-function LogoAvatar({
-  logo,
-  nombre,
-  size = 64,
-}: {
-  logo: string | null
-  nombre: string
-  size?: number
-}) {
-  const [err, setErr] = useState(false)
-  const radius = size <= 48 ? 10 : 12
-  const innerSize = size - 16
+// ─── Timeline card ────────────────────────────────────────────────────────────
 
-  const wrapStyle: React.CSSProperties = {
-    width: size,
-    height: size,
-    minWidth: size,
-    background: "var(--color-arena)",
-    borderRadius: radius,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  }
-
-  if (logo && !err) {
-    return (
-      <div style={wrapStyle}>
-        <Image
-          src={logo}
-          alt={nombre}
-          width={innerSize}
-          height={innerSize}
-          onError={() => setErr(true)}
-          style={{ objectFit: "contain" }}
-        />
-      </div>
-    )
-  }
-
-  return (
-    <div style={wrapStyle}>
-      <span
-        style={{
-          fontFamily: "var(--font-playfair)",
-          fontStyle: "italic",
-          fontSize: size <= 48 ? 22 : 28,
-          color: "var(--color-bordo)",
-          lineHeight: 1,
-        }}
-      >
-        {nombre.charAt(0)}
-      </span>
-    </div>
-  )
-}
-
-// ─── Badges ──────────────────────────────────────────────────────────────────
-
-function FBadge({ text }: { text: string }) {
-  return (
-    <span
-      style={{
-        fontFamily: "var(--font-mono)",
-        fontSize: 10,
-        padding: "2px 8px",
-        borderRadius: 4,
-        background: "var(--color-arena)",
-        color: "var(--color-gris-bordo)",
-        whiteSpace: "nowrap",
-      }}
-    >
-      {text}
-    </span>
-  )
-}
-
-function ABadge({ text }: { text: string }) {
-  return (
-    <span
-      style={{
-        fontFamily: "var(--font-mono)",
-        fontSize: 10,
-        padding: "2px 8px",
-        borderRadius: 4,
-        border: "1px solid rgba(102,0,31,0.15)",
-        color: "rgba(102,0,31,0.7)",
-        whiteSpace: "nowrap",
-      }}
-    >
-      {text}
-    </span>
-  )
-}
-
-// ─── Filter pill ──────────────────────────────────────────────────────────────
-
-function FilterPill({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  const [hovered, setHov] = useState(false)
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      className="shrink-0 transition-all duration-200"
-      style={{
-        fontFamily: "var(--font-sans)",
-        fontSize: 13,
-        padding: "8px 20px",
-        borderRadius: 999,
-        border: active ? "none" : "1px solid rgba(102,0,31,0.2)",
-        background: active ? "var(--color-bordo)" : hovered ? "var(--color-arena)" : "transparent",
-        color: active ? "var(--color-hueso)" : "var(--color-gris-bordo)",
-        cursor: "pointer",
-        whiteSpace: "nowrap",
-      }}
-    >
-      {label}
-    </button>
-  )
-}
-
-// ─── Aparicion row (desktop table, inside accordion) ─────────────────────────
-
-function AparicionRow({ medio, formato, alcance, titular, año, link }: Aparicion) {
-  const rowStyle: React.CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: ROW_COLS,
-    padding: "14px 0",
-    alignItems: "center",
-    borderBottom: "1px solid rgba(102,0,31,0.04)",
-    textDecoration: "none",
-  }
+function TimelineCard({ ap }: { ap: Clipping }) {
+  const borderColor = FORMAT_BORDER[ap.formato] ?? FORMAT_BORDER.Digital
 
   const inner = (
-    <>
-      <span className="font-sans font-medium text-sm" style={{ color: "var(--color-negro-bordo)" }}>
-        {medio}
-      </span>
-      <span><FBadge text={formato} /></span>
-      <span><ABadge text={alcance} /></span>
-      <span
-        className="font-sans text-sm"
-        style={{
-          color: "var(--color-gris-bordo)",
-          lineHeight: 1.4,
-          overflow: "hidden",
-          display: "-webkit-box",
-          WebkitLineClamp: 1,
-          WebkitBoxOrient: "vertical",
-        } as React.CSSProperties}
-      >
-        {titular}
-      </span>
-      <span className="font-mono text-xs text-right" style={{ color: "rgba(74,48,64,0.4)" }}>
-        {año}
-      </span>
-      <span className="flex justify-end items-center">
-        {link && (
-          <ExternalLink size={14} strokeWidth={1.5} style={{ color: "rgba(102,0,31,0.25)" }} />
-        )}
-      </span>
-    </>
-  )
-
-  if (link) {
-    return (
-      <a
-        href={link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hidden sm:grid hover:bg-[rgba(102,0,31,0.02)] transition-colors"
-        style={rowStyle}
-      >
-        {inner}
-      </a>
-    )
-  }
-  return <div className="hidden sm:grid" style={rowStyle}>{inner}</div>
-}
-
-// ─── Aparicion card (mobile, inside accordion) ────────────────────────────────
-
-function AparicionCard({ medio, formato, alcance, titular, año, link }: Aparicion) {
-  const cardContent = (
     <div
-      className="flex flex-col gap-2 py-3"
-      style={{ borderBottom: "1px solid rgba(102,0,31,0.04)" }}
+      style={{
+        background: "var(--color-hueso)",
+        borderRadius: 8,
+        padding: "16px 20px",
+        borderLeft: `2px solid ${borderColor}`,
+      }}
     >
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="font-sans font-medium text-sm" style={{ color: "var(--color-negro-bordo)" }}>
-          {medio}
+      <div className="flex items-start justify-between gap-2" style={{ marginBottom: 6 }}>
+        <span
+          className="font-mono uppercase"
+          style={{ fontSize: 10, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+        >
+          {ap.medio}
         </span>
-        <FBadge text={formato} />
-        <ABadge text={alcance} />
+        <span
+          className="font-mono shrink-0"
+          style={{
+            fontSize: 8,
+            padding: "2px 6px",
+            borderRadius: 4,
+            background: "var(--color-arena)",
+            color: "var(--color-gris-bordo)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {ap.alcance}
+        </span>
       </div>
+
       <p
-        className="font-sans text-sm leading-snug"
+        className="font-sans"
         style={{
-          color: "var(--color-gris-bordo)",
+          fontSize: 13,
+          color: "var(--color-negro-bordo)",
+          lineHeight: 1.4,
           overflow: "hidden",
           display: "-webkit-box",
           WebkitLineClamp: 2,
           WebkitBoxOrient: "vertical",
         } as React.CSSProperties}
       >
-        {titular}
+        {ap.titular}
       </p>
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[11px]" style={{ color: "rgba(74,48,64,0.4)" }}>{año}</span>
-        {link && <ExternalLink size={13} strokeWidth={1.5} style={{ color: "rgba(102,0,31,0.4)" }} />}
-      </div>
+
+      <span
+        className="font-mono"
+        style={{ display: "block", marginTop: 6, fontSize: 10, color: "var(--color-gris-bordo)", opacity: 0.5 }}
+      >
+        {ap.año}
+      </span>
     </div>
   )
 
-  if (link) {
-    return (
-      <a href={link} target="_blank" rel="noopener noreferrer" className="block sm:hidden">
-        {cardContent}
-      </a>
-    )
-  }
-  return <div className="sm:hidden">{cardContent}</div>
+  return ap.link ? (
+    <a
+      href={ap.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block transition-all hover:opacity-80"
+      style={{ textDecoration: "none" }}
+    >
+      {inner}
+    </a>
+  ) : (
+    <div>{inner}</div>
+  )
 }
 
-// ─── Aparicion flat row (modo categoría) ──────────────────────────────────────
+// ─── Zigzag timeline ──────────────────────────────────────────────────────────
 
-function AparicionFlatRow({
-  cliente,
-  medio,
-  formato,
-  alcance,
-  titular,
-  año,
-  link,
+function ZigzagTimeline({
+  apariciones,
+  clientId,
 }: {
-  cliente: string
-  medio: string
-  formato: string
-  alcance: string
-  titular: string
-  año: number
-  link: string
+  apariciones: Clipping[]
+  clientId: string
 }) {
-  const content = (
-    <div className="py-4" style={{ borderBottom: "1px solid rgba(102,0,31,0.06)" }}>
-      <p
-        className="font-mono text-[11px] uppercase mb-2"
-        style={{ color: "rgba(102,0,31,0.5)", letterSpacing: "0.15em" }}
-      >
-        {cliente}
-      </p>
-      <div className="flex items-start gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1.5">
-            <span className="font-sans font-medium text-sm" style={{ color: "var(--color-negro-bordo)" }}>
-              {medio}
-            </span>
-            <FBadge text={formato} />
-            <ABadge text={alcance} />
-          </div>
-          <p
-            className="font-sans text-sm leading-snug"
-            style={{
-              color: "var(--color-gris-bordo)",
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            } as React.CSSProperties}
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [containerW, setContainerW] = useState(0)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    setContainerW(el.getBoundingClientRect().width)
+    const ro = new ResizeObserver((entries) => {
+      setContainerW(entries[0].contentRect.width)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const sorted = useMemo(
+    () =>
+      [...apariciones].sort((a, b) =>
+        b.año !== a.año ? b.año - a.año : b.id - a.id
+      ),
+    [apariciones]
+  )
+
+  const isMobile = containerW > 0 && containerW < 640
+  const rows = Math.ceil(sorted.length / COLS)
+  const colW = containerW > 0 ? (containerW - GAP * (COLS - 1)) / COLS : 0
+  const colCenter = (c: number) => c * (colW + GAP) + colW / 2
+
+  // Build zigzag SVG path
+  const svgPath = useMemo(() => {
+    if (containerW <= 0 || sorted.length === 0) return ""
+    const W = containerW
+    let d = ""
+    for (let r = 0; r < rows; r++) {
+      const y = r * ROW_H + LINE_Y
+      const ltr = r % 2 === 0
+      if (r === 0) d = `M ${ltr ? 0 : W},${y}`
+      d += ` L ${ltr ? W : 0},${y}`
+      if (r < rows - 1) {
+        d += ` L ${ltr ? W : 0},${(r + 1) * ROW_H + LINE_Y}`
+      }
+    }
+    return d
+  }, [containerW, rows, sorted.length])
+
+  const svgH = rows * ROW_H + 20
+
+  if (sorted.length === 0) return null
+
+  // ── Mobile: simple vertical list ──
+  if (isMobile) {
+    return (
+      <div ref={containerRef} style={{ position: "relative", paddingLeft: 28, paddingBottom: 24, width: "100%" }}>
+        <div
+          style={{
+            position: "absolute",
+            left: 10,
+            top: 0,
+            bottom: 0,
+            width: 1,
+            background: "rgba(201,168,130,0.4)",
+          }}
+        />
+        {sorted.map((ap, i) => (
+          <motion.div
+            key={ap.id}
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 + i * 0.08, duration: 0.35, ease: EASE }}
+            style={{ position: "relative", marginBottom: 10 }}
           >
-            {titular}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0 pt-0.5">
-          <span className="font-mono text-[11px]" style={{ color: "rgba(74,48,64,0.4)" }}>
-            {año}
-          </span>
-          {link && (
-            <ExternalLink size={14} strokeWidth={1.5} style={{ color: "rgba(102,0,31,0.25)" }} />
+            <div
+              style={{
+                position: "absolute",
+                left: -22,
+                top: 14,
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: "var(--color-bordo)",
+              }}
+            />
+            <TimelineCard ap={ap} />
+          </motion.div>
+        ))}
+      </div>
+    )
+  }
+
+  // ── Desktop: zigzag grid ──
+  return (
+    <div ref={containerRef} style={{ position: "relative", width: "100%", paddingBottom: 24 }}>
+      {/* SVG zigzag overlay */}
+      {containerW > 0 && svgPath && (
+        <svg
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: containerW,
+            height: svgH,
+            pointerEvents: "none",
+            overflow: "visible",
+            zIndex: 0,
+          }}
+        >
+          {/* Path draw animation */}
+          <motion.path
+            key={`p-${clientId}-${containerW}`}
+            d={svgPath}
+            fill="none"
+            stroke="rgba(201,168,130,0.4)"
+            strokeWidth={1.5}
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          />
+
+          {/* Static dots at card positions */}
+          {sorted.map((ap, i) => {
+            const row = Math.floor(i / COLS)
+            const col = i % COLS
+            const ltr = row % 2 === 0
+            const actualCol = ltr ? col : COLS - 1 - col
+            return (
+              <motion.circle
+                key={`dot-${ap.id}`}
+                cx={colCenter(actualCol)}
+                cy={row * ROW_H + LINE_Y}
+                r={4}
+                fill="var(--color-bordo)"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.45 + i * 0.08, duration: 0.2 }}
+              />
+            )
+          })}
+
+          {/* Traveling dot — infinite loop along the path */}
+          {svgPath && (
+            <circle
+              key={`traveler-${clientId}-${containerW}`}
+              r={3}
+              fill="var(--color-bordo)"
+              opacity={0.65}
+            >
+              <animateMotion dur="8s" repeatCount="indefinite" path={svgPath} />
+            </circle>
           )}
-        </div>
+        </svg>
+      )}
+
+      {/* Cards grid arranged by row */}
+      <div style={{ position: "relative", zIndex: 1 }}>
+        {Array.from({ length: rows }).map((_, rowIdx) => {
+          const rowItems = sorted.slice(rowIdx * COLS, (rowIdx + 1) * COLS)
+          const ltr = rowIdx % 2 === 0
+          const emptyCount = COLS - rowItems.length
+
+          // L→R rows: items left-aligned, empty slots at end
+          // R→L rows: items right-aligned, empty slots at start, items reversed
+          const displayItems: (Clipping | null)[] = ltr
+            ? [...rowItems, ...Array<null>(emptyCount).fill(null)]
+            : [
+                ...Array<null>(emptyCount).fill(null),
+                ...[...rowItems].reverse(),
+              ]
+
+          return (
+            <div
+              key={rowIdx}
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+                gap: GAP,
+                height: ROW_H,
+                alignItems: "flex-start",
+                paddingTop: 18,
+              }}
+            >
+              {displayItems.map((ap, gridCol) => {
+                if (!ap)
+                  return <div key={`empty-${rowIdx}-${gridCol}`} />
+                const sortedIdx = sorted.findIndex((item) => item.id === ap.id)
+                return (
+                  <motion.div
+                    key={ap.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: 0.3 + sortedIdx * 0.1,
+                      duration: 0.35,
+                      ease: EASE,
+                    }}
+                  >
+                    <TimelineCard ap={ap} />
+                  </motion.div>
+                )
+              })}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
-
-  if (link) {
-    return (
-      <a
-        href={link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block transition-colors hover:bg-[rgba(102,0,31,0.02)]"
-      >
-        {content}
-      </a>
-    )
-  }
-  return <>{content}</>
 }
 
-// ─── Client block (accordion) ─────────────────────────────────────────────────
+// ─── Timeline client block ────────────────────────────────────────────────────
 
-function ClientBlock({
-  cliente,
+function TimelineClientBlock({
+  config,
+  apariciones,
   isOpen,
   onToggle,
 }: {
-  cliente: ClienteData
+  config: TimelineCliente
+  apariciones: Clipping[]
   isOpen: boolean
   onToggle: () => void
 }) {
@@ -461,186 +392,107 @@ function ClientBlock({
 
   return (
     <div
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      className="rounded-2xl transition-all duration-200"
-      style={{
-        background: "var(--color-hueso)",
-        border: `1px solid ${isOpen || hov ? "rgba(102,0,31,0.25)" : "rgba(102,0,31,0.08)"}`,
-        boxShadow: isOpen || hov ? "0 4px 24px rgba(102,0,31,0.04)" : "none",
-      }}
+      id={`cliente-${config.id}`}
+      style={{ scrollMarginTop: 100 }}
     >
-      {/* ── Header / trigger ── */}
+      {/* Header button */}
       <button
         onClick={onToggle}
-        className="w-full text-left appearance-none border-0 bg-transparent"
-        style={{ padding: "32px 36px", cursor: "pointer" }}
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        className="w-full text-left"
+        style={{
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          opacity: hov ? 0.82 : 1,
+          transition: "opacity 0.15s ease",
+          padding: 0,
+        }}
       >
-        {/* Desktop */}
-        <div className="hidden sm:flex items-center gap-6">
-          <LogoAvatar logo={cliente.logo} nombre={cliente.nombre} size={64} />
-
-          <div className="flex-1 min-w-0">
-            <p className="font-sans font-semibold text-xl" style={{ color: "var(--color-negro-bordo)" }}>
-              {cliente.nombre}
-            </p>
-            {cliente.descripcion && (
-              <p
-                className="font-sans text-sm mt-1"
-                style={{
-                  color: "var(--color-gris-bordo)",
-                  lineHeight: 1.5,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {cliente.descripcion}
-              </p>
-            )}
-            {cliente.categoria && !cliente.enCamino && (
-              <p
-                className="font-mono text-[10px] uppercase mt-2"
-                style={{ color: "rgba(102,0,31,0.5)", letterSpacing: "0.12em" }}
-              >
-                {cliente.categoria}
-              </p>
-            )}
-            {cliente.enCamino && (
-              <span
-                className="inline-block font-mono text-[10px] uppercase mt-2 px-3 py-1 rounded-full"
-                style={{ background: "var(--color-arena)", color: "var(--color-gris-bordo)", letterSpacing: "0.1em" }}
-              >
-                En camino
-              </span>
-            )}
-          </div>
-
-          {!cliente.enCamino && cliente.apariciones.length > 0 && (
-            <div className="ml-auto text-right shrink-0">
-              <p className="font-playfair leading-none" style={{ fontSize: 32, color: "var(--color-bordo)" }}>
-                {cliente.apariciones.length}
-              </p>
-              <p className="font-mono text-[10px] mt-1" style={{ color: "rgba(74,48,64,0.6)" }}>
-                apariciones · {cliente.mediosCount} medios
-              </p>
-              <div className="flex gap-1 mt-2 justify-end flex-wrap">
-                {cliente.formatos.map((f) => <FBadge key={f} text={f} />)}
-              </div>
+        <div className="flex items-center gap-4">
+          {/* Logo */}
+          {config.logo ? (
+            <div
+              className="shrink-0 flex items-center justify-center"
+              style={{ width: 48, height: 48 }}
+            >
+              <Image
+                src={config.logo}
+                alt={`Logo ${config.label}`}
+                width={48}
+                height={48}
+                style={{ objectFit: "contain", borderRadius: 4 }}
+              />
+            </div>
+          ) : (
+            // TODO: reemplazar por logo real
+            <div
+              className="shrink-0 flex items-center justify-center rounded-full font-mono font-bold"
+              style={{
+                width: 48,
+                height: 48,
+                background: "var(--color-arena)",
+                color: "var(--color-bordo)",
+                fontSize: 18,
+              }}
+            >
+              {config.inicial}
             </div>
           )}
 
-          <div
-            className="ml-6 shrink-0 self-center"
-            style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}
+          <span
+            className="font-sans flex-1"
+            style={{ fontWeight: 600, fontSize: 16, color: "var(--color-negro-bordo)" }}
           >
-            <ChevronDown size={20} style={{ color: "rgba(102,0,31,0.3)" }} />
+            {config.label}
+          </span>
+
+          <div
+            className="shrink-0"
+            style={{
+              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.3s ease",
+            }}
+          >
+            <ChevronDown size={18} style={{ color: "var(--color-gris-bordo)" }} />
           </div>
         </div>
 
-        {/* Mobile */}
-        <div className="flex sm:hidden items-start gap-4 relative">
-          <LogoAvatar logo={cliente.logo} nombre={cliente.nombre} size={48} />
-          <div className="flex-1 min-w-0 pr-8">
-            <p className="font-sans font-semibold text-lg" style={{ color: "var(--color-negro-bordo)" }}>
-              {cliente.nombre}
-            </p>
-            {cliente.descripcion && (
-              <p
-                className="font-sans text-sm mt-1 leading-snug"
-                style={{
-                  color: "var(--color-gris-bordo)",
-                  overflow: "hidden",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                } as React.CSSProperties}
-              >
-                {cliente.descripcion}
-              </p>
-            )}
-            {cliente.enCamino && (
-              <span
-                className="inline-block font-mono text-[10px] uppercase mt-2 px-3 py-1 rounded-full"
-                style={{ background: "var(--color-arena)", color: "var(--color-gris-bordo)", letterSpacing: "0.1em" }}
-              >
-                En camino
-              </span>
-            )}
-            {!cliente.enCamino && cliente.apariciones.length > 0 && (
-              <div className="mt-2">
-                <p className="font-playfair leading-none" style={{ fontSize: 28, color: "var(--color-bordo)" }}>
-                  {cliente.apariciones.length}
-                  <span className="font-mono text-[10px] ml-2" style={{ color: "rgba(74,48,64,0.6)" }}>
-                    apariciones
-                  </span>
-                </p>
-                <div className="flex gap-1 mt-2 flex-wrap">
-                  {cliente.formatos.map((f) => <FBadge key={f} text={f} />)}
-                </div>
-              </div>
-            )}
-          </div>
-          <div
-            className="absolute top-0 right-0"
-            style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}
-          >
-            <ChevronDown size={18} style={{ color: "rgba(102,0,31,0.3)" }} />
-          </div>
-        </div>
+        {/* Gold separator */}
+        <div
+          style={{
+            height: 1,
+            background: "var(--color-dorado)",
+            margin: "14px 0 0",
+            opacity: 0.5,
+          }}
+        />
       </button>
 
-      {/* ── Expanded content ── */}
+      {/* Expandable timeline */}
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
-            key="content"
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
+            key="body"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
             style={{ overflow: "hidden" }}
           >
-            <div style={{ padding: "0 36px 32px" }}>
-              <div style={{ height: 1, background: "rgba(201,168,130,0.2)", marginBottom: 24 }} />
-
-              {cliente.enCamino ? (
-                <p className="font-sans text-sm italic" style={{ color: "var(--color-gris-bordo)" }}>
-                  Los casos de este cliente están en desarrollo.
+            <div style={{ paddingTop: 20 }}>
+              <ZigzagTimeline
+                apariciones={apariciones}
+                clientId={config.id}
+              />
+              {apariciones.length === 0 && (
+                <p
+                  className="font-mono"
+                  style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.5, paddingBottom: 24 }}
+                >
+                  Próximamente
                 </p>
-              ) : (
-                <>
-                  <div
-                    className="hidden sm:grid font-mono text-[10px] uppercase pb-3"
-                    style={{
-                      gridTemplateColumns: ROW_COLS,
-                      color: "rgba(102,0,31,0.3)",
-                      borderBottom: "1px solid var(--color-arena)",
-                      letterSpacing: "0.15em",
-                    }}
-                  >
-                    <span>Medio</span>
-                    <span>Formato</span>
-                    <span>Alcance</span>
-                    <span>Titular</span>
-                    <span className="text-right">Año</span>
-                    <span />
-                  </div>
-
-                  {cliente.apariciones.map((ap) => (
-                    <React.Fragment key={ap.id}>
-                      <AparicionRow {...ap} />
-                      <AparicionCard {...ap} />
-                    </React.Fragment>
-                  ))}
-
-                  <p
-                    className="font-mono text-[11px] mt-4 pt-4"
-                    style={{ color: "rgba(74,48,64,0.4)", borderTop: "1px solid rgba(201,168,130,0.15)" }}
-                  >
-                    {cliente.apariciones.length} apariciones en {cliente.mediosCount} medios distintos
-                  </p>
-                </>
               )}
             </div>
           </motion.div>
@@ -650,113 +502,512 @@ function ClientBlock({
   )
 }
 
+// ─── Index button ─────────────────────────────────────────────────────────────
+
+function IndexButton({
+  label,
+  onClick,
+}: {
+  label: string
+  onClick: () => void
+}) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      onClick={onClick}
+      className="font-sans cursor-pointer"
+      style={{
+        fontSize: 12,
+        color: hov ? "var(--color-bordo)" : "var(--color-gris-bordo)",
+        background: "transparent",
+        border: `1px solid ${hov ? "rgba(201,168,130,0.8)" : "rgba(201,168,130,0.3)"}`,
+        borderRadius: 20,
+        padding: "8px 16px",
+        transition: "color 0.15s ease, border-color 0.15s ease",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {label}
+    </button>
+  )
+}
+
+// ─── Toggle all button ────────────────────────────────────────────────────────
+
+function ToggleAllButton({
+  allExpanded,
+  onToggle,
+}: {
+  allExpanded: boolean
+  onToggle: () => void
+}) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      onClick={onToggle}
+      className="font-sans shrink-0 cursor-pointer self-end"
+      style={{
+        fontSize: 12,
+        color: "var(--color-bordo)",
+        background: "transparent",
+        border: `1px solid ${hov ? "var(--color-dorado)" : "rgba(201,168,130,0.5)"}`,
+        borderRadius: 4,
+        padding: "8px 16px",
+        transition: "border-color 0.15s ease",
+        whiteSpace: "nowrap",
+        marginBottom: 4,
+      }}
+    >
+      {allExpanded ? "Contraer todo" : "Expandir todo"}
+    </button>
+  )
+}
+
+// ─── Featured card (Bloque 2) ─────────────────────────────────────────────────
+
+function FeaturedCard({ c }: { c: Clipping }) {
+  const [hov, setHov] = useState(false)
+
+  return (
+    <a
+      href={c.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="relative flex flex-col gap-4 h-full"
+      style={{
+        padding: 32,
+        borderRadius: 16,
+        textDecoration: "none",
+        minHeight: 240,
+        background: hov ? "rgba(254,252,239,0.10)" : "rgba(254,252,239,0.06)",
+        border: `1px solid ${hov ? "rgba(254,252,239,0.3)" : "rgba(254,252,239,0.1)"}`,
+        transform: hov ? "translateY(-6px)" : "translateY(0px)",
+        transition: "all 0.2s ease",
+      }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      <ExternalLink
+        size={16}
+        strokeWidth={1.5}
+        className="absolute"
+        style={{
+          top: 32,
+          right: 32,
+          color: "var(--color-hueso)",
+          opacity: hov ? 1 : 0.3,
+          transition: "opacity 0.2s",
+        }}
+      />
+      <span
+        className="font-mono uppercase w-fit"
+        style={{
+          fontSize: 9,
+          padding: "3px 10px",
+          borderRadius: 999,
+          background: "rgba(201,168,130,0.15)",
+          color: "var(--color-dorado)",
+          letterSpacing: "0.1em",
+        }}
+      >
+        {c.alcance}
+      </span>
+      <span
+        className="font-mono uppercase"
+        style={{ fontSize: 12, letterSpacing: "0.15em", color: "rgba(254,252,239,0.6)" }}
+      >
+        {c.medio}
+      </span>
+      <p
+        className="font-playfair flex-1"
+        style={{ fontSize: 20, color: "var(--color-hueso)", lineHeight: 1.3 }}
+      >
+        {c.titular}
+      </p>
+      <span className="font-sans" style={{ fontSize: 12, color: "rgba(254,252,239,0.4)" }}>
+        {c.cliente}
+      </span>
+      <span
+        className="font-mono absolute"
+        style={{ bottom: 32, right: 32, fontSize: 11, color: "var(--color-dorado)" }}
+      >
+        {c.año}
+      </span>
+    </a>
+  )
+}
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export function CasosClient() {
-  const [activeFilter, setActiveFilter] = useState<string>("Todos")
-  const [openClient, setOpenClient] = useState<string>("capilla-carlo-acutis")
+  const [openClients, setOpenClients] = useState<Set<string>>(new Set())
+  const allExpanded = openClients.size === TIMELINE_CLIENTES.length
 
-  const allClientes: ClienteData[] = useMemo(() => {
-    return CLIENTES_CONFIG.map((c) => {
-      const apariciones: Aparicion[] = CLIPPINGS.filter(
-        (cl) => NOMBRE_A_ID[cl.cliente] === c.id
-      ).map((cl) => ({
-        id: cl.id,
-        medio: cl.medio,
-        formato: cl.formato,
-        alcance: cl.alcance,
-        titular: cl.titular,
-        año: cl.año,
-        link: cl.link,
-      }))
-      return {
-        ...c,
-        apariciones,
-        formatos: [...new Set(apariciones.map((a) => a.formato))],
-        mediosCount: new Set(apariciones.map((a) => a.medio)).size,
-      }
+  const handleIndexClick = (id: string) => {
+    setOpenClients((prev) => {
+      if (prev.has(id)) return prev
+      return new Set([id])
     })
-  }, [])
+    setTimeout(() => {
+      document.getElementById(`cliente-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
+    }, 40)
+  }
 
-  // Apariciones planas para el modo categoría
-  const flatApariciones = useMemo(() => {
-    if (activeFilter === "Todos") return []
-    return CLIPPINGS.filter((c) => c.categoria === activeFilter)
-  }, [activeFilter])
+  const handleHeaderToggle = (id: string) => {
+    setOpenClients((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
-  const FILTERS = ["Todos", ...CATEGORIAS] as const
+  const handleToggleAll = () => {
+    if (allExpanded) {
+      setOpenClients(new Set())
+    } else {
+      setOpenClients(new Set(TIMELINE_CLIENTES.map((c) => c.id)))
+    }
+  }
+
+  const featured = useMemo(
+    () => FEATURED_IDS.map((id) => CLIPPINGS.find((c) => c.id === id)!),
+    []
+  )
+
+  const timelineData = useMemo(
+    () =>
+      TIMELINE_CLIENTES.map((config) => ({
+        config,
+        apariciones: CLIPPINGS.filter((c) => c.cliente === config.key),
+      })),
+    []
+  )
 
   return (
-    <div>
-      {/* ── Filter bar ── */}
-      <div
-        className="sticky z-30 -mx-6 px-6 lg:-mx-12 lg:px-12 py-4"
-        style={{
-          top: 72,
-          background: "rgba(254,252,239,0.92)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          borderBottom: "1px solid rgba(102,0,31,0.06)",
-        }}
+    <>
+      {/* ── BLOQUE 1 — HERO ───────────────────────────────────────────────── */}
+      <section
+        className="relative bg-hueso overflow-hidden"
+        style={{ paddingTop: 160, paddingBottom: 80 }}
       >
-        <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          {FILTERS.map((f) => (
-            <FilterPill
-              key={f}
-              label={f}
-              active={activeFilter === f}
-              onClick={() => setActiveFilter(f)}
+        <TextureOverlay texture="paperGrain" opacity={0.25} />
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+          <motion.div
+            variants={fadeUpStagger}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col"
+          >
+            <motion.p
+              variants={fadeUp}
+              className="font-mono text-[11px] uppercase tracking-[0.22em]"
+              style={{ color: "var(--color-bordo)" }}
+            >
+              Casos de éxito
+            </motion.p>
+            <motion.div
+              variants={fadeUp}
+              className="mt-4 mb-4"
+              style={{ width: 40, height: 1, background: "var(--color-dorado)" }}
             />
-          ))}
-        </div>
-      </div>
+            <motion.h1
+              variants={fadeUp}
+              className="font-playfair font-bold leading-[1.1]"
+              style={{
+                color: "var(--color-negro-bordo)",
+                fontSize: "clamp(2.25rem, 5vw, 3.5rem)",
+                maxWidth: 700,
+              }}
+            >
+              El impacto de una buena estrategia
+              <br />
+              <em className="italic" style={{ color: "var(--color-bordo)" }}>
+                se mide en presencia real.
+              </em>
+            </motion.h1>
+            <motion.p
+              variants={fadeUp}
+              className="font-sans mt-6"
+              style={{ fontSize: 16, color: "var(--color-gris-bordo)", maxWidth: 560, lineHeight: 1.7 }}
+            >
+              Una selección de gestiones de prensa realizadas para marcas, empresas y
+              profesionales que confiaron en la estrategia. Cada caso cuenta una historia.
+            </motion.p>
+          </motion.div>
 
-      {/* ── Contenido: acordeón (Todos) o lista plana (categoría) ── */}
-      <AnimatePresence mode="wait">
-        {activeFilter === "Todos" ? (
+          {/* Stats — desktop */}
           <motion.div
-            key="accordion"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="pt-10 flex flex-col gap-4"
+            variants={fadeUpStagger}
+            initial="hidden"
+            animate="visible"
+            className="hidden sm:flex items-center gap-0 mt-[60px]"
           >
-            {allClientes.map((cliente) => (
-              <ClientBlock
-                key={cliente.id}
-                cliente={cliente}
-                isOpen={openClient === cliente.id}
-                onToggle={() =>
-                  setOpenClient((prev) => (prev === cliente.id ? "" : cliente.id))
+            {STATS.map((s, i) => (
+              <motion.div key={s.label} variants={revealCard} className="flex items-center">
+                {i > 0 && (
+                  <div
+                    className="self-stretch mx-8"
+                    style={{ width: 1, background: "rgba(201,168,130,0.3)" }}
+                  />
+                )}
+                <div>
+                  <p className="font-playfair leading-none" style={{ fontSize: 48, color: "var(--color-bordo)" }}>
+                    {s.n}
+                  </p>
+                  <p
+                    className="font-mono text-[11px] uppercase mt-2"
+                    style={{ color: "var(--color-gris-bordo)", letterSpacing: "0.12em" }}
+                  >
+                    {s.label}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Stats — mobile */}
+          <motion.div
+            variants={fadeUpStagger}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-2 gap-8 mt-[60px] sm:hidden"
+          >
+            {STATS.map((s) => (
+              <motion.div key={s.label} variants={revealCard}>
+                <p className="font-playfair leading-none" style={{ fontSize: 36, color: "var(--color-bordo)" }}>
+                  {s.n}
+                </p>
+                <p
+                  className="font-mono text-[11px] uppercase mt-2"
+                  style={{ color: "var(--color-gris-bordo)", letterSpacing: "0.12em", lineHeight: 1.4 }}
+                >
+                  {s.label}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── BLOQUE 2 — CASOS DESTACADOS ───────────────────────────────────── */}
+      <section className="bg-bordo" style={{ paddingTop: 100, paddingBottom: 100 }}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-mono uppercase mb-10"
+            style={{ fontSize: 10, letterSpacing: "0.2em", color: "rgba(254,252,239,0.5)" }}
+          >
+            Apariciones destacadas
+          </motion.p>
+          <motion.div
+            variants={fadeUpStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="flex gap-4 overflow-x-auto no-scrollbar pb-4 lg:pb-0 lg:grid lg:grid-cols-3 lg:overflow-visible"
+          >
+            {featured.map((c) => (
+              <motion.div
+                key={c.id}
+                variants={revealCard}
+                className="min-w-[300px] sm:min-w-[360px] lg:min-w-0 shrink-0 lg:shrink"
+              >
+                <FeaturedCard c={c} />
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── BLOQUE 3 — HISTORIAL DE APARICIONES ───────────────────────────── */}
+      <section className="bg-hueso-oscuro" style={{ paddingTop: 100, paddingBottom: 100 }}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+
+          {/* Header + toggle all */}
+          <div className="flex items-end justify-between gap-4 mb-10">
+            <motion.div
+              variants={fadeUpStagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            >
+              <motion.p
+                variants={fadeUp}
+                className="font-mono uppercase"
+                style={{ fontSize: 10, letterSpacing: "0.2em", color: "var(--color-bordo)" }}
+              >
+                Historial de apariciones
+              </motion.p>
+              <motion.div
+                variants={fadeUp}
+                style={{ width: 40, height: 1, background: "var(--color-dorado)", margin: "16px 0 20px" }}
+              />
+              <motion.h2
+                variants={fadeUp}
+                className="font-playfair font-bold"
+                style={{ fontSize: "clamp(28px, 3vw, 36px)", color: "var(--color-negro-bordo)" }}
+              >
+                Apariciones por cliente
+              </motion.h2>
+            </motion.div>
+
+            <ToggleAllButton allExpanded={allExpanded} onToggle={handleToggleAll} />
+          </div>
+
+          {/* Client index */}
+          <motion.div
+            variants={fadeUpStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="flex flex-wrap gap-2 mb-14"
+          >
+            {TIMELINE_CLIENTES.map((c) => (
+              <motion.div key={c.id} variants={fadeUp}>
+                <IndexButton
+                  label={c.label}
+                  onClick={() => handleIndexClick(c.id)}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Timeline blocks */}
+          <div className="flex flex-col gap-8">
+            {timelineData.map(({ config, apariciones }) => (
+              <TimelineClientBlock
+                key={config.id}
+                config={config}
+                apariciones={apariciones}
+                isOpen={openClients.has(config.id)}
+                onToggle={() => handleHeaderToggle(config.id)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BLOQUE 4 — MAPA DE MEDIOS ─────────────────────────────────────── */}
+      <section className="bg-hueso" style={{ paddingTop: 80, paddingBottom: 80 }}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <motion.div
+            variants={fadeUpStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="mb-10"
+          >
+            <motion.h2
+              variants={fadeUp}
+              className="font-playfair font-bold text-negro-bordo"
+              style={{ fontSize: "clamp(24px, 3vw, 32px)" }}
+            >
+              Medios alcanzados
+            </motion.h2>
+            <motion.p
+              variants={fadeUp}
+              className="font-sans text-gris-bordo mt-3"
+              style={{ fontSize: 13 }}
+            >
+              Presencia verificada en medios locales, provinciales, nacionales e internacionales.
+            </motion.p>
+          </motion.div>
+          <motion.div
+            variants={fadeUpStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="flex flex-col"
+          >
+            {MEDIA_ROWS.map((row, ri) => (
+              <motion.div
+                key={row.label}
+                variants={fadeLeft}
+                className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-8 py-5 sm:py-6"
+                style={
+                  ri < MEDIA_ROWS.length - 1
+                    ? { borderBottom: "1px solid rgba(201,168,130,0.15)" }
+                    : undefined
                 }
-              />
+              >
+                <span
+                  className="font-mono uppercase text-bordo sm:w-[110px] sm:shrink-0"
+                  style={{ fontSize: 9, letterSpacing: "0.18em", opacity: 0.5 }}
+                >
+                  {row.label}
+                </span>
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-6 gap-y-2">
+                  {row.medios.map((m) => (
+                    <span
+                      key={m}
+                      className="font-mono text-gris-bordo transition-all duration-150 cursor-default hover:text-bordo hover:opacity-100"
+                      style={{ fontSize: 11, opacity: 0.5 }}
+                    >
+                      {m}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
             ))}
           </motion.div>
-        ) : (
-          <motion.div
-            key={activeFilter}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="pt-6"
+        </div>
+      </section>
+
+      {/* ── BLOQUE 5 — CTA ────────────────────────────────────────────────── */}
+      <section className="bg-bordo" style={{ paddingTop: 100, paddingBottom: 100 }}>
+        <motion.div
+          variants={fadeUpStagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="max-w-7xl mx-auto px-6 lg:px-12 text-center"
+        >
+          <motion.h2
+            variants={fadeUp}
+            className="font-playfair"
+            style={{
+              fontSize: "clamp(32px, 4vw, 44px)",
+              color: "var(--color-hueso)",
+              lineHeight: 1.2,
+              fontWeight: 400,
+            }}
           >
-            {flatApariciones.map((ap) => (
-              <AparicionFlatRow
-                key={ap.id}
-                cliente={ap.cliente}
-                medio={ap.medio}
-                formato={ap.formato}
-                alcance={ap.alcance}
-                titular={ap.titular}
-                año={ap.año}
-                link={ap.link}
+            ¿Querés resultados así
+            <br />
+            <em className="italic font-bold" style={{ color: "var(--color-dorado)" }}>
+              para tu marca?
+            </em>
+          </motion.h2>
+          <motion.div variants={fadeUp} className="mt-10">
+            <Link
+              href="/contacto"
+              className="inline-flex items-center gap-2 font-sans font-semibold transition-opacity hover:opacity-85 group"
+              style={{
+                background: "var(--color-hueso)",
+                color: "var(--color-bordo)",
+                fontSize: 15,
+                padding: "14px 36px",
+                borderRadius: 999,
+              }}
+            >
+              Conversemos
+              <ArrowRight
+                size={15}
+                strokeWidth={2.5}
+                className="group-hover:translate-x-1 transition-transform"
               />
-            ))}
+            </Link>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+        </motion.div>
+      </section>
+    </>
   )
 }

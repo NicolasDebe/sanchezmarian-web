@@ -1,21 +1,11 @@
 "use client"
 
-import { useRef, useState } from "react"
-import { AnimatePresence, motion, useInView } from "motion/react"
+import { useState } from "react"
+import { AnimatePresence, motion } from "motion/react"
 import { ArrowRight, Plus } from "lucide-react"
 import Link from "next/link"
+import { fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 
-/*
- * Cult-UI review:
- * - Expandable / ExpandableContent requiere react-use-measure (no instalada).
- *   Se extrae el patrón: height: "auto" con AnimatePresence de motion v12,
- *   springConfig stiffness 200 / damping 20 — misma config que cult-ui.
- * - TextureCardStyled disponible pero no aplica (CTA es fondo bordo, no arena).
- * - ShiftCard disponible pero es para grid de cards, no para CTA sticky.
- * Resultado: acordeón custom con motion/react nativo, sin dependencias extra.
- */
-
-const EASE = [0.22, 1, 0.36, 1] as const
 const SPRING = { type: "spring" as const, stiffness: 200, damping: 20 }
 
 const SERVICIOS = [
@@ -43,51 +33,40 @@ const SERVICIOS = [
 ]
 
 export function Servicios() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-80px" })
   const [activeIndex, setActiveIndex] = useState(0)
 
   return (
-    <section id="servicios" ref={ref} className="bg-hueso py-24 lg:py-32">
+    <section id="servicios" className="bg-hueso py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-12 lg:gap-16 items-start">
 
         {/* ── IZQUIERDA 60% — acordeón ── */}
-        <div>
-          {/* Eyebrow */}
+        <motion.div
+          variants={fadeUpStagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.05 }}
+            variants={fadeUp}
             className="font-mono text-[11px] uppercase tracking-[0.25em] text-bordo mb-4"
           >
             Servicios
           </motion.p>
 
-          {/* Línea dorada */}
           <motion.div
-            initial={{ scaleX: 0, originX: 0 }}
-            animate={isInView ? { scaleX: 1 } : {}}
-            transition={{ duration: 0.55, ease: EASE, delay: 0.1 }}
+            variants={fadeUp}
             className="w-10 h-px bg-dorado mb-7"
           />
 
-          {/* Título */}
           <motion.h2
-            initial={{ opacity: 0, y: 18 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.65, delay: 0.18, ease: EASE }}
+            variants={fadeUp}
             className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.4rem] lg:text-[3rem] leading-[1.1] mb-10"
           >
             <span className="block">Lo que hacemos</span>
             <em className="block italic text-bordo">juntos.</em>
           </motion.h2>
 
-          {/* Acordeón */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.4, delay: 0.3 }}
-          >
+          <motion.div variants={fadeUp}>
             {SERVICIOS.map((s, i) => {
               const isOpen = activeIndex === i
               return (
@@ -121,7 +100,7 @@ export function Servicios() {
 
                     <motion.span
                       animate={{ rotate: isOpen ? 45 : 0 }}
-                      transition={{ duration: 0.22, ease: EASE }}
+                      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                       className={`shrink-0 transition-colors ${
                         isOpen
                           ? "text-bordo"
@@ -132,7 +111,6 @@ export function Servicios() {
                     </motion.span>
                   </button>
 
-                  {/* Contenido animado — patrón cult-ui Expandable, height: "auto" con motion v12 */}
                   <AnimatePresence initial={false}>
                     {isOpen && (
                       <motion.div
@@ -154,16 +132,22 @@ export function Servicios() {
             })}
             <div className="border-t border-dorado/25" />
           </motion.div>
-        </div>
+        </motion.div>
 
         {/* ── DERECHA 40% — CTA card sticky ── */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.65, delay: 0.35, ease: EASE }}
+          variants={revealCard}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
           className="lg:sticky lg:top-32"
         >
-          <div className="bg-bordo rounded-2xl p-8 lg:p-9 flex flex-col gap-6">
+          <div
+            className="bg-bordo rounded-2xl p-8 lg:p-9 flex flex-col gap-6"
+            style={{
+              background: "radial-gradient(ellipse at 75% 60%, rgba(140,26,53,0.35) 0%, transparent 65%), var(--color-bordo)",
+            }}
+          >
             <h3 className="font-playfair font-bold text-hueso text-[1.5rem] leading-snug">
               ¿Querés aparecer en los medios?
             </h3>

@@ -39,6 +39,80 @@ body {
   color: var(--foreground);
   font-family: var(--font-dm-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  opacity: 0.022;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 300px 300px;
+}
+
+/* ── Sistema tipográfico editorial ── */
+
+.heading-display {
+  font-family: var(--font-playfair), serif;
+  font-size: clamp(40px, 6vw, 96px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.heading-display .light {
+  font-weight: 300;
+}
+
+.heading-display .heavy {
+  font-weight: 700;
+  font-style: italic;
+  color: var(--color-bordo);
+}
+
+.heading-section {
+  font-family: var(--font-playfair), serif;
+  font-size: clamp(28px, 4vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.heading-section em {
+  font-weight: 700;
+  font-style: italic;
+  color: var(--color-bordo);
+}
+
+.eyebrow {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-bordo);
+}
+
+.gold-line {
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--color-dorado);
+  margin: 8px 0 24px;
+}
+
+.watermark-number {
+  font-family: var(--font-playfair), serif;
+  font-size: clamp(120px, 20vw, 200px);
+  font-weight: 700;
+  color: var(--color-bordo);
+  opacity: 0.04;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
 }
 
 @keyframes marquee-scroll {
@@ -54,3 +128,7 @@ body {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+

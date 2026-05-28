@@ -35,7 +35,12 @@ const SOCIAL = [
 
 export function Footer() {
   return (
-    <footer className="bg-bordo-oscuro pt-14 pb-8">
+    <footer
+      className="pt-14 pb-8"
+      style={{
+        background: "radial-gradient(ellipse at 70% 80%, rgba(102,0,31,0.25) 0%, transparent 60%), var(--color-bordo-oscuro)",
+      }}
+    >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
 
         {/* Dorado top divider */}

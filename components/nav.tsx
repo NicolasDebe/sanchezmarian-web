@@ -30,9 +30,17 @@ export function Nav() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
         isScrolled
-          ? "bg-bordo shadow-[0_1px_0_0_rgba(201,168,130,0.12)]"
+          ? "shadow-[0_1px_0_0_rgba(201,168,130,0.12)]"
           : "bg-transparent"
       )}
+      style={
+        isScrolled
+          ? {
+              background:
+                "radial-gradient(ellipse at 50% 50%, rgba(140,26,53,0.35) 0%, transparent 70%), var(--color-bordo)",
+            }
+          : undefined
+      }
     >
       <nav className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
         <Link
@@ -85,7 +93,8 @@ export function Nav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-bordo border-t border-hueso/8 px-6 pb-6 pt-4"
+            className="md:hidden border-t border-hueso/8 px-6 pb-6 pt-4"
+            style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(140,26,53,0.35) 0%, transparent 70%), var(--color-bordo)" }}
           >
             <ul className="flex flex-col gap-4">
               {navLinks.map((link) => (

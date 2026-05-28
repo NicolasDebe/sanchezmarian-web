@@ -1,146 +1,209 @@
 "use client"
 
-import { useRef } from "react"
-import { motion, useInView } from "motion/react"
+import { motion } from "motion/react"
 import Link from "next/link"
-import { ArrowRight, ExternalLink } from "lucide-react"
-import { HOME_CLIPPINGS, type Clipping } from "@/data/clippings"
+import { ArrowRight } from "lucide-react"
+import { fadeUp, fadeLeft, fadeUpStagger, viewportOnce } from "@/lib/animations"
 
-const EASE = [0.22, 1, 0.36, 1] as const
+type MedioItem = { name: string; href: string; dim?: boolean }
 
-function MediaCard({ cliente, medio, formato, alcance, titular, año, link }: Clipping) {
-  return (
-    <motion.a
-      href={link}
-      target="_blank"
-      rel="noopener noreferrer"
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.22, ease: EASE }}
-      className="bg-hueso rounded-xl p-5 flex flex-col gap-3 group cursor-pointer transition-shadow duration-200 hover:shadow-[0_8px_24px_rgba(102,0,31,0.08)]"
-      style={{ borderLeft: "3px solid var(--color-bordo)" }}
-    >
-      {/* Cliente */}
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-bordo">
-        {cliente}
-      </p>
+const FILAS: { label: string; size: number; medios: MedioItem[] }[] = [
+  {
+    label: "Internacional",
+    size: 15,
+    medios: [
+      { name: "Vatican News",         href: "/casos-de-exito" },
+      { name: "L'Osservatore Romano", href: "/casos-de-exito" },
+      { name: "ACI Prensa",           href: "/casos-de-exito" },
+      { name: "Bio Bio Chile",        href: "/casos-de-exito" },
+      { name: "Vida Nueva",           href: "/casos-de-exito" },
+    ],
+  },
+  {
+    label: "Nacional",
+    size: 17,
+    medios: [
+      { name: "La Nación", href: "/casos-de-exito" },
+      { name: "Clarín",    href: "/casos-de-exito" },
+      { name: "Infobae",   href: "/casos-de-exito" },
+      { name: "Cadena 3",  href: "/casos-de-exito" },
+    ],
+  },
+  {
+    label: "Regional",
+    size: 15,
+    medios: [
+      { name: "La Gaceta",          href: "/casos-de-exito" },
+      { name: "La Voz del Interior", href: "/casos-de-exito" },
+      { name: "Entorno Económico",  href: "/casos-de-exito" },
+    ],
+  },
+  {
+    label: "Local",
+    size: 13,
+    medios: [
+      { name: "Los Andes",    href: "/casos-de-exito" },
+      { name: "MDZ Online",   href: "/casos-de-exito" },
+      { name: "Canal 9",      href: "/casos-de-exito" },
+      { name: "Canal 7",      href: "/casos-de-exito" },
+      { name: "El Sol",       href: "/casos-de-exito" },
+      { name: "Diario UNO",   href: "/casos-de-exito" },
+      { name: "Mendovoz",     href: "/casos-de-exito" },
+      { name: "y 23 más",     href: "/casos-de-exito", dim: true },
+    ],
+  },
+]
 
-      {/* Medio + badges */}
-      <div className="flex items-start justify-between gap-2">
-        <p className="font-playfair font-bold text-negro-bordo text-[0.9375rem] leading-snug">
-          {medio}
-        </p>
-        <div className="flex flex-col items-end gap-1 shrink-0">
-          <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-arena text-gris-bordo">
-            {formato}
-          </span>
-          <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-bordo/10 text-bordo">
-            {alcance}
-          </span>
-        </div>
-      </div>
-
-      {/* Titular */}
-      <p className="font-sans text-[0.875rem] text-negro-bordo leading-[1.4] line-clamp-2 flex-1">
-        {titular}
-      </p>
-
-      {/* Footer: año + ícono */}
-      <div className="flex items-end justify-between pt-2 mt-auto">
-        <span className="font-mono text-[11px] text-gris-bordo/50">{año}</span>
-        <ExternalLink
-          size={13}
-          strokeWidth={1.5}
-          className="text-bordo opacity-30 group-hover:opacity-100 transition-opacity duration-200"
-        />
-      </div>
-    </motion.a>
-  )
-}
+const DOT = (
+  <span
+    aria-hidden
+    style={{ color: "var(--color-dorado)", opacity: 0.7, userSelect: "none", fontSize: "inherit" }}
+  >
+    ·
+  </span>
+)
 
 export function EnMedias() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-80px" })
-
   return (
-    <section id="medios" ref={ref} className="bg-hueso-oscuro py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <section id="medios" className="bg-hueso-oscuro">
 
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
-          <div>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.05 }}
-              className="font-mono text-[11px] uppercase tracking-[0.25em] text-bordo mb-4"
-            >
-              Casos de éxito
-            </motion.p>
+      {/* ── BLOQUE A — El número ── */}
+      <div
+        className="flex flex-col items-center text-center px-6"
+        style={{ paddingTop: 120, paddingBottom: 80 }}
+      >
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="font-mono uppercase text-bordo"
+          style={{ fontSize: 10, letterSpacing: "0.2em" }}
+        >
+          Apariciones verificadas
+        </motion.p>
 
-            <motion.div
-              initial={{ scaleX: 0, originX: 0 }}
-              animate={isInView ? { scaleX: 1 } : {}}
-              transition={{ duration: 0.55, ease: EASE, delay: 0.1 }}
-              className="w-10 h-px bg-dorado mb-5"
-            />
-
-            <motion.h2
-              initial={{ opacity: 0, y: 18 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.65, delay: 0.18, ease: EASE }}
-              className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.5rem] lg:text-[2.75rem] leading-[1.1] mb-4"
-            >
-              <span className="block">100+ apariciones reales</span>
-              <em className="block italic text-bordo">en medios.</em>
-            </motion.h2>
-
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.28 }}
-              className="font-sans text-gris-bordo text-sm leading-relaxed max-w-[440px]"
-            >
-              100+ apariciones en medios nacionales y provinciales. Una selección de
-              gestiones de prensa realizadas para marcas, empresas y profesionales que
-              confiaron en mi visión.
-            </motion.p>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="shrink-0 pb-0.5"
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="mt-6 flex flex-wrap items-baseline justify-center leading-none"
+          style={{ gap: "0 0.2em" }}
+        >
+          <span
+            className="font-playfair text-negro-bordo"
+            style={{
+              fontSize: "clamp(120px, 18vw, 200px)",
+              fontWeight: 400,
+              lineHeight: 1,
+              letterSpacing: "-0.05em",
+            }}
           >
-            <Link
-              href="/casos-de-exito"
-              className="inline-flex items-center gap-2 font-sans text-sm font-medium text-bordo group"
-            >
-              Ver todos los casos
-              <ArrowRight
-                size={14}
-                strokeWidth={2}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </Link>
-          </motion.div>
-        </div>
+            56
+          </span>
+          <em
+            className="font-playfair italic text-bordo"
+            style={{
+              fontSize: "clamp(120px, 18vw, 200px)",
+              fontWeight: 400,
+              lineHeight: 1,
+              letterSpacing: "-0.05em",
+            }}
+          >
+            reales.
+          </em>
+        </motion.div>
 
-        {/* Grid 3×3 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {HOME_CLIPPINGS.map((item, i) => (
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="font-sans text-gris-bordo mt-8"
+          style={{ fontSize: 14, maxWidth: 480, lineHeight: 1.65 }}
+        >
+          En medios locales, provinciales, nacionales e internacionales.
+          Desde Mendoza al Vaticano.
+        </motion.p>
+      </div>
+
+      {/* ── BLOQUE B — Los nombres de los medios ── */}
+      <div
+        className="max-w-7xl mx-auto"
+        style={{ paddingLeft: 40, paddingRight: 40, paddingBottom: 80 }}
+      >
+        <motion.div
+          variants={fadeUpStagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="flex flex-col"
+        >
+          {FILAS.map((fila, fi) => (
             <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.38 + i * 0.07, ease: EASE }}
+              key={fila.label}
+              variants={fadeLeft}
+              className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-8 py-5 sm:py-6"
+              style={
+                fi < FILAS.length - 1
+                  ? { borderBottom: "1px solid rgba(201,168,130,0.15)" }
+                  : undefined
+              }
             >
-              <MediaCard {...item} />
+              {/* Fila label */}
+              <span
+                className="font-mono uppercase text-bordo sm:w-[110px] sm:shrink-0"
+                style={{ fontSize: 9, letterSpacing: "0.18em", opacity: 0.5 }}
+              >
+                {fila.label}
+              </span>
+
+              {/* Nombres — scroll horizontal en mobile */}
+              <div
+                className="no-scrollbar flex items-center sm:flex-wrap overflow-x-auto sm:overflow-x-visible"
+                style={{ gap: "0 0.5rem" }}
+              >
+                {fila.medios.map((medio, mi) => (
+                  <span key={medio.name} className="inline-flex items-center gap-2 whitespace-nowrap">
+                    {mi > 0 && DOT}
+                    <Link
+                      href={medio.href}
+                      className="font-sans text-negro-bordo transition-colors duration-150 hover:text-bordo"
+                      style={{
+                        fontSize: fila.size,
+                        opacity: medio.dim ? 0.45 : 1,
+                        fontStyle: medio.dim ? "italic" : "normal",
+                      }}
+                    >
+                      {medio.name}
+                    </Link>
+                  </span>
+                ))}
+              </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
+        {/* CTA — alineado a la derecha */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="flex justify-end mt-8"
+        >
+          <Link
+            href="/casos-de-exito"
+            className="inline-flex items-center gap-2 font-sans text-bordo hover:opacity-70 transition-opacity group"
+            style={{ fontSize: 13 }}
+          >
+            Ver los 56 casos
+            <ArrowRight size={13} strokeWidth={2} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
       </div>
+
     </section>
   )
 }

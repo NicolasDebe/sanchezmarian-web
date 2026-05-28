@@ -3,8 +3,7 @@
 import { motion } from "motion/react"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
-
-const EASE = [0.22, 1, 0.36, 1] as const
+import { fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
 
 export function Hero() {
   return (
@@ -29,12 +28,14 @@ export function Hero() {
       {/* ── CONTENIDO — anclado al fondo izquierdo ── */}
       <div className="absolute inset-0 flex items-end">
         <div className="w-full max-w-7xl mx-auto px-6 lg:px-12 pb-20 lg:pb-28">
-          <div className="flex flex-col gap-6 max-w-[600px]">
-
+          <motion.div
+            variants={fadeUpStagger}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col gap-6 max-w-[600px]"
+          >
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, ease: EASE, delay: 0.3 }}
+              variants={fadeUp}
               className="font-mono text-[11px] uppercase tracking-[0.28em] text-hueso/70"
             >
               Estratega de comunicación · Mendoza, AR
@@ -44,9 +45,9 @@ export function Hero() {
               <span className="block overflow-hidden">
                 <motion.span
                   className="block"
-                  initial={{ y: "110%" }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 0.8, ease: EASE, delay: 0.45 }}
+                  initial={{ y: "110%", rotate: -1 }}
+                  animate={{ y: 0, rotate: 0 }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
                 >
                   Tu historia merece estar
                 </motion.span>
@@ -54,9 +55,9 @@ export function Hero() {
               <span className="block overflow-hidden">
                 <motion.span
                   className="block"
-                  initial={{ y: "110%" }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 0.8, ease: EASE, delay: 0.62 }}
+                  initial={{ y: "110%", rotate: -1 }}
+                  animate={{ y: 0, rotate: 0 }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
                 >
                   <em className="italic">en los medios.</em>
                 </motion.span>
@@ -64,18 +65,14 @@ export function Hero() {
             </h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, ease: EASE, delay: 0.78 }}
+              variants={fadeUp}
               className="font-sans text-[16px] font-normal leading-[1.7] text-hueso/75 max-w-[520px] mb-10"
             >
               Conecto tu marca personal o empresarial con el ecosistema de medios de Mendoza de forma natural, aportando valor al periodista y visibilidad estratégica a tu proyecto.
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, ease: EASE, delay: 0.92 }}
+              variants={fadeUp}
               className="flex flex-wrap gap-3 pt-1"
             >
               <Link
@@ -92,8 +89,7 @@ export function Hero() {
                 Ver mis servicios
               </Link>
             </motion.div>
-
-          </div>
+          </motion.div>
         </div>
       </div>
 
