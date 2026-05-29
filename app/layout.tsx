@@ -28,6 +28,13 @@ const BASE_URL = "https://sanchezmarian.com"
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: "Marian Sánchez — Estratega de comunicación · Mendoza",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/favicon-180.png", sizes: "180x180" }],
+  },
   description:
     "Conecto tu marca con los medios que importan. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
   openGraph: {

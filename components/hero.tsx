@@ -3,6 +3,7 @@
 import { motion } from "motion/react"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
 
 export function Hero() {
@@ -91,6 +92,18 @@ export function Hero() {
             </motion.div>
           </motion.div>
         </div>
+      </div>
+
+      {/* ── Watermark logo — firma visual ── */}
+      <div className="absolute bottom-8 right-8 pointer-events-none">
+        <Image
+          src="/images/logo-marian-negativo.png"
+          alt=""
+          width={200}
+          height={50}
+          aria-hidden="true"
+          style={{ opacity: 0.15, width: "auto", height: "36px" }}
+        />
       </div>
 
       {/* ── Scroll indicator ── */}
