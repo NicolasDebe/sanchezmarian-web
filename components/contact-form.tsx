@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { motion } from "motion/react"
 import { ArrowRight } from "lucide-react"
 
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
@@ -38,9 +38,9 @@ function fieldValidate(name: string, value: string): string {
 }
 
 export function ContactForm() {
-  const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [serverError, setServerError] = useState(false)
+  const [success, setSuccess] = useState(false)
   const [form, setForm] = useState({
     nombre: "",
     email: "",
@@ -75,13 +75,28 @@ export function ContactForm() {
           mensaje: form.mensaje,
         }),
       })
-      if (res.ok) router.push("/gracias")
+      if (res.ok) setSuccess(true)
       else setServerError(true)
     } catch {
       setServerError(true)
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (success) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="flex items-center justify-center py-16"
+      >
+        <p className="font-playfair text-marino text-xl text-center">
+          ¡Gracias! Te respondo pronto.
+        </p>
+      </motion.div>
+    )
   }
 
   return (
@@ -199,7 +214,7 @@ export function ContactForm() {
 
       {serverError && (
         <p className="font-mono text-[10px] text-bordo/80 text-center">
-          Hubo un error al enviar. Intentá de nuevo o escribime a hola@sanchezmarian.com
+          Algo falló. Escribime a sanchezmariana15@gmail.com
         </p>
       )}
     </form>

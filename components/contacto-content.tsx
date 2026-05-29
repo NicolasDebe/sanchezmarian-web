@@ -28,7 +28,7 @@ const FAQ = [
 ]
 
 const INFO_ITEMS = [
-  { icon: Mail, label: "Email", value: "hola@sanchezmarian.com", href: "mailto:hola@sanchezmarian.com" },
+  { icon: Mail, label: "Email", value: "sanchezmariana15@gmail.com", href: "mailto:sanchezmariana15@gmail.com" },
   { icon: MapPin, label: "Ubicación", value: "Mendoza, Argentina", href: null },
   { icon: MessageCircle, label: "Disponibilidad", value: "Agendar sesión", href: null },
 ]

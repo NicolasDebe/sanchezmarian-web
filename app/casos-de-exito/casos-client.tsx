@@ -398,14 +398,19 @@ function TimelineClientBlock({
           {config.logo ? (
             <div
               className="shrink-0 flex items-center justify-center"
-              style={{ width: 72, height: 72 }}
+              style={{
+                background: "white",
+                borderRadius: 8,
+                padding: "8px 12px",
+                border: "1px solid rgba(0,0,0,0.06)",
+              }}
             >
               <Image
                 src={config.logo}
                 alt={`Logo ${config.label}`}
                 width={72}
-                height={72}
-                style={{ objectFit: "contain", borderRadius: 6 }}
+                height={48}
+                style={{ objectFit: "contain" }}
               />
             </div>
           ) : (

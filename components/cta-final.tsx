@@ -1,8 +1,7 @@
 "use client"
 
-import { useRef, useState } from "react"
-import { useRouter } from "next/navigation"
-import { AnimatePresence, motion, useInView } from "motion/react"
+import { useState } from "react"
+import { AnimatePresence, motion } from "motion/react"
 import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 
@@ -31,8 +30,8 @@ const INPUT_FOCUS_STYLE = {
 }
 
 export function CtaFinal() {
-  const router = useRouter()
   const [error, setError] = useState(false)
+  const [success, setSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({ nombre: "", email: "", mensaje: "" })
   const [focused, setFocused] = useState<string | null>(null)
@@ -47,7 +46,7 @@ export function CtaFinal() {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({ nombre: form.nombre, email: form.email, mensaje: form.mensaje }),
       })
-      if (res.ok) router.push("/gracias")
+      if (res.ok) setSuccess(true)
       else setError(true)
     } catch {
       setError(true)
@@ -115,7 +114,7 @@ export function CtaFinal() {
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">
               <div className="flex items-center gap-3">
                 <Mail size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
-                <span className="font-sans text-sm text-hueso/80">hola@sanchezmarian.com</span>
+                <span className="font-sans text-sm text-hueso/80">sanchezmariana15@gmail.com</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
@@ -139,6 +138,18 @@ export function CtaFinal() {
               border: "1px solid rgba(254,252,239,0.12)",
             }}
           >
+            {success ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+                className="flex items-center justify-center min-h-[260px]"
+              >
+                <p className="font-playfair text-hueso text-xl text-center">
+                  ¡Gracias! Te respondo pronto.
+                </p>
+              </motion.div>
+            ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
                 <label
@@ -252,10 +263,11 @@ export function CtaFinal() {
 
               {error && (
                 <p className="font-mono text-[9px] text-dorado/70 text-center">
-                  Error al enviar. Escribime a hola@sanchezmarian.com
+                  Algo falló. Escribime a sanchezmariana15@gmail.com
                 </p>
               )}
             </form>
+            )}
           </div>
         </motion.div>
 

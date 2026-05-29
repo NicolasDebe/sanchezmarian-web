@@ -49,7 +49,6 @@ const FILAS: { label: string; size: number; medios: MedioItem[] }[] = [
       { name: "El Sol",       href: "/casos-de-exito" },
       { name: "Diario UNO",   href: "/casos-de-exito" },
       { name: "Mendovoz",     href: "/casos-de-exito" },
-      { name: "y 23 más",     href: "/casos-de-exito", dim: true },
     ],
   },
 ]
@@ -100,7 +99,7 @@ export function EnMedias() {
               letterSpacing: "-0.05em",
             }}
           >
-            56
+            +100
           </span>
           <em
             className="font-playfair italic text-bordo"
@@ -198,7 +197,7 @@ export function EnMedias() {
             className="inline-flex items-center gap-2 font-sans text-bordo hover:opacity-70 transition-opacity group"
             style={{ fontSize: 13 }}
           >
-            Ver los 56 casos
+            Ver los +100 casos
             <ArrowRight size={13} strokeWidth={2} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>
