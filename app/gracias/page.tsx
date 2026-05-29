@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 
 export const metadata: Metadata = {
@@ -32,7 +33,13 @@ export default function GraciasPage() {
         </div>
 
         {/* Logo */}
-        <p className="font-playfair text-2xl font-bold italic text-bordo">Marian.</p>
+        <Image
+          src="/images/logo-marian-positivo.png"
+          alt="Marian Sánchez"
+          width={120}
+          height={38}
+          className="object-contain"
+        />
 
         {/* Mensaje */}
         <div className="flex flex-col gap-3">

@@ -38,12 +38,14 @@ export const metadata: Metadata = {
     description:
       "Conecto tu marca con los medios que importan. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
     locale: "es_AR",
+    images: [{ url: "/images/logo-marian-positivo.png" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Marian Sánchez — Estratega de comunicación · Mendoza",
     description:
       "Conecto tu marca con los medios que importan. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
+    images: ["/images/logo-marian-positivo.png"],
   },
   alternates: {
     canonical: BASE_URL,

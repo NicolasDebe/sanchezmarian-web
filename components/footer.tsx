@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 const NAV_LINKS = [
   { label: "Servicios", href: "/servicios" },
@@ -51,11 +52,14 @@ export function Footer() {
 
           {/* Logo + tagline */}
           <div className="flex flex-col gap-3">
-            <Link
-              href="/"
-              className="font-playfair text-2xl font-bold italic text-hueso hover:text-dorado transition-colors w-fit"
-            >
-              Marian.
+            <Link href="/" className="hover:opacity-80 transition-opacity w-fit">
+              <Image
+                src="/images/logo-marian-negativo.png"
+                alt="Marian Sánchez"
+                width={120}
+                height={38}
+                className="object-contain"
+              />
             </Link>
             <p className="font-sans text-xs text-hueso/30 leading-relaxed max-w-[200px]">
               Estratega de comunicación · Mendoza, Argentina.

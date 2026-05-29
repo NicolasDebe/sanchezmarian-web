@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { AnimatePresence, motion } from "motion/react"
 import { Menu, X } from "lucide-react"
@@ -23,11 +24,15 @@ export function Nav() {
       style={{ background: "var(--color-bordo)" }}
     >
       <nav className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
-        <Link
-          href="/"
-          className="font-playfair text-2xl font-bold italic text-hueso hover:text-dorado transition-colors"
-        >
-          Marian.
+        <Link href="/" className="hover:opacity-80 transition-opacity">
+          <Image
+            src="/images/logo-marian-negativo.png"
+            alt="Marian Sánchez"
+            width={140}
+            height={45}
+            priority
+            className="object-contain"
+          />
         </Link>
 
         <ul className="hidden md:flex items-center gap-8">
