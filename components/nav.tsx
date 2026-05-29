@@ -20,19 +20,19 @@ export function Nav() {
 
   return (
     <header
-      className="sticky top-0 z-50"
+      className="sticky top-0 z-50 h-[72px] flex items-center"
       style={{ background: "var(--color-bordo)" }}
     >
-      <nav className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+      <nav className="w-full max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
         <Link href="/" className="hover:opacity-80 transition-opacity">
           <Image
             src="/images/logo-marian-negativo.png"
             alt="Marian Sánchez"
-            width={180}
-            height={58}
+            width={220}
+            height={50}
             priority
             className="object-contain"
-            style={{ width: "auto", height: "100%", maxHeight: "52px" }}
+            style={{ width: "auto", height: "42px" }}
           />
         </Link>
 
