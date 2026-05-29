@@ -57,9 +57,9 @@ export function Footer() {
                 src="/images/logo-marian-negativo.png"
                 alt="Marian Sánchez"
                 width={200}
-                height={45}
+                height={50}
                 className="object-contain"
-                style={{ width: "auto", height: "38px" }}
+                style={{ width: "auto", height: "42px" }}
               />
             </Link>
             <p className="font-sans text-xs text-hueso/30 leading-relaxed max-w-[200px]">
