@@ -28,10 +28,11 @@ export function Nav() {
           <Image
             src="/images/logo-marian-negativo.png"
             alt="Marian Sánchez"
-            width={140}
-            height={45}
+            width={180}
+            height={58}
             priority
             className="object-contain"
+            style={{ width: "auto", height: "100%", maxHeight: "52px" }}
           />
         </Link>
 
