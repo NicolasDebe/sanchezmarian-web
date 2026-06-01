@@ -95,6 +95,9 @@ export default function RootLayout({
       lang="es"
       className={`${playfairDisplay.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preload" as="image" href="/images/hero-marian.jpg" />
+      </head>
       <body className="min-h-full flex flex-col">
         <script
           type="application/ld+json"
