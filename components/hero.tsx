@@ -7,15 +7,23 @@ import { fadeUp, fadeUpStagger } from "@/lib/animations"
 
 export function Hero() {
   return (
-    <section
-      className="relative min-h-screen w-full flex items-center justify-start"
-      style={{
-        backgroundImage: "url(/images/hero-marian.jpg)",
-        backgroundSize: "cover",
-        backgroundPosition: "center right",
-      }}
-    >
-      {/* Overlay degradado — oscuro izq donde va el texto, transparente der donde está Marian */}
+    <section className="relative min-h-screen w-full flex items-center justify-start">
+
+      {/* Imagen animada de fondo — zoom-fade al cargar */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "url(/images/hero-marian.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center right",
+          backgroundAttachment: "fixed",
+        }}
+      />
+
+      {/* Overlay degradado — encima de la imagen */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/40 to-transparent pointer-events-none" />
 
       {/* Contenido */}
@@ -51,7 +59,7 @@ export function Hero() {
                 animate={{ y: 0, rotate: 0 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
               >
-                <em className="italic text-dorado">en los medios.</em>
+                <em className="italic text-hueso">en los medios.</em>
               </motion.span>
             </span>
           </h1>

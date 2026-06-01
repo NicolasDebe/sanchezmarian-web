@@ -96,7 +96,14 @@ export default function RootLayout({
       className={`${playfairDisplay.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
     >
       <head>
-        <link rel="preload" as="image" href="/images/hero-marian.jpg" />
+        <link
+          rel="preload"
+          as="image"
+          href="/images/hero-marian.jpg"
+          // @ts-ignore — imagesrcset/imagesizes son atributos HTML válidos no tipados en React
+          imagesrcset="/images/hero-marian.jpg 1200w"
+          imagesizes="100vw"
+        />
       </head>
       <body className="min-h-full flex flex-col">
         <script
