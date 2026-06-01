@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { Nav } from "@/components/nav"
 import { Footer } from "@/components/footer"
-import { PageHero } from "@/components/page-hero"
 import { ContactoContent } from "@/components/contacto-content"
 
 export const metadata: Metadata = {
@@ -19,12 +18,6 @@ export default function ContactoPage() {
   return (
     <main>
       <Nav />
-      <PageHero
-        eyebrow="Contacto"
-        title="Hablemos sobre"
-        titleAccent="tu historia."
-        subtitle="Conversemos sobre tu proyecto y cómo puedo ayudarte a comunicarlo."
-      />
       <ContactoContent />
       <Footer />
     </main>

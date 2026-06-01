@@ -11,48 +11,85 @@ import {
 /* ═══════════════════════════════════════════════════════════════
    BLOQUE 1 — HERO EDITORIAL
 ═══════════════════════════════════════════════════════════════ */
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } },
+}
+
 function HeroEditorial() {
   return (
-    <section className="min-h-screen w-full overflow-hidden bg-hueso">
-      <div className="flex flex-col lg:grid lg:grid-cols-[55fr_45fr] min-h-screen">
+    <section style={{ position: "relative", width: "100%", overflow: "hidden" }}>
 
-        {/* Photo — sangra por el borde izquierdo, sin padding-left */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="h-[60vh] lg:h-auto overflow-hidden bg-arena rounded-b-[40px] lg:rounded-b-none lg:rounded-r-[40px]"
-        />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/NAC_4208.jpg"
+        alt="Marian Sánchez en su espacio de trabajo"
+        className="max-h-[70vh] sm:max-h-[90vh]"
+        style={{
+          width: "100%",
+          height: "auto",
+          display: "block",
+          objectFit: "cover",
+          objectPosition: "center top",
+        }}
+      />
 
-        {/* Texto — centrado verticalmente */}
-        <motion.div
-          variants={fadeUpStagger}
-          initial="hidden"
-          animate="visible"
-          className="flex items-center px-8 lg:px-16 xl:px-20 py-16 lg:py-0"
-        >
-          <div className="flex flex-col gap-6 max-w-[420px]">
-            <motion.p
-              variants={fadeUp}
-              className="font-mono text-[10px] uppercase tracking-[0.25em] text-bordo"
-            >
-              Sobre Marian
-            </motion.p>
-            <motion.div variants={fadeUp} className="w-10 h-px bg-dorado" />
-            <motion.h1
-              variants={fadeUp}
-              className="font-playfair font-bold text-negro-bordo text-[2.5rem] sm:text-[3rem] lg:text-[48px] leading-[1.05]"
-            >
-              <span className="block">Saber qué historia contar,</span>
-              <em className="block italic text-bordo">a quién y en qué momento.</em>
-            </motion.h1>
-            <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo">
-              Estratega de comunicación. Mendoza, Argentina.
-            </motion.p>
-          </div>
+      {/* OVERLAY — solo en la franja inferior donde está el texto */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          background: "linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.65) 100%)",
+        }}
+      />
+
+      {/* TEXTO — abajo sobre el overlay */}
+      <div
+        className="pt-5 sm:pt-0 px-5 sm:px-[clamp(20px,5vw,64px)] pb-8 sm:pb-[clamp(32px,6vh,64px)]"
+        style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
+      >
+        <motion.div variants={containerVariants} initial="hidden" animate="visible">
+
+          <motion.p
+            variants={itemVariants}
+            style={{
+              fontFamily: "DM Mono, monospace",
+              fontSize: "11px",
+              letterSpacing: ".15em",
+              textTransform: "uppercase",
+              color: "rgba(254,252,239,0.65)",
+              marginBottom: "14px",
+            }}
+          >
+            Sobre mí
+          </motion.p>
+
+          <motion.h1
+            variants={itemVariants}
+            style={{
+              fontFamily: "Playfair Display, serif",
+              color: "#FEFCEF",
+              fontWeight: 700,
+              margin: 0,
+            }}
+          >
+            <span style={{ display: "block", fontSize: "clamp(1.3rem, 3vw, 2.2rem)", fontWeight: 600, opacity: 0.88 }}>
+              Mariana Sánchez,
+            </span>
+            <em style={{ display: "block", fontSize: "clamp(2rem, 5vw, 4rem)", fontStyle: "italic", lineHeight: 1.0 }}>
+              estratega de comunicación.
+            </em>
+          </motion.h1>
+
         </motion.div>
-
       </div>
+
     </section>
   )
 }

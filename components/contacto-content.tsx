@@ -8,6 +8,93 @@ import {
   fadeUpStagger, viewportOnce,
 } from "@/lib/animations"
 
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const } },
+}
+
+function ContactoHero() {
+  return (
+    <section
+      className="flex flex-col sm:flex-row items-center flex-wrap mx-auto"
+      style={{
+        maxWidth: "1280px",
+        padding: "clamp(48px, 8vh, 100px) clamp(20px, 5vw, 64px)",
+        gap: "clamp(32px, 6vw, 80px)",
+      }}
+    >
+      {/* FOTO CIRCULAR */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.55, ease: "easeOut" }}
+        style={{ flexShrink: 0 }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/NAC_4230.jpg"
+          alt="Marian Sánchez — conversemos"
+          className="w-[110px] h-[110px] sm:w-[clamp(130px,16vw,210px)] sm:h-[clamp(130px,16vw,210px)]"
+          style={{
+            borderRadius: "50%",
+            objectFit: "cover",
+            objectPosition: "center top",
+            display: "block",
+            border: "2.5px solid rgba(102,0,31,0.2)",
+            boxShadow: "0 0 0 8px rgba(102,0,31,0.06)",
+          }}
+        />
+      </motion.div>
+
+      {/* TEXTO */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="text-center sm:text-left"
+        style={{ flex: 1, minWidth: "260px" }}
+      >
+        <motion.p
+          variants={itemVariants}
+          style={{
+            fontFamily: "DM Mono, monospace",
+            fontSize: "11px",
+            letterSpacing: ".15em",
+            textTransform: "uppercase",
+            color: "#66001F",
+            opacity: 0.65,
+            marginBottom: "16px",
+          }}
+        >
+          Contacto
+        </motion.p>
+
+        <motion.h1
+          variants={itemVariants}
+          style={{
+            fontFamily: "Playfair Display, serif",
+            color: "#1A0008",
+            fontWeight: 700,
+            margin: 0,
+          }}
+        >
+          <span style={{ display: "block", fontSize: "clamp(1.3rem, 2.5vw, 2rem)", fontWeight: 600, opacity: 0.82 }}>
+            Hagamos que las cosas pasen.
+          </span>
+          <em style={{ display: "block", fontSize: "clamp(1.9rem, 4vw, 3.2rem)", fontStyle: "italic", color: "#66001F", lineHeight: 1.0 }}>
+            Conversemos.
+          </em>
+        </motion.h1>
+      </motion.div>
+    </section>
+  )
+}
+
 const FAQ = [
   {
     q: "¿Cómo empezamos a trabajar juntos?",
@@ -36,6 +123,8 @@ const INFO_ITEMS = [
 export function ContactoContent() {
   return (
     <>
+      <ContactoHero />
+
       {/* ── Contacto principal ── */}
       <section className="bg-white py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-16 lg:gap-20 items-start">

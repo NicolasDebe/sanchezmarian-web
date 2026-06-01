@@ -1,10 +1,11 @@
 "use client"
 
 import { motion } from "motion/react"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { TextureCardStyled } from "@/components/ui/texture-card"
-import { fadeLeft, fadeRight, fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
+import { fadeRight, fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
 
 const TAGS = [
   "Comunicación estratégica",
@@ -20,43 +21,49 @@ export function Bio() {
 
         {/* ── IZQUIERDA — foto ── */}
         <motion.div
-          variants={fadeLeft}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
+          initial={{ opacity: 0, x: -24 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-80px" }}
           className="relative flex justify-center lg:justify-start"
         >
           <div className="relative w-full max-w-[380px]">
             <TextureCardStyled className="p-2">
-              <div className="w-full aspect-[3/4] rounded-[20px] overflow-hidden bg-arena">
-                <div className="w-full h-full flex flex-col items-center justify-center gap-4 opacity-30">
-                  <div className="w-20 h-20 rounded-full bg-bordo/20" />
-                  <div className="w-28 h-2 rounded-full bg-bordo/15" />
-                  <p className="font-mono text-[10px] text-bordo/40 uppercase tracking-widest mt-2">
-                    Foto · Marian
+              <div className="relative w-full aspect-[3/4] rounded-[20px] overflow-hidden">
+                <Image
+                  src="/images/NAC_4133.jpg"
+                  alt="Marian Sánchez — estratega de comunicación"
+                  width={600}
+                  height={800}
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    display: "block",
+                    objectFit: "cover",
+                    objectPosition: "center top",
+                    borderRadius: "12px",
+                  }}
+                />
+
+                {/* Badge sobre la foto */}
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute bottom-4 left-4 px-4 py-2 rounded-xl shadow-lg"
+                  style={{ backgroundColor: "#66001F" }}
+                >
+                  <p
+                    className="font-mono text-[11px] uppercase tracking-widest leading-none"
+                    style={{ color: "#FEFCEF" }}
+                  >
+                    Más de una década en comunicación
                   </p>
-                </div>
+                </motion.div>
               </div>
             </TextureCardStyled>
-
-            {/* Badge flotante */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85, rotate: -2 }}
-              whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-              viewport={viewportOnce}
-              transition={{ delay: 0.45, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute -bottom-5 -left-4 lg:-left-8 bg-bordo text-hueso px-5 py-4 rounded-2xl shadow-xl"
-            >
-              <p className="font-mono text-[10px] uppercase tracking-widest text-hueso/45 mb-1.5">
-                Más de una
-              </p>
-              <p className="font-playfair font-bold italic text-xl leading-none">
-                década
-              </p>
-              <p className="font-sans text-xs text-hueso/60 mt-0.5">
-                en comunicación
-              </p>
-            </motion.div>
           </div>
         </motion.div>
 
