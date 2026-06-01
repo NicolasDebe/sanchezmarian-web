@@ -9,22 +9,24 @@ export function Hero() {
   return (
     <section className="relative min-h-screen w-full flex items-center justify-start">
 
-      {/* Imagen animada de fondo — zoom-fade al cargar */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
+      {/* Imagen de fondo */}
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: "url(/images/hero-marian.jpg)",
           backgroundSize: "cover",
-          backgroundPosition: "center right",
+          backgroundPosition: "center",
           backgroundAttachment: "fixed",
         }}
       />
 
-      {/* Overlay degradado — encima de la imagen */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/40 to-transparent pointer-events-none" />
+      {/* Overlay — oscuro izq para legibilidad, transparente der para Marian */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+        }}
+      />
 
       {/* Contenido */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-24">
