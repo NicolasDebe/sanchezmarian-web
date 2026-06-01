@@ -4,122 +4,95 @@ import { motion } from "motion/react"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
+import { fadeUp, fadeUpStagger } from "@/lib/animations"
 
 export function Hero() {
   return (
-    <section className="relative w-full min-h-screen overflow-hidden">
+    <section className="bg-hueso">
+      <div className="flex flex-col lg:flex-row min-h-screen max-w-7xl mx-auto">
 
-      {/* ── BACKGROUND placeholder — reemplazar con <Image> cuando llegue la foto ── */}
-      <div className="absolute inset-0 bg-arena flex items-center justify-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-bordo/25">
-          Foto de Marian — 100% pantalla
-        </p>
-      </div>
-
-      {/* ── OVERLAY: oscuro abajo, transparente arriba ── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(26,0,8,0.92) 0%, rgba(26,0,8,0.55) 42%, rgba(26,0,8,0.0) 100%)",
-        }}
-      />
-
-      {/* ── CONTENIDO — anclado al fondo izquierdo ── */}
-      <div className="absolute inset-0 flex items-end">
-        <div className="w-full max-w-7xl mx-auto px-6 lg:px-12 pb-20 lg:pb-28">
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            animate="visible"
-            className="flex flex-col gap-6 max-w-[600px]"
-          >
-            <motion.p
-              variants={fadeUp}
-              className="font-mono text-[11px] uppercase tracking-[0.28em] text-hueso/70"
-            >
-              Estratega de comunicación · Mendoza, AR
-            </motion.p>
-
-            <h1 className="font-playfair font-bold text-hueso leading-[1.0] text-[2.75rem] sm:text-[3.75rem] lg:text-[4.75rem]">
-              <span className="block overflow-hidden">
-                <motion.span
-                  className="block"
-                  initial={{ y: "110%", rotate: -1 }}
-                  animate={{ y: 0, rotate: 0 }}
-                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-                >
-                  Tu historia merece estar
-                </motion.span>
-              </span>
-              <span className="block overflow-hidden">
-                <motion.span
-                  className="block"
-                  initial={{ y: "110%", rotate: -1 }}
-                  animate={{ y: 0, rotate: 0 }}
-                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-                >
-                  <em className="italic">en los medios.</em>
-                </motion.span>
-              </span>
-            </h1>
-
-            <motion.p
-              variants={fadeUp}
-              className="font-sans text-[16px] font-normal leading-[1.7] text-hueso/75 max-w-[520px] mb-10"
-            >
-              Conecto tu marca personal o empresarial con el ecosistema de medios de Mendoza de forma natural, aportando valor al periodista y visibilidad estratégica a tu proyecto.
-            </motion.p>
-
-            <motion.div
-              variants={fadeUp}
-              className="flex flex-wrap gap-3 pt-1"
-            >
-              <Link
-                href="#contacto"
-                className="inline-flex items-center gap-2 bg-hueso text-bordo px-7 py-3.5 rounded-full font-sans text-sm font-medium hover:bg-arena active:scale-[0.98] transition-all"
-              >
-                Quiero aparecer en medios
-                <ArrowRight size={14} strokeWidth={2} />
-              </Link>
-              <Link
-                href="#servicios"
-                className="inline-flex items-center gap-2 border border-hueso/50 text-hueso px-7 py-3.5 rounded-full font-sans text-sm font-medium hover:border-hueso hover:bg-hueso/10 transition-all"
-              >
-                Ver mis servicios
-              </Link>
-            </motion.div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* ── Watermark logo — firma visual ── */}
-      <div className="absolute bottom-8 right-8 pointer-events-none">
-        <Image
-          src="/images/logo-marian-negativo.png"
-          alt=""
-          width={200}
-          height={50}
-          aria-hidden="true"
-          style={{ opacity: 0.15, width: "auto", height: "36px" }}
-        />
-      </div>
-
-      {/* ── Scroll indicator ── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.6 }}
-        className="absolute bottom-10 right-8 lg:right-12 flex flex-col items-center gap-2"
-      >
+        {/* LEFT: Text */}
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
-          className="w-px h-10 bg-gradient-to-b from-hueso/40 to-transparent"
-        />
-      </motion.div>
+          variants={fadeUpStagger}
+          initial="hidden"
+          animate="visible"
+          className="w-full lg:w-[55%] flex flex-col justify-center order-2 lg:order-1 px-6 py-16 lg:px-16 lg:py-24"
+        >
+          <motion.p variants={fadeUp} className="eyebrow mb-3">
+            Estratega de comunicación · Mendoza, AR
+          </motion.p>
+          <span className="gold-line" />
 
+          <h1 className="font-playfair font-bold text-negro-bordo leading-[1.15] text-3xl lg:text-5xl mb-6">
+            <span className="block overflow-hidden">
+              <motion.span
+                className="block"
+                initial={{ y: "110%", rotate: -1 }}
+                animate={{ y: 0, rotate: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              >
+                Tu historia merece estar
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden">
+              <motion.span
+                className="block"
+                initial={{ y: "110%", rotate: -1 }}
+                animate={{ y: 0, rotate: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
+              >
+                <em className="italic text-dorado">en los medios.</em>
+              </motion.span>
+            </span>
+          </h1>
+
+          <motion.p
+            variants={fadeUp}
+            className="font-sans text-base lg:text-lg text-gris-bordo leading-relaxed mb-8 max-w-[480px]"
+          >
+            Conecto tu marca personal o empresarial con el ecosistema de medios
+            de Mendoza de forma natural, aportando valor al periodista y
+            visibilidad estratégica a tu proyecto.
+          </motion.p>
+
+          <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
+            <Link
+              href="#contacto"
+              className="inline-flex items-center justify-center gap-2 bg-bordo text-hueso px-8 py-4 rounded font-sans text-sm font-medium hover:bg-bordo-oscuro active:scale-[0.98] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordo"
+            >
+              Quiero aparecer en medios
+              <ArrowRight size={14} strokeWidth={2} />
+            </Link>
+            <Link
+              href="#servicios"
+              className="inline-flex items-center justify-center gap-2 border border-bordo text-bordo px-8 py-4 rounded font-sans text-sm font-medium hover:bg-hueso-oscuro active:scale-[0.98] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordo"
+            >
+              Ver mis servicios
+            </Link>
+          </motion.div>
+        </motion.div>
+
+        {/* RIGHT: Image */}
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          className="w-full lg:w-[45%] order-1 lg:order-2 relative h-[500px] lg:h-auto"
+        >
+          <div className="relative w-full h-full overflow-hidden lg:rounded-lg shadow-lg">
+            <Image
+              src="/images/hero-marian.jpg"
+              alt="Marian Sánchez — Estratega de comunicación en Mendoza"
+              fill
+              priority
+              quality={85}
+              sizes="(max-width: 768px) 100vw, 45vw"
+              className="object-cover object-center"
+            />
+          </div>
+        </motion.div>
+
+      </div>
     </section>
   )
 }
