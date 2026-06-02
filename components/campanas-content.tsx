@@ -348,6 +348,14 @@ function CampanaGrid() {
             descripcion="Grupo Presidente confirma el inicio de la preventa exclusiva de Lynk & Co en Mendoza. Tres modelos SUV híbridos premium con apertura de Urban Store en Palmares Mall prevista para el segundo semestre de 2026."
             scrollTarget="campana-lynk-co-grupo-presidente"
           />
+          <CampanaCard
+            marca="Bolsa de Comercio de Mendoza"
+            estado="ACTIVA"
+            fecha="Junio 2026"
+            titulo="El mosto se consolida en el exterior como el endulzante premium de la industria"
+            descripcion="La BCM reafirmó su posición como nexo articulador de la economía regional con un nuevo encuentro de la Comisión del Precio del Vino."
+            scrollTarget="campana-bolsa-comercio-mosto"
+          />
         </motion.div>
 
       </div>
@@ -667,6 +675,373 @@ function LynkCoGrupoPresidente() {
   )
 }
 
+// ─── Detalle: Bolsa de Comercio / Mosto ──────────────────────────────────────
+
+const PARTICIPANTES_BCM = [
+  "Patricia Giménez · ProMendoza",
+  "Martín Materia · CAFEM",
+  "Gustavo López · Juviar",
+]
+
+const DATOS_SECTOR = [
+  { n: "90%",      label: "exportación" },
+  { n: "93.000 tn", label: "campaña estimada" },
+  { n: "EE.UU.",   label: "principal comprador" },
+  { n: "Endulzante", label: "uso premium" },
+]
+
+function BolsaComercioMosto() {
+  return (
+    <section
+      id="campana-bolsa-comercio-mosto"
+      className="bg-hueso-oscuro"
+      style={{ scrollMarginTop: 80 }}
+    >
+      {/* Separador entre campañas */}
+      <div style={{ textAlign: "center", padding: "60px 0 0" }}>
+        <div
+          style={{
+            width:      80,
+            height:     1,
+            background: "var(--color-dorado)",
+            opacity:    0.15,
+            margin:     "0 auto",
+          }}
+        />
+      </div>
+
+      <div
+        className="max-w-7xl mx-auto"
+        style={{ padding: "clamp(48px, 8vh, 80px) clamp(20px, 5vw, 64px) clamp(60px, 10vh, 120px)" }}
+      >
+        {/* Header */}
+        <motion.div
+          variants={fadeUpStagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
+          <motion.div
+            variants={fadeUp}
+            className="flex flex-col sm:flex-row items-start sm:items-center"
+            style={{ gap: "clamp(16px, 3vw, 40px)", marginBottom: 40 }}
+          >
+            <div
+              className="font-playfair"
+              style={{
+                width:        56,
+                height:       56,
+                borderRadius: "50%",
+                background:   "var(--color-bordo)",
+                color:        "var(--color-hueso)",
+                display:      "grid",
+                placeItems:   "center",
+                fontSize:     24,
+                fontWeight:   700,
+                flexShrink:   0,
+              }}
+            >
+              B
+            </div>
+
+            <div>
+              <p
+                className="font-mono uppercase"
+                style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+              >
+                Bolsa de Comercio de Mendoza
+              </p>
+              <p
+                className="font-playfair"
+                style={{
+                  fontSize:   "clamp(1.4rem, 3vw, 2rem)",
+                  fontWeight: 600,
+                  color:      "var(--color-negro-bordo)",
+                  lineHeight: 1.25,
+                  marginTop:  8,
+                  maxWidth:   700,
+                }}
+              >
+                El mosto se consolida en el exterior como el endulzante premium de la industria
+              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
+                <span
+                  className="font-mono"
+                  style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.5 }}
+                >
+                  Junio 2026
+                </span>
+                <span
+                  className="font-mono uppercase"
+                  style={{
+                    fontSize:      10,
+                    letterSpacing: "0.1em",
+                    borderRadius:  100,
+                    padding:       "3px 12px",
+                    background:    "var(--color-bordo)",
+                    color:         "var(--color-hueso)",
+                  }}
+                >
+                  ACTIVA
+                </span>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            style={{ width: 60, height: 1, background: "var(--color-dorado)", marginBottom: 40 }}
+          />
+        </motion.div>
+
+        {/* Cuerpo */}
+        <div style={{ maxWidth: 720 }}>
+
+          {/* Lead */}
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-sans"
+            style={{
+              fontSize:    17,
+              color:       "var(--color-negro-bordo)",
+              lineHeight:  1.8,
+              fontWeight:  400,
+              marginBottom: 24,
+              paddingLeft: "clamp(16px, 3vw, 20px)",
+              borderLeft:  "2px solid rgba(201,168,130,0.4)",
+            }}
+          >
+            La Bolsa de Comercio de Mendoza reafirmó su posición como nexo articulador de la economía regional al realizar un nuevo encuentro de la Comisión del Precio del Vino, histórica en la institución.
+          </motion.p>
+
+          {/* Pills participantes */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 24, marginBottom: 40 }}
+          >
+            {PARTICIPANTES_BCM.map((p) => (
+              <span
+                key={p}
+                className="font-mono"
+                style={{
+                  fontSize:      10,
+                  letterSpacing: "0.08em",
+                  color:         "var(--color-bordo)",
+                  border:        "1px solid rgba(102,0,31,0.2)",
+                  borderRadius:  100,
+                  padding:       "4px 14px",
+                  whiteSpace:    "nowrap",
+                }}
+              >
+                {p}
+              </span>
+            ))}
+          </motion.div>
+
+          {/* Subtítulo 1 */}
+          <motion.h3
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-playfair"
+            style={{ fontSize: 20, color: "var(--color-negro-bordo)", fontStyle: "italic", marginTop: 48, marginBottom: 16 }}
+          >
+            Mendoza, epicentro mundial del vino a granel
+          </motion.h3>
+
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-sans"
+            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.85, marginBottom: 20 }}
+          >
+            Patricia Giménez expuso sobre Vinexpo Explorer — The Bulk Wine Chapter, el prestigioso encuentro internacional que se celebrará en la provincia del 8 al 10 de junio de 2026, con apertura oficial en la Bolsa de Comercio de Mendoza.
+          </motion.p>
+
+          {/* Dato destacado */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            style={{
+              marginTop:    32,
+              marginBottom: 32,
+              padding:      "clamp(20px, 3vw, 28px) clamp(24px, 3vw, 32px)",
+              background:   "var(--color-bordo)",
+              borderRadius: 12,
+            }}
+          >
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2"
+              style={{ gap: 24, marginBottom: 16 }}
+            >
+              {[
+                { n: "25", label: "importadores clave" },
+                { n: "50", label: "bodegas argentinas" },
+              ].map((d) => (
+                <div key={d.label} className="text-center sm:text-left">
+                  <p
+                    className="font-playfair leading-none"
+                    style={{ fontSize: 36, color: "var(--color-hueso)", fontWeight: 700 }}
+                  >
+                    {d.n}
+                  </p>
+                  <p
+                    className="font-mono uppercase"
+                    style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-hueso)", opacity: 0.55, marginTop: 8 }}
+                  >
+                    {d.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p
+              className="font-sans"
+              style={{ fontSize: 13, color: "var(--color-hueso)", opacity: 0.6, marginTop: 16 }}
+            >
+              EE.UU., Reino Unido, Canadá, Alemania y mercados emergentes.
+            </p>
+          </motion.div>
+
+          {/* Cita */}
+          <motion.blockquote
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            style={{
+              padding:      "clamp(16px, 3vw, 24px) clamp(20px, 3vw, 28px)",
+              background:   "var(--color-arena)",
+              borderRadius: 12,
+              borderLeft:   "3px solid var(--color-bordo)",
+              margin:       0,
+              marginBottom: 32,
+            }}
+          >
+            <p
+              className="font-sans"
+              style={{ fontSize: 15, color: "var(--color-gris-bordo)", fontStyle: "italic", lineHeight: 1.7 }}
+            >
+              "Si bien más del 60% de los compradores internacionales ya comercializaba vino argentino, más del 80% de ellos no conocía Mendoza en persona. Aquí es donde la identidad mendocina juega un rol clave."
+            </p>
+            <footer
+              className="font-mono"
+              style={{ fontSize: 10, color: "var(--color-bordo)", opacity: 0.6, marginTop: 10 }}
+            >
+              — Patricia Giménez, ProMendoza
+            </footer>
+          </motion.blockquote>
+
+          {/* Subtítulo 2 */}
+          <motion.h3
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-playfair"
+            style={{ fontSize: 20, color: "var(--color-negro-bordo)", fontStyle: "italic", marginTop: 48, marginBottom: 16 }}
+          >
+            Radiografía y proyección del sector del mosto
+          </motion.h3>
+
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-sans"
+            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.85, marginBottom: 20 }}
+          >
+            El 90% del mosto argentino se destina al mercado externo, siendo Estados Unidos el principal comprador, seguido por Japón, Sudáfrica y Canadá.
+          </motion.p>
+
+          {/* Datos del sector 2×2 */}
+          <motion.div
+            variants={fadeUpStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="grid grid-cols-2"
+            style={{ gap: 20, marginTop: 24, marginBottom: 32 }}
+          >
+            {DATOS_SECTOR.map((d) => (
+              <motion.div
+                key={d.label}
+                variants={revealCard}
+                style={{
+                  padding:      20,
+                  background:   "var(--color-hueso)",
+                  borderRadius: 10,
+                }}
+              >
+                <p
+                  className="font-playfair leading-none"
+                  style={{ fontSize: "clamp(22px, 3vw, 28px)", color: "var(--color-bordo)", fontWeight: 700 }}
+                >
+                  {d.n}
+                </p>
+                <p
+                  className="font-sans"
+                  style={{ fontSize: 13, color: "var(--color-gris-bordo)", marginTop: 4 }}
+                >
+                  {d.label}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Párrafo cierre */}
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-sans"
+            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.85, marginBottom: 20 }}
+          >
+            En Estados Unidos, el mosto se utiliza como endulzante natural en bebidas y alimentos industrializados orientados a un segmento premium que busca sustitutos saludables al jarabe de maíz. La Comisión concluyó en la necesidad de continuar generando estos espacios de debate para dotar de herramientas estratégicas a las pymes y productores de la provincia.
+          </motion.p>
+
+        </div>
+
+        {/* Galería placeholder */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          style={{
+            marginTop:    56,
+            padding:      "60px 40px",
+            background:   "var(--color-arena)",
+            borderRadius: 16,
+            textAlign:    "center",
+            border:       "1px dashed rgba(201,168,130,0.25)",
+          }}
+        >
+          <p
+            className="font-sans"
+            style={{ fontSize: 14, color: "var(--color-gris-bordo)", fontStyle: "italic" }}
+          >
+            Galería fotográfica próximamente
+          </p>
+        </motion.div>
+
+      </div>
+    </section>
+  )
+}
+
 // ─── CTA final ────────────────────────────────────────────────────────────────
 
 function CampanaCta() {
@@ -745,6 +1120,7 @@ export function CampanasContent() {
       <CampanaStats />
       <CampanaGrid />
       <LynkCoGrupoPresidente />
+      <BolsaComercioMosto />
       <CampanaCta />
     </>
   )
