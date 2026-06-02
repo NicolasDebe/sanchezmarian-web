@@ -5,6 +5,7 @@ const NAV_LINKS = [
   { label: "Servicios", href: "/servicios" },
   { label: "Sobre mí", href: "/sobre-marian" },
   { label: "Casos de éxito", href: "/casos-de-exito" },
+  { label: "Campañas", href: "/campanas" },
   { label: "Contacto", href: "/contacto" },
 ]
 
