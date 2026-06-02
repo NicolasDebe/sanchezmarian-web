@@ -109,7 +109,7 @@ export function Clientes() {
           className="font-mono uppercase mb-3"
           style={{ fontSize: 11, letterSpacing: "0.15em", color: "var(--color-bordo, #66001F)" }}
         >
-          Clientes
+          Marcas
         </p>
         <motion.div
           initial={{ scaleX: 0 }}
@@ -133,7 +133,7 @@ export function Clientes() {
           </em>
         </h2>
         <p className="font-sans" style={{ fontSize: 14, color: "var(--color-gris-bordo)" }}>
-          100+ apariciones en medios nacionales y provinciales.
+          100+ coberturas en medios nacionales y provinciales.
         </p>
       </motion.div>
 

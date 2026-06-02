@@ -106,7 +106,7 @@ export function Bio() {
               </p>
               <p>
                 Mi enfoque no se limita a la difusión masiva; se basa
-                en el vínculo real. Entiendo el ADN de cada cliente
+                en el vínculo real. Entiendo el ADN de cada marca
                 para identificar exactamente qué periodista o medio de
                 comunicación está buscando esa historia. Diseño estrategias
                 personalizadas, adaptadas a las necesidades de cada
@@ -115,8 +115,8 @@ export function Bio() {
               </p>
               <p>
                 Entiendo la comunicación como una sinergia donde todas las
-                partes ganan. Mi metodología no solo busca el beneficio del
-                cliente, sino que se enfoca en brindar un valor agregado al
+                partes ganan. Mi metodología no solo busca el beneficio de la
+                marca, sino que se enfoca en brindar un valor agregado al
                 periodista. Al entregar contenido de calidad, chequeado y de
                 interés genuino, facilito la labor informativa de los medios,
                 generando una relación de respeto y colaboración que perdura.

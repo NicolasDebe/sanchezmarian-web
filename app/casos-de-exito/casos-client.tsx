@@ -13,10 +13,10 @@ import { DestacadasRotativo } from "@/components/destacadas-rotativo"
 // ─── Hero stats ───────────────────────────────────────────────────────────────
 
 const STATS = [
-  { n: "100+", label: "apariciones verificadas" },
+  { n: "100+", label: "coberturas verificadas" },
   { n: "30+",  label: "medios distintos" },
   { n: "5",    label: "formatos cubiertos" },
-  { n: "15",   label: "clientes activos" },
+  { n: "15",   label: "marcas activas" },
 ] as const
 
 // 12 apariciones rotativas — 4 grupos × 3 cards
@@ -721,7 +721,7 @@ export function CasosClient() {
             className="font-mono uppercase mb-10"
             style={{ fontSize: 10, letterSpacing: "0.2em", color: "rgba(254,252,239,0.5)" }}
           >
-            Apariciones destacadas
+            Coberturas destacadas
           </motion.p>
           <DestacadasRotativo apariciones={rotativo} />
         </div>
@@ -744,7 +744,7 @@ export function CasosClient() {
                 className="font-mono uppercase"
                 style={{ fontSize: 10, letterSpacing: "0.2em", color: "var(--color-bordo)" }}
               >
-                Historial de apariciones
+                Historial de cobertura
               </motion.p>
               <motion.div
                 variants={fadeUp}
@@ -755,7 +755,7 @@ export function CasosClient() {
                 className="font-playfair font-bold"
                 style={{ fontSize: "clamp(28px, 3vw, 36px)", color: "var(--color-negro-bordo)" }}
               >
-                Apariciones por cliente
+                Coberturas por marca
               </motion.h2>
             </motion.div>
 

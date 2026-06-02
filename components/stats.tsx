@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react"
 
 const STATS = [
-  { value: 100, suffix: "+", label: "apariciones en medios" },
-  { value: 10,  suffix: "+", label: "clientes" },
+  { value: 100, suffix: "+", label: "coberturas en medios" },
+  { value: 10,  suffix: "+", label: "marcas" },
   { value: 10,  suffix: "+", label: "años de experiencia" },
   { value: 3,   suffix: "",  label: "servicios especializados" },
 ]
