@@ -29,17 +29,13 @@ export function Bio() {
         >
           <div className="relative w-full max-w-[380px]">
             <TextureCardStyled className="p-2">
-              <div className="relative w-full aspect-[3/4] rounded-[20px] overflow-hidden">
+              <div className="relative w-full rounded-[20px] overflow-hidden" style={{ aspectRatio: "3/4" }}>
                 <Image
                   src="/images/NAC_4133.jpg"
                   alt="Marian Sánchez — estratega de comunicación"
-                  width={600}
-                  height={800}
+                  fill
                   sizes="(max-width: 768px) 100vw, 40vw"
                   style={{
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
                     objectFit: "cover",
                     objectPosition: "center top",
                     borderRadius: "12px",
