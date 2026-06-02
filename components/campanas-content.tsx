@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "motion/react"
 import { ArrowRight } from "lucide-react"
 import {
@@ -355,6 +356,14 @@ function CampanaGrid() {
             titulo="El mosto se consolida en el exterior como el endulzante premium de la industria"
             descripcion="La BCM reafirmó su posición como nexo articulador de la economía regional con un nuevo encuentro de la Comisión del Precio del Vino."
             scrollTarget="campana-bolsa-comercio-mosto"
+          />
+          <CampanaCard
+            marca="Capilla Carlo Acutis"
+            estado="ACTIVA"
+            fecha="Junio 2026"
+            titulo="Peligra la continuidad de la Capilla Carlo Acutis en Luján de Cuyo: lanzan suscripción nacional para salvar la obra"
+            descripcion="La obra corre riesgo de paralizarse por falta de fondos. Se lanzó un sistema de donaciones con Mercado Pago buscando 8.000 donantes de todo el país."
+            scrollTarget="campana-capilla-carlo-acutis"
           />
         </motion.div>
 
@@ -1042,6 +1051,330 @@ function BolsaComercioMosto() {
   )
 }
 
+// ─── Detalle: Capilla Carlo Acutis ───────────────────────────────────────────
+
+const DRIVE_URL = "https://drive.google.com/drive/u/2/folders/1qU-v1Lkd_Kh-QAOw2tw3Q0irrj4XrkdL"
+
+const OPCIONES_DONACION = [
+  { icono: "🙏", nombre: "Donante",       desc: "Aporte mensual" },
+  { icono: "⭐", nombre: "Colaborador",   desc: "Aporte trimestral" },
+  { icono: "💎", nombre: "Padrino",       desc: "Aporte anual" },
+]
+
+function CapillaCarloAcutis() {
+  const [hovBtn, setHovBtn]       = useState(false)
+  const [hovSecBtn, setHovSecBtn] = useState(false)
+
+  return (
+    <section
+      id="campana-capilla-carlo-acutis"
+      className="bg-hueso"
+      style={{ scrollMarginTop: 80 }}
+    >
+      {/* Separador entre campañas */}
+      <div style={{ textAlign: "center", padding: "60px 0 0" }}>
+        <div
+          style={{
+            width:      80,
+            height:     1,
+            background: "var(--color-dorado)",
+            opacity:    0.15,
+            margin:     "0 auto",
+          }}
+        />
+      </div>
+
+      <div
+        className="max-w-7xl mx-auto"
+        style={{ padding: "clamp(48px, 8vh, 80px) clamp(20px, 5vw, 64px) clamp(60px, 10vh, 120px)" }}
+      >
+        {/* Header */}
+        <motion.div
+          variants={fadeUpStagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+        >
+          <motion.div
+            variants={fadeUp}
+            className="flex flex-col sm:flex-row items-start sm:items-center"
+            style={{ gap: "clamp(16px, 3vw, 40px)", marginBottom: 40 }}
+          >
+            {/* Logo real */}
+            <div
+              style={{
+                background:   "white",
+                borderRadius: 8,
+                padding:      "8px 10px",
+                border:       "1px solid rgba(0,0,0,0.06)",
+                flexShrink:   0,
+              }}
+            >
+              <Image
+                src="/images/logos/logo-capilla-acutis.png"
+                alt="Capilla Carlo Acutis"
+                width={56}
+                height={56}
+                style={{ width: 56, height: 56, objectFit: "contain", display: "block" }}
+              />
+            </div>
+
+            <div>
+              <p
+                className="font-mono uppercase"
+                style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+              >
+                Capilla Carlo Acutis
+              </p>
+              <p
+                className="font-playfair"
+                style={{
+                  fontSize:   "clamp(1.4rem, 3vw, 2rem)",
+                  fontWeight: 600,
+                  color:      "var(--color-negro-bordo)",
+                  lineHeight: 1.25,
+                  marginTop:  8,
+                  maxWidth:   700,
+                }}
+              >
+                Peligra la continuidad de la Capilla Carlo Acutis en Luján de Cuyo: lanzan suscripción nacional para salvar la obra
+              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
+                <span
+                  className="font-mono"
+                  style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.5 }}
+                >
+                  Junio 2026
+                </span>
+                <span
+                  className="font-mono uppercase"
+                  style={{
+                    fontSize:      10,
+                    letterSpacing: "0.1em",
+                    borderRadius:  100,
+                    padding:       "3px 12px",
+                    background:    "var(--color-bordo)",
+                    color:         "var(--color-hueso)",
+                  }}
+                >
+                  ACTIVA
+                </span>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            style={{ width: 60, height: 1, background: "var(--color-dorado)", marginBottom: 40 }}
+          />
+        </motion.div>
+
+        {/* Cuerpo */}
+        <div style={{ maxWidth: 720 }}>
+
+          {/* Lead */}
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-sans"
+            style={{
+              fontSize:     17,
+              color:        "var(--color-negro-bordo)",
+              lineHeight:   1.8,
+              fontWeight:   400,
+              marginBottom: 32,
+              paddingLeft:  "clamp(16px, 3vw, 20px)",
+              borderLeft:   "2px solid rgba(201,168,130,0.4)",
+            }}
+          >
+            La obra se encuentra en una etapa crítica y corre riesgo de paralizarse debido a la falta de fondos.
+          </motion.p>
+
+          {/* Bloque de urgencia */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            style={{
+              marginTop:    32,
+              marginBottom: 40,
+              padding:      "clamp(24px, 4vw, 36px)",
+              background:   "var(--color-bordo)",
+              borderRadius: 16,
+              textAlign:    "center",
+            }}
+          >
+            <p
+              className="font-playfair leading-none"
+              style={{
+                fontSize:   "clamp(2.5rem, 5vw, 4rem)",
+                color:      "var(--color-hueso)",
+                fontWeight: 700,
+                lineHeight: 1,
+              }}
+            >
+              8.000
+            </p>
+            <p
+              className="font-sans"
+              style={{ fontSize: 15, color: "var(--color-hueso)", opacity: 0.7, marginTop: 8 }}
+            >
+              donantes necesarios de todo el país
+            </p>
+            <p
+              className="font-mono uppercase"
+              style={{
+                fontSize:      11,
+                letterSpacing: "0.1em",
+                color:         "var(--color-hueso)",
+                opacity:       0.45,
+                marginTop:     12,
+              }}
+            >
+              para garantizar la continuidad del proyecto
+            </p>
+            <div className="w-full sm:w-auto flex justify-center" style={{ marginTop: 24 }}>
+              <a
+                href={DRIVE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onMouseEnter={() => setHovBtn(true)}
+                onMouseLeave={() => setHovBtn(false)}
+                className="font-sans w-full sm:w-auto inline-flex items-center justify-center gap-2"
+                style={{
+                  background:     "var(--color-hueso)",
+                  color:          "var(--color-bordo)",
+                  borderRadius:   100,
+                  padding:        "14px 32px",
+                  fontSize:       14,
+                  fontWeight:     600,
+                  textDecoration: "none",
+                  transform:      hovBtn ? "translateY(-1px)" : "translateY(0)",
+                  boxShadow:      hovBtn ? "0 4px 16px rgba(0,0,0,0.15)" : "none",
+                  transition:     "transform 0.25s ease, box-shadow 0.25s ease",
+                }}
+              >
+                Sumate como donante
+                <ArrowRight size={14} strokeWidth={2.5} />
+              </a>
+            </div>
+          </motion.div>
+
+          {/* Párrafo */}
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-sans"
+            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.85, marginBottom: 20 }}
+          >
+            Ante este escenario, se ha lanzado un nuevo sistema de donaciones integrado con Mercado Pago, que permite a ciudadanos de todo el país suscribirse de forma anual con distintos montos, buscando garantizar el flujo de recursos necesarios para avanzar en la concreción de la obra.
+          </motion.p>
+
+          {/* Detalle de donación */}
+          <motion.div
+            variants={fadeUpStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="grid grid-cols-1 sm:grid-cols-3"
+            style={{ gap: 16, marginTop: 32 }}
+          >
+            {OPCIONES_DONACION.map((op) => (
+              <motion.div
+                key={op.nombre}
+                variants={revealCard}
+                style={{
+                  padding:      24,
+                  textAlign:    "center",
+                  background:   "var(--color-hueso-oscuro)",
+                  borderRadius: 12,
+                  border:       "1px solid rgba(102,0,31,0.04)",
+                }}
+              >
+                <p style={{ fontSize: 24, marginBottom: 8 }}>{op.icono}</p>
+                <p
+                  className="font-sans"
+                  style={{ fontSize: 14, color: "var(--color-negro-bordo)", fontWeight: 600 }}
+                >
+                  {op.nombre}
+                </p>
+                <p
+                  className="font-sans"
+                  style={{ fontSize: 12, color: "var(--color-gris-bordo)", marginTop: 4 }}
+                >
+                  {op.desc}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Link externo */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            style={{ marginTop: 40 }}
+          >
+            <a
+              href={DRIVE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseEnter={() => setHovSecBtn(true)}
+              onMouseLeave={() => setHovSecBtn(false)}
+              className="font-sans w-full sm:w-auto inline-flex items-center justify-center gap-2"
+              style={{
+                border:         "1.5px solid rgba(102,0,31,0.25)",
+                borderRadius:   100,
+                padding:        "12px 28px",
+                fontSize:       14,
+                color:          "var(--color-bordo)",
+                fontWeight:     500,
+                textDecoration: "none",
+                background:     hovSecBtn ? "rgba(102,0,31,0.04)" : "transparent",
+                transition:     "background 0.2s ease",
+              }}
+            >
+              Ver material completo en Drive
+              <ArrowRight size={13} strokeWidth={2} />
+            </a>
+          </motion.div>
+
+        </div>
+
+        {/* Galería placeholder */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          style={{
+            marginTop:    56,
+            padding:      "60px 40px",
+            background:   "var(--color-arena)",
+            borderRadius: 16,
+            textAlign:    "center",
+            border:       "1px dashed rgba(201,168,130,0.25)",
+          }}
+        >
+          <p
+            className="font-sans"
+            style={{ fontSize: 14, color: "var(--color-gris-bordo)", fontStyle: "italic" }}
+          >
+            Galería fotográfica próximamente
+          </p>
+        </motion.div>
+
+      </div>
+    </section>
+  )
+}
+
 // ─── CTA final ────────────────────────────────────────────────────────────────
 
 function CampanaCta() {
@@ -1121,6 +1454,7 @@ export function CampanasContent() {
       <CampanaGrid />
       <LynkCoGrupoPresidente />
       <BolsaComercioMosto />
+      <CapillaCarloAcutis />
       <CampanaCta />
     </>
   )
