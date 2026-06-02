@@ -1053,17 +1053,8 @@ function BolsaComercioMosto() {
 
 // ─── Detalle: Capilla Carlo Acutis ───────────────────────────────────────────
 
-const DRIVE_URL = "https://drive.google.com/drive/u/2/folders/1qU-v1Lkd_Kh-QAOw2tw3Q0irrj4XrkdL"
-
-const OPCIONES_DONACION = [
-  { icono: "🙏", nombre: "Donante",       desc: "Aporte mensual" },
-  { icono: "⭐", nombre: "Colaborador",   desc: "Aporte trimestral" },
-  { icono: "💎", nombre: "Padrino",       desc: "Aporte anual" },
-]
-
 function CapillaCarloAcutis() {
-  const [hovBtn, setHovBtn]       = useState(false)
-  const [hovSecBtn, setHovSecBtn] = useState(false)
+  const [hovBtn, setHovBtn] = useState(false)
 
   return (
     <section
@@ -1192,6 +1183,18 @@ function CapillaCarloAcutis() {
             La obra se encuentra en una etapa crítica y corre riesgo de paralizarse debido a la falta de fondos.
           </motion.p>
 
+          {/* Párrafo */}
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-sans"
+            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.85, marginBottom: 40 }}
+          >
+            Ante este escenario, se ha lanzado un nuevo sistema de donaciones integrado con Mercado Pago, que permite a ciudadanos de todo el país suscribirse de forma anual con distintos montos, buscando garantizar el flujo de recursos necesarios para avanzar en la concreción de la obra.
+          </motion.p>
+
           {/* Bloque de urgencia */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
@@ -1199,9 +1202,8 @@ function CapillaCarloAcutis() {
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             style={{
-              marginTop:    32,
-              marginBottom: 40,
-              padding:      "clamp(24px, 4vw, 36px)",
+              marginBottom: 0,
+              padding:      "clamp(24px, 4vw, 40px)",
               background:   "var(--color-bordo)",
               borderRadius: 16,
               textAlign:    "center",
@@ -1224,23 +1226,10 @@ function CapillaCarloAcutis() {
             >
               donantes necesarios de todo el país
             </p>
-            <p
-              className="font-mono uppercase"
-              style={{
-                fontSize:      11,
-                letterSpacing: "0.1em",
-                color:         "var(--color-hueso)",
-                opacity:       0.45,
-                marginTop:     12,
-              }}
-            >
-              para garantizar la continuidad del proyecto
-            </p>
-            <div className="w-full sm:w-auto flex justify-center" style={{ marginTop: 24 }}>
+            <div className="flex justify-center" style={{ marginTop: 24 }}>
+              {/* TODO: reemplazar href con el link real de Mercado Pago cuando Marian lo proporcione */}
               <a
-                href={DRIVE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#"
                 onMouseEnter={() => setHovBtn(true)}
                 onMouseLeave={() => setHovBtn(false)}
                 className="font-sans w-full sm:w-auto inline-flex items-center justify-center gap-2"
@@ -1261,88 +1250,6 @@ function CapillaCarloAcutis() {
                 <ArrowRight size={14} strokeWidth={2.5} />
               </a>
             </div>
-          </motion.div>
-
-          {/* Párrafo */}
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="font-sans"
-            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.85, marginBottom: 20 }}
-          >
-            Ante este escenario, se ha lanzado un nuevo sistema de donaciones integrado con Mercado Pago, que permite a ciudadanos de todo el país suscribirse de forma anual con distintos montos, buscando garantizar el flujo de recursos necesarios para avanzar en la concreción de la obra.
-          </motion.p>
-
-          {/* Detalle de donación */}
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="grid grid-cols-1 sm:grid-cols-3"
-            style={{ gap: 16, marginTop: 32 }}
-          >
-            {OPCIONES_DONACION.map((op) => (
-              <motion.div
-                key={op.nombre}
-                variants={revealCard}
-                style={{
-                  padding:      24,
-                  textAlign:    "center",
-                  background:   "var(--color-hueso-oscuro)",
-                  borderRadius: 12,
-                  border:       "1px solid rgba(102,0,31,0.04)",
-                }}
-              >
-                <p style={{ fontSize: 24, marginBottom: 8 }}>{op.icono}</p>
-                <p
-                  className="font-sans"
-                  style={{ fontSize: 14, color: "var(--color-negro-bordo)", fontWeight: 600 }}
-                >
-                  {op.nombre}
-                </p>
-                <p
-                  className="font-sans"
-                  style={{ fontSize: 12, color: "var(--color-gris-bordo)", marginTop: 4 }}
-                >
-                  {op.desc}
-                </p>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Link externo */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            style={{ marginTop: 40 }}
-          >
-            <a
-              href={DRIVE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onMouseEnter={() => setHovSecBtn(true)}
-              onMouseLeave={() => setHovSecBtn(false)}
-              className="font-sans w-full sm:w-auto inline-flex items-center justify-center gap-2"
-              style={{
-                border:         "1.5px solid rgba(102,0,31,0.25)",
-                borderRadius:   100,
-                padding:        "12px 28px",
-                fontSize:       14,
-                color:          "var(--color-bordo)",
-                fontWeight:     500,
-                textDecoration: "none",
-                background:     hovSecBtn ? "rgba(102,0,31,0.04)" : "transparent",
-                transition:     "background 0.2s ease",
-              }}
-            >
-              Ver material completo en Drive
-              <ArrowRight size={13} strokeWidth={2} />
-            </a>
           </motion.div>
 
         </div>
