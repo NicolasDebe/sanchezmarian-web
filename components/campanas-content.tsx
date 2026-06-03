@@ -36,6 +36,8 @@ const MODELOS_LYNKCO = [
 
 const PILLS_LYNKCO = ["PHEV", "5★ Euro NCAP", "Diseño escandinavo"]
 
+const PILLS_MATERIALES = ["Ladrillos", "Hierro", "Cemento"]
+
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 function CampanaHero() {
@@ -362,7 +364,7 @@ function CampanaGrid() {
             estado="ACTIVA"
             fecha="Junio 2026"
             titulo="Peligra la continuidad de la Capilla Carlo Acutis en Luján de Cuyo: lanzan suscripción nacional para salvar la obra"
-            descripcion="La obra corre riesgo de paralizarse por falta de fondos. Se lanzó un sistema de donaciones con Mercado Pago buscando 8.000 donantes de todo el país."
+            descripcion="A un año de iniciar la construcción de la primera capilla dedicada al santo millennial en Chacras de Coria, la obra alcanzó solo el 17% de avance y corre riesgo de paralizarse por falta de fondos."
             scrollTarget="campana-capilla-carlo-acutis"
           />
         </motion.div>
@@ -1054,7 +1056,7 @@ function BolsaComercioMosto() {
 // ─── Detalle: Capilla Carlo Acutis ───────────────────────────────────────────
 
 function CapillaCarloAcutis() {
-  const [hovBtn, setHovBtn] = useState(false)
+  const [hovLink, setHovLink] = useState(false)
 
   return (
     <section
@@ -1091,7 +1093,6 @@ function CapillaCarloAcutis() {
             className="flex flex-col sm:flex-row items-start sm:items-center"
             style={{ gap: "clamp(16px, 3vw, 40px)", marginBottom: 40 }}
           >
-            {/* Logo real */}
             <div
               style={{
                 background:   "white",
@@ -1115,7 +1116,7 @@ function CapillaCarloAcutis() {
                 className="font-mono uppercase"
                 style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
               >
-                Capilla Carlo Acutis
+                CAPILLA CARLO ACUTIS
               </p>
               <p
                 className="font-playfair"
@@ -1177,32 +1178,20 @@ function CapillaCarloAcutis() {
               fontWeight:   400,
               marginBottom: 32,
               paddingLeft:  "clamp(16px, 3vw, 20px)",
-              borderLeft:   "2px solid rgba(201,168,130,0.4)",
+              borderLeft:   "2px solid var(--color-dorado)",
             }}
           >
-            La obra se encuentra en una etapa crítica y corre riesgo de paralizarse debido a la falta de fondos.
+            A un año de haber iniciado la construcción de la primera capilla dedicada al «Ciberapóstol de la Eucaristía» en Chacras de Coria, Luján de Cuyo, la coordinación del proyecto advierte que la obra se encuentra en una etapa crítica y corre riesgo de paralizarse debido a la falta de fondos.
           </motion.p>
 
-          {/* Párrafo */}
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
-            className="font-sans"
-            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.85, marginBottom: 40 }}
-          >
-            Ante este escenario, se ha lanzado un nuevo sistema de donaciones integrado con Mercado Pago, que permite a ciudadanos de todo el país suscribirse de forma anual con distintos montos, buscando garantizar el flujo de recursos necesarios para avanzar en la concreción de la obra.
-          </motion.p>
-
-          {/* Bloque de urgencia */}
+          {/* Bloque dato 17% */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             style={{
-              marginBottom: 0,
+              marginBottom: 32,
               padding:      "clamp(24px, 4vw, 40px)",
               background:   "var(--color-bordo)",
               borderRadius: 16,
@@ -1218,43 +1207,259 @@ function CapillaCarloAcutis() {
                 lineHeight: 1,
               }}
             >
-              8.000
+              17%
             </p>
             <p
               className="font-sans"
               style={{ fontSize: 15, color: "var(--color-hueso)", opacity: 0.7, marginTop: 8 }}
             >
-              donantes necesarios de todo el país
+              de avance en la construcción
             </p>
-            <div className="flex justify-center" style={{ marginTop: 24 }}>
-              {/* TODO: reemplazar href con el link real de Mercado Pago cuando Marian lo proporcione */}
-              <a
-                href="#"
-                onMouseEnter={() => setHovBtn(true)}
-                onMouseLeave={() => setHovBtn(false)}
-                className="font-sans w-full sm:w-auto inline-flex items-center justify-center gap-2"
+            <p
+              className="font-sans"
+              style={{ fontSize: 13, color: "var(--color-hueso)", opacity: 0.55, marginTop: 8 }}
+            >
+              Cimientos · Subsuelo · Losa del piso del templo
+            </p>
+            <p
+              className="font-mono uppercase"
+              style={{
+                fontSize:      11,
+                letterSpacing: "0.1em",
+                color:         "var(--color-hueso)",
+                opacity:       0.45,
+                marginTop:     16,
+              }}
+            >
+              Próximo objetivo: primeras columnas del proyecto
+            </p>
+          </motion.div>
+
+          {/* Párrafo donaciones */}
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-sans"
+            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.85, marginBottom: 16 }}
+          >
+            Ante este escenario, se ha lanzado un nuevo sistema de donaciones integrado con Mercado Pago, que permite a ciudadanos de todo el país suscribirse de forma anual con distintos montos, de manera simple y segura, buscando garantizar el flujo de recursos necesarios para avanzar en la concreción de la obra.
+          </motion.p>
+
+          {/* Pills materiales */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            style={{
+              display:      "flex",
+              gap:          8,
+              flexWrap:     "wrap",
+              overflowX:    "auto",
+              marginTop:    16,
+              marginBottom: 32,
+            }}
+          >
+            {PILLS_MATERIALES.map((p) => (
+              <span
+                key={p}
+                className="font-mono uppercase"
                 style={{
-                  background:     "var(--color-hueso)",
-                  color:          "var(--color-bordo)",
-                  borderRadius:   100,
-                  padding:        "14px 32px",
-                  fontSize:       14,
-                  fontWeight:     600,
-                  textDecoration: "none",
-                  transform:      hovBtn ? "translateY(-1px)" : "translateY(0)",
-                  boxShadow:      hovBtn ? "0 4px 16px rgba(0,0,0,0.15)" : "none",
-                  transition:     "transform 0.25s ease, box-shadow 0.25s ease",
+                  fontSize:      10,
+                  letterSpacing: "0.1em",
+                  color:         "var(--color-bordo)",
+                  border:        "1px solid rgba(102,0,31,0.2)",
+                  borderRadius:  100,
+                  padding:       "4px 14px",
+                  whiteSpace:    "nowrap",
                 }}
               >
-                Sumate como donante
-                <ArrowRight size={14} strokeWidth={2.5} />
-              </a>
-            </div>
+                {p}
+              </span>
+            ))}
+          </motion.div>
+
+          {/* Cita 1 */}
+          <motion.blockquote
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            style={{
+              padding:      "clamp(16px, 3vw, 24px) clamp(20px, 3vw, 28px)",
+              background:   "var(--color-arena)",
+              borderRadius: 12,
+              borderLeft:   "3px solid var(--color-bordo)",
+              margin:       0,
+              marginBottom: 32,
+            }}
+          >
+            <p
+              className="font-sans"
+              style={{ fontSize: 15, color: "var(--color-gris-bordo)", fontStyle: "italic", lineHeight: 1.7 }}
+            >
+              "Luego de un pequeño párate en la obra, ya estamos reanudándola nuevamente gracias a la solidaridad de muchas personas de Argentina y del exterior que se sienten movilizadas con este proyecto. La idea es seguir adelante con todo y no detenernos hasta su inauguración durante el primer semestre de 2028. El Padre Osvaldo Scandura, parte fundamental de esta obra, siempre nos recuerda que este proyecto es de DIOS, para que nunca bajemos los brazos."
+            </p>
+            <footer
+              className="font-mono"
+              style={{ fontSize: 10, color: "var(--color-bordo)", opacity: 0.6, marginTop: 10, fontStyle: "normal" }}
+            >
+              — Carlos Bajach, coordinador del proyecto
+            </footer>
+          </motion.blockquote>
+
+          {/* Subtítulo: Cómo colaborar */}
+          <motion.h3
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-playfair"
+            style={{ fontSize: 20, color: "var(--color-negro-bordo)", fontStyle: "italic", marginTop: 48, marginBottom: 16 }}
+          >
+            Cómo colaborar
+          </motion.h3>
+
+          {/* Párrafo colaborar */}
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-sans"
+            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.85, marginBottom: 20 }}
+          >
+            Los interesados en preservar este espacio dedicado al santo Carlo Acutis pueden sumarse a través del sistema de suscripción, aportando montos fijos que permiten una planificación real de los trabajos de construcción.
+          </motion.p>
+
+          {/* Link público */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            style={{ marginBottom: 32 }}
+          >
+            <a
+              href="https://capillacarloacutis.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseEnter={() => setHovLink(true)}
+              onMouseLeave={() => setHovLink(false)}
+              className="font-sans block sm:inline-block text-center sm:text-left"
+              style={{
+                border:         "1.5px solid rgba(102,0,31,0.25)",
+                borderRadius:   100,
+                padding:        "12px 28px",
+                fontSize:       14,
+                color:          "var(--color-bordo)",
+                fontWeight:     500,
+                textDecoration: "none",
+                background:     hovLink ? "rgba(102,0,31,0.04)" : "transparent",
+                transition:     "background 0.25s ease",
+              }}
+            >
+              Conocer más en capillacarloacutis.com →
+            </a>
+          </motion.div>
+
+          {/* Cita 2 */}
+          <motion.blockquote
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            style={{
+              padding:      "clamp(16px, 3vw, 24px) clamp(20px, 3vw, 28px)",
+              background:   "var(--color-arena)",
+              borderRadius: 12,
+              borderLeft:   "3px solid var(--color-bordo)",
+              margin:       0,
+              marginBottom: 32,
+            }}
+          >
+            <p
+              className="font-sans"
+              style={{ fontSize: 15, color: "var(--color-gris-bordo)", fontStyle: "italic", lineHeight: 1.7 }}
+            >
+              "Nos resuenan constantemente las palabras de Antonia Salzano, mamá de San Carlo Acutis, quien nos grabó un video deseando que esta capilla sea un faro de luz para los jóvenes del mundo. Nos emociona ver que, desde hace meses, cientos de peregrinos de distintos lugares de nuestro país se acercan a la obra para dar gracias por los favores recibidos."
+            </p>
+            <footer
+              className="font-mono"
+              style={{ fontSize: 10, color: "var(--color-bordo)", opacity: 0.6, marginTop: 10, fontStyle: "normal" }}
+            >
+              — Carlos Bajach
+            </footer>
+          </motion.blockquote>
+
+          {/* Subtítulo: El agradecimiento */}
+          <motion.h3
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="font-playfair"
+            style={{ fontSize: 20, color: "var(--color-negro-bordo)", fontStyle: "italic", marginTop: 48, marginBottom: 16 }}
+          >
+            El agradecimiento para quienes colaboran
+          </motion.h3>
+
+          {/* Cita 3 — bloque bordó */}
+          <motion.blockquote
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            style={{
+              padding:      "28px 32px",
+              background:   "var(--color-bordo)",
+              borderRadius: 12,
+              margin:       0,
+              marginBottom: 32,
+            }}
+          >
+            <p
+              className="font-playfair"
+              style={{ fontSize: 18, color: "var(--color-hueso)", fontStyle: "italic", lineHeight: 1.6 }}
+            >
+              "Pocas oportunidades tendremos en nuestras vidas de ser parte, de manera real e importante, en la construcción de una capilla. Para agradecer a todos los que colaboran, habrá un chapón gigante con los nombres de los donantes de esta obra, que será un legado para nuestras familias, hijos y nietos. El momento es ahora: hay que animarse a aportar."
+            </p>
+            <footer
+              className="font-mono"
+              style={{ fontSize: 10, color: "var(--color-hueso)", opacity: 0.5, marginTop: 12, fontStyle: "normal" }}
+            >
+              — Carlos Bajach, coordinador del proyecto
+            </footer>
+          </motion.blockquote>
+
+          {/* Dato: inauguración */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            style={{ textAlign: "center", marginTop: 40, marginBottom: 32 }}
+          >
+            <p
+              className="font-mono uppercase"
+              style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--color-gris-bordo)", opacity: 0.5 }}
+            >
+              Inauguración prevista:
+            </p>
+            <p
+              className="font-playfair"
+              style={{ fontSize: 24, color: "var(--color-bordo)", fontStyle: "italic", marginTop: 4 }}
+            >
+              Primer semestre 2028
+            </p>
           </motion.div>
 
         </div>
 
         {/* Galería placeholder */}
+        {/* TODO: agregar fotos cuando Marian las envíe */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
