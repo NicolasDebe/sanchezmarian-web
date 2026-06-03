@@ -1077,28 +1077,85 @@ function BolsaComercioMosto() {
 
         </div>
 
-        {/* Galería placeholder */}
+        {/* Galería */}
         <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-          style={{
-            marginTop:    56,
-            padding:      "60px 40px",
-            background:   "var(--color-arena)",
-            borderRadius: 16,
-            textAlign:    "center",
-            border:       "1px dashed rgba(201,168,130,0.25)",
-          }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+          viewport={{ once: true }}
+          style={{ marginTop: 56 }}
         >
           <p
-            className="font-sans"
-            style={{ fontSize: 14, color: "var(--color-gris-bordo)", fontStyle: "italic" }}
+            className="font-mono uppercase"
+            style={{
+              fontSize:      11,
+              letterSpacing: "0.12em",
+              color:         "var(--color-bordo)",
+              marginBottom:  20,
+            }}
           >
-            Galería fotográfica próximamente
+            Galería
+          </p>
+
+          <div
+            style={{
+              display:        "flex",
+              gap:            16,
+              overflowX:      "auto",
+              paddingBottom:  16,
+              scrollSnapType: "x mandatory",
+            }}
+            className="bcm-gallery"
+          >
+            {[
+              "/images/NAC_3874.jpg",
+              "/images/NAC_3895.jpg",
+              "/images/NAC_4000.jpg",
+              "/images/NAC_4067.jpg",
+            ].map((src) => (
+              <Image
+                key={src}
+                src={src}
+                alt="Bolsa de Comercio de Mendoza — Comisión del Precio del Vino"
+                width={420}
+                height={263}
+                style={{
+                  scrollSnapAlign: "start",
+                  flexShrink:      0,
+                  width:           "clamp(280px, 40vw, 420px)",
+                  height:          "auto",
+                  aspectRatio:     "16/10",
+                  objectFit:       "cover",
+                  objectPosition:  "center",
+                  borderRadius:    12,
+                  display:         "block",
+                  transition:      "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                } as React.CSSProperties}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1.02)" }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)" }}
+              />
+            ))}
+          </div>
+
+          <p
+            className="font-mono md:hidden"
+            style={{
+              fontSize:  10,
+              color:     "var(--color-gris-bordo)",
+              opacity:   0.4,
+              marginTop: 12,
+              textAlign: "right",
+            }}
+          >
+            ← Deslizá para ver más
           </p>
         </motion.div>
+
+        <style>{`
+          .bcm-gallery::-webkit-scrollbar { height: 3px; }
+          .bcm-gallery::-webkit-scrollbar-track { background: var(--color-arena); }
+          .bcm-gallery::-webkit-scrollbar-thumb { background: rgba(102,0,31,0.4); border-radius: 100px; }
+        `}</style>
 
       </div>
     </section>
