@@ -9,6 +9,7 @@ import {
   fadeUp, fadeUpStagger, revealCard, viewportOnce,
 } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
+import { CampaignSlideshow } from "@/components/campaign-slideshow"
 
 // ─── Datos estáticos ──────────────────────────────────────────────────────────
 
@@ -658,80 +659,16 @@ function LynkCoGrupoPresidente() {
 
         </div>
 
-        {/* Galería */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-          viewport={{ once: true }}
-          style={{ marginTop: 56 }}
-        >
-          <p
-            className="font-mono uppercase"
-            style={{
-              fontSize:      11,
-              letterSpacing: "0.12em",
-              color:         "var(--color-bordo)",
-              marginBottom:  20,
-            }}
-          >
-            Galería
-          </p>
-
-          <div
-            style={{
-              display:         "flex",
-              gap:             16,
-              overflowX:       "auto",
-              paddingBottom:   16,
-              scrollSnapType:  "x mandatory",
-            }}
-            className="lynkco-gallery"
-          >
-            {[1, 2, 3, 4, 5].map((n) => (
-              <Image
-                key={n}
-                src={`/images/${n}.jpg`}
-                alt="Lynk & Co — Grupo Presidente Mendoza"
-                width={420}
-                height={263}
-                style={{
-                  scrollSnapAlign: "start",
-                  flexShrink:      0,
-                  width:           "clamp(280px, 40vw, 420px)",
-                  height:          "auto",
-                  aspectRatio:     "16/10",
-                  objectFit:       "cover",
-                  objectPosition:  "center",
-                  borderRadius:    12,
-                  display:         "block",
-                  transition:      "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-                } as React.CSSProperties}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1.02)" }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)" }}
-              />
-            ))}
-          </div>
-
-          <p
-            className="font-mono md:hidden"
-            style={{
-              fontSize:  10,
-              color:     "var(--color-gris-bordo)",
-              opacity:   0.4,
-              marginTop: 12,
-              textAlign: "right",
-            }}
-          >
-            ← Deslizá para ver más
-          </p>
-        </motion.div>
-
-        <style>{`
-          .lynkco-gallery::-webkit-scrollbar { height: 3px; }
-          .lynkco-gallery::-webkit-scrollbar-track { background: var(--color-arena); }
-          .lynkco-gallery::-webkit-scrollbar-thumb { background: rgba(102,0,31,0.4); border-radius: 100px; }
-        `}</style>
+        <CampaignSlideshow
+          campaignName="Lynk & Co — Grupo Presidente"
+          images={[
+            { src: "/images/1.jpg", alt: "Lynk & Co Mendoza" },
+            { src: "/images/2.jpg", alt: "Lynk & Co Mendoza" },
+            { src: "/images/3.jpg", alt: "Lynk & Co Mendoza" },
+            { src: "/images/4.jpg", alt: "Lynk & Co Mendoza" },
+            { src: "/images/5.jpg", alt: "Lynk & Co Mendoza" },
+          ]}
+        />
 
       </div>
     </section>
@@ -1077,85 +1014,15 @@ function BolsaComercioMosto() {
 
         </div>
 
-        {/* Galería */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-          viewport={{ once: true }}
-          style={{ marginTop: 56 }}
-        >
-          <p
-            className="font-mono uppercase"
-            style={{
-              fontSize:      11,
-              letterSpacing: "0.12em",
-              color:         "var(--color-bordo)",
-              marginBottom:  20,
-            }}
-          >
-            Galería
-          </p>
-
-          <div
-            style={{
-              display:        "flex",
-              gap:            16,
-              overflowX:      "auto",
-              paddingBottom:  16,
-              scrollSnapType: "x mandatory",
-            }}
-            className="bcm-gallery"
-          >
-            {[
-              "/images/NAC_3874.jpg",
-              "/images/NAC_3895.jpg",
-              "/images/NAC_4000.jpg",
-              "/images/NAC_4067.jpg",
-            ].map((src) => (
-              <Image
-                key={src}
-                src={src}
-                alt="Bolsa de Comercio de Mendoza — Comisión del Precio del Vino"
-                width={420}
-                height={263}
-                style={{
-                  scrollSnapAlign: "start",
-                  flexShrink:      0,
-                  width:           "clamp(280px, 40vw, 420px)",
-                  height:          "auto",
-                  aspectRatio:     "16/10",
-                  objectFit:       "cover",
-                  objectPosition:  "center",
-                  borderRadius:    12,
-                  display:         "block",
-                  transition:      "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-                } as React.CSSProperties}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1.02)" }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)" }}
-              />
-            ))}
-          </div>
-
-          <p
-            className="font-mono md:hidden"
-            style={{
-              fontSize:  10,
-              color:     "var(--color-gris-bordo)",
-              opacity:   0.4,
-              marginTop: 12,
-              textAlign: "right",
-            }}
-          >
-            ← Deslizá para ver más
-          </p>
-        </motion.div>
-
-        <style>{`
-          .bcm-gallery::-webkit-scrollbar { height: 3px; }
-          .bcm-gallery::-webkit-scrollbar-track { background: var(--color-arena); }
-          .bcm-gallery::-webkit-scrollbar-thumb { background: rgba(102,0,31,0.4); border-radius: 100px; }
-        `}</style>
+        <CampaignSlideshow
+          campaignName="Bolsa de Comercio de Mendoza"
+          images={[
+            { src: "/images/NAC_3874.jpg", alt: "BCM Comisión del Precio del Vino" },
+            { src: "/images/NAC_3895.jpg", alt: "BCM Comisión del Precio del Vino" },
+            { src: "/images/NAC_4000.jpg", alt: "BCM Comisión del Precio del Vino" },
+            { src: "/images/NAC_4067.jpg", alt: "BCM Comisión del Precio del Vino" },
+          ]}
+        />
 
       </div>
     </section>
@@ -1567,80 +1434,20 @@ function CapillaCarloAcutis() {
 
         </div>
 
-        {/* Galería */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-          viewport={{ once: true }}
-          style={{ marginTop: 56 }}
-        >
-          <p
-            className="font-mono uppercase"
-            style={{
-              fontSize:      11,
-              letterSpacing: "0.12em",
-              color:         "var(--color-bordo)",
-              marginBottom:  20,
-            }}
-          >
-            Galería
-          </p>
-
-          <div
-            style={{
-              display:        "flex",
-              gap:            16,
-              overflowX:      "auto",
-              paddingBottom:  16,
-              scrollSnapType: "x mandatory",
-            }}
-            className="acutis-gallery"
-          >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-              <Image
-                key={n}
-                src={`/images/${n}.jpeg`}
-                alt="Capilla Carlo Acutis — Luján de Cuyo, Mendoza"
-                width={420}
-                height={263}
-                style={{
-                  scrollSnapAlign: "start",
-                  flexShrink:      0,
-                  width:           "clamp(280px, 40vw, 420px)",
-                  height:          "auto",
-                  aspectRatio:     "16/10",
-                  objectFit:       "cover",
-                  objectPosition:  "center",
-                  borderRadius:    12,
-                  display:         "block",
-                  transition:      "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-                } as React.CSSProperties}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1.02)" }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)" }}
-              />
-            ))}
-          </div>
-
-          <p
-            className="font-mono md:hidden"
-            style={{
-              fontSize:  10,
-              color:     "var(--color-gris-bordo)",
-              opacity:   0.4,
-              marginTop: 12,
-              textAlign: "right",
-            }}
-          >
-            ← Deslizá para ver más
-          </p>
-        </motion.div>
-
-        <style>{`
-          .acutis-gallery::-webkit-scrollbar { height: 3px; }
-          .acutis-gallery::-webkit-scrollbar-track { background: var(--color-arena); }
-          .acutis-gallery::-webkit-scrollbar-thumb { background: rgba(102,0,31,0.4); border-radius: 100px; }
-        `}</style>
+        <CampaignSlideshow
+          campaignName="Capilla Carlo Acutis"
+          images={[
+            { src: "/images/1.jpeg", alt: "Capilla Carlo Acutis Luján de Cuyo" },
+            { src: "/images/2.jpeg", alt: "Capilla Carlo Acutis Luján de Cuyo" },
+            { src: "/images/3.jpeg", alt: "Capilla Carlo Acutis Luján de Cuyo" },
+            { src: "/images/4.jpeg", alt: "Capilla Carlo Acutis Luján de Cuyo" },
+            { src: "/images/5.jpeg", alt: "Capilla Carlo Acutis Luján de Cuyo" },
+            { src: "/images/6.jpeg", alt: "Capilla Carlo Acutis Luján de Cuyo" },
+            { src: "/images/7.jpeg", alt: "Capilla Carlo Acutis Luján de Cuyo" },
+            { src: "/images/8.jpeg", alt: "Capilla Carlo Acutis Luján de Cuyo" },
+            { src: "/images/9.jpeg", alt: "Capilla Carlo Acutis Luján de Cuyo" },
+          ]}
+        />
 
       </div>
     </section>
