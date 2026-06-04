@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 
 interface SlideImage {
@@ -38,10 +39,24 @@ function ProgressBar({ duration, isPaused }: { duration: number; isPaused: boole
 }
 
 export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isPaused, setIsPaused]         = useState(false)
+  const [currentIndex, setCurrentIndex]     = useState(0)
+  const [isPaused, setIsPaused]             = useState(false)
+  const [loadedSlides, setLoadedSlides]     = useState<Set<number>>(new Set())
+  const [slideshowReady, setSlideshowReady] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const resumeRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const isLoaded = loadedSlides.has(currentIndex)
+
+  function handleImageLoad(index: number) {
+    setLoadedSlides(prev => {
+      const next = new Set(prev)
+      next.add(index)
+      return next
+    })
+    // El slideshow arranca solo después de que la primera imagen cargó
+    if (index === 0) setSlideshowReady(true)
+  }
 
   function handleInteract() {
     setIsPaused(true)
@@ -64,15 +79,16 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
     handleInteract()
   }
 
+  // El intervalo no arranca hasta que slideshowReady sea true
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
-    if (!isPaused) {
+    if (!isPaused && slideshowReady) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex(i => (i + 1) % images.length)
       }, 4000)
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [isPaused, images.length])
+  }, [isPaused, images.length, slideshowReady])
 
   useEffect(() => {
     return () => { if (resumeRef.current) clearTimeout(resumeRef.current) }
@@ -100,7 +116,7 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
           className="font-mono uppercase"
           style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)", marginBottom: 16 }}
         >
-          Galería
+          Galería — {campaignName}
         </p>
 
         {/* Contenedor principal */}
@@ -114,7 +130,7 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
             background:   "var(--color-arena)",
           }}
         >
-          {/* Barra de progreso */}
+          {/* Barra de progreso: espera a que slideshowReady sea true */}
           <div
             key={currentIndex}
             style={{
@@ -127,28 +143,30 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
               background: "rgba(254,252,239,0.2)",
             }}
           >
-            <ProgressBar duration={4000} isPaused={isPaused} />
+            <ProgressBar duration={4000} isPaused={isPaused || !slideshowReady} />
           </div>
 
-          {/* Imagen activa */}
+          {/* Imagen activa — fade-in solo después del onLoad */}
           <AnimatePresence mode="wait">
-            <motion.img
+            <motion.div
               key={currentIndex}
-              src={images[currentIndex].src}
-              alt={images[currentIndex].alt}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: isLoaded ? 1 : 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
-              style={{
-                position:       "absolute",
-                inset:          0,
-                width:          "100%",
-                height:         "100%",
-                objectFit:      "cover",
-                objectPosition: "center",
-              }}
-            />
+              style={{ position: "absolute", inset: 0 }}
+            >
+              <Image
+                src={images[currentIndex].src}
+                alt={images[currentIndex].alt}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px"
+                priority={currentIndex === 0}
+                loading={currentIndex > 0 && currentIndex < 3 ? "eager" : undefined}
+                onLoad={() => handleImageLoad(currentIndex)}
+                style={{ objectFit: "cover", objectPosition: "center" }}
+              />
+            </motion.div>
           </AnimatePresence>
 
           {/* Overlay gradiente */}

@@ -2,6 +2,9 @@ import type { Metadata } from "next"
 import { Nav } from "@/components/nav"
 import { Footer } from "@/components/footer"
 import { CampanasContent } from "@/components/campanas-content"
+import { getAllCampaigns } from "@/lib/campaigns"
+
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: "Campañas activas — Marian Sánchez",
@@ -21,11 +24,13 @@ export const metadata: Metadata = {
   },
 }
 
-export default function CampanasPage() {
+export default async function CampanasPage() {
+  const campaigns = await getAllCampaigns()
+
   return (
     <main>
       <Nav />
-      <CampanasContent />
+      <CampanasContent campaigns={campaigns} />
       <Footer />
     </main>
   )
