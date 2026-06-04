@@ -27,7 +27,7 @@ const BASE_URL = "https://sanchezmarian.com"
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "Marian Sánchez — Estratega de comunicación · Mendoza",
+  title: "Marian Sánchez — Comunicación estratégica · Mendoza",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -36,22 +36,22 @@ export const metadata: Metadata = {
     apple: [{ url: "/favicon-180.png", sizes: "180x180" }],
   },
   description:
-    "Conecto tu marca con los medios que importan. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
+    "Comunicación estratégica y narrativas multiplataforma para negocios. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
   openGraph: {
     type: "website",
     url: BASE_URL,
     siteName: "Marian Sánchez",
-    title: "Marian Sánchez — Estratega de comunicación · Mendoza",
+    title: "Marian Sánchez — Comunicación estratégica · Mendoza",
     description:
-      "Conecto tu marca con los medios que importan. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
+      "Comunicación estratégica y narrativas multiplataforma para negocios. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
     locale: "es_AR",
     images: [{ url: "/images/logo-marian-positivo.png" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Marian Sánchez — Estratega de comunicación · Mendoza",
+    title: "Marian Sánchez — Comunicación estratégica · Mendoza",
     description:
-      "Conecto tu marca con los medios que importan. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
+      "Comunicación estratégica y narrativas multiplataforma para negocios. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
     images: ["/images/logo-marian-positivo.png"],
   },
   alternates: {

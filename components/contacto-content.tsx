@@ -115,7 +115,7 @@ const FAQ = [
 ]
 
 const INFO_ITEMS = [
-  { icon: Mail, label: "Email", value: "sanchezmariana15@gmail.com", href: "mailto:sanchezmariana15@gmail.com" },
+  { icon: Mail, label: "Email", value: "contacto@sanchezmarian.com", href: "mailto:contacto@sanchezmarian.com" },
   { icon: MapPin, label: "Ubicación", value: "Mendoza, Argentina", href: null },
   { icon: MessageCircle, label: "Disponibilidad", value: "Agendar sesión", href: null },
 ]
@@ -193,8 +193,8 @@ export function ContactoContent() {
               </p>
               <div className="flex gap-3">
                 {[
-                  { label: "LinkedIn", href: "https://linkedin.com/in/sanchezmarian" },
-                  { label: "Instagram", href: "https://instagram.com/sanchezmarian" },
+                  { label: "LinkedIn", href: "https://www.linkedin.com/in/marians%C3%A1nchez/" },
+                  { label: "Instagram", href: "https://www.instagram.com/marian15s/" },
                 ].map(({ label, href }) => (
                   <a
                     key={label}

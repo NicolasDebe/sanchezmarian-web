@@ -83,7 +83,7 @@ function HeroEditorial() {
               Mariana Sánchez,
             </span>
             <em style={{ display: "block", fontSize: "clamp(2rem, 5vw, 4rem)", fontStyle: "italic", lineHeight: 1.0 }}>
-              estratega de comunicación.
+              comunicación con propósito.
             </em>
           </motion.h1>
 
@@ -154,7 +154,7 @@ const HITOS = [
   { year: "2016", desc: "Primeros pasos en comunicación y medios en Mendoza" },
   { year: "2019", desc: "Fundación de GB Consulting como consultora independiente" },
   { year: "2023", desc: "100+ apariciones en medios gestionadas" },
-  { year: "2026", desc: "Consolidación como estratega con red nacional e internacional" },
+  { year: "2026", desc: "Consolidación como referente con red nacional e internacional" },
 ]
 
 const TRAY_LINE_DUR = 1.5

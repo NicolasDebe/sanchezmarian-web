@@ -23,11 +23,11 @@ const SECTIONS = [
   },
   {
     title: "Tus derechos",
-    body: "Tenés derecho a acceder, corregir o solicitar la eliminación de tus datos personales. Para ejercer estos derechos, escribinos a sanchezmariana15@gmail.com.",
+    body: "Tenés derecho a acceder, corregir o solicitar la eliminación de tus datos personales. Para ejercer estos derechos, escribinos a contacto@sanchezmarian.com.",
   },
   {
     title: "Contacto",
-    body: "Ante cualquier consulta sobre esta política de privacidad, podés contactarnos en sanchezmariana15@gmail.com.",
+    body: "Ante cualquier consulta sobre esta política de privacidad, podés contactarnos en contacto@sanchezmarian.com.",
   },
 ]
 

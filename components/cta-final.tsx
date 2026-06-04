@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react"
 import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 
-const WA_HREF = "https://wa.me/5492614000000?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
+const WA_HREF = "https://wa.me/542615433882?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
 
 function IconWA() {
   return (
@@ -114,19 +114,16 @@ export function CtaFinal() {
               <em className="block italic text-dorado">y en el poder de las conexiones reales.</em>
             </motion.h2>
 
-            <motion.p variants={fadeUp} className="font-sans italic text-[0.9375rem] text-hueso/65">
-              Conversemos.
-            </motion.p>
-
             <motion.p variants={fadeUp} className="font-sans text-[0.9375rem] text-hueso/65 leading-[1.7] max-w-[420px]">
-              Si buscás posicionar tu proyecto de forma orgánica y estratégica,
-              me encantaría escucharte.
+              Si buscás un asesoramiento estratégico para posicionar tu negocio,
+              conversemos. Hablemos de esa gran historia que tu negocio tiene
+              para contar.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">
               <div className="flex items-center gap-3">
                 <Mail size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
-                <span className="font-sans text-sm text-hueso/80">sanchezmariana15@gmail.com</span>
+                <span className="font-sans text-sm text-hueso/80">contacto@sanchezmarian.com</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
@@ -275,7 +272,7 @@ export function CtaFinal() {
 
               {error && (
                 <p className="font-mono text-[9px] text-dorado/70 text-center">
-                  Algo falló. Escribime a sanchezmariana15@gmail.com
+                  Algo falló. Escribime a contacto@sanchezmarian.com
                 </p>
               )}
             </form>

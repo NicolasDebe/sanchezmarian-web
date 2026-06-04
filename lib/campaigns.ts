@@ -13,6 +13,20 @@ export async function getAllCampaigns(): Promise<Campaign[]> {
   return (data ?? []) as Campaign[]
 }
 
+export async function getCampaignById(id: string): Promise<Campaign | null> {
+  const { data, error } = await supabase
+    .from("campaigns")
+    .select("*, images:campaign_images(*)")
+    .eq("id", id)
+    .single()
+
+  if (error) {
+    if (error.code === "PGRST116") return null
+    throw error
+  }
+  return data as Campaign
+}
+
 export async function getCampaignBySlug(slug: string): Promise<Campaign | null> {
   const { data, error } = await supabase
     .from("campaigns")

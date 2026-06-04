@@ -1,10 +1,10 @@
 const ITEMS = [
-  "PR Estratégico",
-  "Posicionamiento de Voceros",
-  "Gestión Orgánica de Medios",
-  "Relaciones Institucionales",
+  "Prensa y Comunicación Multiplataforma",
   "Comunicación Estratégica",
-  "Prensa y Medios",
+  "Relaciones Públicas",
+  "Eventos Institucionales",
+  "Narrativas multiplataforma",
+  "Visibilidad real",
 ]
 
 const DOT = (

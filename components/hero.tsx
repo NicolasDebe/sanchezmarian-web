@@ -31,7 +31,7 @@ export function Hero() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/hero-marian.jpg"
-        alt="Marian Sánchez — Estratega de comunicación en Mendoza"
+        alt="Marian Sánchez — Comunicación estratégica en Mendoza"
         className="w-full block"
         style={{
           height: "auto",
@@ -86,9 +86,7 @@ export function Hero() {
                 gap: "10px",
               }}
             >
-              Estratega de comunicación
-              <span style={{ opacity: 0.4 }}>·</span>
-              Mendoza, AR
+              Comunicación estratégica y narrativas multiplataforma para negocios
             </motion.p>
 
             {/* H1 */}
@@ -100,31 +98,11 @@ export function Hero() {
                 color: "#FEFCEF",
                 fontWeight: 700,
                 margin: "0 0 24px",
+                fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)",
+                letterSpacing: "-0.02em",
               }}
             >
-              <span
-                style={{
-                  display: "block",
-                  fontSize: "clamp(1.5rem, 3.5vw, 2.8rem)",
-                  fontWeight: 600,
-                  opacity: 0.92,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                Tu historia merece estar
-              </span>
-              <em
-                style={{
-                  display: "block",
-                  fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)",
-                  fontStyle: "italic",
-                  fontWeight: 700,
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.0,
-                }}
-              >
-                en los medios.
-              </em>
+              Comunicar es conectar
             </motion.h1>
 
             {/* DESCRIPCIÓN */}
@@ -139,9 +117,11 @@ export function Hero() {
                 marginBottom: "32px",
               }}
             >
-              Conecto tu marca personal o empresarial con el ecosistema de
-              medios de Mendoza de forma natural, aportando valor al periodista
-              y visibilidad estratégica a tu proyecto.
+              Diseño estrategias de comunicación multiplataforma con visión de
+              futuro que transforman tu valor diferencial en visibilidad real.
+              Te acompaño a construir puentes honestos con los medios y la
+              comunidad para que el mensaje de tu negocio resuene con fuerza,
+              claridad y el impacto que realmente merece.
             </motion.p>
 
             {/* BOTONES */}
@@ -176,12 +156,12 @@ export function Hero() {
                   e.currentTarget.style.boxShadow = "none"
                 }}
               >
-                Quiero aparecer en medios
+                Tengo un negocio con una historia para contar
                 <span aria-hidden="true">→</span>
               </a>
 
               <a
-                href="/servicios"
+                href="/mis-valores"
                 style={{
                   backgroundColor: "rgba(254,252,239,0.06)",
                   color: "#FEFCEF",
@@ -208,7 +188,7 @@ export function Hero() {
                   e.currentTarget.style.borderColor = "rgba(254,252,239,0.35)"
                 }}
               >
-                Ver mis servicios
+                Mis valores
               </a>
             </motion.div>
 

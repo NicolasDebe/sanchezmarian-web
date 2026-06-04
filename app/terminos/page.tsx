@@ -27,7 +27,7 @@ const SECTIONS = [
   },
   {
     title: "Contacto",
-    body: "Para cualquier consulta sobre estos términos, escribinos a sanchezmariana15@gmail.com.",
+    body: "Para cualquier consulta sobre estos términos, escribinos a contacto@sanchezmarian.com.",
   },
 ]
 

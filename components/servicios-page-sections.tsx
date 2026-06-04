@@ -452,7 +452,7 @@ function ComparacionSection() {
                 href="/contacto"
                 className="mt-auto inline-flex items-center justify-center border border-bordo text-bordo font-sans text-[13px] px-4 py-2.5 rounded-lg hover:bg-bordo hover:text-hueso transition-all duration-200"
               >
-                Conversemos →
+                Quiero este servicio →
               </Link>
             </motion.div>
           ))}

@@ -32,7 +32,7 @@ export function Bio() {
               <div className="relative w-full rounded-[20px] overflow-hidden" style={{ aspectRatio: "3/4" }}>
                 <Image
                   src="/images/NAC_4133.jpg"
-                  alt="Marian Sánchez — estratega de comunicación"
+                  alt="Marian Sánchez — comunicación con propósito"
                   fill
                   sizes="(max-width: 768px) 100vw, 40vw"
                   style={{
@@ -92,7 +92,7 @@ export function Bio() {
               className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.5rem] lg:text-[2.75rem] leading-[1.15]"
             >
               <span className="block">Mariana Sánchez,</span>
-              <em className="block italic text-bordo">estratega de comunicación.</em>
+              <em className="block italic text-bordo">comunicación con propósito.</em>
             </motion.h2>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo text-base leading-[1.8] max-w-[480px]">
@@ -136,11 +136,11 @@ export function Bio() {
 
             <motion.div variants={fadeUp}>
               <Link
-                href="/sobre-marian"
+                href="/mis-valores"
                 className="group inline-flex items-center gap-2 font-sans text-sm font-medium text-bordo w-fit"
               >
                 <span className="relative">
-                  Leer más sobre mí
+                  Conocé mis valores
                   <span
                     aria-hidden
                     className="absolute -bottom-0.5 left-0 h-px w-0 bg-bordo group-hover:w-full transition-[width] duration-300 ease-out"

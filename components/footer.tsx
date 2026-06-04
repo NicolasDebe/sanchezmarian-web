@@ -3,7 +3,7 @@ import Image from "next/image"
 
 const NAV_LINKS = [
   { label: "Servicios", href: "/servicios" },
-  { label: "Sobre mí", href: "/sobre-marian" },
+  { label: "Mis valores", href: "/mis-valores" },
   { label: "Casos de éxito", href: "/casos-de-exito" },
   { label: "Campañas", href: "/campanas" },
   { label: "Contacto", href: "/contacto" },
@@ -31,8 +31,8 @@ function IconInstagram() {
 
 // TODO: Marian debe confirmar URLs reales de Instagram y LinkedIn
 const SOCIAL = [
-  { label: "LinkedIn", href: "https://linkedin.com/in/PENDIENTE", Icon: IconLinkedin },
-  { label: "Instagram", href: "https://instagram.com/PENDIENTE", Icon: IconInstagram },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/marians%C3%A1nchez/", Icon: IconLinkedin },
+  { label: "Instagram", href: "https://www.instagram.com/marian15s/", Icon: IconInstagram },
 ]
 
 export function Footer() {
@@ -64,13 +64,13 @@ export function Footer() {
               />
             </Link>
             <p className="font-sans text-xs text-hueso/30 leading-relaxed max-w-[200px]">
-              Estratega de comunicación · Mendoza, Argentina.
+              Comunicación con propósito · Mendoza, Argentina.
             </p>
             <a
-              href="mailto:sanchezmariana15@gmail.com"
+              href="mailto:contacto@sanchezmarian.com"
               className="font-mono text-[10px] text-hueso/35 hover:text-hueso/70 transition-colors tracking-wide"
             >
-              sanchezmariana15@gmail.com
+              contacto@sanchezmarian.com
             </a>
           </div>
 

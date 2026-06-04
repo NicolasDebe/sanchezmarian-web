@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react"
 
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
 // TODO: reemplazar por número WA Business real
-const WA_HREF = "https://wa.me/5492614000000?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
+const WA_HREF = "https://wa.me/542615433882?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
 
 function IconWA() {
   return (
@@ -214,7 +214,7 @@ export function ContactForm() {
 
       {serverError && (
         <p className="font-mono text-[10px] text-bordo/80 text-center">
-          Algo falló. Escribime a sanchezmariana15@gmail.com
+          Algo falló. Escribime a contacto@sanchezmarian.com
         </p>
       )}
     </form>
