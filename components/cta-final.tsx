@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { AnimatePresence, motion } from "motion/react"
 import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
@@ -69,18 +68,7 @@ export function CtaFinal() {
         background: "radial-gradient(ellipse at 25% 40%, rgba(140,26,53,0.35) 0%, transparent 65%), var(--color-bordo)",
       }}
     >
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <Image
-          src="/images/logo-marian-negativo.png"
-          alt=""
-          width={600}
-          height={150}
-          aria-hidden="true"
-          style={{ opacity: 0.04, width: "60%", height: "auto", userSelect: "none" }}
-        />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start relative">
+<div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start relative">
 
         {/* ── IZQUIERDA — texto ── */}
         <motion.div
