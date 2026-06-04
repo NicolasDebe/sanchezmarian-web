@@ -16,8 +16,8 @@ const TAGS = [
 
 export function Bio() {
   return (
-    <section id="bio" className="bg-hueso-oscuro py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-24 items-center">
+    <section id="bio" className="bg-hueso-oscuro py-[120px] lg:py-[160px]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-28 items-center">
 
         {/* ── IZQUIERDA — foto ── */}
         <motion.div
@@ -27,8 +27,16 @@ export function Bio() {
           viewport={{ once: true, margin: "-80px" }}
           className="relative flex justify-center lg:justify-start"
         >
-          <div className="relative w-full max-w-[380px]">
-            <TextureCardStyled className="p-2">
+          <div className="relative w-full max-w-[460px]">
+            {/* Decorative glow behind photo */}
+            <div
+              className="absolute -bottom-6 -right-6 w-[70%] h-[70%] rounded-full pointer-events-none"
+              style={{
+                background: "radial-gradient(circle, rgba(201,168,130,0.18) 0%, transparent 70%)",
+                zIndex: 0,
+              }}
+            />
+            <TextureCardStyled className="p-2 relative" style={{ zIndex: 1 }}>
               <div className="relative w-full rounded-[20px] overflow-hidden" style={{ aspectRatio: "3/4" }}>
                 <Image
                   src="/images/NAC_4133.jpg"
@@ -137,15 +145,9 @@ export function Bio() {
             <motion.div variants={fadeUp}>
               <Link
                 href="/mis-valores"
-                className="group inline-flex items-center gap-2 font-sans text-sm font-medium text-bordo w-fit"
+                className="group inline-flex items-center gap-2.5 font-sans text-sm font-semibold text-bordo border border-bordo/40 px-5 py-2.5 rounded-full w-fit hover:bg-bordo hover:text-hueso hover:border-bordo transition-all duration-300"
               >
-                <span className="relative">
-                  Conocé mis valores
-                  <span
-                    aria-hidden
-                    className="absolute -bottom-0.5 left-0 h-px w-0 bg-bordo group-hover:w-full transition-[width] duration-300 ease-out"
-                  />
-                </span>
+                Conocé mis valores
                 <ArrowRight
                   size={14}
                   strokeWidth={2}

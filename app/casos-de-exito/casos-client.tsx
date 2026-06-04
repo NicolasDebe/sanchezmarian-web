@@ -4,7 +4,7 @@ import React, { useState, useMemo, useRef, useEffect } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
-import { ArrowRight, ChevronDown } from "lucide-react"
+import { ArrowRight, ChevronDown, ExternalLink } from "lucide-react"
 import { CLIPPINGS, type Clipping } from "@/data/clippings"
 import { fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
@@ -32,6 +32,123 @@ const FORMAT_BORDER: Record<string, string> = {
   TV:        "var(--color-dorado)",
   Radio:     "var(--color-gris-bordo)",
   Streaming: "var(--color-bordo-claro)",
+}
+
+const FORMAT_BADGE: Record<string, { bg: string; color: string; label: string }> = {
+  TV:        { bg: "var(--color-bordo)",       color: "var(--color-hueso)",      label: "TV" },
+  Radio:     { bg: "var(--color-gris-bordo)",  color: "var(--color-hueso)",      label: "Radio" },
+  Gráfico:   { bg: "var(--color-negro-bordo)", color: "var(--color-hueso)",      label: "Diario" },
+  Digital:   { bg: "var(--color-dorado)",      color: "var(--color-negro-bordo)", label: "Digital" },
+  Streaming: { bg: "var(--color-bordo-claro)", color: "var(--color-negro-bordo)", label: "Stream" },
+}
+
+const MESES: Record<number, string> = {
+  1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril",
+  5: "Mayo", 6: "Junio", 7: "Julio", 8: "Agosto",
+  9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre",
+}
+
+// ─── Grouped month timeline (for clients with mes data) ───────────────────────
+
+function GroupedMonthTimeline({ apariciones }: { apariciones: Clipping[] }) {
+  const grouped = useMemo(() => {
+    const map = new Map<number, Clipping[]>()
+    for (const ap of apariciones) {
+      const m = ap.mes ?? 0
+      if (!map.has(m)) map.set(m, [])
+      map.get(m)!.push(ap)
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a - b)
+  }, [apariciones])
+
+  return (
+    <div style={{ paddingBottom: 24 }}>
+      {grouped.map(([mes, items], gi) => (
+        <div key={mes} style={{ marginBottom: gi < grouped.length - 1 ? 28 : 0 }}>
+          {/* Month header */}
+          <div
+            className="flex items-center gap-3 mb-4"
+          >
+            <span
+              className="font-mono uppercase"
+              style={{ fontSize: 10, letterSpacing: "0.18em", color: "var(--color-bordo)" }}
+            >
+              {mes > 0 ? `${MESES[mes]} 2026` : "—"}
+            </span>
+            <div style={{ flex: 1, height: 1, background: "rgba(201,168,130,0.25)" }} />
+          </div>
+
+          {/* Clipping rows */}
+          <div className="flex flex-col gap-2">
+            {items.map((ap, i) => {
+              const badge = FORMAT_BADGE[ap.formato] ?? FORMAT_BADGE.Digital
+              const row = (
+                <div
+                  className="flex items-center gap-3"
+                  style={{
+                    background: "var(--color-hueso)",
+                    borderRadius: 8,
+                    padding: "10px 14px",
+                    borderLeft: `2px solid ${FORMAT_BORDER[ap.formato] ?? FORMAT_BORDER.Digital}`,
+                  }}
+                >
+                  <span
+                    className="font-mono shrink-0"
+                    style={{
+                      fontSize: 9,
+                      padding: "3px 8px",
+                      borderRadius: 20,
+                      background: badge.bg,
+                      color: badge.color,
+                      letterSpacing: "0.06em",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {badge.label}
+                  </span>
+                  <span
+                    className="font-sans flex-1"
+                    style={{ fontSize: 13, color: "var(--color-negro-bordo)", lineHeight: 1.4 }}
+                  >
+                    {ap.medio}
+                  </span>
+                  {ap.link && (
+                    <ExternalLink
+                      size={13}
+                      style={{ color: "var(--color-gris-bordo)", opacity: 0.5, flexShrink: 0 }}
+                    />
+                  )}
+                </div>
+              )
+
+              return (
+                <motion.div
+                  key={ap.id}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.15 + gi * 0.08 + i * 0.05, duration: 0.3, ease: EASE }}
+                >
+                  {ap.link ? (
+                    <a
+                      href={ap.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block transition-opacity hover:opacity-75"
+                      style={{ textDecoration: "none" }}
+                    >
+                      {row}
+                    </a>
+                  ) : (
+                    row
+                  )}
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 // ─── Timeline config ──────────────────────────────────────────────────────────
@@ -470,10 +587,14 @@ function TimelineClientBlock({
             style={{ overflow: "hidden" }}
           >
             <div style={{ paddingTop: 20 }}>
-              <ZigzagTimeline
-                apariciones={apariciones}
-                clientId={config.id}
-              />
+              {apariciones.length > 0 && apariciones[0].mes != null ? (
+                <GroupedMonthTimeline apariciones={apariciones} />
+              ) : (
+                <ZigzagTimeline
+                  apariciones={apariciones}
+                  clientId={config.id}
+                />
+              )}
               {apariciones.length === 0 && (
                 <p
                   className="font-mono"
