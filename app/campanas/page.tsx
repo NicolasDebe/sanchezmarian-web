@@ -25,7 +25,12 @@ export const metadata: Metadata = {
 }
 
 export default async function CampanasPage() {
-  const campaigns = await getAllCampaigns()
+  let campaigns: Awaited<ReturnType<typeof getAllCampaigns>> = []
+  try {
+    campaigns = await getAllCampaigns()
+  } catch {
+    // Supabase no disponible en build (env vars no configuradas)
+  }
 
   return (
     <main>
