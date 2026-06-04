@@ -4,6 +4,8 @@ import type { Campaign, CampaignImage, CampaignInsert, CampaignUpdate } from "@/
 // ─── Lectura (anon key) ───────────────────────────────────────────────────────
 
 export async function getAllCampaigns(): Promise<Campaign[]> {
+  console.log('SUPABASE_URL defined:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
+  console.log('SUPABASE_KEY defined:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   const { data, error } = await supabase
     .from("campaigns")
     .select("*, images:campaign_images(*)")

@@ -28,8 +28,8 @@ export default async function CampanasPage() {
   let campaigns: Awaited<ReturnType<typeof getAllCampaigns>> = []
   try {
     campaigns = await getAllCampaigns()
-  } catch {
-    // Supabase no disponible en build (env vars no configuradas)
+  } catch (error) {
+    console.error('CAMPANAS ERROR:', error)
   }
 
   return (
