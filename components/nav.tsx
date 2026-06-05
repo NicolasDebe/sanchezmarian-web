@@ -56,13 +56,6 @@ export function Nav() {
         </ul>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/contacto"
-            className="hidden md:inline-flex items-center gap-2 bg-hueso text-bordo px-5 py-2.5 rounded-full font-sans text-sm font-medium hover:bg-arena transition-colors"
-          >
-            Conversemos
-          </Link>
-
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-2 text-hueso/70 hover:text-hueso transition-colors"
@@ -100,13 +93,6 @@ export function Nav() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/contacto"
-              onClick={() => setIsMenuOpen(false)}
-              className="mt-5 block w-full text-center bg-hueso text-bordo px-5 py-3 rounded-full font-sans text-sm font-medium"
-            >
-              Conversemos
-            </Link>
           </motion.div>
         )}
       </AnimatePresence>

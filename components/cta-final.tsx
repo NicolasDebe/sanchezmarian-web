@@ -103,9 +103,8 @@ export function CtaFinal() {
             </motion.h2>
 
             <motion.p variants={fadeUp} className="font-sans text-[0.9375rem] text-hueso/65 leading-[1.7] max-w-[420px]">
-              Si buscás un asesoramiento estratégico para posicionar tu negocio,
-              conversemos. Hablemos de esa gran historia que tu negocio tiene
-              para contar.
+              Si querés comunicar mejor lo que hacés, empezamos por una charla.
+              Hablemos de la historia que tu negocio tiene para contar.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">

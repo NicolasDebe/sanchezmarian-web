@@ -11,13 +11,13 @@ const PASOS = [
   },
   {
     num: "02",
-    title: "Diseño de la estrategia",
+    title: "Diseño y mentoreo de la estrategia",
     body: "Plan de comunicación personalizado.",
   },
   {
     num: "03",
     title: "Gestión y relacionamiento",
-    body: "Activo mi red en medios de Mendoza.",
+    body: "Junto a mi equipo ejecuto el plan de comunicación que diseñamos juntos.",
   },
   {
     num: "04",
@@ -27,7 +27,7 @@ const PASOS = [
   {
     num: "05",
     title: "Análisis de impacto",
-    body: "Entrego resultados medibles y claros.",
+    body: "Resultados medibles y claros para avanzar al próximo nivel.",
   },
 ]
 

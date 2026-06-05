@@ -60,19 +60,6 @@ function CampanaHero() {
             >
               Estrategias en acción.
             </span>
-            <em
-              style={{
-                display:    "block",
-                fontFamily: "var(--font-playfair-display), serif",
-                fontSize:   "clamp(1.2rem, 2.5vw, 2rem)",
-                fontStyle:  "italic",
-                fontWeight: 700,
-                color:      "var(--color-bordo)",
-                lineHeight: 1.1,
-              }}
-            >
-              Prensa que está pasando ahora.
-            </em>
           </motion.h1>
 
           <motion.p
@@ -80,8 +67,8 @@ function CampanaHero() {
             className="font-sans"
             style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.7, maxWidth: 520, marginTop: 24 }}
           >
-            Campañas de prensa activas para marcas y proyectos
-            que confían en nuestra gestión.
+            Campañas activas para marcas personales y empresas
+            que confían en mi trabajo.
           </motion.p>
         </motion.div>
       </div>
@@ -389,7 +376,7 @@ function CampanaEmpty() {
 
           <motion.div variants={fadeUp}>
             <Link
-              href="/contacto"
+              href="/#contacto"
               onMouseEnter={() => setHov(true)}
               onMouseLeave={() => setHov(false)}
               className="font-sans inline-flex items-center gap-2"
@@ -601,7 +588,7 @@ function CampanaCta() {
 
         <motion.div variants={fadeUp}>
           <Link
-            href="/contacto"
+            href="/#contacto"
             onMouseEnter={() => setHov(true)}
             onMouseLeave={() => setHov(false)}
             className="font-sans inline-flex items-center gap-2"

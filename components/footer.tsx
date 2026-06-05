@@ -5,7 +5,6 @@ const NAV_LINKS = [
   { label: "Mis valores", href: "/mis-valores" },
   { label: "Casos de éxito", href: "/casos-de-exito" },
   { label: "Campañas", href: "/campanas" },
-  { label: "Contacto", href: "/contacto" },
 ]
 
 function IconLinkedin() {
@@ -101,7 +100,7 @@ export function Footer() {
               ))}
             </div>
             <Link
-              href="/contacto"
+              href="/#contacto"
               className="inline-flex items-center gap-2 bg-hueso/6 border border-hueso/12 text-hueso/50 px-5 py-2.5 rounded-full font-sans text-xs font-medium hover:bg-hueso hover:text-bordo hover:border-hueso transition-all"
             >
               Conversemos

@@ -98,19 +98,19 @@ function ContactoHero() {
 const FAQ = [
   {
     q: "¿Cómo empezamos a trabajar juntos?",
-    a: "Agendamos una sesión para conocernos, entender tu proyecto y ver cómo puedo ayudarte a comunicarlo.",
+    a: "Agendamos una charla para conocernos, entender tu proyecto y ver cómo puedo ayudarte a comunicarlo.",
   },
   {
     q: "¿Con qué tipo de clientes trabajás?",
-    a: "Trabajo con marcas, empresas, profesionales independientes y emprendedores de todo tamaño. Lo que importa es tener algo importante que contar.",
+    a: "Trabajo con marcas, empresas, profesionales independientes y emprendedores de todo tamaño. Lo que importa es tener una historia para contar.",
   },
   {
     q: "¿En cuánto tiempo ven resultados?",
-    a: "Depende del servicio. En prensa, las primeras apariciones pueden darse en semanas. La construcción de autoridad a largo plazo lleva más tiempo, pero se nota.",
+    a: "Depende del servicio. En prensa, las primeras apariciones pueden darse en semanas. Construir presencia a largo plazo lleva más tiempo, pero se nota.",
   },
   {
     q: "¿Trabajás solo con clientes de Mendoza?",
-    a: "No. Tengo clientes en Buenos Aires, Córdoba y otras provincias. La comunicación estratégica no tiene fronteras geográficas.",
+    a: "No. Tengo clientes en Buenos Aires, Córdoba y otras provincias. Mi trabajo no tiene fronteras geográficas.",
   },
 ]
 

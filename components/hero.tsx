@@ -102,7 +102,7 @@ export function Hero() {
                 letterSpacing: "-0.02em",
               }}
             >
-              Comunicar es conectar
+              Comunicación simple, conexiones reales
             </motion.h1>
 
             {/* DESCRIPCIÓN */}
@@ -117,8 +117,8 @@ export function Hero() {
                 marginBottom: "32px",
               }}
             >
-              Diseño estrategias de comunicación multiplataforma con visión de
-              futuro que transforman tu valor diferencial en visibilidad real.
+              Planifico y ejecuto estrategias de comunicación multiplataforma con visión de
+              futuro que transforman lo que hacés en visibilidad real.
               Te acompaño a construir puentes honestos con los medios y la
               comunidad para que el mensaje de tu negocio resuene con fuerza,
               claridad y el impacto que realmente merece.
@@ -130,7 +130,7 @@ export function Hero() {
               className="flex flex-col sm:flex-row gap-3"
             >
               <a
-                href="/contacto"
+                href="/#contacto"
                 style={{
                   backgroundColor: "#FEFCEF",
                   color: "#66001F",

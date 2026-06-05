@@ -105,29 +105,25 @@ export function Bio() {
 
             <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo text-base leading-[1.8] max-w-[480px]">
               <p>
-                Mi nombre es Marian Sánchez y ayudo a empresas y marcas
-                personales a transformar su propósito en noticias,
-                conectando su propuesta de valor con los canales de
-                comunicación adecuados. Llevo más de una década
+                Mentoreo a personas y empresas para transformar
+                su propósito en un mensaje simple, cercano y real,
+                conectando su propuesta de valor con los canales
+                de comunicación adecuados. Una década de trayectoria
                 construyendo vínculos reales con los protagonistas
-                de los medios locales.
+                del ecosistema de la comunicación me respaldan.
               </p>
               <p>
-                Mi enfoque no se limita a la difusión masiva; se basa
-                en el vínculo real. Entiendo el ADN de cada marca
-                para identificar exactamente qué periodista o medio de
-                comunicación está buscando esa historia. Diseño estrategias
-                personalizadas, adaptadas a las necesidades de cada
-                proyecto, porque cada marca tiene un ritmo, un tono y un
-                objetivo diferente.
+                Entiendo el ADN de cada caso y trabajo en una
+                estrategia personalizada, aterrizada y real dentro
+                de la comunicación del nuevo paradigma. Donde lo
+                simple y genuino triunfa en diversas plataformas,
+                entendiendo el público y el objetivo del mensaje.
               </p>
               <p>
-                Entiendo la comunicación como una sinergia donde todas las
-                partes ganan. Mi metodología no solo busca el beneficio de la
-                marca, sino que se enfoca en brindar un valor agregado al
-                periodista. Al entregar contenido de calidad, chequeado y de
-                interés genuino, facilito la labor informativa de los medios,
-                generando una relación de respeto y colaboración que perdura.
+                Mi método de comunicación suma un valor diferencial
+                a cada proyecto con contenido de calidad, chequeado
+                y de interés genuino para los negocios del presente
+                y del futuro.
               </p>
             </motion.div>
 
