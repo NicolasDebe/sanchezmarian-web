@@ -587,9 +587,7 @@ function TimelineClientBlock({
             style={{ overflow: "hidden" }}
           >
             <div style={{ paddingTop: 20 }}>
-              {apariciones.length > 0 && apariciones[0].mes != null ? (
-                <GroupedMonthTimeline apariciones={apariciones} />
-              ) : (
+              {apariciones.length > 0 && (
                 <ZigzagTimeline
                   apariciones={apariciones}
                   clientId={config.id}
@@ -943,7 +941,7 @@ export function CasosClient() {
           </motion.h2>
           <motion.div variants={fadeUp} className="mt-10">
             <Link
-              href="/contacto"
+              href="/#contacto"
               className="inline-flex items-center gap-2 font-sans font-semibold transition-opacity hover:opacity-85 group"
               style={{
                 background: "var(--color-hueso)",
