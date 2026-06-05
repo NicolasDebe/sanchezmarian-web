@@ -26,6 +26,14 @@ const ESTRATEGIA_INCLUDES = [
 ]
 const PASOS = ["Diagnóstico", "Posicionamiento", "Plan", "Canales", "Acompañamiento"]
 
+const RRPP_INCLUDES = [
+  "Gestión de relaciones institucionales y con medios",
+  "Representación y networking en eventos clave",
+  "Coordinación de alianzas estratégicas",
+  "Manejo de imagen y reputación pública",
+  "Acompañamiento continuo y construcción de vínculos",
+]
+
 /* ─── shared ─────────────────────────────────────────────────── */
 function IncludesList({ items, dark = false }: { items: string[]; dark?: boolean }) {
   const border = dark ? "border-dorado/30" : "border-dorado/25"
@@ -183,7 +191,7 @@ function TypewriterSuffix() {
 ═══════════════════════════════════════════════════════════════ */
 function ServicioPrensaSection() {
   return (
-    <section id="01" className="bg-bordo py-24 lg:py-32">
+    <section id="01" className="bg-bordo py-[120px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-12 lg:gap-16 items-start">
 
         <motion.div
@@ -306,7 +314,7 @@ function AnimatedSteps() {
 
 function ServicioEstrategiaSection() {
   return (
-    <section id="02" className="bg-hueso-oscuro py-24 lg:py-32">
+    <section id="02" className="bg-hueso-oscuro py-[120px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[45fr_55fr] gap-12 lg:gap-16 items-center">
 
         <motion.div variants={fadeLeft} initial="hidden" whileInView="visible" viewport={viewportOnce}>
@@ -357,115 +365,94 @@ function ServicioEstrategiaSection() {
 ═══════════════════════════════════════════════════════════════ */
 function ServicioRRPPSection() {
   return (
-    <section id="03" className="bg-hueso py-24 lg:py-28">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative">
-        <span
-          className="absolute -top-2 left-6 lg:left-12 font-mono leading-none text-bordo select-none pointer-events-none"
-          style={{ fontSize: 120, opacity: 0.04 }}
-          aria-hidden
-        >
-          03
-        </span>
+    <section id="03" className="bg-hueso py-[120px]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-12 lg:gap-16 items-start">
+
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className="relative z-10 max-w-[640px]"
+          className="flex flex-col gap-6 relative"
         >
-          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[40px] leading-[1.1] mb-5">
+          <span
+            className="absolute -top-2 left-0 font-mono leading-none text-bordo select-none pointer-events-none"
+            style={{ fontSize: 120, opacity: 0.04 }}
+            aria-hidden
+          >
+            03
+          </span>
+          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[40px] leading-[1.1] relative z-10">
             Relaciones Públicas
           </motion.h2>
-          <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo leading-[1.8]">
-            Gestión de relaciones institucionales y networking para fortalecer la reputación de
-            marcas y personas. Actúo como nexo estratégico para generar alianzas, coordinar
-            presencia en eventos clave y facilitar el contacto con actores relevantes.
+          <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo leading-[1.8] max-w-[520px] relative z-10">
+            Organizo y coordino eventos y lanzamientos donde las personas se conectan de verdad.
+            Acercá tu marca a periodistas, autoridades y referentes del sector en espacios que
+            generan conversaciones que valen.
+          </motion.p>
+          <motion.p variants={fadeUp} className="font-sans text-[13px] relative z-10">
+            <span className="font-semibold text-negro-bordo">Para quién: </span>
+            <span className="text-gris-bordo">
+              Marcas y personas que buscan construir confianza y visibilidad sostenida en el tiempo.
+            </span>
           </motion.p>
         </motion.div>
+
+        <motion.div
+          variants={revealCard}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="bg-hueso-oscuro rounded-2xl p-8 flex flex-col gap-6 border border-dorado/20"
+        >
+          <IncludesList items={RRPP_INCLUDES} />
+        </motion.div>
+
       </div>
     </section>
   )
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CAMBIO 5 — COMPARACIÓN: "Conversemos →"
+   CTA CIERRE
 ═══════════════════════════════════════════════════════════════ */
-const COMPARACION = [
-  { num: "01", name: "Prensa y Comunicación",    frase: "Quiero salir en los medios.",           duracion: "Campañas puntuales o mensuales", featured: true  },
-  { num: "02", name: "Comunicación Estratégica", frase: "Necesito un plan de comunicación.",      duracion: "Trimestral o anual",             featured: false },
-  { num: "03", name: "Relaciones Públicas",       frase: "Quiero construir red y reputación.",    duracion: "Acompañamiento continuo",        featured: false },
-]
-
-function ComparacionSection() {
+function CtaSimpleServicios() {
   return (
-    <section className="bg-hueso-oscuro py-20 lg:py-24">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
-
-        <motion.div
-          variants={fadeUpStagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-          className="text-center mb-14"
+    <section
+      className="py-[120px]"
+      style={{
+        background:
+          "radial-gradient(ellipse at 25% 40%, rgba(140,26,53,0.35) 0%, transparent 65%), var(--color-bordo)",
+      }}
+    >
+      <motion.div
+        variants={fadeUpStagger}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportOnce}
+        className="max-w-7xl mx-auto px-6 lg:px-12 text-center flex flex-col items-center gap-8"
+      >
+        <motion.h2
+          variants={fadeUp}
+          className="font-playfair font-bold text-hueso"
+          style={{ fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.1 }}
         >
-          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[36px] leading-[1.1] mb-3">
-            ¿Cuál necesitás?
-          </motion.h2>
-          <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo">
-            Tres formas distintas de trabajar, según tu etapa y objetivo.
-          </motion.p>
+          ¿Tenés una historia para contar?
+        </motion.h2>
+        <motion.div variants={fadeUp}>
+          <Link
+            href="/#contacto"
+            className="inline-flex items-center gap-2 bg-hueso text-bordo font-sans font-semibold px-8 py-4 rounded-full hover:bg-arena active:scale-[0.98] transition-all"
+            style={{ fontSize: 15 }}
+          >
+            Escribime
+          </Link>
         </motion.div>
-
-        <motion.div
-          variants={fadeUpStagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
-          {COMPARACION.map((s) => (
-            <motion.div
-              key={s.num}
-              variants={revealCard}
-              className={`bg-hueso rounded-xl p-7 flex flex-col gap-5 relative ${
-                s.featured
-                  ? "border-t-[3px] border-t-bordo border-x border-b border-dorado/20"
-                  : "border border-dorado/15"
-              }`}
-            >
-              {s.featured && (
-                <span className="absolute -top-[11px] left-6 font-mono text-[9px] uppercase tracking-[0.15em] bg-bordo text-hueso px-2 py-0.5 rounded-sm">
-                  Más solicitado
-                </span>
-              )}
-              <div>
-                <p className="font-sans font-semibold text-[16px] text-negro-bordo mb-1">{s.name}</p>
-                <p className="font-sans text-[13px] text-gris-bordo italic">{s.frase}</p>
-              </div>
-              <div className="h-px bg-dorado/20" />
-              <div>
-                <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gris-bordo/50">Duración típica</span>
-                <p className="font-sans text-[13px] text-gris-bordo mt-1">{s.duracion}</p>
-              </div>
-              {/* CAMBIO 5: "Conversemos →" */}
-              <Link
-                href="/contacto"
-                className="mt-auto inline-flex items-center justify-center border border-bordo text-bordo font-sans text-[13px] px-4 py-2.5 rounded-lg hover:bg-bordo hover:text-hueso transition-all duration-200"
-              >
-                Quiero este servicio →
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
-
-      </div>
+      </motion.div>
     </section>
   )
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   EXPORT — CAMBIO 6: sin CtaCierreSection
-═══════════════════════════════════════════════════════════════ */
 export function ServiciosPageSections() {
   return (
     <>
@@ -474,7 +461,7 @@ export function ServiciosPageSections() {
       <ServicioEstrategiaSection />
       <ServicioRRPPSection />
       <TimelineRelacionesPublicas />
-      <ComparacionSection />
+      <CtaSimpleServicios />
     </>
   )
 }

@@ -403,7 +403,7 @@ function CtaCierre() {
         </motion.p>
         <motion.div variants={fadeUp}>
           <Link
-            href="/contacto"
+            href="/#contacto"
             className="inline-flex items-center gap-2 bg-hueso text-bordo font-sans text-[15px] font-semibold px-8 py-4 rounded-full hover:bg-arena active:scale-[0.98] transition-all"
           >
             Conversemos →

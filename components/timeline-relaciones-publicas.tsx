@@ -31,14 +31,6 @@ const PHASES = [
   },
 ]
 
-const RRPP_INCLUDES = [
-  "Gestión de relaciones institucionales y con medios",
-  "Representación y networking en eventos clave",
-  "Coordinación de alianzas estratégicas",
-  "Manejo de imagen y reputación pública",
-  "Acompañamiento continuo y construcción de vínculos",
-]
-
 const LINE_DUR  = 1.5  // horizontal line animation duration (seconds)
 const M_LINE_DUR = 2.5 // vertical mobile line duration
 
@@ -47,7 +39,7 @@ export function TimelineRelacionesPublicas() {
   const inView = useInView(ref, { once: true, margin: "-80px 0px" })
 
   return (
-    <div ref={ref} className="bg-hueso-oscuro py-20">
+    <div ref={ref} className="bg-hueso-oscuro py-[120px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-[60px]">
 
         {/* ── Header ── */}
@@ -218,33 +210,6 @@ export function TimelineRelacionesPublicas() {
           </div>
         </div>
 
-        {/* ── Para quién + Qué incluye ── */}
-        <div className="mt-16 pt-12 border-t border-dorado/15 grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gris-bordo/50 mb-3">
-              Para quién
-            </p>
-            <p className="font-sans text-[14px] text-gris-bordo leading-relaxed">
-              Marcas y personas que buscan construir confianza y visibilidad sostenida en el tiempo.
-            </p>
-          </div>
-
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gris-bordo/50 mb-3">
-              Qué incluye
-            </p>
-            <ul className="flex flex-col gap-3">
-              {RRPP_INCLUDES.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <span className="text-dorado font-bold text-[18px] leading-none mt-[-1px] shrink-0">·</span>
-                  <span className="font-sans text-[14px] text-gris-bordo leading-relaxed">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-        </div>
 
       </div>
     </div>
