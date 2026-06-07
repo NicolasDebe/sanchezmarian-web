@@ -1,5 +1,6 @@
 "use client"
 
+import { Fragment } from "react"
 import { motion } from "motion/react"
 import type { Variants } from "motion/react"
 import Link from "next/link"
@@ -66,12 +67,13 @@ const SERVICIOS = [
 function HeroServicios() {
   return (
     <section className="bg-hueso" style={{ paddingTop: 140, paddingBottom: 100 }}>
-      <div className="max-w-[800px] mx-auto px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
           animate="visible"
           className="flex flex-col gap-5"
+          style={{ maxWidth: 720 }}
         >
           <motion.p
             variants={fadeUp}
@@ -125,7 +127,7 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
           {/* número marca de agua — solo desktop */}
           <span
             className="hidden md:block absolute font-playfair italic text-bordo select-none pointer-events-none leading-none"
-            style={{ fontSize: 120, opacity: 0.06, top: -20, right: 0 }}
+            style={{ fontSize: 120, opacity: 0.1, top: -20, right: 0 }}
             aria-hidden
           >
             {s.num}
@@ -164,7 +166,7 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
             className="font-mono uppercase text-bordo relative z-10 mb-5"
             style={{ fontSize: 11, letterSpacing: "0.15em", opacity: 0.6 }}
           >
-            Qué incluye:
+            Sub-servicios:
           </motion.p>
 
           {/* lista sub-servicios con stagger propio */}
@@ -179,7 +181,7 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
                 <motion.li key={i} variants={fadeUp} className="flex items-start gap-4">
                   {/* indicador vertical dorado */}
                   <span
-                    className="shrink-0 bg-dorado rounded-full"
+                    className="shrink-0 bg-bordo rounded-full"
                     style={{ width: 2, height: 20, marginTop: 4 }}
                   />
                   <div>
@@ -224,8 +226,15 @@ export function ServiciosPageSections() {
   return (
     <>
       <HeroServicios />
-      {SERVICIOS.map((s) => (
-        <ServicioSection key={s.id} s={s} />
+      {/* banda separadora 4px --bordo */}
+      <div className="w-full bg-bordo" style={{ height: 4 }} aria-hidden />
+      {SERVICIOS.map((s, i) => (
+        <Fragment key={s.id}>
+          {i > 0 && (
+            <div className="w-full bg-bordo/15" style={{ height: 1 }} aria-hidden />
+          )}
+          <ServicioSection s={s} />
+        </Fragment>
       ))}
     </>
   )
