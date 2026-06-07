@@ -5,6 +5,7 @@ import { motion } from "motion/react"
 import type { Variants } from "motion/react"
 import Link from "next/link"
 import { fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
+import { TextureOverlay } from "@/components/ui/texture-overlay"
 
 /* ─── helpers ───────────────────────────────────────────────────── */
 function splitSub(s: string): { titulo: string; desc: string } {
@@ -16,6 +17,49 @@ function splitSub(s: string): { titulo: string; desc: string } {
 const subStagger: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+}
+
+/* ─── esquemas de color ─────────────────────────────────────────── */
+type Scheme = {
+  watermarkClass: string
+  watermarkOpacity: number
+  nombreClass: string
+  taglineClass: string
+  descClass: string
+  labelClass: string
+  labelOpacity: number
+  indicadorClass: string
+  subTituloClass: string
+  subDescClass: string
+  btnClass: string
+}
+
+const LIGHT: Scheme = {
+  watermarkClass:  "text-bordo",
+  watermarkOpacity: 0.1,
+  nombreClass:     "text-negro-bordo",
+  taglineClass:    "text-bordo",
+  descClass:       "text-gris-bordo",
+  labelClass:      "text-bordo",
+  labelOpacity:    0.6,
+  indicadorClass:  "bg-bordo",
+  subTituloClass:  "text-negro-bordo",
+  subDescClass:    "text-gris-bordo",
+  btnClass:        "bg-bordo text-hueso hover:bg-bordo-oscuro",
+}
+
+const DARK: Scheme = {
+  watermarkClass:  "text-hueso",
+  watermarkOpacity: 0.08,
+  nombreClass:     "text-hueso",
+  taglineClass:    "text-hueso/70",
+  descClass:       "text-hueso/85",
+  labelClass:      "text-dorado",
+  labelOpacity:    1,
+  indicadorClass:  "bg-dorado",
+  subTituloClass:  "text-hueso",
+  subDescClass:    "text-hueso/75",
+  btnClass:        "bg-hueso text-bordo hover:bg-arena",
 }
 
 /* ─── data ─────────────────────────────────────────────────────── */
@@ -32,7 +76,8 @@ const SERVICIOS = [
       "Laboratorio de comunicación: Entrenamiento técnico y discursivo para voceros ante escenarios mediáticos reales.",
       "Monitoreo: Medición cualitativa del impacto de tu negocio en el ecosistema de medios de comunicación.",
     ],
-    bg: "bg-hueso",
+    bg:   "bg-hueso",
+    dark: false,
   },
   {
     id: "servicio-02",
@@ -46,7 +91,8 @@ const SERVICIOS = [
       "Estrategia Multiplataforma: Co-creación de narrativas que fluyen con sinergia y coherencia en diversos canales de comunicación.",
       "Gestión de Alianzas Estratégicas: Formo equipo con profesionales especializados en marketing y redes sociales para ofrecerte soluciones integrales.",
     ],
-    bg: "bg-hueso-oscuro",
+    bg:   "bg-bordo",
+    dark: true,
   },
   {
     id: "servicio-03",
@@ -59,15 +105,20 @@ const SERVICIOS = [
       "RRPP y Networking Estratégico: Planificación de eventos de alto impacto. Conexión directa y gestión de invitaciones para actividades relacionadas al nicho de tu negocio.",
       "Lanzamientos: Coordinación integral de la convocatoria de prensa y cobertura mediática para eventos.",
     ],
-    bg: "bg-hueso",
+    bg:   "bg-hueso",
+    dark: false,
   },
 ]
 
 /* ─── hero ──────────────────────────────────────────────────────── */
 function HeroServicios() {
   return (
-    <section className="bg-hueso" style={{ paddingTop: 140, paddingBottom: 100 }}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <section
+      className="relative bg-hueso overflow-hidden"
+      style={{ paddingTop: 140, paddingBottom: 100 }}
+    >
+      <TextureOverlay texture="paperGrain" opacity={0.2} />
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
         <motion.div
           variants={fadeUpStagger}
           initial="hidden"
@@ -114,6 +165,8 @@ function HeroServicios() {
 
 /* ─── servicio individual ───────────────────────────────────────── */
 function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
+  const c = s.dark ? DARK : LIGHT
+
   return (
     <section id={s.id} className={`${s.bg} py-[120px] overflow-hidden`}>
       <div className="max-w-[900px] mx-auto px-6 lg:px-12">
@@ -126,8 +179,8 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
         >
           {/* número marca de agua — solo desktop */}
           <span
-            className="hidden md:block absolute font-playfair italic text-bordo select-none pointer-events-none leading-none"
-            style={{ fontSize: 120, opacity: 0.1, top: -20, right: 0 }}
+            className={`hidden md:block absolute font-playfair italic ${c.watermarkClass} select-none pointer-events-none leading-none`}
+            style={{ fontSize: 120, opacity: c.watermarkOpacity, top: -20, right: 0 }}
             aria-hidden
           >
             {s.num}
@@ -136,7 +189,7 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
           {/* nombre */}
           <motion.h2
             variants={fadeUp}
-            className="font-playfair font-bold text-negro-bordo relative z-10 mb-3"
+            className={`font-playfair font-bold ${c.nombreClass} relative z-10 mb-3`}
             style={{ fontSize: 36, lineHeight: 1.1 }}
           >
             {s.nombre}
@@ -145,7 +198,7 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
           {/* tagline */}
           <motion.p
             variants={fadeUp}
-            className="font-playfair italic text-bordo relative z-10 mb-6"
+            className={`font-playfair italic ${c.taglineClass} relative z-10 mb-6`}
             style={{ fontSize: 18 }}
           >
             {s.tagline}
@@ -154,7 +207,7 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
           {/* descripción */}
           <motion.p
             variants={fadeUp}
-            className="font-sans text-gris-bordo relative z-10 mb-12"
+            className={`font-sans ${c.descClass} relative z-10 mb-12`}
             style={{ fontSize: 16, lineHeight: 1.7, maxWidth: 680 }}
           >
             {s.descripcion}
@@ -163,13 +216,13 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
           {/* label */}
           <motion.p
             variants={fadeUp}
-            className="font-mono uppercase text-bordo relative z-10 mb-5"
-            style={{ fontSize: 11, letterSpacing: "0.15em", opacity: 0.6 }}
+            className={`font-mono uppercase ${c.labelClass} relative z-10 mb-5`}
+            style={{ fontSize: 11, letterSpacing: "0.15em", opacity: c.labelOpacity }}
           >
             Sub-servicios:
           </motion.p>
 
-          {/* lista sub-servicios con stagger propio */}
+          {/* lista con stagger propio */}
           <motion.ul
             variants={subStagger}
             className="flex flex-col relative z-10"
@@ -179,21 +232,20 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
               const { titulo, desc } = splitSub(sub)
               return (
                 <motion.li key={i} variants={fadeUp} className="flex items-start gap-4">
-                  {/* indicador vertical dorado */}
                   <span
-                    className="shrink-0 bg-bordo rounded-full"
+                    className={`shrink-0 rounded-full ${c.indicadorClass}`}
                     style={{ width: 2, height: 20, marginTop: 4 }}
                   />
                   <div>
                     <p
-                      className="font-sans font-semibold text-negro-bordo"
+                      className={`font-sans font-semibold ${c.subTituloClass}`}
                       style={{ fontSize: 15, lineHeight: 1.5 }}
                     >
                       {titulo}
                     </p>
                     {desc && (
                       <p
-                        className="font-sans text-gris-bordo mt-1"
+                        className={`font-sans ${c.subDescClass} mt-1`}
                         style={{ fontSize: 14, lineHeight: 1.7 }}
                       >
                         {desc}
@@ -209,7 +261,7 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
           <motion.div variants={fadeUp} className="relative z-10 mt-10">
             <Link
               href="/#contacto"
-              className="inline-flex items-center bg-bordo text-hueso font-sans font-semibold rounded-lg hover:bg-bordo-oscuro active:scale-[0.98] transition-all duration-200"
+              className={`inline-flex items-center font-sans font-semibold rounded-lg active:scale-[0.98] transition-all duration-200 ${c.btnClass}`}
               style={{ fontSize: 14, paddingInline: 28, paddingBlock: 14 }}
             >
               Quiero este servicio
@@ -226,8 +278,6 @@ export function ServiciosPageSections() {
   return (
     <>
       <HeroServicios />
-      {/* banda separadora 4px --bordo */}
-      <div className="w-full bg-bordo" style={{ height: 4 }} aria-hidden />
       {SERVICIOS.map((s, i) => (
         <Fragment key={s.id}>
           {i > 0 && (
