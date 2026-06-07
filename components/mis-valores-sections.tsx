@@ -22,7 +22,7 @@ const PILARES = [
     num: "01",
     titulo: "Inteligencia y Oficio",
     descripcion:
-      "Tengo formación académica y años de trabajo en medios. Esa combinación me da criterio para tomar decisiones que realmente funcionan.",
+      "Combino el respaldo de mis años de estudio con la experiencia real del terreno y una capacitación constante para tomar decisiones estratégicas y con criterio.",
   },
   {
     num: "02",
@@ -34,19 +34,19 @@ const PILARES = [
     num: "03",
     titulo: "Libertad",
     descripcion:
-      "Trabajo por objetivos, no por horarios. Esa independencia me permite hablarte con franqueza y decirte lo que tu negocio necesita escuchar, aunque no sea lo más cómodo.",
+      "Mi negocio y trabajo está basado en objetivos, no en horarios rígidos. Esa misma independencia me da la libertad de palabra para asesorarte con total franqueza y decirte siempre lo que tu marca necesita escuchar.",
   },
   {
     num: "04",
     titulo: "Responsabilidad y Compromiso",
     descripcion:
-      "No me manejás como a una proveedora externa. Me involucro en tu proyecto como si fuera mío y cuido cada detalle.",
+      "No soy una proveedora externa más; me involucro en tu negocio como una aliada estratégica para cuidar cada detalle.",
   },
   {
     num: "05",
     titulo: "Pasión",
     descripcion:
-      "Amo lo que hago. Me entusiasma trabajar en distintas plataformas y transformar el propósito de cada persona o empresa en una historia que vale la pena contar.",
+      "Amo profundamente lo que hago. Disfruto el ecosistema multiplataforma y me entusiasma transformar el propósito de las personas y empresas en historias que merecen ser contadas.",
   },
 ]
 
