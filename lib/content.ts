@@ -1,4 +1,6 @@
 import { supabase } from "@/lib/supabase"
+import type { SectionDef } from "@/lib/content-schema"
+import { fallbacksForIn } from "@/lib/content-schema"
 
 /**
  * Helpers de lectura pública de contenido editable.
@@ -77,4 +79,20 @@ export async function getContentBatch(
   } catch {
     return result
   }
+}
+
+/**
+ * Lee TODAS las secciones de una página de una sola vez, usando el esquema para
+ * conocer secciones y fallbacks. Devuelve { [section]: { [field]: value } }.
+ * Resiliente: cada sección cae a su fallback ante cualquier error.
+ */
+export async function getPageContent(
+  page: string,
+  schema: SectionDef[],
+): Promise<Record<string, Record<string, string>>> {
+  const sections = schema.map((s) => s.section)
+  const results = await Promise.all(
+    sections.map((s) => getContentBatch(page, s, fallbacksForIn(schema, s))),
+  )
+  return Object.fromEntries(sections.map((s, i) => [s, results[i]]))
 }

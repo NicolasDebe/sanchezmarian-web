@@ -7,6 +7,15 @@ import { createAdminClient } from "@/lib/supabase"
 
 const PAGE_DEFAULT = "home"
 
+/** Ruta pública asociada a cada `page` de content_blocks (para revalidar). */
+const PAGE_PATHS: Record<string, string> = {
+  home: "/",
+  servicios: "/servicios",
+  mis_valores: "/mis-valores",
+  casos_de_exito: "/casos-de-exito",
+  contacto: "/contacto",
+}
+
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
 export type AuthState = { error: string } | null
@@ -146,6 +155,17 @@ export async function saveContentSection(
   }
 
   // 5. Refrescar el sitio público.
-  revalidatePath("/")
+  const pageKey = page || PAGE_DEFAULT
+  if (pageKey === "global") {
+    // Nav y Footer aparecen en todas las páginas (comparten el root layout).
+    revalidatePath("/", "layout")
+  } else if (pageKey === "seo") {
+    // El SEO se guarda como page="seo", section=<slug de la página afectada>.
+    const path = PAGE_PATHS[section]
+    if (path) revalidatePath(path)
+  } else {
+    const path = PAGE_PATHS[pageKey]
+    if (path) revalidatePath(path)
+  }
   return { success: true }
 }

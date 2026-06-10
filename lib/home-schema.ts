@@ -13,22 +13,10 @@
  * en Server Components como en Client Components.
  */
 
-export type FieldType = "text" | "longtext" | "number"
+import type { FieldType, FieldDef, SectionDef } from "@/lib/content-schema"
+import { fallbacksForIn, fallbackOfIn } from "@/lib/content-schema"
 
-export interface FieldDef {
-  field: string
-  type: FieldType
-  label: string
-  fallback: string
-}
-
-export interface SectionDef {
-  /** slug usado en content_blocks.section */
-  section: string
-  /** título legible para el acordeón del admin */
-  title: string
-  fields: FieldDef[]
-}
+export type { FieldType, FieldDef, SectionDef }
 
 export const HOME_SECTIONS: SectionDef[] = [
   {
@@ -86,9 +74,12 @@ export const HOME_SECTIONS: SectionDef[] = [
   {
     section: "metodo",
     title: "Método",
+    legend:
+      "Título del método — la parte destacada se muestra en cursiva bordó automáticamente.",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Mi método de trabajo" },
-      { field: "title", type: "text", label: "Título", fallback: "Saber qué decir, a quién y cuándo." },
+      { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Saber qué decir," },
+      { field: "title_accent", type: "text", label: "Título — texto destacado (cursiva bordó)", fallback: "a quién y cuándo." },
       { field: "step_1_title", type: "text", label: "Paso 1 — Título", fallback: "Definición del relato" },
       { field: "step_1_desc", type: "text", label: "Paso 1 — Descripción", fallback: "Qué historia contar y a quién." },
       { field: "step_2_title", type: "text", label: "Paso 2 — Título", fallback: "Diseño y mentoreo de la estrategia" },
@@ -104,10 +95,13 @@ export const HOME_SECTIONS: SectionDef[] = [
   {
     section: "bio",
     title: "Bio",
+    legend:
+      "Título — la parte destacada (segunda línea) se muestra en cursiva bordó automáticamente.",
     fields: [
       { field: "badge", type: "text", label: "Badge sobre la foto", fallback: "Más de una década en comunicación" },
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Sobre Marian" },
-      { field: "title", type: "text", label: "Título", fallback: "Mariana Sánchez, comunicación con propósito." },
+      { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Mariana Sánchez," },
+      { field: "title_accent", type: "text", label: "Título — texto destacado (cursiva bordó)", fallback: "comunicación con propósito." },
       {
         field: "paragraph_1",
         type: "longtext",
@@ -139,14 +133,21 @@ export const HOME_SECTIONS: SectionDef[] = [
   {
     section: "cta_final",
     title: "CTA Final",
+    legend:
+      "Título — la parte destacada (segunda línea) se muestra en cursiva dorada automáticamente.",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Hagamos que las cosas pasen." },
       {
-        field: "title",
-        type: "longtext",
-        label: "Título",
-        fallback:
-          "Creo en el valor de las buenas historias y en el poder de las conexiones reales.",
+        field: "title_pre",
+        type: "text",
+        label: "Título — parte normal",
+        fallback: "Creo en el valor de las buenas historias",
+      },
+      {
+        field: "title_accent",
+        type: "text",
+        label: "Título — texto destacado (cursiva dorada)",
+        fallback: "y en el poder de las conexiones reales.",
       },
       {
         field: "description",
@@ -165,12 +166,10 @@ export const HOME_SECTIONS: SectionDef[] = [
 
 /** Devuelve el record { field: fallback } de una sección. */
 export function fallbacksFor(section: string): Record<string, string> {
-  const def = HOME_SECTIONS.find((s) => s.section === section)
-  if (!def) return {}
-  return Object.fromEntries(def.fields.map((f) => [f.field, f.fallback]))
+  return fallbacksForIn(HOME_SECTIONS, section)
 }
 
 /** Devuelve el fallback de un campo puntual. */
 export function fallbackOf(section: string, field: string): string {
-  return HOME_SECTIONS.find((s) => s.section === section)?.fields.find((f) => f.field === field)?.fallback ?? ""
+  return fallbackOfIn(HOME_SECTIONS, section, field)
 }

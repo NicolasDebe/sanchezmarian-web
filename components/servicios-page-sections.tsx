@@ -6,13 +6,7 @@ import type { Variants } from "motion/react"
 import Link from "next/link"
 import { fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
-
-/* ─── helpers ───────────────────────────────────────────────────── */
-function splitSub(s: string): { titulo: string; desc: string } {
-  const i = s.indexOf(": ")
-  if (i === -1) return { titulo: s, desc: "" }
-  return { titulo: s.slice(0, i), desc: s.slice(i + 2) }
-}
+import { fallbacksFor } from "@/lib/servicios-schema"
 
 const subStagger: Variants = {
   hidden: {},
@@ -62,56 +56,43 @@ const DARK: Scheme = {
   btnClass:        "bg-hueso text-bordo hover:bg-arena",
 }
 
-/* ─── data ─────────────────────────────────────────────────────── */
-const SERVICIOS = [
-  {
-    id: "servicio-01",
-    num: "01",
-    nombre: "Prensa y Comunicación Multiplataforma",
-    tagline: "Historias con impacto real.",
-    descripcion:
-      "No se trata de enviar notas masivas, sino de construir puentes honestos y duraderos con los periodistas. Analizo el valor periodístico de tu negocio y lo transformo en contenido relevante para los medios tradicionales y digitales, garantizando credibilidad y autoridad.",
-    subServicios: [
-      "Gestión de Medios (Earned Media): Redacción y distribución estratégica de gacetillas de prensa orientadas a objetivos, no a formatos rígidos.",
-      "Laboratorio de comunicación: Entrenamiento técnico y discursivo para voceros ante escenarios mediáticos reales.",
-      "Monitoreo: Medición cualitativa del impacto de tu negocio en el ecosistema de medios de comunicación.",
-    ],
-    bg:   "bg-hueso",
-    dark: false,
-  },
-  {
-    id: "servicio-02",
-    num: "02",
-    nombre: "Mentoría y Asesoramiento en Comunicación Estratégica",
-    tagline: "La arquitectura narrativa que tu negocio necesita.",
-    descripcion:
-      "Un espacio de asesoramiento y mentoreo fluido desde mi expertise en comunicación. Trabajo a la par de los profesionales para descubrir su brillo auténtico, estructurar sus mensajes clave y diseñar un plan de visibilidad personalizado.",
-    subServicios: [
-      "Auditoría y Planificación 360°: Diagnóstico profundo de la identidad del negocio y alineación de la comunicación interna con la externa.",
-      "Estrategia Multiplataforma: Co-creación de narrativas que fluyen con sinergia y coherencia en diversos canales de comunicación.",
-      "Gestión de Alianzas Estratégicas: Formo equipo con profesionales especializados en marketing y redes sociales para ofrecerte soluciones integrales.",
-    ],
-    bg:   "bg-bordo",
-    dark: true,
-  },
-  {
-    id: "servicio-03",
-    num: "03",
-    nombre: "Relaciones Públicas",
-    tagline: "Conexión genuina para potenciar tu historia y tu red de contactos.",
-    descripcion:
-      "Diseño y coordino acciones presenciales donde el diálogo y la apertura son los protagonistas. Conecto a profesionales con sus públicos de interés (stakeholders), autoridades y líderes de opinión, creando entornos de confianza mutua.",
-    subServicios: [
-      "RRPP y Networking Estratégico: Planificación de eventos de alto impacto. Conexión directa y gestión de invitaciones para actividades relacionadas al nicho de tu negocio.",
-      "Lanzamientos: Coordinación integral de la convocatoria de prensa y cobertura mediática para eventos.",
-    ],
-    bg:   "bg-hueso",
-    dark: false,
-  },
-]
+/* ─── tipos ─────────────────────────────────────────────────────── */
+type Servicio = {
+  id: string
+  num: string
+  nombre: string
+  tagline: string
+  descripcion: string
+  subServicios: { titulo: string; desc: string }[]
+  cta: string
+  bg: string
+  dark: boolean
+}
+
+function buildServicio(
+  id: string,
+  c: Record<string, string>,
+  bg: string,
+  dark: boolean,
+): Servicio {
+  const subServicios = [1, 2, 3]
+    .map((n) => ({ titulo: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
+    .filter((s) => s.titulo.trim() !== "")
+  return {
+    id,
+    num: c.number,
+    nombre: c.name,
+    tagline: c.tagline,
+    descripcion: c.description,
+    subServicios,
+    cta: c.cta_text,
+    bg,
+    dark,
+  }
+}
 
 /* ─── hero ──────────────────────────────────────────────────────── */
-function HeroServicios() {
+function HeroServicios({ c }: { c: Record<string, string> }) {
   return (
     <section
       className="relative bg-hueso overflow-hidden"
@@ -131,7 +112,7 @@ function HeroServicios() {
             className="font-mono uppercase text-bordo"
             style={{ fontSize: 11, letterSpacing: "0.15em" }}
           >
-            Servicios
+            {c.eyebrow}
           </motion.p>
 
           <motion.div variants={fadeUp} className="w-10 h-px bg-dorado" />
@@ -141,7 +122,7 @@ function HeroServicios() {
             className="font-playfair font-bold text-negro-bordo"
             style={{ fontSize: "clamp(30px, 4vw, 52px)", lineHeight: 1.15 }}
           >
-            Conexión genuina para potenciar la voz y el mensaje de tu negocio.
+            {c.h1}
           </motion.h1>
 
           <motion.p
@@ -149,13 +130,7 @@ function HeroServicios() {
             className="font-sans text-gris-bordo"
             style={{ fontSize: 16, lineHeight: 1.7 }}
           >
-            Planifico y gestiono relaciones profesionales sin intermediarios ni
-            estructuras rígidas: vínculos fluidos y horizontales donde el diálogo y
-            la apertura son la base de todo. Mi rol combina el asesoramiento
-            estratégico con una gestión activa y resolutiva, creando una conexión
-            genuina con cada persona o empresa para que se sienta verdaderamente
-            escuchada, contenida y potenciada en cada etapa de la estrategia de
-            comunicación de su negocio.
+            {c.description}
           </motion.p>
         </motion.div>
       </div>
@@ -164,7 +139,7 @@ function HeroServicios() {
 }
 
 /* ─── servicio individual ───────────────────────────────────────── */
-function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
+function ServicioSection({ s }: { s: Servicio }) {
   const c = s.dark ? DARK : LIGHT
 
   return (
@@ -177,7 +152,6 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
           viewport={viewportOnce}
           className="relative flex flex-col"
         >
-          {/* número marca de agua — solo desktop */}
           <span
             className={`hidden md:block absolute font-playfair italic ${c.watermarkClass} select-none pointer-events-none leading-none`}
             style={{ fontSize: 120, opacity: c.watermarkOpacity, top: -20, right: 0 }}
@@ -186,7 +160,6 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
             {s.num}
           </span>
 
-          {/* nombre */}
           <motion.h2
             variants={fadeUp}
             className={`font-playfair font-bold ${c.nombreClass} relative z-10 mb-3`}
@@ -195,7 +168,6 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
             {s.nombre}
           </motion.h2>
 
-          {/* tagline */}
           <motion.p
             variants={fadeUp}
             className={`font-playfair italic ${c.taglineClass} relative z-10 mb-6`}
@@ -204,7 +176,6 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
             {s.tagline}
           </motion.p>
 
-          {/* descripción */}
           <motion.p
             variants={fadeUp}
             className={`font-sans ${c.descClass} relative z-10 mb-12`}
@@ -213,7 +184,6 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
             {s.descripcion}
           </motion.p>
 
-          {/* label */}
           <motion.p
             variants={fadeUp}
             className={`font-mono uppercase ${c.labelClass} relative z-10 mb-5`}
@@ -222,49 +192,44 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
             Sub-servicios:
           </motion.p>
 
-          {/* lista con stagger propio */}
           <motion.ul
             variants={subStagger}
             className="flex flex-col relative z-10"
             style={{ gap: 20 }}
           >
-            {s.subServicios.map((sub, i) => {
-              const { titulo, desc } = splitSub(sub)
-              return (
-                <motion.li key={i} variants={fadeUp} className="flex items-start gap-4">
-                  <span
-                    className={`shrink-0 rounded-full ${c.indicadorClass}`}
-                    style={{ width: 2, height: 20, marginTop: 4 }}
-                  />
-                  <div>
+            {s.subServicios.map((sub, i) => (
+              <motion.li key={i} variants={fadeUp} className="flex items-start gap-4">
+                <span
+                  className={`shrink-0 rounded-full ${c.indicadorClass}`}
+                  style={{ width: 2, height: 20, marginTop: 4 }}
+                />
+                <div>
+                  <p
+                    className={`font-sans font-semibold ${c.subTituloClass}`}
+                    style={{ fontSize: 15, lineHeight: 1.5 }}
+                  >
+                    {sub.titulo}
+                  </p>
+                  {sub.desc && (
                     <p
-                      className={`font-sans font-semibold ${c.subTituloClass}`}
-                      style={{ fontSize: 15, lineHeight: 1.5 }}
+                      className={`font-sans ${c.subDescClass} mt-1`}
+                      style={{ fontSize: 14, lineHeight: 1.7 }}
                     >
-                      {titulo}
+                      {sub.desc}
                     </p>
-                    {desc && (
-                      <p
-                        className={`font-sans ${c.subDescClass} mt-1`}
-                        style={{ fontSize: 14, lineHeight: 1.7 }}
-                      >
-                        {desc}
-                      </p>
-                    )}
-                  </div>
-                </motion.li>
-              )
-            })}
+                  )}
+                </div>
+              </motion.li>
+            ))}
           </motion.ul>
 
-          {/* botón */}
           <motion.div variants={fadeUp} className="relative z-10 mt-10">
             <Link
               href="/#contacto"
               className={`inline-flex items-center font-sans font-semibold rounded-lg active:scale-[0.98] transition-all duration-200 ${c.btnClass}`}
               style={{ fontSize: 14, paddingInline: 28, paddingBlock: 14 }}
             >
-              Quiero este servicio
+              {s.cta}
             </Link>
           </motion.div>
         </motion.div>
@@ -274,11 +239,27 @@ function ServicioSection({ s }: { s: (typeof SERVICIOS)[0] }) {
 }
 
 /* ─── export ────────────────────────────────────────────────────── */
-export function ServiciosPageSections() {
+export function ServiciosPageSections({
+  content,
+}: {
+  content?: {
+    hero?: Record<string, string>
+    servicio_01?: Record<string, string>
+    servicio_02?: Record<string, string>
+    servicio_03?: Record<string, string>
+  }
+}) {
+  const hero = { ...fallbacksFor("hero"), ...content?.hero }
+  const servicios: Servicio[] = [
+    buildServicio("servicio-01", { ...fallbacksFor("servicio_01"), ...content?.servicio_01 }, "bg-hueso", false),
+    buildServicio("servicio-02", { ...fallbacksFor("servicio_02"), ...content?.servicio_02 }, "bg-bordo", true),
+    buildServicio("servicio-03", { ...fallbacksFor("servicio_03"), ...content?.servicio_03 }, "bg-hueso", false),
+  ]
+
   return (
     <>
-      <HeroServicios />
-      {SERVICIOS.map((s, i) => (
+      <HeroServicios c={hero} />
+      {servicios.map((s, i) => (
         <Fragment key={s.id}>
           {i > 0 && (
             <div className="w-full bg-bordo/15" style={{ height: 1 }} aria-hidden />

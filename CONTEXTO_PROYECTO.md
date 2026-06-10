@@ -80,15 +80,27 @@ Problema principal: todas las páginas internas dan 404, sitio en noindex (invis
 - Informe PDF completo para presentarle a Marian
 
 ## CMS Admin — edición de contenido sin tocar código
-El sitio tiene un panel de administración para editar los textos del home desde
-el navegador. Stack: Next.js 16 + Supabase (auth + Postgres).
+El sitio tiene un panel de administración para editar los textos de TODO el
+sitio desde el navegador. Stack: Next.js 16 + Supabase (auth + Postgres).
 
 ### Cómo se usa
 - Entrar a `/admin/login` e iniciar sesión (usuario en Supabase Auth;
   hoy: nicodebe05@gmail.com).
-- Dashboard en `/admin/dashboard`, editor del home en `/admin/edit/home`.
-- El editor tiene 5 acordeones (Hero, Stats, Método, Bio, CTA Final). Cada
-  sección se guarda por separado. Los cambios se ven en el sitio en ~1 minuto.
+- Dashboard en `/admin/dashboard` con una tarjeta por página editable.
+- Editores disponibles: `/admin/edit/home`, `/servicios`, `/mis-valores`,
+  `/casos-de-exito`, `/contacto`, `/global` (menú + footer) y `/seo` (metadata).
+- Cada editor es un acordeón por sección; cada sección se guarda por separado.
+  Los cambios se ven en el sitio público en ~1 minuto.
+
+### Patrón pre/accent/post (textos con acento editorial)
+Los textos donde parte va en cursiva + color (bordó/dorado/terracota) se parten
+en campos `{x}_pre` / `{x}_accent` / `{x}_post`. El styling vive HARDCODED en el
+JSX; Mariana solo edita texto plano por campo y es imposible que rompa el diseño.
+Tipos compartidos en `lib/content-schema.ts`. Cada página tiene su esquema:
+`lib/{home,servicios,mis-valores,casos,contacto,global,seo}-schema.ts`.
+Helpers de lectura: `getPageContent` y `getGlobalContent` (siempre con fallback).
+Metadata SEO editable vía `generateMetadata` + `lib/seo.ts` (page="seo",
+una sección por página).
 
 ### Cómo funciona por dentro
 - Tablas Supabase: `content_blocks` (contenido actual, unique en
@@ -106,6 +118,16 @@ el navegador. Stack: Next.js 16 + Supabase (auth + Postgres).
   `/admin/*`; `app/admin/actions.ts` tiene `signIn`, `signOut` y
   `saveContentSection` (escribe con service_role, hace backup de versiones).
 - Seed inicial: `npx tsx scripts/seed-content.ts` (idempotente, ~43 filas).
+
+### Pendiente (próxima iteración)
+- `/casos-de-exito`: el listado de clientes y sus coberturas (timeline/zigzag)
+  sigue hardcodeado en `data/clippings.ts` y `TIMELINE_CLIENTES` dentro de
+  `casos-client.tsx`. Para hacerlos editables se necesitan tablas `clients` y
+  `coverages` en Supabase (no se hizo en esta iteración). El hero y las stats
+  SÍ son editables desde `/admin/edit/casos-de-exito`.
+- Páginas secundarias (`/campanas`, `/privacidad`, `/terminos`, `/sobre-marian`)
+  usan Nav/Footer con sus textos de fallback (no leen `global` aún). Se ven
+  idénticas; si se editan los textos globales, esas páginas no los reflejan.
 
 ### Reglas críticas (no romper)
 1. Rutas admin SIEMPRE con `export const dynamic = 'force-dynamic'`.

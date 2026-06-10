@@ -2,24 +2,28 @@ import type { Metadata } from "next"
 import { Nav } from "@/components/nav"
 import { Footer } from "@/components/footer"
 import { ContactoContent } from "@/components/contacto-content"
+import { getPageContent } from "@/lib/content"
+import { CONTACTO_SECTIONS } from "@/lib/contacto-schema"
+import { getGlobalContent } from "@/lib/global-content"
+import { buildMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  title: "Contacto — Marian Sánchez",
-  description:
-    "Conversemos sobre tu estrategia de comunicación. Hablemos sobre cómo posicionar tu proyecto en los medios.",
-  openGraph: {
-    title: "Contacto — Marian Sánchez",
-    description: "Conversemos sobre tu proyecto y cómo puedo ayudarte a comunicarlo.",
-    url: "https://sanchezmarian.com/contacto",
-  },
+export const revalidate = 60
+
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("contacto", "https://sanchezmarian.com/contacto")
 }
 
-export default function ContactoPage() {
+export default async function ContactoPage() {
+  const [global, content] = await Promise.all([
+    getGlobalContent(),
+    getPageContent("contacto", CONTACTO_SECTIONS),
+  ])
+
   return (
     <main>
-      <Nav />
-      <ContactoContent />
-      <Footer />
+      <Nav content={global.nav} />
+      <ContactoContent content={content} />
+      <Footer content={global.footer} nav={global.nav} />
     </main>
   )
 }

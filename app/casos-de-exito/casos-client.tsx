@@ -9,15 +9,7 @@ import { CLIPPINGS, type Clipping } from "@/data/clippings"
 import { fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { DestacadasRotativo } from "@/components/destacadas-rotativo"
-
-// ─── Hero stats ───────────────────────────────────────────────────────────────
-
-const STATS = [
-  { n: "100+", label: "coberturas verificadas" },
-  { n: "30+",  label: "medios distintos" },
-  { n: "5",    label: "formatos cubiertos" },
-  { n: "15",   label: "marcas activas" },
-] as const
+import { fallbacksFor } from "@/lib/casos-schema"
 
 // 12 apariciones rotativas — 4 grupos × 3 cards
 // Grupo 1: La Nación · Vatican News · Los Andes (Notarial)
@@ -678,7 +670,17 @@ function ToggleAllButton({
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export function CasosClient() {
+export function CasosClient({
+  content,
+}: {
+  content?: { hero?: Record<string, string>; stats?: Record<string, string> }
+}) {
+  const hero = { ...fallbacksFor("hero"), ...content?.hero }
+  const statsContent = { ...fallbacksFor("stats"), ...content?.stats }
+  const STATS = [1, 2, 3, 4].map((n) => ({
+    n: statsContent[`stat_${n}_number`] ?? "",
+    label: statsContent[`stat_${n}_label`] ?? "",
+  }))
   const [openClients, setOpenClients] = useState<Set<string>>(new Set())
   const allExpanded = openClients.size === TIMELINE_CLIENTES.length
 
@@ -743,7 +745,7 @@ export function CasosClient() {
               className="font-mono text-[11px] uppercase tracking-[0.22em]"
               style={{ color: "var(--color-bordo)" }}
             >
-              Casos de éxito
+              {hero.eyebrow}
             </motion.p>
             <motion.div
               variants={fadeUp}
@@ -759,10 +761,10 @@ export function CasosClient() {
                 maxWidth: 700,
               }}
             >
-              El impacto de una buena estrategia
+              {hero.h1_pre}
               <br />
               <em className="italic" style={{ color: "var(--color-bordo)" }}>
-                se mide en presencia real.
+                {hero.h1_accent}
               </em>
             </motion.h1>
             <motion.p
@@ -770,8 +772,7 @@ export function CasosClient() {
               className="font-sans mt-6"
               style={{ fontSize: 16, color: "var(--color-gris-bordo)", maxWidth: 560, lineHeight: 1.7 }}
             >
-              Una selección de gestiones de prensa realizadas para marcas, empresas y
-              profesionales que confiaron en la estrategia. Cada caso cuenta una historia.
+              {hero.description}
             </motion.p>
           </motion.div>
 

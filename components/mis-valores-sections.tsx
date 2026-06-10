@@ -6,6 +6,7 @@ import {
   fadeUp, fadeLeft,
   fadeUpStagger, viewportOnce,
 } from "@/lib/animations"
+import { fallbacksFor } from "@/lib/mis-valores-schema"
 
 const containerVariants = {
   hidden: {},
@@ -17,43 +18,10 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } },
 }
 
-const PILARES = [
-  {
-    num: "01",
-    titulo: "Inteligencia y Oficio",
-    descripcion:
-      "Combino el respaldo de mis años de estudio con la experiencia real del terreno y una capacitación constante para tomar decisiones estratégicas y con criterio.",
-  },
-  {
-    num: "02",
-    titulo: "Integridad",
-    descripcion:
-      "Construyo puentes honestos y transparentes. Prefiero cuidar la confianza a largo plazo con un periodista que forzar una noticia sin valor real.",
-  },
-  {
-    num: "03",
-    titulo: "Libertad",
-    descripcion:
-      "Mi negocio y trabajo está basado en objetivos, no en horarios rígidos. Esa misma independencia me da la libertad de palabra para asesorarte con total franqueza y decirte siempre lo que tu marca necesita escuchar.",
-  },
-  {
-    num: "04",
-    titulo: "Responsabilidad y Compromiso",
-    descripcion:
-      "No soy una proveedora externa más; me involucro en tu negocio como una aliada estratégica para cuidar cada detalle.",
-  },
-  {
-    num: "05",
-    titulo: "Pasión",
-    descripcion:
-      "Amo profundamente lo que hago. Disfruto el ecosistema multiplataforma y me entusiasma transformar el propósito de las personas y empresas en historias que merecen ser contadas.",
-  },
-]
-
 /* ═══════════════════════════════════════════════════════════════
    HERO EDITORIAL
 ═══════════════════════════════════════════════════════════════ */
-function HeroEditorial() {
+function HeroEditorial({ c }: { c: Record<string, string> }) {
   return (
     <section style={{ position: "relative", width: "100%", overflow: "hidden" }}>
 
@@ -97,7 +65,7 @@ function HeroEditorial() {
               marginBottom: "14px",
             }}
           >
-            Mis valores
+            {c.eyebrow}
           </motion.p>
 
           <motion.h1
@@ -110,10 +78,10 @@ function HeroEditorial() {
             }}
           >
             <span style={{ display: "block", fontSize: "clamp(1.3rem, 3vw, 2.2rem)", fontWeight: 600, opacity: 0.88 }}>
-              Detrás de la estrategia:
+              {c.h1_pre}
             </span>
             <em style={{ display: "block", fontSize: "clamp(2rem, 5vw, 4rem)", fontStyle: "italic", lineHeight: 1.0 }}>
-              mi historia.
+              {c.h1_accent}
             </em>
           </motion.h1>
 
@@ -127,7 +95,7 @@ function HeroEditorial() {
 /* ═══════════════════════════════════════════════════════════════
    BIO — 3 párrafos
 ═══════════════════════════════════════════════════════════════ */
-function BioSection() {
+function BioSection({ c }: { c: Record<string, string> }) {
   return (
     <section className="bg-hueso py-[120px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -139,9 +107,8 @@ function BioSection() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           >
-            Mi camino en el mundo de la comunicación comenzó hace más de una
-            década, impulsado por una certeza que hoy es el motor de mi negocio:{" "}
-            <em className="italic text-bordo">comunicar es conectar.</em>
+            {c.paragraph_1_pre}{" "}
+            <em className="italic text-bordo">{c.paragraph_1_accent}</em>
           </motion.p>
 
           <motion.p
@@ -151,12 +118,7 @@ function BioSection() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.65, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
           >
-            Me formé en la universidad, pero mi verdadero oficio se moldeó en la experiencia
-            en los medios de comunicación. Esas &ldquo;horas calle&rdquo; me dieron las
-            herramientas esenciales para entender el ritmo de las noticias y aprender qué busca
-            realmente un periodista. También he dedicado mis días a la comunicación institucional
-            y corporativa, donde descubrí la complejidad de construir y blindar la reputación de
-            marcas, empresas y organismos públicos y privados.
+            {c.paragraph_2}
           </motion.p>
 
           <motion.p
@@ -166,10 +128,7 @@ function BioSection() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.65, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
-            A lo largo de este recorrido, entendí que para ofrecer un servicio de excelencia no
-            podía trabajar aislada. Por eso, hoy lidero mis proyectos y negocio tejiendo alianzas
-            estratégicas con colegas de confianza, lo que me permite ofrecer soluciones integrales
-            y multiplataforma, garantizando que cada mensaje brille en el soporte adecuado.
+            {c.paragraph_3}
           </motion.p>
 
           <motion.p
@@ -179,7 +138,7 @@ function BioSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            — Marian Sánchez
+            {c.signature}
           </motion.p>
         </div>
       </div>
@@ -190,7 +149,13 @@ function BioSection() {
 /* ═══════════════════════════════════════════════════════════════
    PILARES
 ═══════════════════════════════════════════════════════════════ */
-function PilaresSection() {
+function PilaresSection({ c }: { c: Record<string, string> }) {
+  const pilares = [1, 2, 3, 4, 5].map((n) => ({
+    num: String(n).padStart(2, "0"),
+    titulo: c[`pilar_${n}_title`] ?? "",
+    descripcion: c[`pilar_${n}_desc`] ?? "",
+  }))
+
   return (
     <section className="bg-hueso-oscuro py-[120px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -203,15 +168,15 @@ function PilaresSection() {
           className="mb-16"
         >
           <motion.p variants={fadeUp} className="font-mono text-[10px] uppercase tracking-[0.25em] text-bordo mb-4">
-            Mis valores
+            {c.eyebrow}
           </motion.p>
           <motion.div variants={fadeUp} className="w-10 h-px bg-dorado mb-6" />
           <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[40px] leading-[1.1] mb-4">
-            Los pilares que{" "}
-            <em className="italic text-bordo">guían mi trabajo.</em>
+            {c.title_pre}{" "}
+            <em className="italic text-bordo">{c.title_accent}</em>
           </motion.h2>
           <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo max-w-[480px] leading-relaxed">
-            Esta trayectoria es la que hoy me permite dar vida a mis valores en cada consultoría:
+            {c.intro}
           </motion.p>
         </motion.div>
 
@@ -222,7 +187,7 @@ function PilaresSection() {
           viewport={viewportOnce}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {PILARES.map((pilar) => (
+          {pilares.map((pilar) => (
             <motion.div
               key={pilar.num}
               variants={fadeUp}
@@ -250,7 +215,7 @@ function PilaresSection() {
 /* ═══════════════════════════════════════════════════════════════
    CIERRE
 ═══════════════════════════════════════════════════════════════ */
-function CierreSection() {
+function CierreSection({ c }: { c: Record<string, string> }) {
   return (
     <section className="bg-hueso py-[120px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -262,18 +227,13 @@ function CierreSection() {
           className="max-w-[760px]"
         >
           <p className="font-playfair text-negro-bordo text-[22px] sm:text-[26px] leading-[1.5] mb-10">
-            Mi propósito en este mundo es abrir caminos para que las historias que merecen ser
-            contadas encuentren su lugar. Creo firmemente que todos tenemos una voz única y el
-            derecho a ser vistos, reconocidos y potenciados desde nuestras propias inteligencias.
-            Mi negocio no es moldear a las marcas o a las personas bajo un formato rígido, sino
-            descubrir su brillo auténtico, darles herramientas estratégicas y tender los puentes
-            necesarios para que su mensaje resuene con fuerza y claridad en la comunidad.
+            {c.paragraph}
           </p>
           <Link
             href="/#contacto"
             className="inline-flex items-center gap-2 bg-bordo text-hueso font-sans text-[15px] font-semibold px-8 py-4 rounded-full hover:bg-bordo/90 active:scale-[0.98] transition-all"
           >
-            Conversemos →
+            {c.button_text}
           </Link>
         </motion.div>
       </div>
@@ -284,13 +244,22 @@ function CierreSection() {
 /* ═══════════════════════════════════════════════════════════════
    EXPORT
 ═══════════════════════════════════════════════════════════════ */
-export function MisValoresSections() {
+export function MisValoresSections({
+  content,
+}: {
+  content?: {
+    hero?: Record<string, string>
+    bio?: Record<string, string>
+    pilares?: Record<string, string>
+    cierre?: Record<string, string>
+  }
+}) {
   return (
     <>
-      <HeroEditorial />
-      <BioSection />
-      <PilaresSection />
-      <CierreSection />
+      <HeroEditorial c={{ ...fallbacksFor("hero"), ...content?.hero }} />
+      <BioSection c={{ ...fallbacksFor("bio"), ...content?.bio }} />
+      <PilaresSection c={{ ...fallbacksFor("pilares"), ...content?.pilares }} />
+      <CierreSection c={{ ...fallbacksFor("cierre"), ...content?.cierre }} />
     </>
   )
 }

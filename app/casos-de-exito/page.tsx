@@ -2,25 +2,28 @@ import type { Metadata } from "next"
 import { Nav } from "@/components/nav"
 import { Footer } from "@/components/footer"
 import { CasosClient } from "./casos-client"
+import { getPageContent } from "@/lib/content"
+import { CASOS_SECTIONS } from "@/lib/casos-schema"
+import { getGlobalContent } from "@/lib/global-content"
+import { buildMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  title: "Casos de éxito — Marian Sánchez",
-  description:
-    "56 coberturas en medios nacionales e internacionales. La Nación, Clarín, Infobae, Vatican News, Los Andes y más. Resultados reales para marcas reales.",
-  openGraph: {
-    title: "Casos de éxito — Marian Sánchez",
-    description:
-      "56 coberturas en medios nacionales e internacionales. Portfolio de gestiones de GB Consulting.",
-    url: "https://sanchezmarian.com/casos-de-exito",
-  },
+export const revalidate = 60
+
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("casos_de_exito", "https://sanchezmarian.com/casos-de-exito")
 }
 
-export default function CasosDeExitoPage() {
+export default async function CasosDeExitoPage() {
+  const [global, content] = await Promise.all([
+    getGlobalContent(),
+    getPageContent("casos_de_exito", CASOS_SECTIONS),
+  ])
+
   return (
     <main>
-      <Nav />
-      <CasosClient />
-      <Footer />
+      <Nav content={global.nav} />
+      <CasosClient content={content} />
+      <Footer content={global.footer} nav={global.nav} />
     </main>
   )
 }

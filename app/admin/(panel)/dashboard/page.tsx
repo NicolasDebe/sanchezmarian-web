@@ -36,62 +36,54 @@ export default async function DashboardPage() {
         {greeting(email)}
       </h1>
 
-      {/* Tarjeta de bienvenida */}
-      <div
-        className="mt-8 rounded-2xl border p-7"
-        style={{ backgroundColor: "var(--color-hueso-oscuro)", borderColor: "rgba(201,168,130,0.3)" }}
-      >
-        <h2 className="font-playfair text-xl font-bold" style={{ color: "var(--color-negro-bordo)" }}>
-          Editá el contenido de tu sitio
-        </h2>
-        <p className="mt-2 font-sans text-sm leading-relaxed" style={{ color: "var(--color-gris-bordo)" }}>
-          Desde acá podés cambiar los textos del home sin tocar código. Los
-          cambios se publican en el sitio en aproximadamente un minuto.
-        </p>
-        <Link
-          href="/admin/edit/home"
-          className="mt-5 inline-flex items-center gap-2 rounded-lg px-5 py-2.5 font-sans text-sm font-semibold transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "var(--color-bordo)", color: "var(--color-hueso)" }}
-        >
-          Editar contenido del home
-          <span aria-hidden="true">→</span>
-        </Link>
-      </div>
+      <p className="mt-3 font-sans text-sm leading-relaxed" style={{ color: "var(--color-gris-bordo)" }}>
+        Elegí qué página editar. Podés cambiar los textos sin tocar código; los
+        cambios se publican en el sitio en aproximadamente un minuto.
+      </p>
 
-      {/* Tarjetas deshabilitadas */}
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {["Histórico de cambios", "Campañas"].map((t) => (
-          <div
-            key={t}
-            className="rounded-2xl border p-6"
+      {/* Tarjetas por página editable */}
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {EDITABLES.map((card) => (
+          <Link
+            key={card.href}
+            href={card.href}
+            className="group rounded-2xl border p-6 transition-colors hover:border-[var(--color-bordo)]"
             style={{
               backgroundColor: "var(--color-hueso-oscuro)",
-              borderColor: "rgba(201,168,130,0.22)",
-              opacity: 0.65,
+              borderColor: "rgba(201,168,130,0.3)",
             }}
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-playfair text-lg font-bold" style={{ color: "var(--color-gris-bordo)" }}>
-                {t}
-              </h3>
-              <span
-                className="rounded-full px-2 py-0.5 font-mono"
-                style={{
-                  fontSize: 8,
-                  letterSpacing: "0.08em",
-                  backgroundColor: "rgba(201,168,130,0.18)",
-                  color: "var(--color-dorado)",
-                }}
+              <h2
+                className="font-playfair text-lg font-bold"
+                style={{ color: "var(--color-negro-bordo)" }}
               >
-                PRÓXIMAMENTE
+                {card.title}
+              </h2>
+              <span
+                aria-hidden="true"
+                className="transition-transform group-hover:translate-x-1"
+                style={{ color: "var(--color-bordo)" }}
+              >
+                →
               </span>
             </div>
-            <p className="mt-2 font-sans text-xs" style={{ color: "rgba(74,48,64,0.6)" }}>
-              Disponible más adelante.
+            <p className="mt-2 font-sans text-xs leading-relaxed" style={{ color: "var(--color-gris-bordo)" }}>
+              {card.desc}
             </p>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
   )
 }
+
+const EDITABLES = [
+  { title: "Home", href: "/admin/edit/home", desc: "Hero, stats, método, bio y llamada final." },
+  { title: "Servicios", href: "/admin/edit/servicios", desc: "Encabezado y los tres servicios con sus sub-servicios." },
+  { title: "Mis valores", href: "/admin/edit/mis-valores", desc: "Hero, historia, pilares y cierre." },
+  { title: "Casos de éxito", href: "/admin/edit/casos-de-exito", desc: "Encabezado y estadísticas." },
+  { title: "Contacto", href: "/admin/edit/contacto", desc: "Hero, datos de contacto y preguntas frecuentes." },
+  { title: "Menú y footer", href: "/admin/edit/global", desc: "Textos que aparecen en todas las páginas." },
+  { title: "SEO", href: "/admin/edit/seo", desc: "Títulos y descripciones para Google de cada página." },
+]

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
-import { fallbacksFor, fallbackOf } from "@/lib/home-schema"
+import { fallbacksFor } from "@/lib/home-schema"
 
 const WA_HREF = "https://wa.me/542615433882?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
 
@@ -32,7 +32,6 @@ const INPUT_FOCUS_STYLE = {
 
 export function CtaFinal({ content }: { content?: Record<string, string> }) {
   const c = { ...fallbacksFor("cta_final"), ...content }
-  const titleIsDefault = c.title === fallbackOf("cta_final", "title")
   const [error, setError] = useState(false)
   const [success, setSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -101,14 +100,8 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
               variants={fadeUp}
               className="font-playfair font-bold text-hueso text-[2.5rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.0]"
             >
-              {titleIsDefault ? (
-                <>
-                  <span className="block">Creo en el valor de las buenas historias</span>
-                  <em className="block italic text-dorado">y en el poder de las conexiones reales.</em>
-                </>
-              ) : (
-                c.title
-              )}
+              <span className="block">{c.title_pre}</span>
+              <em className="block italic text-dorado">{c.title_accent}</em>
             </motion.h2>
 
             <motion.p variants={fadeUp} className="font-sans text-[0.9375rem] text-hueso/65 leading-[1.7] max-w-[420px]">

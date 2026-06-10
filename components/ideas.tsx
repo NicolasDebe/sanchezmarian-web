@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react"
 import { fadeUp, fadeUpStagger, fadeLeft, viewportOnce } from "@/lib/animations"
-import { fallbacksFor, fallbackOf } from "@/lib/home-schema"
+import { fallbacksFor } from "@/lib/home-schema"
 
 export function Ideas({ content }: { content?: Record<string, string> }) {
   const c = { ...fallbacksFor("metodo"), ...content }
@@ -11,9 +11,6 @@ export function Ideas({ content }: { content?: Record<string, string> }) {
     title: c[`step_${n}_title`] ?? "",
     body: c[`step_${n}_desc`] ?? "",
   }))
-
-  // Título: si no fue editado, conserva el acento editorial en italic/bordo.
-  const titleIsDefault = c.title === fallbackOf("metodo", "title")
 
   return (
     <section className="bg-hueso-oscuro py-24 lg:py-32">
@@ -38,14 +35,8 @@ export function Ideas({ content }: { content?: Record<string, string> }) {
             variants={fadeUp}
             className="font-playfair font-bold text-negro-bordo text-[2.25rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.1] max-w-[640px]"
           >
-            {titleIsDefault ? (
-              <>
-                Saber qué decir,{" "}
-                <em className="italic text-bordo-claro">a quién y cuándo.</em>
-              </>
-            ) : (
-              c.title
-            )}
+            {c.title_pre}{" "}
+            <em className="italic text-bordo-claro">{c.title_accent}</em>
           </motion.h2>
         </motion.div>
 

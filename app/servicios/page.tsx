@@ -2,25 +2,28 @@ import type { Metadata } from "next"
 import { Nav } from "@/components/nav"
 import { Footer } from "@/components/footer"
 import { ServiciosPageSections } from "@/components/servicios-page-sections"
+import { getPageContent } from "@/lib/content"
+import { SERVICIOS_SECTIONS } from "@/lib/servicios-schema"
+import { getGlobalContent } from "@/lib/global-content"
+import { buildMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  title: "Servicios — Marian Sánchez",
-  description:
-    "Prensa y Comunicación, Comunicación Estratégica y Relaciones Públicas. Descubrí cómo puedo ayudarte a posicionarte en los medios.",
-  openGraph: {
-    title: "Servicios — Marian Sánchez",
-    description:
-      "Prensa y Comunicación, Comunicación Estratégica y Relaciones Públicas.",
-    url: "https://sanchezmarian.com/servicios",
-  },
+export const revalidate = 60
+
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("servicios", "https://sanchezmarian.com/servicios")
 }
 
-export default function ServiciosPage() {
+export default async function ServiciosPage() {
+  const [global, content] = await Promise.all([
+    getGlobalContent(),
+    getPageContent("servicios", SERVICIOS_SECTIONS),
+  ])
+
   return (
     <main>
-      <Nav />
-      <ServiciosPageSections />
-      <Footer />
+      <Nav content={global.nav} />
+      <ServiciosPageSections content={content} />
+      <Footer content={global.footer} nav={global.nav} />
     </main>
   )
 }

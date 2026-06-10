@@ -7,15 +7,16 @@ import { usePathname } from "next/navigation"
 import { AnimatePresence, motion } from "motion/react"
 import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { globalFallbacksFor } from "@/lib/global-schema"
 
-const navLinks = [
-  { label: "Servicios", href: "/servicios" },
-  { label: "Mis valores", href: "/mis-valores" },
-  { label: "Casos de éxito", href: "/casos-de-exito" },
-  { label: "Campañas", href: "/campanas" },
-]
-
-export function Nav() {
+export function Nav({ content }: { content?: Record<string, string> }) {
+  const c = { ...globalFallbacksFor("nav"), ...content }
+  const navLinks = [
+    { label: c.link_servicios, href: "/servicios" },
+    { label: c.link_valores, href: "/mis-valores" },
+    { label: c.link_casos, href: "/casos-de-exito" },
+    { label: c.link_campanas, href: "/campanas" },
+  ]
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
 

@@ -10,15 +10,23 @@ import { CtaFinal } from "@/components/cta-final"
 import { Footer } from "@/components/footer"
 import { getContentBatch } from "@/lib/content"
 import { fallbacksFor } from "@/lib/home-schema"
+import { getGlobalContent } from "@/lib/global-content"
+import { buildMetadata } from "@/lib/seo"
+import type { Metadata } from "next"
 
 // Revalidación incremental: combinada con revalidatePath('/') en el save action,
 // los cambios del admin se reflejan en el sitio en ~1 minuto.
 export const revalidate = 60
 
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata("home", "https://sanchezmarian.com")
+}
+
 export default async function Home() {
   // Lectura resiliente: getContentBatch nunca tira excepción y ya trae fallbacks,
   // así que el build de Vercel jamás rompe por una falla de Supabase.
-  const [hero, stats, metodo, bio, ctaFinal] = await Promise.all([
+  const [global, hero, stats, metodo, bio, ctaFinal] = await Promise.all([
+    getGlobalContent(),
     getContentBatch("home", "hero", fallbacksFor("hero")),
     getContentBatch("home", "stats", fallbacksFor("stats")),
     getContentBatch("home", "metodo", fallbacksFor("metodo")),
@@ -28,7 +36,7 @@ export default async function Home() {
 
   return (
     <main>
-      <Nav />
+      <Nav content={global.nav} />
       <Hero content={hero} />
       <Stats content={stats} />
       <Ideas content={metodo} />
@@ -37,7 +45,7 @@ export default async function Home() {
       <Bio content={bio} />
       <EnMedias />
       <CtaFinal content={ctaFinal} />
-      <Footer />
+      <Footer content={global.footer} nav={global.nav} />
     </main>
   )
 }

@@ -6,12 +6,11 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { TextureCardStyled } from "@/components/ui/texture-card"
 import { fadeRight, fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
-import { fallbacksFor, fallbackOf } from "@/lib/home-schema"
+import { fallbacksFor } from "@/lib/home-schema"
 
 export function Bio({ content }: { content?: Record<string, string> }) {
   const c = { ...fallbacksFor("bio"), ...content }
   const TAGS = [c.tag_1, c.tag_2, c.tag_3, c.tag_4].filter(Boolean)
-  const titleIsDefault = c.title === fallbackOf("bio", "title")
 
   return (
     <section id="bio" className="bg-hueso-oscuro py-[120px] lg:py-[160px]">
@@ -97,14 +96,8 @@ export function Bio({ content }: { content?: Record<string, string> }) {
               variants={fadeUp}
               className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.5rem] lg:text-[2.75rem] leading-[1.15]"
             >
-              {titleIsDefault ? (
-                <>
-                  <span className="block">Mariana Sánchez,</span>
-                  <em className="block italic text-bordo">comunicación con propósito.</em>
-                </>
-              ) : (
-                c.title
-              )}
+              <span className="block">{c.title_pre}</span>
+              <em className="block italic text-bordo">{c.title_accent}</em>
             </motion.h2>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo text-base leading-[1.8] max-w-[480px]">

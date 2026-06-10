@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { saveContentSection } from "@/app/admin/actions"
-import type { FieldType } from "@/lib/home-schema"
+import type { FieldType } from "@/lib/content-schema"
 
 const MAX = { text: 250, longtext: 2000, number: 20 } as const
 
@@ -15,12 +15,24 @@ export interface EditorField {
 export interface EditorSection {
   section: string
   title: string
+  legend?: string
   fields: EditorField[]
 }
 
 type Status = "idle" | "loading" | "success" | "error"
 
-export function HomeEditor({ sections }: { sections: EditorSection[] }) {
+/**
+ * Editor genérico de contenido por secciones (acordeón). Reutilizado por todas
+ * las rutas /admin/edit/*. Recibe la `page` (slug en content_blocks) y la lista
+ * de secciones ya resuelta con los valores actuales.
+ */
+export function ContentEditor({
+  page,
+  sections,
+}: {
+  page: string
+  sections: EditorSection[]
+}) {
   const [open, setOpen] = useState<string>(sections[0]?.section ?? "")
   const [values, setValues] = useState<Record<string, Record<string, string>>>(
     () =>
@@ -46,7 +58,6 @@ export function HomeEditor({ sections }: { sections: EditorSection[] }) {
   }
 
   async function handleSave(sec: EditorSection) {
-    // Validación de longitud
     for (const f of sec.fields) {
       const v = values[sec.section][f.field] ?? ""
       if (v.length > maxFor(f.type)) {
@@ -59,7 +70,6 @@ export function HomeEditor({ sections }: { sections: EditorSection[] }) {
       }
     }
 
-    // Confirmar si hay campos vacíos
     const empties = sec.fields.filter(
       (f) => (values[sec.section][f.field] ?? "").trim() === "",
     )
@@ -78,7 +88,7 @@ export function HomeEditor({ sections }: { sections: EditorSection[] }) {
       payload[f.field] = { value: values[sec.section][f.field] ?? "", type: f.type }
     }
 
-    const result = await saveContentSection("home", sec.section, payload)
+    const result = await saveContentSection(page, sec.section, payload)
 
     if ("success" in result) {
       setStatus((s) => ({ ...s, [sec.section]: "success" }))
@@ -106,7 +116,6 @@ export function HomeEditor({ sections }: { sections: EditorSection[] }) {
             className="border-b"
             style={{ borderColor: "rgba(201,168,130,0.2)" }}
           >
-            {/* Header del acordeón */}
             <button
               type="button"
               onClick={() => setOpen(isOpen ? "" : sec.section)}
@@ -130,9 +139,22 @@ export function HomeEditor({ sections }: { sections: EditorSection[] }) {
               </span>
             </button>
 
-            {/* Cuerpo */}
             {isOpen && (
               <div className="pb-8">
+                {sec.legend && (
+                  <p
+                    className="mb-5 rounded-lg px-4 py-3 font-sans"
+                    style={{
+                      fontSize: 13,
+                      lineHeight: 1.5,
+                      color: "var(--color-gris-bordo)",
+                      backgroundColor: "rgba(201,168,130,0.12)",
+                      border: "1px solid rgba(201,168,130,0.25)",
+                    }}
+                  >
+                    {sec.legend}
+                  </p>
+                )}
                 <div className="grid grid-cols-1 gap-5">
                   {sec.fields.map((f) => {
                     const v = values[sec.section][f.field] ?? ""
@@ -178,7 +200,6 @@ export function HomeEditor({ sections }: { sections: EditorSection[] }) {
                   })}
                 </div>
 
-                {/* Mensaje + botón */}
                 {messages[sec.section] && (
                   <p
                     className="mt-4 font-sans text-sm"

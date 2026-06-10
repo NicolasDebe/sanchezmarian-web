@@ -1,11 +1,5 @@
 import Link from "next/link"
-
-const NAV_LINKS = [
-  { label: "Servicios", href: "/servicios" },
-  { label: "Mis valores", href: "/mis-valores" },
-  { label: "Casos de éxito", href: "/casos-de-exito" },
-  { label: "Campañas", href: "/campanas" },
-]
+import { globalFallbacksFor } from "@/lib/global-schema"
 
 function IconLinkedin() {
   return (
@@ -27,13 +21,27 @@ function IconInstagram() {
   )
 }
 
-// TODO: Marian debe confirmar URLs reales de Instagram y LinkedIn
-const SOCIAL = [
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/marians%C3%A1nchez/", Icon: IconLinkedin },
-  { label: "Instagram", href: "https://www.instagram.com/marian15s/", Icon: IconInstagram },
-]
+export function Footer({
+  content,
+  nav,
+}: {
+  content?: Record<string, string>
+  nav?: Record<string, string>
+}) {
+  const c = { ...globalFallbacksFor("footer"), ...content }
+  const n = { ...globalFallbacksFor("nav"), ...nav }
 
-export function Footer() {
+  const NAV_LINKS = [
+    { label: n.link_servicios, href: "/servicios" },
+    { label: n.link_valores, href: "/mis-valores" },
+    { label: n.link_casos, href: "/casos-de-exito" },
+    { label: n.link_campanas, href: "/campanas" },
+  ]
+  const SOCIAL = [
+    { label: "LinkedIn", href: c.linkedin_url, Icon: IconLinkedin },
+    { label: "Instagram", href: c.instagram_url, Icon: IconInstagram },
+  ]
+
   return (
     <footer
       className="pt-14 pb-8"
@@ -57,13 +65,13 @@ export function Footer() {
               </span>
             </Link>
             <p className="font-sans text-xs text-hueso/30 leading-relaxed max-w-[200px]">
-              Comunicación con propósito · Mendoza, Argentina.
+              {c.tagline}
             </p>
             <a
-              href="mailto:contacto@sanchezmarian.com"
+              href={`mailto:${c.email}`}
               className="font-mono text-[10px] text-hueso/35 hover:text-hueso/70 transition-colors tracking-wide"
             >
-              contacto@sanchezmarian.com
+              {c.email}
             </a>
           </div>
 
@@ -103,7 +111,7 @@ export function Footer() {
               href="/#contacto"
               className="inline-flex items-center gap-2 bg-hueso/6 border border-hueso/12 text-hueso/50 px-5 py-2.5 rounded-full font-sans text-xs font-medium hover:bg-hueso hover:text-bordo hover:border-hueso transition-all"
             >
-              Conversemos
+              {c.cta_text}
             </Link>
           </div>
 
@@ -112,7 +120,7 @@ export function Footer() {
         {/* Bottom row */}
         <div className="pt-7 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="font-mono text-[10px] text-hueso/20 tracking-wide flex items-center gap-2 flex-wrap">
-            © {new Date().getFullYear()} Mariana Sánchez
+            © {new Date().getFullYear()} {c.copyright_name}
             <span className="text-hueso/10">·</span>
             <Link href="/privacidad" className="hover:text-hueso/40 transition-colors">
               Privacidad
@@ -123,7 +131,7 @@ export function Footer() {
             </Link>
           </p>
           <p className="font-mono text-[10px] text-hueso/15 tracking-wide">
-            Diseñado con intención.
+            {c.signature}
           </p>
         </div>
 

@@ -4,9 +4,10 @@ import { motion } from "motion/react"
 import { Mail, MapPin, MessageCircle } from "lucide-react"
 import { ContactForm } from "@/components/contact-form"
 import {
-  fadeUp, fadeLeft, fadeRight, revealCard,
+  fadeUp, fadeLeft, revealCard,
   fadeUpStagger, viewportOnce,
 } from "@/lib/animations"
+import { fallbacksFor } from "@/lib/contacto-schema"
 
 const containerVariants = {
   hidden: {},
@@ -18,7 +19,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const } },
 }
 
-function ContactoHero() {
+function ContactoHero({ c }: { c: Record<string, string> }) {
   return (
     <section
       className="flex flex-col sm:flex-row items-center flex-wrap mx-auto"
@@ -71,7 +72,7 @@ function ContactoHero() {
             marginBottom: "16px",
           }}
         >
-          Contacto
+          {c.eyebrow}
         </motion.p>
 
         <motion.h1
@@ -84,10 +85,10 @@ function ContactoHero() {
           }}
         >
           <span style={{ display: "block", fontSize: "clamp(1.3rem, 2.5vw, 2rem)", fontWeight: 600, opacity: 0.82 }}>
-            Hagamos que las cosas pasen.
+            {c.h1_pre}
           </span>
           <em style={{ display: "block", fontSize: "clamp(1.9rem, 4vw, 3.2rem)", fontStyle: "italic", color: "#66001F", lineHeight: 1.0 }}>
-            Conversemos.
+            {c.h1_accent}
           </em>
         </motion.h1>
       </motion.div>
@@ -95,35 +96,29 @@ function ContactoHero() {
   )
 }
 
-const FAQ = [
-  {
-    q: "¿Cómo empezamos a trabajar juntos?",
-    a: "Agendamos una charla para conocernos, entender tu proyecto y ver cómo puedo ayudarte a comunicarlo.",
-  },
-  {
-    q: "¿Con qué tipo de clientes trabajás?",
-    a: "Trabajo con marcas, empresas, profesionales independientes y emprendedores de todo tamaño. Lo que importa es tener una historia para contar.",
-  },
-  {
-    q: "¿En cuánto tiempo ven resultados?",
-    a: "Depende del servicio. En prensa, las primeras apariciones pueden darse en semanas. Construir presencia a largo plazo lleva más tiempo, pero se nota.",
-  },
-  {
-    q: "¿Trabajás solo con clientes de Mendoza?",
-    a: "No. Tengo clientes en Buenos Aires, Córdoba y otras provincias. Mi trabajo no tiene fronteras geográficas.",
-  },
-]
+export function ContactoContent({
+  content,
+}: {
+  content?: {
+    hero?: Record<string, string>
+    info?: Record<string, string>
+    faq?: Record<string, string>
+  }
+}) {
+  const hero = { ...fallbacksFor("hero"), ...content?.hero }
+  const info = { ...fallbacksFor("info"), ...content?.info }
+  const faq = { ...fallbacksFor("faq"), ...content?.faq }
 
-const INFO_ITEMS = [
-  { icon: Mail, label: "Email", value: "contacto@sanchezmarian.com", href: "mailto:contacto@sanchezmarian.com" },
-  { icon: MapPin, label: "Ubicación", value: "Mendoza, Argentina", href: null },
-  { icon: MessageCircle, label: "Disponibilidad", value: "Agendar sesión", href: null },
-]
+  const INFO_ITEMS = [
+    { icon: Mail, label: "Email", value: info.email, href: `mailto:${info.email}` },
+    { icon: MapPin, label: "Ubicación", value: info.location, href: null as string | null },
+    { icon: MessageCircle, label: "Disponibilidad", value: info.availability, href: null as string | null },
+  ]
+  const FAQ = [1, 2, 3, 4].map((n) => ({ q: faq[`q${n}`] ?? "", a: faq[`a${n}`] ?? "" }))
 
-export function ContactoContent() {
   return (
     <>
-      <ContactoHero />
+      <ContactoHero c={hero} />
 
       {/* ── Contacto principal ── */}
       <section className="bg-white py-20 lg:py-28">
@@ -145,11 +140,11 @@ export function ContactoContent() {
               className="flex flex-col gap-3"
             >
               <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.22em] text-terracota">
-                Datos de contacto
+                {info.eyebrow}
               </motion.p>
               <motion.h2 variants={fadeUp} className="font-playfair font-bold text-marino text-[2rem] leading-[1.1]">
-                Estoy disponible para<br />
-                <em className="italic text-terracota">nuevos proyectos.</em>
+                {info.title_pre}<br />
+                <em className="italic text-terracota">{info.title_accent}</em>
               </motion.h2>
             </motion.div>
 
@@ -193,8 +188,8 @@ export function ContactoContent() {
               </p>
               <div className="flex gap-3">
                 {[
-                  { label: "LinkedIn", href: "https://www.linkedin.com/in/marians%C3%A1nchez/" },
-                  { label: "Instagram", href: "https://www.instagram.com/marian15s/" },
+                  { label: "LinkedIn", href: info.linkedin_url },
+                  { label: "Instagram", href: info.instagram_url },
                 ].map(({ label, href }) => (
                   <a
                     key={label}
@@ -219,10 +214,10 @@ export function ContactoContent() {
             className="bg-arena rounded-2xl p-8 lg:p-10"
           >
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-terracota mb-2">
-              Formulario de contacto
+              {info.form_eyebrow}
             </p>
             <p className="font-playfair font-bold text-marino text-xl mb-8">
-              Contame en qué puedo ayudarte.
+              {info.form_title}
             </p>
             <ContactForm />
           </motion.div>
@@ -246,11 +241,11 @@ export function ContactoContent() {
             className="mb-12"
           >
             <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.22em] text-terracota mb-5">
-              Preguntas frecuentes
+              {faq.eyebrow}
             </motion.p>
             <motion.h2 variants={fadeUp} className="font-playfair font-bold text-white text-[2rem] sm:text-[2.5rem] leading-[1.1]">
-              Antes de escribirme,<br />
-              <em className="italic text-terracota">quizás acá está la respuesta.</em>
+              {faq.title_pre}<br />
+              <em className="italic text-terracota">{faq.title_accent}</em>
             </motion.h2>
           </motion.div>
 
