@@ -89,6 +89,8 @@ sitio desde el navegador. Stack: Next.js 16 + Supabase (auth + Postgres).
 - Dashboard en `/admin/dashboard` con una tarjeta por página editable.
 - Editores disponibles: `/admin/edit/home`, `/servicios`, `/mis-valores`,
   `/casos-de-exito`, `/contacto`, `/global` (menú + footer) y `/seo` (metadata).
+- Clippings de casos de éxito: `/admin/clippings` (alta/edición/baja por
+  cliente, con auto-completar desde la URL de la nota).
 - Cada editor es un acordeón por sección; cada sección se guarda por separado.
   Los cambios se ven en el sitio público en ~1 minuto.
 
@@ -119,12 +121,32 @@ una sección por página).
   `saveContentSection` (escribe con service_role, hace backup de versiones).
 - Seed inicial: `npx tsx scripts/seed-content.ts` (idempotente, ~43 filas).
 
+### Clippings de /casos-de-exito (sistema completo, 2026-06-10)
+- Tablas Supabase: `clients` (slug único, name, logo_url, order_position,
+  is_active) y `clippings` (client_id FK con cascade, medium, title,
+  published_at DATE, scope local/nacional/regional/internacional, format
+  Digital/Gráfico/TV/Radio/Streaming — define el color del borde de la card —,
+  url, order_position). SQL en `supabase/migrations/20260610_clients_clippings.sql`
+  (idempotente, se pega en el SQL Editor del dashboard).
+- Seed: `npx tsx scripts/seed-clippings.ts` (idempotente: clients por slug,
+  clippings por client+url; 11 clientes, 90 clippings con fecha placeholder
+  año-mes-01 — Mariana corrige las fechas reales desde el admin).
+- Lectura pública: `getClientsWithClippings()` en `lib/clippings.ts` (anon key,
+  orden published_at DESC). Si Supabase falla o las tablas no existen, cae al
+  fallback hardcoded de `data/clippings.ts` y la página se ve idéntica.
+- Admin: `/admin/clippings` (grid de clientes con contador) →
+  `/admin/clippings/{slug}` (tabla + modal alta/edición + eliminar con confirm).
+  El modal tiene "Auto-completar desde URL": pega el link de la nota y un server
+  action (cheerio, timeout 5s) llena medio/título/fecha desde Open Graph y
+  JSON-LD. Server actions en `app/admin/(panel)/clippings/actions.ts`.
+- El carrusel "Coberturas destacadas" (12 cards rotativas) sigue siendo una
+  curaduría fija por ids de `data/clippings.ts` (decisión: es contenido curado,
+  no un listado). Lo mismo el grid del home.
+
 ### Pendiente (próxima iteración)
-- `/casos-de-exito`: el listado de clientes y sus coberturas (timeline/zigzag)
-  sigue hardcodeado en `data/clippings.ts` y `TIMELINE_CLIENTES` dentro de
-  `casos-client.tsx`. Para hacerlos editables se necesitan tablas `clients` y
-  `coverages` en Supabase (no se hizo en esta iteración). El hero y las stats
-  SÍ son editables desde `/admin/edit/casos-de-exito`.
+- Correr la migración SQL de clippings en el dashboard + seed (paso manual,
+  ver arriba). Hasta entonces el admin de clippings muestra el aviso de setup
+  y la página pública usa el fallback.
 - Páginas secundarias (`/campanas`, `/privacidad`, `/terminos`, `/sobre-marian`)
   usan Nav/Footer con sus textos de fallback (no leen `global` aún). Se ven
   idénticas; si se editan los textos globales, esas páginas no los reflejan.

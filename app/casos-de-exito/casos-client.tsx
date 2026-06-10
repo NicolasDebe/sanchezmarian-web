@@ -4,8 +4,15 @@ import React, { useState, useMemo, useRef, useEffect } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
-import { ArrowRight, ChevronDown, ExternalLink } from "lucide-react"
-import { CLIPPINGS, type Clipping } from "@/data/clippings"
+import { ArrowRight, ChevronDown } from "lucide-react"
+import { CLIPPINGS } from "@/data/clippings"
+import {
+  SCOPE_LABELS,
+  clippingYear,
+  type ClientWithClippings,
+  type DbClient,
+  type DbClipping,
+} from "@/lib/clippings"
 import { fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { DestacadasRotativo } from "@/components/destacadas-rotativo"
@@ -34,139 +41,6 @@ const FORMAT_BADGE: Record<string, { bg: string; color: string; label: string }>
   Streaming: { bg: "var(--color-bordo-claro)", color: "var(--color-negro-bordo)", label: "Stream" },
 }
 
-const MESES: Record<number, string> = {
-  1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril",
-  5: "Mayo", 6: "Junio", 7: "Julio", 8: "Agosto",
-  9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre",
-}
-
-// ─── Grouped month timeline (for clients with mes data) ───────────────────────
-
-function GroupedMonthTimeline({ apariciones }: { apariciones: Clipping[] }) {
-  const grouped = useMemo(() => {
-    const map = new Map<number, Clipping[]>()
-    for (const ap of apariciones) {
-      const m = ap.mes ?? 0
-      if (!map.has(m)) map.set(m, [])
-      map.get(m)!.push(ap)
-    }
-    return Array.from(map.entries()).sort(([a], [b]) => a - b)
-  }, [apariciones])
-
-  return (
-    <div style={{ paddingBottom: 24 }}>
-      {grouped.map(([mes, items], gi) => (
-        <div key={mes} style={{ marginBottom: gi < grouped.length - 1 ? 28 : 0 }}>
-          {/* Month header */}
-          <div
-            className="flex items-center gap-3 mb-4"
-          >
-            <span
-              className="font-mono uppercase"
-              style={{ fontSize: 10, letterSpacing: "0.18em", color: "var(--color-bordo)" }}
-            >
-              {mes > 0 ? `${MESES[mes]} 2026` : "—"}
-            </span>
-            <div style={{ flex: 1, height: 1, background: "rgba(201,168,130,0.25)" }} />
-          </div>
-
-          {/* Clipping rows */}
-          <div className="flex flex-col gap-2">
-            {items.map((ap, i) => {
-              const badge = FORMAT_BADGE[ap.formato] ?? FORMAT_BADGE.Digital
-              const row = (
-                <div
-                  className="flex items-center gap-3"
-                  style={{
-                    background: "var(--color-hueso)",
-                    borderRadius: 8,
-                    padding: "10px 14px",
-                    borderLeft: `2px solid ${FORMAT_BORDER[ap.formato] ?? FORMAT_BORDER.Digital}`,
-                  }}
-                >
-                  <span
-                    className="font-mono shrink-0"
-                    style={{
-                      fontSize: 9,
-                      padding: "3px 8px",
-                      borderRadius: 20,
-                      background: badge.bg,
-                      color: badge.color,
-                      letterSpacing: "0.06em",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {badge.label}
-                  </span>
-                  <span
-                    className="font-sans flex-1"
-                    style={{ fontSize: 13, color: "var(--color-negro-bordo)", lineHeight: 1.4 }}
-                  >
-                    {ap.medio}
-                  </span>
-                  {ap.link && (
-                    <ExternalLink
-                      size={13}
-                      style={{ color: "var(--color-gris-bordo)", opacity: 0.5, flexShrink: 0 }}
-                    />
-                  )}
-                </div>
-              )
-
-              return (
-                <motion.div
-                  key={ap.id}
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.15 + gi * 0.08 + i * 0.05, duration: 0.3, ease: EASE }}
-                >
-                  {ap.link ? (
-                    <a
-                      href={ap.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block transition-opacity hover:opacity-75"
-                      style={{ textDecoration: "none" }}
-                    >
-                      {row}
-                    </a>
-                  ) : (
-                    row
-                  )}
-                </motion.div>
-              )
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ─── Timeline config ──────────────────────────────────────────────────────────
-
-type TimelineCliente = {
-  id: string
-  label: string
-  key: string
-  logo: string | null
-  inicial: string
-}
-
-const TIMELINE_CLIENTES: TimelineCliente[] = [
-  { id: "bolsa-comercio",    label: "Bolsa de Comercio",         key: "Bolsa de Comercio de Mendoza",  logo: "/images/logos/logo-bolsa-comercio.png",    inicial: "B" },
-  { id: "colegio-notarial",  label: "Colegio Notarial",          key: "Colegio Notarial de Mendoza",   logo: "/images/logos/logo-colegio-notarial.png",  inicial: "N" },
-  { id: "grupo-presidente",  label: "Grupo Presidente",          key: "Grupo Presidente",              logo: "/images/logos/logo-presidente.png",        inicial: "P" },
-  { id: "capilla-acutis",    label: "Capilla Carlo Acutis",      key: "Capilla Carlo Acutis",          logo: "/images/logos/logo-capilla-acutis.png",    inicial: "C" },
-  { id: "dra-meneo",         label: "Dra. Elina Meneo",          key: "Dra. Elina Meneo",              logo: "/images/logos/logo-meneo.png",             inicial: "M" },
-  { id: "chakaymanta",       label: "Esc. Vendimia Chakaymanta", key: "Esc. Vendimia Chakaymanta",     logo: "/images/logos/logo-chakaymanta.png",       inicial: "E" },
-  { id: "quienvino",         label: "QuienVino App",             key: "QuienVino App",                 logo: "/images/logos/logo-quienvino.png",         inicial: "Q" },
-  { id: "agrocosecha",       label: "Agrocosecha",               key: "Agrocosecha",                   logo: "/images/logos/logo-agrocosecha.png",       inicial: "A" },
-  { id: "fuerza-silenciosa", label: "Fuerza Silenciosa",         key: "Fuerza Silenciosa",             logo: "/images/logos/logo-fuerza-silenciosa.jpg", inicial: "F" },
-  { id: "mendoza-regenera",  label: "Mendoza Regenera",          key: "Mendoza Regenera",              logo: "/images/logos/logo-mendoza-regenera.png",  inicial: "M" },
-  { id: "flor-mouradian",    label: "Flor Mouradian",            key: "Flor Mouradian",                logo: "/images/logos/logo-mfmc.png",              inicial: "F" },
-]
-
 const EASE = [0.16, 1, 0.3, 1] as const
 
 // ─── Timeline layout constants ────────────────────────────────────────────────
@@ -178,8 +52,8 @@ const GAP = 24         // column gap
 
 // ─── Timeline card ────────────────────────────────────────────────────────────
 
-function TimelineCard({ ap }: { ap: Clipping }) {
-  const borderColor = FORMAT_BORDER[ap.formato] ?? FORMAT_BORDER.Digital
+function TimelineCard({ ap }: { ap: DbClipping }) {
+  const borderColor = FORMAT_BORDER[ap.format] ?? FORMAT_BORDER.Digital
 
   const inner = (
     <div
@@ -195,7 +69,7 @@ function TimelineCard({ ap }: { ap: Clipping }) {
           className="font-mono uppercase"
           style={{ fontSize: 10, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
         >
-          {ap.medio}
+          {ap.medium}
         </span>
         <span
           className="font-mono shrink-0"
@@ -208,7 +82,7 @@ function TimelineCard({ ap }: { ap: Clipping }) {
             whiteSpace: "nowrap",
           }}
         >
-          {ap.alcance}
+          {SCOPE_LABELS[ap.scope] ?? ap.scope}
         </span>
       </div>
 
@@ -224,21 +98,21 @@ function TimelineCard({ ap }: { ap: Clipping }) {
           WebkitBoxOrient: "vertical",
         } as React.CSSProperties}
       >
-        {ap.titular}
+        {ap.title}
       </p>
 
       <span
         className="font-mono"
         style={{ display: "block", marginTop: 6, fontSize: 10, color: "var(--color-gris-bordo)", opacity: 0.5 }}
       >
-        {ap.año}
+        {clippingYear(ap.published_at)}
       </span>
     </div>
   )
 
-  return ap.link ? (
+  return ap.url ? (
     <a
-      href={ap.link}
+      href={ap.url}
       target="_blank"
       rel="noopener noreferrer"
       className="block transition-all hover:opacity-80"
@@ -257,7 +131,7 @@ function ZigzagTimeline({
   apariciones,
   clientId,
 }: {
-  apariciones: Clipping[]
+  apariciones: DbClipping[]
   clientId: string
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -274,13 +148,8 @@ function ZigzagTimeline({
     return () => ro.disconnect()
   }, [])
 
-  const sorted = useMemo(
-    () =>
-      [...apariciones].sort((a, b) =>
-        b.año !== a.año ? b.año - a.año : b.id - a.id
-      ),
-    [apariciones]
-  )
+  // Ya vienen ordenadas por published_at DESC desde el servidor.
+  const sorted = apariciones
 
   const isMobile = containerW > 0 && containerW < 640
   const rows = Math.ceil(sorted.length / COLS)
@@ -421,7 +290,7 @@ function ZigzagTimeline({
 
           // L→R rows: items left-aligned, empty slots at end
           // R→L rows: items right-aligned, empty slots at start, items reversed
-          const displayItems: (Clipping | null)[] = ltr
+          const displayItems: (DbClipping | null)[] = ltr
             ? [...rowItems, ...Array<null>(emptyCount).fill(null)]
             : [
                 ...Array<null>(emptyCount).fill(null),
@@ -470,13 +339,13 @@ function ZigzagTimeline({
 // ─── Timeline client block ────────────────────────────────────────────────────
 
 function TimelineClientBlock({
-  config,
+  client,
   apariciones,
   isOpen,
   onToggle,
 }: {
-  config: TimelineCliente
-  apariciones: Clipping[]
+  client: DbClient
+  apariciones: DbClipping[]
   isOpen: boolean
   onToggle: () => void
 }) {
@@ -484,7 +353,7 @@ function TimelineClientBlock({
 
   return (
     <div
-      id={`cliente-${config.id}`}
+      id={`cliente-${client.slug}`}
       style={{ scrollMarginTop: 100 }}
     >
       {/* Header button */}
@@ -504,7 +373,7 @@ function TimelineClientBlock({
       >
         <div className="flex items-center gap-4">
           {/* Logo */}
-          {config.logo ? (
+          {client.logo_url ? (
             <div
               className="shrink-0 flex items-center justify-center"
               style={{
@@ -515,15 +384,14 @@ function TimelineClientBlock({
               }}
             >
               <Image
-                src={config.logo}
-                alt={`Logo ${config.label}`}
+                src={client.logo_url}
+                alt={`Logo ${client.name}`}
                 width={72}
                 height={48}
                 style={{ objectFit: "contain" }}
               />
             </div>
           ) : (
-            // TODO: reemplazar por logo real
             <div
               className="shrink-0 flex items-center justify-center rounded-full font-mono font-bold"
               style={{
@@ -534,7 +402,7 @@ function TimelineClientBlock({
                 fontSize: 24,
               }}
             >
-              {config.inicial}
+              {client.name.charAt(0).toUpperCase()}
             </div>
           )}
 
@@ -542,7 +410,7 @@ function TimelineClientBlock({
             className="font-sans flex-1"
             style={{ fontWeight: 600, fontSize: 16, color: "var(--color-negro-bordo)" }}
           >
-            {config.label}
+            {client.name}
           </span>
 
           <div
@@ -582,7 +450,7 @@ function TimelineClientBlock({
               {apariciones.length > 0 && (
                 <ZigzagTimeline
                   apariciones={apariciones}
-                  clientId={config.id}
+                  clientId={client.slug}
                 />
               )}
               {apariciones.length === 0 && (
@@ -590,7 +458,7 @@ function TimelineClientBlock({
                   className="font-mono"
                   style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.5, paddingBottom: 24 }}
                 >
-                  Próximamente
+                  Próximamente — sin clippings cargados todavía
                 </p>
               )}
             </div>
@@ -672,8 +540,10 @@ function ToggleAllButton({
 
 export function CasosClient({
   content,
+  clientsData,
 }: {
   content?: { hero?: Record<string, string>; stats?: Record<string, string> }
+  clientsData: ClientWithClippings[]
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
   const statsContent = { ...fallbacksFor("stats"), ...content?.stats }
@@ -682,23 +552,23 @@ export function CasosClient({
     label: statsContent[`stat_${n}_label`] ?? "",
   }))
   const [openClients, setOpenClients] = useState<Set<string>>(new Set())
-  const allExpanded = openClients.size === TIMELINE_CLIENTES.length
+  const allExpanded = openClients.size === clientsData.length
 
-  const handleIndexClick = (id: string) => {
+  const handleIndexClick = (slug: string) => {
     setOpenClients((prev) => {
-      if (prev.has(id)) return prev
-      return new Set([id])
+      if (prev.has(slug)) return prev
+      return new Set([slug])
     })
     setTimeout(() => {
-      document.getElementById(`cliente-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
+      document.getElementById(`cliente-${slug}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
     }, 40)
   }
 
-  const handleHeaderToggle = (id: string) => {
+  const handleHeaderToggle = (slug: string) => {
     setOpenClients((prev) => {
       const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
+      if (next.has(slug)) next.delete(slug)
+      else next.add(slug)
       return next
     })
   }
@@ -707,21 +577,13 @@ export function CasosClient({
     if (allExpanded) {
       setOpenClients(new Set())
     } else {
-      setOpenClients(new Set(TIMELINE_CLIENTES.map((c) => c.id)))
+      setOpenClients(new Set(clientsData.map(({ client }) => client.slug)))
     }
   }
 
+  // Las destacadas del carrusel son una curaduría fija (ids de data/clippings.ts).
   const rotativo = useMemo(
     () => ROTATIVO_IDS.map((id) => CLIPPINGS.find((c) => c.id === id)!),
-    []
-  )
-
-  const timelineData = useMemo(
-    () =>
-      TIMELINE_CLIENTES.map((config) => ({
-        config,
-        apariciones: CLIPPINGS.filter((c) => c.cliente === config.key),
-      })),
     []
   )
 
@@ -890,11 +752,11 @@ export function CasosClient({
             viewport={viewportOnce}
             className="flex flex-wrap gap-2 mb-14"
           >
-            {TIMELINE_CLIENTES.map((c) => (
-              <motion.div key={c.id} variants={fadeUp}>
+            {clientsData.map(({ client }) => (
+              <motion.div key={client.slug} variants={fadeUp}>
                 <IndexButton
-                  label={c.label}
-                  onClick={() => handleIndexClick(c.id)}
+                  label={client.name}
+                  onClick={() => handleIndexClick(client.slug)}
                 />
               </motion.div>
             ))}
@@ -902,13 +764,13 @@ export function CasosClient({
 
           {/* Timeline blocks */}
           <div className="flex flex-col gap-8">
-            {timelineData.map(({ config, apariciones }) => (
+            {clientsData.map(({ client, clippings }) => (
               <TimelineClientBlock
-                key={config.id}
-                config={config}
-                apariciones={apariciones}
-                isOpen={openClients.has(config.id)}
-                onToggle={() => handleHeaderToggle(config.id)}
+                key={client.slug}
+                client={client}
+                apariciones={clippings}
+                isOpen={openClients.has(client.slug)}
+                onToggle={() => handleHeaderToggle(client.slug)}
               />
             ))}
           </div>

@@ -83,6 +83,7 @@ const EDITABLES = [
   { title: "Servicios", href: "/admin/edit/servicios", desc: "Encabezado y los tres servicios con sus sub-servicios." },
   { title: "Mis valores", href: "/admin/edit/mis-valores", desc: "Hero, historia, pilares y cierre." },
   { title: "Casos de éxito", href: "/admin/edit/casos-de-exito", desc: "Encabezado y estadísticas." },
+  { title: "Casos de éxito / Clippings", href: "/admin/clippings", desc: "Apariciones en medios por cliente: cargar, editar y eliminar." },
   { title: "Contacto", href: "/admin/edit/contacto", desc: "Hero, datos de contacto y preguntas frecuentes." },
   { title: "Menú y footer", href: "/admin/edit/global", desc: "Textos que aparecen en todas las páginas." },
   { title: "SEO", href: "/admin/edit/seo", desc: "Títulos y descripciones para Google de cada página." },

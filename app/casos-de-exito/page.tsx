@@ -5,6 +5,7 @@ import { CasosClient } from "./casos-client"
 import { getPageContent } from "@/lib/content"
 import { CASOS_SECTIONS } from "@/lib/casos-schema"
 import { getGlobalContent } from "@/lib/global-content"
+import { getClientsWithClippings } from "@/lib/clippings"
 import { buildMetadata } from "@/lib/seo"
 
 export const revalidate = 60
@@ -14,15 +15,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CasosDeExitoPage() {
-  const [global, content] = await Promise.all([
+  const [global, content, clientsData] = await Promise.all([
     getGlobalContent(),
     getPageContent("casos_de_exito", CASOS_SECTIONS),
+    getClientsWithClippings(),
   ])
 
   return (
     <main>
       <Nav content={global.nav} />
-      <CasosClient content={content} />
+      <CasosClient content={content} clientsData={clientsData} />
       <Footer content={global.footer} nav={global.nav} />
     </main>
   )
