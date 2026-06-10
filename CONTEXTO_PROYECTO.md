@@ -79,6 +79,41 @@ Problema principal: todas las páginas internas dan 404, sitio en noindex (invis
 - Demo HTML en producción (descartada — resultó genérica, hay que rehacer)
 - Informe PDF completo para presentarle a Marian
 
+## CMS Admin — edición de contenido sin tocar código
+El sitio tiene un panel de administración para editar los textos del home desde
+el navegador. Stack: Next.js 16 + Supabase (auth + Postgres).
+
+### Cómo se usa
+- Entrar a `/admin/login` e iniciar sesión (usuario en Supabase Auth;
+  hoy: nicodebe05@gmail.com).
+- Dashboard en `/admin/dashboard`, editor del home en `/admin/edit/home`.
+- El editor tiene 5 acordeones (Hero, Stats, Método, Bio, CTA Final). Cada
+  sección se guarda por separado. Los cambios se ven en el sitio en ~1 minuto.
+
+### Cómo funciona por dentro
+- Tablas Supabase: `content_blocks` (contenido actual, unique en
+  page+section+field) y `content_versions` (backup automático del valor anterior
+  en cada guardado). Las claves Supabase son legacy JWT (eyJhbGci...).
+- `lib/home-schema.ts` es la fuente ÚNICA de verdad: define secciones, campos,
+  tipos, labels y los textos de fallback (los originales del código). Lo usan el
+  sitio público, el seed y el editor.
+- `lib/content.ts` (`getContent` / `getContentBatch`): lectura pública con la
+  anon key. NUNCA tiran excepción: si Supabase falla, devuelven el fallback, así
+  el build de Vercel jamás rompe por Supabase.
+- El home (`app/page.tsx`) es estático con `revalidate = 60`; el save action hace
+  `revalidatePath('/')`.
+- Auth/escritura: `proxy.ts` (en Next 16 el middleware se llama "proxy") protege
+  `/admin/*`; `app/admin/actions.ts` tiene `signIn`, `signOut` y
+  `saveContentSection` (escribe con service_role, hace backup de versiones).
+- Seed inicial: `npx tsx scripts/seed-content.ts` (idempotente, ~43 filas).
+
+### Reglas críticas (no romper)
+1. Rutas admin SIEMPRE con `export const dynamic = 'force-dynamic'`.
+2. `getContent`/`getContentBatch` SIEMPRE con fallback; nunca tiran excepción.
+3. Usar las legacy keys (eyJhbGci...), NO el formato sb_publishable_/sb_secret_.
+4. Lecturas públicas con el cliente de `lib/supabase.ts` (anon); el server client
+   de `@supabase/ssr` es solo para el admin.
+
 ## Cómo trabajar conmigo
 - Soy estudiante de Comunicación Digital (UCA Mendoza), no desarrollador
 - Trabajo con Claude como copiloto: necesito instrucciones claras y código listo para ejecutar

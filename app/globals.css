@@ -132,3 +132,34 @@ body::after {
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
+/* ── Admin — inputs ── */
+.admin-input,
+.admin-textarea {
+  width: 100%;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 14px;
+  color: var(--color-negro-bordo);
+  background: var(--color-hueso);
+  border: 1px solid rgba(201, 168, 130, 0.4);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.admin-input::placeholder,
+.admin-textarea::placeholder {
+  color: rgba(74, 48, 64, 0.35);
+}
+
+.admin-input:focus,
+.admin-textarea:focus {
+  border-color: var(--color-bordo);
+  box-shadow: 0 0 0 3px rgba(102, 0, 31, 0.08);
+}
+

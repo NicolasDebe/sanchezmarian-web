@@ -2,36 +2,19 @@
 
 import { motion } from "motion/react"
 import { fadeUp, fadeUpStagger, fadeLeft, viewportOnce } from "@/lib/animations"
+import { fallbacksFor, fallbackOf } from "@/lib/home-schema"
 
-const PASOS = [
-  {
-    num: "01",
-    title: "Definición del relato",
-    body: "Qué historia contar y a quién.",
-  },
-  {
-    num: "02",
-    title: "Diseño y mentoreo de la estrategia",
-    body: "Plan de comunicación personalizado.",
-  },
-  {
-    num: "03",
-    title: "Gestión y relacionamiento",
-    body: "Junto a mi equipo ejecuto el plan de comunicación que diseñamos juntos.",
-  },
-  {
-    num: "04",
-    title: "Monitoreo",
-    body: "Superviso cada interacción de la campaña.",
-  },
-  {
-    num: "05",
-    title: "Análisis de impacto",
-    body: "Resultados medibles y claros para avanzar al próximo nivel.",
-  },
-]
+export function Ideas({ content }: { content?: Record<string, string> }) {
+  const c = { ...fallbacksFor("metodo"), ...content }
+  const PASOS = [1, 2, 3, 4, 5].map((n) => ({
+    num: String(n).padStart(2, "0"),
+    title: c[`step_${n}_title`] ?? "",
+    body: c[`step_${n}_desc`] ?? "",
+  }))
 
-export function Ideas() {
+  // Título: si no fue editado, conserva el acento editorial en italic/bordo.
+  const titleIsDefault = c.title === fallbackOf("metodo", "title")
+
   return (
     <section className="bg-hueso-oscuro py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -48,15 +31,21 @@ export function Ideas() {
             variants={fadeUp}
             className="font-mono text-[11px] uppercase tracking-[0.28em] text-bordo-claro/70 mb-5"
           >
-            Mi método de trabajo
+            {c.eyebrow}
           </motion.p>
 
           <motion.h2
             variants={fadeUp}
             className="font-playfair font-bold text-negro-bordo text-[2.25rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.1] max-w-[640px]"
           >
-            Saber qué decir,{" "}
-            <em className="italic text-bordo-claro">a quién y cuándo.</em>
+            {titleIsDefault ? (
+              <>
+                Saber qué decir,{" "}
+                <em className="italic text-bordo-claro">a quién y cuándo.</em>
+              </>
+            ) : (
+              c.title
+            )}
           </motion.h2>
         </motion.div>
 

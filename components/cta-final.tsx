@@ -4,6 +4,7 @@ import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
+import { fallbacksFor, fallbackOf } from "@/lib/home-schema"
 
 const WA_HREF = "https://wa.me/542615433882?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
 
@@ -29,7 +30,9 @@ const INPUT_FOCUS_STYLE = {
   borderColor: "rgba(254,252,239,0.5)",
 }
 
-export function CtaFinal() {
+export function CtaFinal({ content }: { content?: Record<string, string> }) {
+  const c = { ...fallbacksFor("cta_final"), ...content }
+  const titleIsDefault = c.title === fallbackOf("cta_final", "title")
   const [error, setError] = useState(false)
   const [success, setSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -86,7 +89,7 @@ export function CtaFinal() {
             className="flex flex-col gap-7"
           >
             <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.25em] text-hueso/60">
-              Hagamos que las cosas pasen.
+              {c.eyebrow}
             </motion.p>
 
             <motion.div
@@ -98,23 +101,28 @@ export function CtaFinal() {
               variants={fadeUp}
               className="font-playfair font-bold text-hueso text-[2.5rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.0]"
             >
-              <span className="block">Creo en el valor de las buenas historias</span>
-              <em className="block italic text-dorado">y en el poder de las conexiones reales.</em>
+              {titleIsDefault ? (
+                <>
+                  <span className="block">Creo en el valor de las buenas historias</span>
+                  <em className="block italic text-dorado">y en el poder de las conexiones reales.</em>
+                </>
+              ) : (
+                c.title
+              )}
             </motion.h2>
 
             <motion.p variants={fadeUp} className="font-sans text-[0.9375rem] text-hueso/65 leading-[1.7] max-w-[420px]">
-              Si querés comunicar mejor lo que hacés, empezamos por una charla.
-              Hablemos de la historia que tu negocio tiene para contar.
+              {c.description}
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">
               <div className="flex items-center gap-3">
                 <Mail size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
-                <span className="font-sans text-sm text-hueso/80">contacto@sanchezmarian.com</span>
+                <span className="font-sans text-sm text-hueso/80">{c.email}</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
-                <span className="font-sans text-sm text-hueso/60">Mendoza, Argentina</span>
+                <span className="font-sans text-sm text-hueso/60">{c.location}</span>
               </div>
             </motion.div>
           </motion.div>
@@ -237,7 +245,7 @@ export function CtaFinal() {
                       transition={{ type: "spring", duration: 0.25, bounce: 0 }}
                       className="flex items-center gap-2"
                     >
-                      Escribime
+                      {c.form_button}
                       <ArrowRight size={14} strokeWidth={2} />
                     </motion.span>
                   )}
@@ -253,7 +261,7 @@ export function CtaFinal() {
                   className="inline-flex items-center gap-1.5 font-sans text-xs font-medium text-hueso/50 hover:text-hueso transition-colors"
                 >
                   <IconWA />
-                  Escribime por acá
+                  {c.whatsapp_text}
                 </a>
               </div>
 

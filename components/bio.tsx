@@ -6,15 +6,13 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { TextureCardStyled } from "@/components/ui/texture-card"
 import { fadeRight, fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
+import { fallbacksFor, fallbackOf } from "@/lib/home-schema"
 
-const TAGS = [
-  "Comunicación estratégica",
-  "Prensa y medios",
-  "Relaciones Públicas",
-  "Mendoza, Argentina",
-]
+export function Bio({ content }: { content?: Record<string, string> }) {
+  const c = { ...fallbacksFor("bio"), ...content }
+  const TAGS = [c.tag_1, c.tag_2, c.tag_3, c.tag_4].filter(Boolean)
+  const titleIsDefault = c.title === fallbackOf("bio", "title")
 
-export function Bio() {
   return (
     <section id="bio" className="bg-hueso-oscuro py-[120px] lg:py-[160px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-28 items-center">
@@ -63,7 +61,7 @@ export function Bio() {
                     className="font-mono text-[11px] uppercase tracking-widest leading-none"
                     style={{ color: "#FEFCEF" }}
                   >
-                    Más de una década en comunicación
+                    {c.badge}
                   </p>
                 </motion.div>
               </div>
@@ -87,7 +85,7 @@ export function Bio() {
             className="flex flex-col gap-6"
           >
             <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.25em] text-bordo">
-              Sobre Marian
+              {c.eyebrow}
             </motion.p>
 
             <motion.div
@@ -99,32 +97,20 @@ export function Bio() {
               variants={fadeUp}
               className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.5rem] lg:text-[2.75rem] leading-[1.15]"
             >
-              <span className="block">Mariana Sánchez,</span>
-              <em className="block italic text-bordo">comunicación con propósito.</em>
+              {titleIsDefault ? (
+                <>
+                  <span className="block">Mariana Sánchez,</span>
+                  <em className="block italic text-bordo">comunicación con propósito.</em>
+                </>
+              ) : (
+                c.title
+              )}
             </motion.h2>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo text-base leading-[1.8] max-w-[480px]">
-              <p>
-                Mentoreo a personas y empresas para transformar
-                su propósito en un mensaje simple, cercano y real,
-                conectando su propuesta de valor con los canales
-                de comunicación adecuados. Una década de trayectoria
-                construyendo vínculos reales con los protagonistas
-                del ecosistema de la comunicación me respaldan.
-              </p>
-              <p>
-                Entiendo el ADN de cada caso y trabajo en una
-                estrategia personalizada, aterrizada y real dentro
-                de la comunicación del nuevo paradigma. Donde lo
-                simple y genuino triunfa en diversas plataformas,
-                entendiendo el público y el objetivo del mensaje.
-              </p>
-              <p>
-                Mi método de comunicación suma un valor diferencial
-                a cada proyecto con contenido de calidad, chequeado
-                y de interés genuino para los negocios del presente
-                y del futuro.
-              </p>
+              <p>{c.paragraph_1}</p>
+              <p>{c.paragraph_2}</p>
+              <p>{c.paragraph_3}</p>
             </motion.div>
 
             <motion.ul variants={fadeUp} className="flex flex-wrap gap-2">
@@ -143,7 +129,7 @@ export function Bio() {
                 href="/mis-valores"
                 className="group inline-flex items-center gap-2.5 font-sans text-sm font-semibold text-bordo border border-bordo/40 px-5 py-2.5 rounded-full w-fit hover:bg-bordo hover:text-hueso hover:border-bordo transition-all duration-300"
               >
-                Conocé mis valores
+                {c.link_text}
                 <ArrowRight
                   size={14}
                   strokeWidth={2}

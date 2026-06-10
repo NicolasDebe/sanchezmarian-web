@@ -1,13 +1,14 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { fallbacksFor } from "@/lib/home-schema"
 
-const STATS = [
-  { value: 100, suffix: "+", label: "coberturas en medios" },
-  { value: 10,  suffix: "+", label: "marcas" },
-  { value: 10,  suffix: "+", label: "años de experiencia" },
-  { value: 3,   suffix: "",  label: "servicios especializados" },
-]
+/** Separa el prefijo numérico del sufijo: "100+" -> { value: "100", suffix: "+" }. */
+function splitNumber(raw: string): { value: string; suffix: string } {
+  const m = raw.match(/^([\d.,\s]*)(.*)$/)
+  if (!m) return { value: raw, suffix: "" }
+  return { value: m[1].trim(), suffix: m[2] }
+}
 
 function StatItem({
   value,
@@ -15,7 +16,7 @@ function StatItem({
   label,
   delay,
 }: {
-  value: number
+  value: string
   suffix: string
   label: string
   delay: number
@@ -57,14 +58,20 @@ function StatItem({
   )
 }
 
-export function Stats() {
+export function Stats({ content }: { content?: Record<string, string> }) {
+  const c = { ...fallbacksFor("stats"), ...content }
+  const stats = [1, 2, 3, 4].map((n) => {
+    const { value, suffix } = splitNumber(c[`stat_${n}_number`] ?? "")
+    return { value, suffix, label: c[`stat_${n}_label`] ?? "" }
+  })
+
   return (
     <section className="bg-hueso py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-2 lg:grid-cols-4">
-          {STATS.map((stat, i) => (
-            <div key={stat.label} className="relative">
-              {i < STATS.length - 1 && (
+          {stats.map((stat, i) => (
+            <div key={i} className="relative">
+              {i < stats.length - 1 && (
                 <span className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-14 bg-dorado/30" />
               )}
               <StatItem

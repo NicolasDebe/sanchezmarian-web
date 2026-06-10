@@ -1,6 +1,7 @@
 "use client"
 
 import { motion, useReducedMotion } from "motion/react"
+import { fallbacksFor } from "@/lib/home-schema"
 
 const containerVariants = {
   hidden: {},
@@ -12,7 +13,8 @@ const containerVariants = {
   },
 }
 
-export function Hero() {
+export function Hero({ content }: { content?: Record<string, string> }) {
+  const c = { ...fallbacksFor("hero"), ...content }
   const shouldReduceMotion = useReducedMotion()
 
   const itemVariants = {
@@ -86,7 +88,7 @@ export function Hero() {
                 gap: "10px",
               }}
             >
-              Comunicación estratégica y narrativas multiplataforma para negocios
+              {c.eyebrow}
             </motion.p>
 
             {/* H1 */}
@@ -102,7 +104,7 @@ export function Hero() {
                 letterSpacing: "-0.02em",
               }}
             >
-              Comunicar es conectar
+              {c.h1}
             </motion.h1>
 
             {/* DESCRIPCIÓN */}
@@ -117,11 +119,7 @@ export function Hero() {
                 marginBottom: "32px",
               }}
             >
-              Diseño estrategias de comunicación multiplataforma con visión de
-              futuro que transforman tu valor diferencial en visibilidad real.
-              Te acompaño a construir puentes honestos con los medios y la
-              comunidad para que el mensaje de tu negocio resuene con fuerza,
-              claridad y el impacto que realmente merece.
+              {c.subtitle}
             </motion.p>
 
             {/* BOTONES */}
@@ -156,7 +154,7 @@ export function Hero() {
                   e.currentTarget.style.boxShadow = "none"
                 }}
               >
-                Tengo un negocio con una historia para contar
+                {c.cta_primary}
                 <span aria-hidden="true">→</span>
               </a>
 
@@ -188,7 +186,7 @@ export function Hero() {
                   e.currentTarget.style.borderColor = "rgba(254,252,239,0.35)"
                 }}
               >
-                Mis valores
+                {c.cta_secondary}
               </a>
             </motion.div>
 
