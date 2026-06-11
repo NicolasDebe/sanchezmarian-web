@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "motion/react"
 import { ArrowRight } from "lucide-react"
 import {
@@ -139,6 +140,11 @@ const BADGE_STYLES: Record<CampaignStatus, React.CSSProperties> = {
   finished: { background: "var(--color-bordo-oscuro)", color: "var(--color-hueso)" },
 }
 
+interface FeaturedImage {
+  url: string
+  alt: string
+}
+
 interface CampanaCardProps {
   marca: string
   titulo: string
@@ -146,119 +152,306 @@ interface CampanaCardProps {
   fecha: string
   descripcion: string
   href: string
+  featuredImage: FeaturedImage | null
+  priority?: boolean
 }
 
-function CampanaCard({ marca, titulo, estado, fecha, descripcion, href }: CampanaCardProps) {
+// Placeholder mostrado cuando la campaña aún no tiene fotos cargadas:
+// fondo --arena + ícono de imagen sutil en --dorado a 0.3 de opacidad.
+function ImagePlaceholder({ size = 40 }: { size?: number }) {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        width:           "100%",
+        height:          "100%",
+        background:      "var(--color-arena)",
+        display:         "flex",
+        alignItems:      "center",
+        justifyContent:  "center",
+      }}
+    >
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="var(--color-dorado)"
+        strokeWidth="1.5"
+        style={{ opacity: 0.3 }}
+      >
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" fill="var(--color-dorado)" stroke="none" />
+        <path d="M21 15l-5-5L5 21" />
+      </svg>
+    </div>
+  )
+}
+
+function CampanaCard({
+  marca, titulo, estado, fecha, descripcion, href,
+  featuredImage, priority = false,
+}: CampanaCardProps) {
   const [hov, setHov] = useState(false)
 
+  const altText = featuredImage?.alt?.trim() || titulo
+
   return (
-    <motion.div
-      variants={revealCard}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-    >
-      <div
+    <motion.div variants={revealCard}>
+      <Link
+        href={href}
+        aria-label={`Ver campaña completa: ${titulo}`}
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        onFocus={() => setHov(true)}
+        onBlur={() => setHov(false)}
+        className="campana-card-link block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-bordo"
         style={{
-          background:   "var(--color-hueso)",
-          borderRadius: 16,
-          border:       `1px solid ${hov ? "rgba(102,0,31,0.12)" : "rgba(102,0,31,0.06)"}`,
-          overflow:     "hidden",
-          transform:    hov ? "translateY(-3px)" : "translateY(0)",
-          boxShadow:    hov ? "0 8px 32px rgba(102,0,31,0.06)" : "none",
-          transition:   "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+          background:     "var(--color-hueso)",
+          borderRadius:   16,
+          border:         `1px solid ${hov ? "rgba(102,0,31,0.12)" : "rgba(102,0,31,0.06)"}`,
+          overflow:       "hidden",
+          transform:      hov ? "translateY(-3px)" : "translateY(0)",
+          boxShadow:      hov ? "0 12px 32px -8px rgba(102, 0, 31, 0.12)" : "none",
+          transition:     "transform 500ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1), border-color 500ms cubic-bezier(0.16, 1, 0.3, 1)",
+          textDecoration: "none",
+          color:          "inherit",
         }}
       >
-        <div
-          style={{
-            padding:        "32px clamp(20px, 3vw, 36px) 24px",
-            display:        "flex",
-            justifyContent: "space-between",
-            alignItems:     "flex-start",
-            gap:            16,
-            flexWrap:       "wrap",
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p
-              className="font-mono uppercase"
-              style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
-            >
-              {marca}
-            </p>
-            <p
-              className="font-playfair"
-              style={{ fontSize: 22, fontWeight: 600, color: "var(--color-negro-bordo)", lineHeight: 1.3, marginTop: 8, maxWidth: 600 }}
-            >
-              {titulo}
-            </p>
-          </div>
-
-          <div style={{ flexShrink: 0, textAlign: "right" }}>
-            <span
-              className="font-mono uppercase"
-              style={{
-                fontSize:      10,
-                letterSpacing: "0.1em",
-                borderRadius:  100,
-                padding:       "5px 16px",
-                display:       "inline-block",
-                ...BADGE_STYLES[estado],
-              }}
-            >
-              {STATUS_LABELS[estado]}
-            </span>
-            <p
-              className="font-mono"
-              style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.45, marginTop: 8 }}
-            >
-              {fecha}
-            </p>
-          </div>
-        </div>
-
-        <div
-          style={{
-            padding:    "0 clamp(20px, 3vw, 36px) 32px",
-            borderTop:  "1px solid rgba(201, 168, 130, 0.12)",
-            paddingTop: 20,
-          }}
-        >
-          <p
-            className="font-sans"
-            style={{
-              fontSize:            14,
-              color:               "var(--color-gris-bordo)",
-              lineHeight:          1.7,
-              maxWidth:            640,
-              overflow:            "hidden",
-              display:             "-webkit-box",
-              WebkitLineClamp:     3,
-              WebkitBoxOrient:     "vertical",
-            } as React.CSSProperties}
+        {/* ─── DESKTOP layout (≥768px): grid 40% imagen / 60% texto ─── */}
+        <div className="hidden md:grid md:grid-cols-[40%_60%]">
+          <div
+            className="relative"
+            style={{ aspectRatio: "4 / 3", overflow: "hidden" }}
           >
-            {descripcion}
-          </p>
+            {featuredImage ? (
+              <Image
+                src={featuredImage.url}
+                alt={altText}
+                fill
+                sizes="(max-width: 768px) 96px, 40vw"
+                priority={priority}
+                style={{
+                  objectFit:  "cover",
+                  transform:  hov ? "scale(1.04)" : "scale(1)",
+                  transition: "transform 600ms cubic-bezier(0.16, 1, 0.3, 1)",
+                }}
+              />
+            ) : (
+              <ImagePlaceholder size={48} />
+            )}
+          </div>
 
-          <Link
-            href={href}
-            className="font-sans"
+          <div
             style={{
-              fontSize:       14,
-              color:          "var(--color-bordo)",
-              fontWeight:     500,
-              display:        "inline-flex",
-              alignItems:     "center",
-              gap:            hov ? 8 : 4,
-              marginTop:      16,
-              transition:     "gap 0.3s ease",
-              textDecoration: "none",
+              display:       "flex",
+              flexDirection: "column",
+              padding:       "32px clamp(24px, 3vw, 40px) 32px 40px",
             }}
           >
-            Ver campaña completa
-            <ArrowRight size={13} strokeWidth={2} />
-          </Link>
+            <div
+              style={{
+                display:        "flex",
+                justifyContent: "space-between",
+                alignItems:     "flex-start",
+                gap:            16,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p
+                  className="font-mono uppercase"
+                  style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+                >
+                  {marca}
+                </p>
+                <p
+                  className="font-playfair"
+                  style={{ fontSize: 22, fontWeight: 600, color: "var(--color-negro-bordo)", lineHeight: 1.3, marginTop: 8 }}
+                >
+                  {titulo}
+                </p>
+              </div>
+
+              <div style={{ flexShrink: 0, textAlign: "right" }}>
+                <span
+                  className="font-mono uppercase"
+                  style={{
+                    fontSize:      10,
+                    letterSpacing: "0.1em",
+                    borderRadius:  100,
+                    padding:       "5px 16px",
+                    display:       "inline-block",
+                    ...BADGE_STYLES[estado],
+                  }}
+                >
+                  {STATUS_LABELS[estado]}
+                </span>
+                <p
+                  className="font-mono"
+                  style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.45, marginTop: 8 }}
+                >
+                  {fecha}
+                </p>
+              </div>
+            </div>
+
+            <div
+              style={{
+                borderTop:  "1px solid rgba(201, 168, 130, 0.12)",
+                marginTop:  20,
+                paddingTop: 20,
+              }}
+            >
+              <p
+                className="font-sans"
+                style={{
+                  fontSize:        14,
+                  color:           "var(--color-gris-bordo)",
+                  lineHeight:      1.7,
+                  overflow:        "hidden",
+                  display:         "-webkit-box",
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: "vertical",
+                } as React.CSSProperties}
+              >
+                {descripcion}
+              </p>
+
+              <span
+                className="font-sans"
+                style={{
+                  fontSize:   14,
+                  color:      "var(--color-bordo)",
+                  fontWeight: 500,
+                  display:    "inline-flex",
+                  alignItems: "center",
+                  gap:        hov ? 8 : 4,
+                  marginTop:  16,
+                  transition: "gap 0.3s ease",
+                }}
+              >
+                Ver campaña completa
+                <ArrowRight size={13} strokeWidth={2} />
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* ─── MOBILE layout (<768px): thumbnail 96x96 + texto ─── */}
+        <div
+          className="md:hidden"
+          style={{ padding: "20px clamp(20px, 4vw, 28px)" }}
+        >
+          <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+            <div
+              style={{
+                width:        96,
+                height:       96,
+                flexShrink:   0,
+                borderRadius: 8,
+                overflow:     "hidden",
+                position:     "relative",
+              }}
+            >
+              {featuredImage ? (
+                <Image
+                  src={featuredImage.url}
+                  alt={altText}
+                  fill
+                  sizes="96px"
+                  priority={priority}
+                  style={{ objectFit: "cover" }}
+                />
+              ) : (
+                <ImagePlaceholder size={28} />
+              )}
+            </div>
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  display:        "flex",
+                  justifyContent: "space-between",
+                  alignItems:     "flex-start",
+                  gap:            8,
+                }}
+              >
+                <p
+                  className="font-mono uppercase"
+                  style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+                >
+                  {marca}
+                </p>
+                <span
+                  className="font-mono uppercase"
+                  style={{
+                    fontSize:      9,
+                    letterSpacing: "0.1em",
+                    borderRadius:  100,
+                    padding:       "4px 12px",
+                    display:       "inline-block",
+                    flexShrink:    0,
+                    ...BADGE_STYLES[estado],
+                  }}
+                >
+                  {STATUS_LABELS[estado]}
+                </span>
+              </div>
+              <p
+                className="font-playfair"
+                style={{ fontSize: 18, fontWeight: 600, color: "var(--color-negro-bordo)", lineHeight: 1.3, marginTop: 6 }}
+              >
+                {titulo}
+              </p>
+              <p
+                className="font-mono"
+                style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.45, marginTop: 8 }}
+              >
+                {fecha}
+              </p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              borderTop:  "1px solid rgba(201, 168, 130, 0.12)",
+              marginTop:  16,
+              paddingTop: 16,
+            }}
+          >
+            <p
+              className="font-sans"
+              style={{
+                fontSize:        14,
+                color:           "var(--color-gris-bordo)",
+                lineHeight:      1.7,
+                overflow:        "hidden",
+                display:         "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+              } as React.CSSProperties}
+            >
+              {descripcion}
+            </p>
+
+            <span
+              className="font-sans"
+              style={{
+                fontSize:   14,
+                color:      "var(--color-bordo)",
+                fontWeight: 500,
+                display:    "inline-flex",
+                alignItems: "center",
+                gap:        4,
+                marginTop:  14,
+              }}
+            >
+              Ver campaña completa
+              <ArrowRight size={13} strokeWidth={2} />
+            </span>
+          </div>
+        </div>
+      </Link>
     </motion.div>
   )
 }
@@ -305,17 +498,27 @@ function CampanaGrid({ campaigns }: { campaigns: Campaign[] }) {
           className="flex flex-col"
           style={{ gap: 24 }}
         >
-          {campaigns.map((c) => (
-            <CampanaCard
-              key={c.id}
-              marca={c.brand}
-              titulo={c.title}
-              estado={c.status}
-              fecha={c.date}
-              descripcion={hasHtmlTags(c.description) ? htmlToPlainText(c.description) : c.description}
-              href={`/campanas/${c.slug}`}
-            />
-          ))}
+          {campaigns.map((c, i) => {
+            // images viene ya ordenado por position ASC desde lib/campaigns.ts.
+            // La foto destacada es siempre la primera (menor position).
+            const first = c.images?.[0]
+            const featuredImage = first
+              ? { url: first.url, alt: first.alt }
+              : null
+            return (
+              <CampanaCard
+                key={c.id}
+                marca={c.brand}
+                titulo={c.title}
+                estado={c.status}
+                fecha={c.date}
+                descripcion={hasHtmlTags(c.description) ? htmlToPlainText(c.description) : c.description}
+                href={`/campanas/${c.slug}`}
+                featuredImage={featuredImage}
+                priority={i === 0}
+              />
+            )
+          })}
         </motion.div>
 
       </div>
