@@ -266,6 +266,83 @@ body::after {
 .rich-content blockquote.dark p { color: var(--color-hueso); }
 .rich-content blockquote.dark footer { color: var(--color-hueso); }
 
+/* ── Rich inline — longtext embebido en componentes diseñados ──
+   A diferencia de .rich-content (artículos), acá la tipografía y el color los
+   define el wrapper de cada componente (clases originales del diseño): los <p>
+   heredan todo y solo se estiliza la estructura. Así las páginas se ven
+   IDÉNTICAS a cuando el texto era plano. */
+
+.rich-inline p {
+  margin: 0;
+}
+
+.rich-inline p + p,
+.rich-inline p + ul,
+.rich-inline p + ol,
+.rich-inline ul + p,
+.rich-inline ol + p {
+  margin-top: 0.9em;
+}
+
+.rich-inline strong,
+.rich-inline b {
+  font-weight: 600;
+  color: inherit;
+}
+
+.rich-inline em,
+.rich-inline i {
+  font-style: italic;
+}
+
+.rich-inline a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(201, 168, 130, 0.7);
+}
+
+.rich-inline a:hover {
+  text-decoration-color: currentColor;
+}
+
+.rich-inline ul,
+.rich-inline ol {
+  padding-left: 24px;
+  margin: 0;
+  color: inherit;
+}
+
+.rich-inline ul { list-style: disc; }
+.rich-inline ol { list-style: decimal; }
+.rich-inline li { margin-bottom: 0.35em; }
+.rich-inline li::marker { color: var(--color-dorado); }
+
+.rich-inline blockquote {
+  border-left: 3px solid var(--color-dorado);
+  padding-left: 20px;
+  font-style: italic;
+  color: inherit;
+  margin: 0.9em 0;
+}
+
+.rich-inline h2,
+.rich-inline h3,
+.rich-inline h4 {
+  font-family: var(--font-playfair-display), serif;
+  font-weight: 600;
+  color: inherit;
+  line-height: 1.25;
+  margin: 1.2em 0 0.4em;
+}
+
+.rich-inline h2 { font-size: 1.35em; }
+.rich-inline h3 { font-size: 1.18em; }
+.rich-inline h4 { font-size: 1.05em; }
+
+.rich-inline > :first-child { margin-top: 0; }
+.rich-inline > :last-child { margin-bottom: 0; }
+
 /* ── RichTextEditor (admin) ── */
 
 .rte-wrapper {

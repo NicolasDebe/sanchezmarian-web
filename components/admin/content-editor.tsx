@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { saveContentSection } from "@/app/admin/actions"
+import { RichTextEditor } from "@/components/admin/RichTextEditor"
+import { hasHtmlTags, htmlToPlainText, plainToHtml } from "@/lib/rich-text"
 import type { FieldType } from "@/lib/content-schema"
 
 const MAX = { text: 250, longtext: 2000, number: 20 } as const
@@ -11,6 +13,13 @@ export interface EditorField {
   type: FieldType
   label: string
   value: string
+  /** longtext que NO admite HTML (SEO, H1, pre/accent) → textarea plano */
+  plain?: boolean
+}
+
+/** ¿Este campo usa el editor enriquecido? */
+function isRich(f: { type: FieldType; plain?: boolean }): boolean {
+  return f.type === "longtext" && !f.plain
 }
 export interface EditorSection {
   section: string
@@ -39,7 +48,16 @@ export function ContentEditor({
       Object.fromEntries(
         sections.map((s) => [
           s.section,
-          Object.fromEntries(s.fields.map((f) => [f.field, f.value])),
+          Object.fromEntries(
+            s.fields.map((f) => [
+              f.field,
+              // Los campos rich con valor plano legacy entran al editor ya
+              // convertidos a HTML (párrafos), así Tiptap los muestra bien.
+              isRich(f) && f.value && !hasHtmlTags(f.value)
+                ? plainToHtml(f.value)
+                : f.value,
+            ]),
+          ),
         ]),
       ),
   )
@@ -59,7 +77,9 @@ export function ContentEditor({
 
   async function handleSave(sec: EditorSection) {
     for (const f of sec.fields) {
-      const v = values[sec.section][f.field] ?? ""
+      const raw = values[sec.section][f.field] ?? ""
+      // En campos rich el límite cuenta el texto visible, no los tags HTML.
+      const v = isRich(f) ? htmlToPlainText(raw) : raw
       if (v.length > maxFor(f.type)) {
         setStatus((s) => ({ ...s, [sec.section]: "error" }))
         setMessages((m) => ({
@@ -159,7 +179,9 @@ export function ContentEditor({
                   {sec.fields.map((f) => {
                     const v = values[sec.section][f.field] ?? ""
                     const max = maxFor(f.type)
-                    const over = v.length > max
+                    // En rich el contador mide el texto visible, no los tags.
+                    const len = isRich(f) ? htmlToPlainText(v).length : v.length
+                    const over = len > max
                     return (
                       <div key={f.field} className="flex flex-col gap-1.5">
                         <label
@@ -169,7 +191,12 @@ export function ContentEditor({
                         >
                           {f.label}
                         </label>
-                        {f.type === "longtext" ? (
+                        {isRich(f) ? (
+                          <RichTextEditor
+                            value={v}
+                            onChange={(html) => setField(sec.section, f.field, html)}
+                          />
+                        ) : f.type === "longtext" ? (
                           <textarea
                             id={`${sec.section}-${f.field}`}
                             rows={5}
@@ -193,7 +220,7 @@ export function ContentEditor({
                             color: over ? "var(--color-bordo)" : "rgba(74,48,64,0.5)",
                           }}
                         >
-                          {v.length}/{max}
+                          {len}/{max}
                         </span>
                       </div>
                     )

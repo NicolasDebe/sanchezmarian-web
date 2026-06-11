@@ -75,15 +75,17 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
     if (!editor) return
     const previous = (editor.getAttributes("link").href as string) ?? ""
     const input = window.prompt(
-      "URL del link (tiene que empezar con http:// o https://):",
+      "URL del link (ej.: https://ejemplo.com — si no ponés https:// lo agregamos):",
       previous,
     )
     if (input === null) return
-    const url = input.trim()
+    let url = input.trim()
     if (url === "") {
       editor.chain().focus().unsetLink().run()
       return
     }
+    // Sin protocolo ("google.com") → agregamos https:// automáticamente.
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(url)) url = `https://${url}`
     if (!isHttpUrl(url)) {
       window.alert("La URL no es válida. Tiene que empezar con http:// o https://.")
       return

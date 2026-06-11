@@ -15,6 +15,8 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       {
         field: "h1",
         type: "longtext",
+        // Es el H1 de la página: no puede llevar HTML adentro.
+        plain: true,
         label: "Título principal (H1)",
         fallback:
           "Conexión genuina para potenciar la voz y el mensaje de tu negocio.",

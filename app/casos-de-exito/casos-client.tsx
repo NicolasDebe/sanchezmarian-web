@@ -14,6 +14,7 @@ import {
   type DbClipping,
 } from "@/lib/clippings"
 import { fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
+import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { DestacadasRotativo } from "@/components/destacadas-rotativo"
 import { fallbacksFor } from "@/lib/casos-schema"
@@ -629,13 +630,13 @@ export function CasosClient({
                 {hero.h1_accent}
               </em>
             </motion.h1>
-            <motion.p
+            <motion.div
               variants={fadeUp}
               className="font-sans mt-6"
               style={{ fontSize: 16, color: "var(--color-gris-bordo)", maxWidth: 560, lineHeight: 1.7 }}
             >
-              {hero.description}
-            </motion.p>
+              <RichText html={hero.description} className="rich-inline" />
+            </motion.div>
           </motion.div>
 
           {/* Stats — desktop */}

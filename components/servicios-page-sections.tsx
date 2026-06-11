@@ -7,6 +7,7 @@ import Link from "next/link"
 import { fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { fallbacksFor } from "@/lib/servicios-schema"
+import { RichText } from "@/components/ui/RichText"
 
 const subStagger: Variants = {
   hidden: {},
@@ -125,13 +126,13 @@ function HeroServicios({ c }: { c: Record<string, string> }) {
             {c.h1}
           </motion.h1>
 
-          <motion.p
+          <motion.div
             variants={fadeUp}
             className="font-sans text-gris-bordo"
             style={{ fontSize: 16, lineHeight: 1.7 }}
           >
-            {c.description}
-          </motion.p>
+            <RichText html={c.description} className="rich-inline" />
+          </motion.div>
         </motion.div>
       </div>
     </section>
@@ -176,13 +177,13 @@ function ServicioSection({ s }: { s: Servicio }) {
             {s.tagline}
           </motion.p>
 
-          <motion.p
+          <motion.div
             variants={fadeUp}
             className={`font-sans ${c.descClass} relative z-10 mb-12`}
             style={{ fontSize: 16, lineHeight: 1.7, maxWidth: 680 }}
           >
-            {s.descripcion}
-          </motion.p>
+            <RichText html={s.descripcion} className="rich-inline" />
+          </motion.div>
 
           <motion.p
             variants={fadeUp}
@@ -210,14 +211,11 @@ function ServicioSection({ s }: { s: Servicio }) {
                   >
                     {sub.titulo}
                   </p>
-                  {sub.desc && (
-                    <p
-                      className={`font-sans ${c.subDescClass} mt-1`}
-                      style={{ fontSize: 14, lineHeight: 1.7 }}
-                    >
-                      {sub.desc}
-                    </p>
-                  )}
+                  <RichText
+                    html={sub.desc}
+                    className={`rich-inline font-sans ${c.subDescClass} mt-1`}
+                    style={{ fontSize: 14, lineHeight: 1.7 }}
+                  />
                 </div>
               </motion.li>
             ))}

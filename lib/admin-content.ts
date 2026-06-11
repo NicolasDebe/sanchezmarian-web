@@ -35,6 +35,7 @@ export async function loadEditorSections(
       field: f.field,
       type: f.type,
       label: f.label,
+      plain: f.plain,
       value: dbMap.get(`${s.section}.${f.field}`) ?? f.fallback,
     })),
   }))

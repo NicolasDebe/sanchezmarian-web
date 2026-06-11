@@ -8,6 +8,7 @@ import {
   fadeUpStagger, viewportOnce,
 } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/contacto-schema"
+import { RichText } from "@/components/ui/RichText"
 
 const containerVariants = {
   hidden: {},
@@ -265,7 +266,7 @@ export function ContactoContent({
                 <h3 className="font-playfair font-bold text-white text-base leading-snug">
                   {item.q}
                 </h3>
-                <p className="font-sans text-white/55 text-sm leading-relaxed">{item.a}</p>
+                <RichText html={item.a} className="rich-inline font-sans text-white/55 text-sm leading-relaxed" />
               </motion.div>
             ))}
           </motion.div>

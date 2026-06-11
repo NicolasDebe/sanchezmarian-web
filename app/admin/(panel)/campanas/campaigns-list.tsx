@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Plus, Search, Pencil, Trash2, Eye, ImageOff } from "lucide-react"
 import { STATUS_LABELS, type Campaign, type CampaignStatus } from "@/lib/types/campaign"
+import { hasHtmlTags, htmlToPlainText } from "@/lib/rich-text"
 import { deleteCampaign } from "./actions"
 
 export type CampaignFilter = "todas" | "draft" | "active" | "finished"
@@ -280,7 +281,7 @@ export function CampaignsList({
                         className="mt-2 line-clamp-2 font-sans text-sm leading-relaxed"
                         style={{ color: "var(--color-gris-bordo)" }}
                       >
-                        {c.description}
+                        {hasHtmlTags(c.description) ? htmlToPlainText(c.description) : c.description}
                       </p>
                       <p
                         className="mt-3 font-mono"

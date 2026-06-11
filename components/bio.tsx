@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react"
 import { TextureCardStyled } from "@/components/ui/texture-card"
 import { fadeRight, fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/home-schema"
+import { RichText } from "@/components/ui/RichText"
 
 export function Bio({ content }: { content?: Record<string, string> }) {
   const c = { ...fallbacksFor("bio"), ...content }
@@ -101,9 +102,9 @@ export function Bio({ content }: { content?: Record<string, string> }) {
             </motion.h2>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo text-base leading-[1.8] max-w-[480px]">
-              <p>{c.paragraph_1}</p>
-              <p>{c.paragraph_2}</p>
-              <p>{c.paragraph_3}</p>
+              <RichText html={c.paragraph_1} className="rich-inline" />
+              <RichText html={c.paragraph_2} className="rich-inline" />
+              <RichText html={c.paragraph_3} className="rich-inline" />
             </motion.div>
 
             <motion.ul variants={fadeUp} className="flex flex-wrap gap-2">

@@ -47,17 +47,3 @@ export function legacyStatus(status: CampaignStatus): string | null {
   if (status === "finished") return "FINALIZADA"
   return null
 }
-
-/**
- * El contenido legacy podía ser texto plano. Si no trae tags HTML,
- * lo envolvemos en <p> por párrafo para que .rich-content lo estilice.
- */
-export function ensureHtml(content: string): string {
-  if (/<[a-z][\s\S]*>/i.test(content)) return content
-  return content
-    .split(/\n{2,}/)
-    .map((p) => p.trim())
-    .filter(Boolean)
-    .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
-    .join("\n")
-}

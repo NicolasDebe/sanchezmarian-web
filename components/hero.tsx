@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import { fallbacksFor } from "@/lib/home-schema"
+import { RichText } from "@/components/ui/RichText"
 
 const containerVariants = {
   hidden: {},
@@ -108,7 +109,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
             </motion.h1>
 
             {/* DESCRIPCIÓN */}
-            <motion.p
+            <motion.div
               variants={itemVariants}
               style={{
                 fontFamily: "var(--font-dm-sans), sans-serif",
@@ -119,8 +120,8 @@ export function Hero({ content }: { content?: Record<string, string> }) {
                 marginBottom: "32px",
               }}
             >
-              {c.subtitle}
-            </motion.p>
+              <RichText html={c.subtitle} className="rich-inline" />
+            </motion.div>
 
             {/* BOTONES */}
             <motion.div

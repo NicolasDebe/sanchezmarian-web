@@ -7,6 +7,7 @@ import {
   fadeUpStagger, viewportOnce,
 } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/mis-valores-schema"
+import { RichText } from "@/components/ui/RichText"
 
 const containerVariants = {
   hidden: {},
@@ -111,25 +112,25 @@ function BioSection({ c }: { c: Record<string, string> }) {
             <em className="italic text-bordo">{c.paragraph_1_accent}</em>
           </motion.p>
 
-          <motion.p
+          <motion.div
             className="font-sans text-[15px] text-gris-bordo leading-[1.8]"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.65, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
           >
-            {c.paragraph_2}
-          </motion.p>
+            <RichText html={c.paragraph_2} className="rich-inline" />
+          </motion.div>
 
-          <motion.p
+          <motion.div
             className="font-sans text-[15px] text-gris-bordo leading-[1.8]"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.65, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
-            {c.paragraph_3}
-          </motion.p>
+            <RichText html={c.paragraph_3} className="rich-inline" />
+          </motion.div>
 
           <motion.p
             className="font-mono text-[11px] text-gris-bordo/60 mt-2 text-right"
@@ -175,9 +176,9 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
             {c.title_pre}{" "}
             <em className="italic text-bordo">{c.title_accent}</em>
           </motion.h2>
-          <motion.p variants={fadeUp} className="font-sans text-[14px] text-gris-bordo max-w-[480px] leading-relaxed">
-            {c.intro}
-          </motion.p>
+          <motion.div variants={fadeUp} className="font-sans text-[14px] text-gris-bordo max-w-[480px] leading-relaxed">
+            <RichText html={c.intro} className="rich-inline" />
+          </motion.div>
         </motion.div>
 
         <motion.div
@@ -200,9 +201,10 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
               <p className="font-playfair font-bold text-negro-bordo text-[20px] leading-[1.15] mb-3 transition-transform duration-300 ease-out group-hover:-translate-y-1">
                 {pilar.titulo}
               </p>
-              <p className="font-sans text-[13px] text-gris-bordo leading-relaxed">
-                {pilar.descripcion}
-              </p>
+              <RichText
+                html={pilar.descripcion}
+                className="rich-inline font-sans text-[13px] text-gris-bordo leading-relaxed"
+              />
             </motion.div>
           ))}
         </motion.div>
@@ -226,9 +228,10 @@ function CierreSection({ c }: { c: Record<string, string> }) {
           viewport={viewportOnce}
           className="max-w-[760px]"
         >
-          <p className="font-playfair text-negro-bordo text-[22px] sm:text-[26px] leading-[1.5] mb-10">
-            {c.paragraph}
-          </p>
+          <RichText
+            html={c.paragraph}
+            className="rich-inline font-playfair text-negro-bordo text-[22px] sm:text-[26px] leading-[1.5] mb-10"
+          />
           <Link
             href="/#contacto"
             className="inline-flex items-center gap-2 bg-bordo text-hueso font-sans text-[15px] font-semibold px-8 py-4 rounded-full hover:bg-bordo/90 active:scale-[0.98] transition-all"

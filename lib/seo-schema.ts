@@ -17,7 +17,7 @@ export const SEO_SECTIONS: SectionDef[] = [
     title: "Home",
     fields: [
       { field: "title", type: "text", label: "Título (etiqueta <title>)", fallback: "Marian Sánchez — Comunicación estratégica · Mendoza" },
-      { field: "description", type: "longtext", label: "Descripción (meta description)", fallback: "Comunicación estratégica y narrativas multiplataforma para negocios. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina." },
+      { field: "description", type: "longtext", plain: true, label: "Descripción (meta description)", fallback: "Comunicación estratégica y narrativas multiplataforma para negocios. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina." },
     ],
   },
   {
@@ -25,7 +25,7 @@ export const SEO_SECTIONS: SectionDef[] = [
     title: "Servicios",
     fields: [
       { field: "title", type: "text", label: "Título (etiqueta <title>)", fallback: "Servicios — Marian Sánchez" },
-      { field: "description", type: "longtext", label: "Descripción (meta description)", fallback: "Prensa y Comunicación, Comunicación Estratégica y Relaciones Públicas. Descubrí cómo puedo ayudarte a posicionarte en los medios." },
+      { field: "description", type: "longtext", plain: true, label: "Descripción (meta description)", fallback: "Prensa y Comunicación, Comunicación Estratégica y Relaciones Públicas. Descubrí cómo puedo ayudarte a posicionarte en los medios." },
     ],
   },
   {
@@ -33,7 +33,7 @@ export const SEO_SECTIONS: SectionDef[] = [
     title: "Mis valores",
     fields: [
       { field: "title", type: "text", label: "Título (etiqueta <title>)", fallback: "Mis valores — Marian Sánchez" },
-      { field: "description", type: "longtext", label: "Descripción (meta description)", fallback: "Conocé la historia y los pilares que guían el trabajo de Marian Sánchez: inteligencia, integridad, libertad, compromiso y pasión por la comunicación." },
+      { field: "description", type: "longtext", plain: true, label: "Descripción (meta description)", fallback: "Conocé la historia y los pilares que guían el trabajo de Marian Sánchez: inteligencia, integridad, libertad, compromiso y pasión por la comunicación." },
     ],
   },
   {
@@ -41,7 +41,7 @@ export const SEO_SECTIONS: SectionDef[] = [
     title: "Casos de éxito",
     fields: [
       { field: "title", type: "text", label: "Título (etiqueta <title>)", fallback: "Casos de éxito — Marian Sánchez" },
-      { field: "description", type: "longtext", label: "Descripción (meta description)", fallback: "56 coberturas en medios nacionales e internacionales. La Nación, Clarín, Infobae, Vatican News, Los Andes y más. Resultados reales para marcas reales." },
+      { field: "description", type: "longtext", plain: true, label: "Descripción (meta description)", fallback: "56 coberturas en medios nacionales e internacionales. La Nación, Clarín, Infobae, Vatican News, Los Andes y más. Resultados reales para marcas reales." },
     ],
   },
   {
@@ -49,7 +49,7 @@ export const SEO_SECTIONS: SectionDef[] = [
     title: "Contacto",
     fields: [
       { field: "title", type: "text", label: "Título (etiqueta <title>)", fallback: "Contacto — Marian Sánchez" },
-      { field: "description", type: "longtext", label: "Descripción (meta description)", fallback: "Conversemos sobre tu estrategia de comunicación. Hablemos sobre cómo posicionar tu proyecto en los medios." },
+      { field: "description", type: "longtext", plain: true, label: "Descripción (meta description)", fallback: "Conversemos sobre tu estrategia de comunicación. Hablemos sobre cómo posicionar tu proyecto en los medios." },
     ],
   },
 ]

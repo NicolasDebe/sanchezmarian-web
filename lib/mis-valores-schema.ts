@@ -26,6 +26,8 @@ export const MIS_VALORES_SECTIONS: SectionDef[] = [
       {
         field: "paragraph_1_pre",
         type: "longtext",
+        // Parte del patrón pre/accent: fluye inline con el acento, no puede ser HTML.
+        plain: true,
         label: "Párrafo 1 — parte normal",
         fallback:
           "Mi camino en el mundo de la comunicación comenzó hace más de una década, impulsado por una certeza que hoy es el motor de mi negocio:",

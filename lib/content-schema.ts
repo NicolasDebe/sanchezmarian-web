@@ -23,6 +23,12 @@ export interface FieldDef {
   type: FieldType
   label: string
   fallback: string
+  /**
+   * Solo para longtext: fuerza <textarea> de texto plano en el admin y excluye
+   * el campo de la migración a HTML. Para campos que NO pueden contener tags:
+   * meta descriptions de SEO, títulos H1 y partes del patrón pre/accent/post.
+   */
+  plain?: boolean
 }
 
 export interface SectionDef {

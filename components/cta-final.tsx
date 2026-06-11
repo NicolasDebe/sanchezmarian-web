@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react"
 import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/home-schema"
+import { RichText } from "@/components/ui/RichText"
 
 const WA_HREF = "https://wa.me/542615433882?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
 
@@ -104,9 +105,9 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
               <em className="block italic text-dorado">{c.title_accent}</em>
             </motion.h2>
 
-            <motion.p variants={fadeUp} className="font-sans text-[0.9375rem] text-hueso/65 leading-[1.7] max-w-[420px]">
-              {c.description}
-            </motion.p>
+            <motion.div variants={fadeUp} className="font-sans text-[0.9375rem] text-hueso/65 leading-[1.7] max-w-[420px]">
+              <RichText html={c.description} className="rich-inline" />
+            </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">
               <div className="flex items-center gap-3">

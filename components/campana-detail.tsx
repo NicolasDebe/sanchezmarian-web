@@ -5,7 +5,8 @@ import { motion } from "motion/react"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
 import { CampaignSlideshow } from "@/components/campaign-slideshow"
-import { ensureHtml, STATUS_LABELS, type Campaign } from "@/lib/types/campaign"
+import { RichText } from "@/components/ui/RichText"
+import { STATUS_LABELS, type Campaign } from "@/lib/types/campaign"
 
 function StatusBadge({ status }: { status: Campaign["status"] }) {
   const styles: Record<Campaign["status"], React.CSSProperties> = {
@@ -122,10 +123,7 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
 
           {/* Contenido HTML */}
           <motion.div variants={fadeUp} style={{ maxWidth: 720 }}>
-            <div
-              className="rich-content"
-              dangerouslySetInnerHTML={{ __html: ensureHtml(campaign.content) }}
-            />
+            <RichText html={campaign.content} className="rich-content" />
           </motion.div>
         </motion.div>
 

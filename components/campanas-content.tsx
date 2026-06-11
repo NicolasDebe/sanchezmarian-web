@@ -9,6 +9,7 @@ import {
 } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { STATUS_LABELS, type Campaign, type CampaignStatus } from "@/lib/types/campaign"
+import { hasHtmlTags, htmlToPlainText } from "@/lib/rich-text"
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
@@ -311,7 +312,7 @@ function CampanaGrid({ campaigns }: { campaigns: Campaign[] }) {
               titulo={c.title}
               estado={c.status}
               fecha={c.date}
-              descripcion={c.description}
+              descripcion={hasHtmlTags(c.description) ? htmlToPlainText(c.description) : c.description}
               href={`/campanas/${c.slug}`}
             />
           ))}

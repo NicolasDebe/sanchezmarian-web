@@ -94,6 +94,31 @@ sitio desde el navegador. Stack: Next.js 16 + Supabase (auth + Postgres).
 - Cada editor es un acordeón por sección; cada sección se guarda por separado.
   Los cambios se ven en el sitio público en ~1 minuto.
 
+### Texto enriquecido (Tiptap global, 2026-06-11)
+- TODOS los campos `longtext` editables usan Tiptap (`RichTextEditor`) en el
+  admin y se renderizan con `<RichText />` (`components/ui/RichText.tsx`) en el
+  sitio. EXCEPCIONES marcadas con `plain: true` en los esquemas (siguen siendo
+  textarea + texto plano): las meta descriptions de `seo`, `servicios/hero/h1`
+  (es un H1) y `mis_valores/bio/paragraph_1_pre` (patrón pre/accent).
+- `lib/rich-text.ts`: utils compartidos — `plainToHtml` (doble salto = `<p>`,
+  salto simple = `<br/>`, escapa & < >), `hasHtmlTags`, `htmlToPlainText`
+  (contadores y vistas breves) y `sanitizeHtml` (allowlist propia, sin
+  DOMPurify/jsdom; permite los tags/clases del contenido legacy de campañas:
+  p.lead, blockquote.dark, footer, style en links).
+- `<RichText html={...} />`: null si vacío; texto plano legacy se envuelve en
+  `<p>` automáticamente (los fallbacks de los esquemas siguen siendo texto
+  plano y se ven idénticos). Dos contextos de estilo en globals.css:
+  `.rich-content` (artículos: detalle de campañas) y `.rich-inline` (longtext
+  embebido en componentes: los `<p>` heredan tipografía/color del wrapper —
+  clave para que las páginas se vean IDÉNTICAS al diseño original).
+- Migraciones de datos (idempotentes, con backup en `content_versions`):
+  `npx tsx scripts/migrate-longtext-to-html.ts` y
+  `npx tsx scripts/migrate-campaigns-to-html.ts`. ⚠ Correr SIEMPRE después de
+  deployar el código que renderiza con RichText (el código viejo mostraría los
+  tags literales).
+- El contador de caracteres del admin mide el texto visible (sin tags). El
+  RichTextEditor agrega `https://` automáticamente a links sin protocolo.
+
 ### Patrón pre/accent/post (textos con acento editorial)
 Los textos donde parte va en cursiva + color (bordó/dorado/terracota) se parten
 en campos `{x}_pre` / `{x}_accent` / `{x}_post`. El styling vive HARDCODED en el
