@@ -1,20 +1,18 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import slugify from "slugify"
-import { Check, Eye, Loader2, Pencil, Star, Trash2, Upload, X } from "lucide-react"
+import { Check, Eye, Pencil, Trash2, X } from "lucide-react"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
+import { PhotoManager, type PhotoManagerHandle } from "@/components/admin/PhotoManager"
 import { STATUS_LABELS, type Campaign, type CampaignStatus } from "@/lib/types/campaign"
 import {
   checkSlugAvailability,
   createCampaign,
   deleteCampaign,
-  deleteCampaignImage,
-  deleteStagedImage,
   updateCampaign,
-  uploadCampaignImage,
   type CampaignInput,
 } from "@/app/admin/(panel)/campanas/actions"
 
@@ -54,17 +52,6 @@ function plainTextLength(html: string): number {
 }
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
-
-interface PhotoItem {
-  /** id de campaign_images si ya está persistida (modo edición) */
-  id?: string
-  url: string
-  /** path en el bucket si fue subida en esta sesión (campaña nueva) */
-  path?: string
-}
-
-const ALLOWED_EXT = ["jpg", "jpeg", "png", "webp"]
-const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 const STATUS_OPTIONS: CampaignStatus[] = ["draft", "active", "finished"]
 
@@ -152,18 +139,15 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
   const [dateMonth, setDateMonth] = useState(labelToMonthInput(initial?.date ?? ""))
   const [description, setDescription] = useState(initial?.description ?? "")
   const [content, setContent] = useState(initial?.content ?? "")
-  const [photos, setPhotos] = useState<PhotoItem[]>(
-    (initial?.images ?? []).map((img) => ({ id: img.id, url: img.url })),
-  )
+  const [photoCount, setPhotoCount] = useState(initial?.images?.length ?? 0)
+  const [photosBusy, setPhotosBusy] = useState(false)
+  const photoManagerRef = useRef<PhotoManagerHandle>(null)
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState<null | "draft" | "publish">(null)
-  const [uploading, setUploading] = useState(0)
-  const [dragOver, setDragOver] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!toast) return
@@ -204,62 +188,11 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
     clearError("slug")
   }
 
-  // ── Fotos ──
-  async function uploadFiles(files: FileList | File[]) {
-    const list = Array.from(files)
-    if (list.length === 0) return
-
-    const folderSlug = slug || makeSlug(title)
-    if (!folderSlug) {
-      setErrors((e) => ({ ...e, photos: "Completá el título antes de subir fotos." }))
-      return
-    }
-    clearError("photos")
-
-    setUploading((n) => n + list.length)
-    for (const file of list) {
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? ""
-      if (!ALLOWED_EXT.includes(ext)) {
-        setToast(`"${file.name}" no es JPG, PNG ni WebP — se salteó.`)
-        setUploading((n) => n - 1)
-        continue
-      }
-      if (file.size > MAX_FILE_SIZE) {
-        setToast(`"${file.name}" pesa más de 5MB — se salteó.`)
-        setUploading((n) => n - 1)
-        continue
-      }
-      const fd = new FormData()
-      fd.set("file", file)
-      fd.set("slug", folderSlug)
-      if (initial?.id) fd.set("campaignId", initial.id)
-
-      const result = await uploadCampaignImage(fd)
-      setUploading((n) => n - 1)
-      if (!result.success) {
-        setToast(result.error)
-        continue
-      }
-      setPhotos((prev) => [...prev, { id: result.id, url: result.url, path: result.path }])
-    }
-  }
-
-  async function removePhoto(photo: PhotoItem, index: number) {
-    setPhotos((prev) => prev.filter((_, i) => i !== index))
-    const result = photo.id
-      ? await deleteCampaignImage(photo.id)
-      : photo.path
-        ? await deleteStagedImage(photo.path)
-        : { success: true as const }
-    if (!result.success) {
-      setToast(result.error)
-      setPhotos((prev) => {
-        const next = [...prev]
-        next.splice(index, 0, photo)
-        return next
-      })
-    }
-  }
+  // ── Fotos (PhotoManager) ──
+  const handlePhotoCount = useCallback((count: number) => {
+    setPhotoCount(count)
+    if (count > 0) setErrors((prev) => (prev.photos ? { ...prev, photos: "" } : prev))
+  }, [])
 
   // ── Guardado ──
   function validate(finalStatus: CampaignStatus): boolean {
@@ -273,7 +206,7 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
     if (d.length < 50 || d.length > 200) next.description = "La descripción tiene que tener entre 50 y 200 caracteres."
     if (plainTextLength(content) < 100) next.content = "El contenido tiene que tener al menos 100 caracteres de texto."
     if (!dateMonth) next.date = "Elegí la fecha."
-    if (finalStatus !== "draft" && photos.length === 0)
+    if (finalStatus !== "draft" && photoCount === 0)
       next.photos = "Necesitás al menos una foto para publicar."
     setErrors(next)
     return Object.keys(next).length === 0
@@ -294,12 +227,22 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
       date: monthInputToLabel(dateMonth),
     }
 
-    const result = isEdit
-      ? await updateCampaign(initial!.id, data)
-      : await createCampaign(
-          data,
-          photos.map((p) => ({ url: p.url, path: p.path })),
-        )
+    let result
+    if (isEdit) {
+      result = await updateCampaign(initial!.id, data)
+    } else {
+      // Campaña nueva: las fotos pendientes se suben al bucket recién acá.
+      const flush = (await photoManagerRef.current?.flushPending(slug)) ?? {
+        success: true as const,
+        images: [],
+      }
+      if (!flush.success) {
+        setSaving(null)
+        setErrors((e) => ({ ...e, _global: flush.error }))
+        return
+      }
+      result = await createCampaign(data, flush.images)
+    }
     setSaving(null)
 
     if (!result.success) {
@@ -522,113 +465,17 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
         {/* ── Sección 4: Fotos ── */}
         <Section
           title="Fotos"
-          helper="La primera foto es la destacada. JPG, PNG o WebP, hasta 5MB cada una."
+          helper="La primera foto es la destacada. Arrastrá las cards para reordenar. Las imágenes se optimizan solas al subirlas."
         >
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => fileInputRef.current?.click()}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click()
-            }}
-            onDragOver={(e) => {
-              e.preventDefault()
-              setDragOver(true)
-            }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={(e) => {
-              e.preventDefault()
-              setDragOver(false)
-              uploadFiles(e.dataTransfer.files)
-            }}
-            className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors"
-            style={{
-              borderColor: dragOver ? "var(--color-bordo)" : "rgba(201,168,130,0.5)",
-              background: dragOver ? "rgba(102,0,31,0.04)" : "var(--color-hueso)",
-            }}
-          >
-            <Upload size={20} style={{ color: "var(--color-bordo)" }} />
-            <p className="font-sans text-sm" style={{ color: "var(--color-negro-bordo)" }}>
-              Arrastrá las fotos acá o hacé click para elegirlas
-            </p>
-            <p className="font-mono" style={{ fontSize: 10, color: "rgba(74,48,64,0.5)" }}>
-              JPG · JPEG · PNG · WEBP — máx. 5MB
-            </p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-              multiple
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files) uploadFiles(e.target.files)
-                e.target.value = ""
-              }}
-            />
-          </div>
-
-          {uploading > 0 && (
-            <p
-              className="flex items-center gap-2 font-sans text-sm"
-              style={{ color: "var(--color-gris-bordo)" }}
-            >
-              <Loader2 size={14} className="animate-spin" />
-              Subiendo {uploading} foto{uploading === 1 ? "" : "s"}…
-            </p>
-          )}
-
-          {errors.photos && (
-            <p className="font-sans text-xs" style={{ color: "#B3261E" }}>
-              {errors.photos}
-            </p>
-          )}
-
-          {photos.length === 0 && uploading === 0 ? (
-            <p className="font-sans text-sm" style={{ color: "rgba(74,48,64,0.55)" }}>
-              Subí al menos una foto{isDraft ? " (podés guardar el borrador sin fotos)" : ""}.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {photos.map((photo, i) => (
-                <div
-                  key={photo.id ?? photo.path ?? photo.url}
-                  className="group relative overflow-hidden rounded-xl border"
-                  style={{ borderColor: "rgba(201,168,130,0.4)", aspectRatio: "4 / 3" }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={photo.url}
-                    alt={`Foto ${i + 1}`}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                  {i === 0 && (
-                    <span
-                      className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full px-2.5 py-1 font-mono uppercase"
-                      style={{
-                        fontSize: 8,
-                        letterSpacing: "0.1em",
-                        background: "var(--color-bordo)",
-                        color: "var(--color-hueso)",
-                      }}
-                    >
-                      <Star size={9} fill="currentColor" />
-                      Destacada
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(photo, i)}
-                    aria-label="Eliminar foto"
-                    className="absolute right-2 top-2 rounded-full p-1.5 opacity-0 shadow transition-opacity hover:opacity-100 group-hover:opacity-90"
-                    style={{ background: "rgba(26,0,8,0.75)", color: "var(--color-hueso)" }}
-                  >
-                    <X size={13} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          <PhotoManager
+            ref={photoManagerRef}
+            campaignSlug={initial?.slug ?? slug}
+            campaignId={initial?.id}
+            initialImages={initial?.images ?? []}
+            onCountChange={handlePhotoCount}
+            onBusyChange={setPhotosBusy}
+            error={errors.photos}
+          />
         </Section>
       </div>
 
@@ -676,7 +523,7 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
             <button
               type="button"
               onClick={() => handleSave("draft")}
-              disabled={!!saving || uploading > 0}
+              disabled={!!saving || photosBusy}
               className="rounded-lg border px-5 py-2.5 font-sans text-sm font-medium transition-colors hover:bg-[rgba(102,0,31,0.04)] disabled:opacity-50"
               style={{ borderColor: "var(--color-bordo)", color: "var(--color-bordo)" }}
             >
@@ -689,7 +536,7 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
             <button
               type="button"
               onClick={() => handleSave("publish")}
-              disabled={!!saving || uploading > 0}
+              disabled={!!saving || photosBusy}
               className="rounded-lg px-6 py-2.5 font-sans text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-60"
               style={{ backgroundColor: "var(--color-bordo)", color: "var(--color-hueso)" }}
             >
@@ -732,7 +579,7 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
               className="mt-3 font-sans text-sm leading-relaxed"
               style={{ color: "var(--color-gris-bordo)" }}
             >
-              Esta acción borra también las {photos.length} fotos cargadas. No se
+              Esta acción borra también las {photoCount} fotos cargadas. No se
               puede deshacer.
             </p>
             <div className="mt-6 flex justify-end gap-3">

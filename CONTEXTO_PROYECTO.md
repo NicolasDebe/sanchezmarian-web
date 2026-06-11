@@ -191,21 +191,43 @@ una sección por página).
   `/admin/campanas/{slug}/editar` (form compartido
   `components/admin/campaign-form.tsx`: slug auto-generado con slugify +
   chequeo de unicidad con debounce, fecha con input month ⇄ "Junio 2026",
-  contadores de caracteres, drop zone de fotos múltiples — la primera es la
-  destacada, sin reorder todavía —, footer sticky Guardar borrador/Publicar,
+  contadores de caracteres, footer sticky Guardar borrador/Publicar,
   publicar exige ≥1 foto). Server actions en
   `app/admin/(panel)/campanas/actions.ts` (create/update/delete campaña,
-  upload/delete imagen con compactación de positions, checkSlugAvailability).
+  upload/delete imagen con compactación de positions, checkSlugAvailability,
+  updateImageAlt, reorderImages).
 - Editor de contenido: `components/admin/RichTextEditor.tsx` (Tiptap v3,
   StarterKit con link integrado — NO agregar @tiptap/extension-link aparte,
   duplica la extensión — `immediatelyRender: false` obligatorio por SSR).
+- Fotos: `components/admin/PhotoManager.tsx` (sesión 2026-06-11). Drag & drop
+  para reordenar con @dnd-kit (PointerSensor distance 8 + KeyboardSensor:
+  Space + flechas; fallback de botones subir/bajar en cada card), alt editable
+  inline (lápiz → input → check, máx. 200 chars), eliminar individual, badge
+  "Destacada" en la primera card (= la de menor position; ojo: las campañas
+  seed tienen positions desde 1, las nuevas desde 0 — siempre comparar por
+  orden, no por position === 0). Compresión client-side ANTES del upload con
+  browser-image-compression (maxSizeMB 2, maxWidthOrHeight 2400, convierte a
+  .webp, skip si el original pesa <500KB, fallback al original si falla; el
+  límite del archivo original es 10MB, el server action sigue aceptando 5MB
+  post-compresión). Dos modos: edición (campaignId presente → cada cambio se
+  persiste al instante, optimistic UI con revert + toast) y campaña nueva
+  (las fotos quedan como object URLs locales y se suben al bucket recién al
+  guardar, vía `flushPending(slug)` expuesto por ref — si createCampaign
+  falla, el retry no re-sube las que ya subieron). reorderImages hace upsert
+  en batch (una sentencia) y revalida /campanas y el detalle.
 - `next.config.ts`: `serverActions.bodySizeLimit: "8mb"` (fotos hasta 5MB van
   por server action).
 - deleteCampaign borra primero los archivos del bucket (por URL parseada y por
   carpeta del slug) y las filas de `campaign_images` explícitamente (no
   depende de cascade).
 - Tests: `npx tsx scripts/e2e-campaigns.ts` con el dev server corriendo
-  (auto-limpiante; crea y borra usuario y campaña de prueba).
+  (auto-limpiante; crea y borra usuario y campaña de prueba). Para el
+  PhotoManager: `npx tsx scripts/e2e-photo-manager.ts` (Playwright con el
+  Edge del sistema vía playwright-core, headless; prueba drag con mouse y
+  teclado, alt, compresión real, delete, flush de pendientes y touch/mobile.
+  `playwright-core` está en devDependencies porque tsconfig typecheckea
+  `scripts/` en el build — si se quita, Vercel rompe con TS2307).
+  `scripts/audit-campaign-images.ts` imprime schema y positions actuales.
 
 ### Pendiente (próxima iteración)
 - Correr la migración SQL de clippings en el dashboard + seed (paso manual,
@@ -214,8 +236,8 @@ una sección por página).
 - Correr la migración SQL de campañas
   (`supabase/migrations/20260611_campaigns_status.sql`) en el SQL Editor para
   habilitar borradores (ver sección Campañas).
-- Sesión 2 de campañas: Tiptap en otras páginas. Sesión 3: reorder de fotos
-  por drag & drop.
+- ~~Sesión 3: reorder de fotos por drag & drop~~ → hecho (PhotoManager,
+  2026-06-11).
 - Páginas secundarias (`/privacidad`, `/terminos`, `/sobre-marian`)
   usan Nav/Footer con sus textos de fallback (no leen `global` aún). Se ven
   idénticas; si se editan los textos globales, esas páginas no los reflejan.

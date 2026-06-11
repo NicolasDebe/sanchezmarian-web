@@ -163,6 +163,16 @@ body::after {
   box-shadow: 0 0 0 3px rgba(102, 0, 31, 0.08);
 }
 
+/* ── Admin — cards de fotos (PhotoManager) ── */
+@keyframes photo-card-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.photo-card-enter {
+  animation: photo-card-in 0.3s ease both;
+}
+
 /* ── Rich content — HTML de campañas (Tiptap + contenido legacy) ── */
 
 .rich-content {

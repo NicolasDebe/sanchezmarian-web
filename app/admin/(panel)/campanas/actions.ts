@@ -426,6 +426,81 @@ export async function deleteCampaignImage(imageId: string): Promise<ActionResult
   }
 }
 
+// ─── updateImageAlt ───────────────────────────────────────────────────────────
+
+export async function updateImageAlt(
+  imageId: string,
+  alt: string,
+): Promise<ActionResult> {
+  const user = await requireUser()
+  if (!user) return { success: false, error: "Tu sesión expiró. Volvé a iniciar sesión." }
+
+  const clean = alt.trim()
+  if (clean.length > 200)
+    return { success: false, error: "El texto alternativo no puede superar los 200 caracteres." }
+
+  try {
+    const admin = createAdminClient()
+    const { error } = await admin
+      .from("campaign_images")
+      .update({ alt: clean })
+      .eq("id", imageId)
+    if (error)
+      return { success: false, error: "No se pudo guardar el texto alternativo. Intentá de nuevo." }
+    return { success: true }
+  } catch {
+    return { success: false, error: "Ocurrió un error al guardar. Intentá de nuevo." }
+  }
+}
+
+// ─── reorderImages ────────────────────────────────────────────────────────────
+
+/**
+ * Reordena las fotos de una campaña: position = índice en orderedIds.
+ * supabase-js no expone transacciones, así que se usa un upsert en batch
+ * (una sola sentencia) con las filas completas.
+ */
+export async function reorderImages(
+  campaignId: string,
+  orderedIds: string[],
+): Promise<ActionResult> {
+  const user = await requireUser()
+  if (!user) return { success: false, error: "Tu sesión expiró. Volvé a iniciar sesión." }
+
+  try {
+    const admin = createAdminClient()
+
+    const { data: campaign } = await admin
+      .from("campaigns")
+      .select("slug")
+      .eq("id", campaignId)
+      .maybeSingle()
+    if (!campaign) return { success: false, error: "La campaña ya no existe." }
+
+    const { data: rows } = await admin
+      .from("campaign_images")
+      .select("id, campaign_id, url, alt")
+      .eq("campaign_id", campaignId)
+    const byId = new Map((rows ?? []).map((r) => [r.id as string, r]))
+
+    if (orderedIds.length !== byId.size || orderedIds.some((id) => !byId.has(id)))
+      return {
+        success: false,
+        error: "El orden no coincide con las fotos guardadas. Recargá la página e intentá de nuevo.",
+      }
+
+    const upserts = orderedIds.map((id, i) => ({ ...byId.get(id)!, position: i }))
+    const { error } = await admin.from("campaign_images").upsert(upserts)
+    if (error) return { success: false, error: "No se pudo guardar el orden. Intentá de nuevo." }
+
+    revalidatePath("/campanas")
+    revalidatePath(`/campanas/${campaign.slug}`)
+    return { success: true }
+  } catch {
+    return { success: false, error: "Ocurrió un error al reordenar. Intentá de nuevo." }
+  }
+}
+
 /** Foto staged de una campaña que todavía no se guardó: solo borra el archivo. */
 export async function deleteStagedImage(path: string): Promise<ActionResult> {
   const user = await requireUser()
