@@ -1,125 +1,50 @@
-import { supabase, createAdminClient } from "@/lib/supabase"
-import type { Campaign, CampaignImage, CampaignInsert, CampaignUpdate } from "@/lib/types/campaign"
+import { supabase } from "@/lib/supabase"
+import { FALLBACK_CAMPAIGNS } from "@/data/campaigns-fallback"
+import { normalizeStatus, type Campaign, type CampaignImage } from "@/lib/types/campaign"
 
-// ─── Lectura (anon key) ───────────────────────────────────────────────────────
+/**
+ * Lecturas públicas de campañas (anon key). Igual que lib/content.ts:
+ * NUNCA tiran excepción — si Supabase falla, devuelven el fallback hardcoded
+ * y el build de Vercel jamás rompe por Supabase.
+ */
 
-export async function getAllCampaigns(): Promise<Campaign[]> {
-  console.log('SUPABASE_URL defined:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
-  console.log('SUPABASE_KEY defined:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-  const { data, error } = await supabase
-    .from("campaigns")
-    .select("*, images:campaign_images(*)")
-    .order("created_at", { ascending: false })
-
-  if (error) throw error
-  return (data ?? []) as Campaign[]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function normalizeCampaign(row: any): Campaign {
+  const images = ((row.images ?? []) as CampaignImage[])
+    .slice()
+    .sort((a, b) => a.position - b.position)
+  return { ...row, status: normalizeStatus(row.status), images } as Campaign
 }
 
-export async function getCampaignById(id: string): Promise<Campaign | null> {
-  const { data, error } = await supabase
-    .from("campaigns")
-    .select("*, images:campaign_images(*)")
-    .eq("id", id)
-    .single()
+/** Campañas visibles en /campanas: activas y finalizadas (sin borradores). */
+export async function getPublicCampaigns(): Promise<Campaign[]> {
+  try {
+    const { data, error } = await supabase
+      .from("campaigns")
+      .select("*, images:campaign_images(*)")
+      .order("created_at", { ascending: false })
 
-  if (error) {
-    if (error.code === "PGRST116") return null
-    throw error
+    if (error) throw error
+    return (data ?? [])
+      .map(normalizeCampaign)
+      .filter((c) => c.status === "active" || c.status === "finished")
+  } catch {
+    return FALLBACK_CAMPAIGNS
   }
-  return data as Campaign
 }
 
+/** Una campaña por slug, cualquier status (el caller decide qué hacer con drafts). */
 export async function getCampaignBySlug(slug: string): Promise<Campaign | null> {
-  const { data, error } = await supabase
-    .from("campaigns")
-    .select("*, images:campaign_images(*)")
-    .eq("slug", slug)
-    .single()
+  try {
+    const { data, error } = await supabase
+      .from("campaigns")
+      .select("*, images:campaign_images(*)")
+      .eq("slug", slug)
+      .maybeSingle()
 
-  if (error) {
-    if (error.code === "PGRST116") return null
-    throw error
+    if (error) throw error
+    return data ? normalizeCampaign(data) : null
+  } catch {
+    return FALLBACK_CAMPAIGNS.find((c) => c.slug === slug) ?? null
   }
-  return data as Campaign
-}
-
-export async function getActiveCampaigns(): Promise<Campaign[]> {
-  const { data, error } = await supabase
-    .from("campaigns")
-    .select("*, images:campaign_images(*)")
-    .eq("status", "ACTIVA")
-    .order("created_at", { ascending: false })
-
-  if (error) throw error
-  return (data ?? []) as Campaign[]
-}
-
-// ─── Escritura (service_role — solo server-side) ──────────────────────────────
-
-export async function createCampaign(payload: CampaignInsert): Promise<Campaign> {
-  const admin = createAdminClient()
-  const { data, error } = await admin
-    .from("campaigns")
-    .insert(payload)
-    .select()
-    .single()
-
-  if (error) throw error
-  return data as Campaign
-}
-
-export async function updateCampaign(id: string, payload: CampaignUpdate): Promise<Campaign> {
-  const admin = createAdminClient()
-  const { data, error } = await admin
-    .from("campaigns")
-    .update(payload)
-    .eq("id", id)
-    .select()
-    .single()
-
-  if (error) throw error
-  return data as Campaign
-}
-
-export async function deleteCampaign(id: string): Promise<void> {
-  const admin = createAdminClient()
-  const { error } = await admin.from("campaigns").delete().eq("id", id)
-  if (error) throw error
-}
-
-export async function addCampaignImage(
-  campaignId: string,
-  url: string,
-  alt: string,
-  position: number,
-): Promise<CampaignImage> {
-  const admin = createAdminClient()
-  const { data, error } = await admin
-    .from("campaign_images")
-    .insert({ campaign_id: campaignId, url, alt, position })
-    .select()
-    .single()
-
-  if (error) throw error
-  return data as CampaignImage
-}
-
-export async function removeCampaignImage(id: string): Promise<void> {
-  const admin = createAdminClient()
-  const { error } = await admin.from("campaign_images").delete().eq("id", id)
-  if (error) throw error
-}
-
-export async function uploadImage(file: File, campaignSlug: string): Promise<string> {
-  const admin = createAdminClient()
-  const path  = `${campaignSlug}/${Date.now()}-${file.name}`
-
-  const { error: uploadError } = await admin.storage
-    .from("campaign-images")
-    .upload(path, file, { upsert: false })
-
-  if (uploadError) throw uploadError
-
-  const { data } = admin.storage.from("campaign-images").getPublicUrl(path)
-  return data.publicUrl
 }

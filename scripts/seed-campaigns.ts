@@ -27,7 +27,7 @@ const CAMPAIGNS = [
     brand:       "Grupo Presidente",
     title:       "Lynk & Co llega a Mendoza: preventa exclusiva de la marca de movilidad premium escandinava",
     description: "Grupo Presidente confirma el inicio de la preventa exclusiva de Lynk & Co en Mendoza. Tres modelos SUV híbridos premium con apertura de Urban Store en Palmares Mall prevista para el segundo semestre de 2026.",
-    status:      "ACTIVA" as const,
+    status:      "active" as const,
     date:        "Junio 2026",
     content: `
 <p class="lead">Hay hitos que cambian el pulso de un mercado, y lo que ocurre hoy en Mendoza es uno de ellos. Grupo Presidente confirma el inicio de la preventa exclusiva de Lynk &amp; Co, la marca global que está transformando la industria automotriz.</p>
@@ -66,7 +66,7 @@ const CAMPAIGNS = [
     brand:       "Bolsa de Comercio de Mendoza",
     title:       "El mosto se consolida en el exterior como el endulzante premium de la industria",
     description: "La BCM reafirmó su posición como nexo articulador de la economía regional con un nuevo encuentro de la Comisión del Precio del Vino.",
-    status:      "ACTIVA" as const,
+    status:      "active" as const,
     date:        "Junio 2026",
     content: `
 <p class="lead">La Bolsa de Comercio de Mendoza reafirmó su posición como nexo articulador de la economía regional al realizar un nuevo encuentro de la Comisión del Precio del Vino, histórica en la institución.</p>
@@ -100,7 +100,7 @@ const CAMPAIGNS = [
     brand:       "Capilla Carlo Acutis",
     title:       "Peligra la continuidad de la Capilla Carlo Acutis en Luján de Cuyo: lanzan suscripción nacional para salvar la obra",
     description: "A un año de iniciar la construcción de la primera capilla dedicada al santo millennial en Chacras de Coria, la obra alcanzó solo el 17% de avance y corre riesgo de paralizarse por falta de fondos.",
-    status:      "ACTIVA" as const,
+    status:      "active" as const,
     date:        "Junio 2026",
     content: `
 <p class="lead">A un año de haber iniciado la construcción de la primera capilla dedicada al «Ciberapóstol de la Eucaristía» en Chacras de Coria, Luján de Cuyo, la coordinación del proyecto advierte que la obra se encuentra en una etapa crítica y corre riesgo de paralizarse debido a la falta de fondos.</p>

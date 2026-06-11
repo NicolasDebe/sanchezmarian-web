@@ -8,8 +8,7 @@ import {
   fadeUp, fadeUpStagger, revealCard, viewportOnce,
 } from "@/lib/animations"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
-import { CampaignSlideshow } from "@/components/campaign-slideshow"
-import type { Campaign } from "@/lib/types/campaign"
+import { STATUS_LABELS, type Campaign, type CampaignStatus } from "@/lib/types/campaign"
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
@@ -79,7 +78,7 @@ function CampanaHero() {
 // ─── Stats band ───────────────────────────────────────────────────────────────
 
 function CampanaStats({ campaigns }: { campaigns: Campaign[] }) {
-  const active   = campaigns.filter(c => c.status === "ACTIVA").length
+  const active   = campaigns.filter(c => c.status === "active").length
   const lastDate = campaigns[0]?.date ?? "—"
 
   const STATS = [
@@ -133,23 +132,23 @@ function CampanaStats({ campaigns }: { campaigns: Campaign[] }) {
 
 // ─── Card de campaña ──────────────────────────────────────────────────────────
 
+const BADGE_STYLES: Record<CampaignStatus, React.CSSProperties> = {
+  draft:    { background: "var(--color-arena)",        color: "var(--color-gris-bordo)" },
+  active:   { background: "var(--color-bordo)",        color: "var(--color-hueso)" },
+  finished: { background: "var(--color-bordo-oscuro)", color: "var(--color-hueso)" },
+}
+
 interface CampanaCardProps {
   marca: string
   titulo: string
-  estado: "ACTIVA" | "FINALIZADA"
+  estado: CampaignStatus
   fecha: string
   descripcion: string
-  scrollTarget?: string
+  href: string
 }
 
-function CampanaCard({ marca, titulo, estado, fecha, descripcion, scrollTarget }: CampanaCardProps) {
+function CampanaCard({ marca, titulo, estado, fecha, descripcion, href }: CampanaCardProps) {
   const [hov, setHov] = useState(false)
-
-  function handleScroll(e: React.MouseEvent) {
-    e.preventDefault()
-    if (!scrollTarget) return
-    document.getElementById(scrollTarget)?.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
 
   return (
     <motion.div
@@ -202,11 +201,10 @@ function CampanaCard({ marca, titulo, estado, fecha, descripcion, scrollTarget }
                 borderRadius:  100,
                 padding:       "5px 16px",
                 display:       "inline-block",
-                background:    estado === "ACTIVA" ? "var(--color-bordo)" : "var(--color-arena)",
-                color:         estado === "ACTIVA" ? "var(--color-hueso)" : "var(--color-gris-bordo)",
+                ...BADGE_STYLES[estado],
               }}
             >
-              {estado}
+              {STATUS_LABELS[estado]}
             </span>
             <p
               className="font-mono"
@@ -240,29 +238,24 @@ function CampanaCard({ marca, titulo, estado, fecha, descripcion, scrollTarget }
             {descripcion}
           </p>
 
-          {scrollTarget && (
-            <button
-              onClick={handleScroll}
-              className="font-sans"
-              style={{
-                fontSize:   14,
-                color:      "var(--color-bordo)",
-                fontWeight: 500,
-                display:    "inline-flex",
-                alignItems: "center",
-                gap:        hov ? 8 : 4,
-                marginTop:  16,
-                transition: "gap 0.3s ease",
-                background: "none",
-                border:     "none",
-                cursor:     "pointer",
-                padding:    0,
-              }}
-            >
-              Ver campaña completa
-              <ArrowRight size={13} strokeWidth={2} />
-            </button>
-          )}
+          <Link
+            href={href}
+            className="font-sans"
+            style={{
+              fontSize:       14,
+              color:          "var(--color-bordo)",
+              fontWeight:     500,
+              display:        "inline-flex",
+              alignItems:     "center",
+              gap:            hov ? 8 : 4,
+              marginTop:      16,
+              transition:     "gap 0.3s ease",
+              textDecoration: "none",
+            }}
+          >
+            Ver campaña completa
+            <ArrowRight size={13} strokeWidth={2} />
+          </Link>
         </div>
       </div>
     </motion.div>
@@ -319,7 +312,7 @@ function CampanaGrid({ campaigns }: { campaigns: Campaign[] }) {
               estado={c.status}
               fecha={c.date}
               descripcion={c.description}
-              scrollTarget={`campana-${c.slug}`}
+              href={`/campanas/${c.slug}`}
             />
           ))}
         </motion.div>
@@ -402,153 +395,6 @@ function CampanaEmpty() {
   )
 }
 
-// ─── Detalle genérico (datos de Supabase) ─────────────────────────────────────
-
-function CampanaDetail({ campaign, index }: { campaign: Campaign; index: number }) {
-  const bg     = index % 2 === 0 ? "bg-hueso" : "bg-hueso-oscuro"
-  const images = (campaign.images ?? [])
-    .sort((a, b) => a.position - b.position)
-    .map(img => ({ src: img.url, alt: img.alt }))
-
-  const initial = campaign.brand.trim()[0]?.toUpperCase() ?? "?"
-
-  return (
-    <section
-      id={`campana-${campaign.slug}`}
-      className={bg}
-      style={{ scrollMarginTop: 80 }}
-    >
-      {index > 0 && (
-        <div style={{ textAlign: "center", padding: "60px 0 0" }}>
-          <div
-            style={{
-              width:      80,
-              height:     1,
-              background: "var(--color-dorado)",
-              opacity:    0.15,
-              margin:     "0 auto",
-            }}
-          />
-        </div>
-      )}
-
-      <div
-        className="max-w-7xl mx-auto"
-        style={{ padding: "clamp(48px, 8vh, 80px) clamp(20px, 5vw, 64px) clamp(60px, 10vh, 120px)" }}
-      >
-        {/* Header */}
-        <motion.div
-          variants={fadeUpStagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-        >
-          <motion.div
-            variants={fadeUp}
-            className="flex flex-col sm:flex-row items-start sm:items-center"
-            style={{ gap: "clamp(16px, 3vw, 40px)", marginBottom: 40 }}
-          >
-            <div
-              className="font-playfair"
-              style={{
-                width:        56,
-                height:       56,
-                borderRadius: "50%",
-                background:   "var(--color-bordo)",
-                color:        "var(--color-hueso)",
-                display:      "grid",
-                placeItems:   "center",
-                fontSize:     24,
-                fontWeight:   700,
-                flexShrink:   0,
-              }}
-            >
-              {initial}
-            </div>
-
-            <div>
-              <p
-                className="font-mono uppercase"
-                style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
-              >
-                {campaign.brand}
-              </p>
-              <p
-                className="font-playfair"
-                style={{
-                  fontSize:   "clamp(1.4rem, 3vw, 2rem)",
-                  fontWeight: 600,
-                  color:      "var(--color-negro-bordo)",
-                  lineHeight: 1.25,
-                  marginTop:  8,
-                  maxWidth:   700,
-                }}
-              >
-                {campaign.title}
-              </p>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
-                <span
-                  className="font-mono"
-                  style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.5 }}
-                >
-                  {campaign.date}
-                </span>
-                <span
-                  className="font-mono uppercase"
-                  style={{
-                    fontSize:      10,
-                    letterSpacing: "0.1em",
-                    borderRadius:  100,
-                    padding:       "3px 12px",
-                    background:    campaign.status === "ACTIVA" ? "var(--color-bordo)" : "var(--color-arena)",
-                    color:         campaign.status === "ACTIVA" ? "var(--color-hueso)" : "var(--color-gris-bordo)",
-                  }}
-                >
-                  {campaign.status}
-                </span>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            variants={fadeUp}
-            style={{ width: 60, height: 1, background: "var(--color-dorado)", marginBottom: 40 }}
-          />
-        </motion.div>
-
-        {/* Contenido HTML */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-          style={{ maxWidth: 720 }}
-        >
-          <style>{`
-            .campana-prose p          { font-size: 15px; color: var(--color-gris-bordo); line-height: 1.85; margin-bottom: 20px; }
-            .campana-prose p.lead     { font-size: 17px; color: var(--color-negro-bordo); line-height: 1.8; font-weight: 400; margin-bottom: 40px; padding-left: clamp(16px,3vw,20px); border-left: 2px solid rgba(201,168,130,0.4); }
-            .campana-prose h3         { font-family: var(--font-playfair-display), serif; font-size: 20px; color: var(--color-negro-bordo); font-style: italic; margin-top: 48px; margin-bottom: 16px; }
-            .campana-prose blockquote { padding: clamp(16px,3vw,24px) clamp(20px,3vw,28px); background: var(--color-arena); border-radius: 12px; border-left: 3px solid var(--color-bordo); margin: 0 0 32px; }
-            .campana-prose blockquote p { font-style: italic; }
-            .campana-prose blockquote footer { font-family: var(--font-dm-mono), monospace; font-size: 10px; color: var(--color-bordo); opacity: 0.6; margin-top: 10px; }
-            .campana-prose blockquote.dark  { background: var(--color-bordo); border: none; }
-            .campana-prose blockquote.dark p { color: var(--color-hueso); }
-            .campana-prose blockquote.dark footer { color: var(--color-hueso); }
-          `}</style>
-          <div
-            className="campana-prose"
-            dangerouslySetInnerHTML={{ __html: campaign.content }}
-          />
-        </motion.div>
-
-        {images.length > 0 && (
-          <CampaignSlideshow campaignName={campaign.brand} images={images} />
-        )}
-      </div>
-    </section>
-  )
-}
-
 // ─── CTA final ────────────────────────────────────────────────────────────────
 
 function CampanaCta() {
@@ -626,16 +472,9 @@ export function CampanasContent({ campaigns = [] }: { campaigns?: Campaign[] }) 
       <CampanaHero />
       <CampanaStats campaigns={campaigns} />
       {campaigns.length === 0 ? (
-        <>
-          <CampanaEmpty />
-        </>
+        <CampanaEmpty />
       ) : (
-        <>
-          <CampanaGrid campaigns={campaigns} />
-          {campaigns.map((c, i) => (
-            <CampanaDetail key={c.id} campaign={c} index={i} />
-          ))}
-        </>
+        <CampanaGrid campaigns={campaigns} />
       )}
       <CampanaCta />
     </>

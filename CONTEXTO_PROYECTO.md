@@ -143,11 +143,55 @@ una sección por página).
   curaduría fija por ids de `data/clippings.ts` (decisión: es contenido curado,
   no un listado). Lo mismo el grid del home.
 
+### Campañas (CRUD completo, 2026-06-11)
+- Tablas Supabase: `campaigns` (slug único, brand, title, description, content
+  HTML, status, date texto "Junio 2026") y `campaign_images` (campaign_id FK,
+  url, alt, position — menor position = foto destacada). Bucket Storage
+  público `campaign-images`, archivos en `{slug}/{timestamp}-{random}-{nombre}`.
+- Status canónicos: `draft` / `active` / `finished` (labels Borrador/Activa/
+  Finalizada). Migración `supabase/migrations/20260611_campaigns_status.sql`
+  (idempotente, pegar en el SQL Editor) convierte los legacy ACTIVA/FINALIZADA
+  y extiende el CHECK constraint. HASTA CORRERLA la base rechaza drafts: el
+  código normaliza al leer (`normalizeStatus`) y al escribir reintenta con el
+  valor legacy (`legacyStatus`); guardar un borrador devuelve un error claro
+  pidiendo correr la migración.
+- Público: `/campanas` (revalidate 60, `getPublicCampaigns()` filtra drafts,
+  fallback hardcoded en `data/campaigns-fallback.ts` si Supabase falla) y
+  `/campanas/[slug]` (force-dynamic, detalle con `.rich-content` de
+  globals.css; contenido legacy en texto plano se envuelve en `<p>` vía
+  `ensureHtml`). Drafts: 404 salvo `?preview=true` + sesión activa (banner
+  "Borrador — vista previa").
+- Admin: `/admin/campanas` (lista con filtros por status vía query param,
+  buscador client-side, eliminar con modal + toast), `/admin/campanas/nueva` y
+  `/admin/campanas/{slug}/editar` (form compartido
+  `components/admin/campaign-form.tsx`: slug auto-generado con slugify +
+  chequeo de unicidad con debounce, fecha con input month ⇄ "Junio 2026",
+  contadores de caracteres, drop zone de fotos múltiples — la primera es la
+  destacada, sin reorder todavía —, footer sticky Guardar borrador/Publicar,
+  publicar exige ≥1 foto). Server actions en
+  `app/admin/(panel)/campanas/actions.ts` (create/update/delete campaña,
+  upload/delete imagen con compactación de positions, checkSlugAvailability).
+- Editor de contenido: `components/admin/RichTextEditor.tsx` (Tiptap v3,
+  StarterKit con link integrado — NO agregar @tiptap/extension-link aparte,
+  duplica la extensión — `immediatelyRender: false` obligatorio por SSR).
+- `next.config.ts`: `serverActions.bodySizeLimit: "8mb"` (fotos hasta 5MB van
+  por server action).
+- deleteCampaign borra primero los archivos del bucket (por URL parseada y por
+  carpeta del slug) y las filas de `campaign_images` explícitamente (no
+  depende de cascade).
+- Tests: `npx tsx scripts/e2e-campaigns.ts` con el dev server corriendo
+  (auto-limpiante; crea y borra usuario y campaña de prueba).
+
 ### Pendiente (próxima iteración)
 - Correr la migración SQL de clippings en el dashboard + seed (paso manual,
   ver arriba). Hasta entonces el admin de clippings muestra el aviso de setup
   y la página pública usa el fallback.
-- Páginas secundarias (`/campanas`, `/privacidad`, `/terminos`, `/sobre-marian`)
+- Correr la migración SQL de campañas
+  (`supabase/migrations/20260611_campaigns_status.sql`) en el SQL Editor para
+  habilitar borradores (ver sección Campañas).
+- Sesión 2 de campañas: Tiptap en otras páginas. Sesión 3: reorder de fotos
+  por drag & drop.
+- Páginas secundarias (`/privacidad`, `/terminos`, `/sobre-marian`)
   usan Nav/Footer con sus textos de fallback (no leen `global` aún). Se ven
   idénticas; si se editan los textos globales, esas páginas no los reflejan.
 

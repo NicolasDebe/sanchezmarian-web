@@ -163,3 +163,173 @@ body::after {
   box-shadow: 0 0 0 3px rgba(102, 0, 31, 0.08);
 }
 
+/* ── Rich content — HTML de campañas (Tiptap + contenido legacy) ── */
+
+.rich-content {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.rich-content p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--color-gris-bordo);
+  margin: 0 0 20px;
+}
+
+.rich-content p.lead {
+  font-size: 17px;
+  color: var(--color-negro-bordo);
+  line-height: 1.8;
+  margin-bottom: 40px;
+  padding-left: clamp(16px, 3vw, 20px);
+  border-left: 2px solid rgba(201, 168, 130, 0.4);
+}
+
+.rich-content h2 {
+  font-family: var(--font-playfair-display), serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--color-negro-bordo);
+  line-height: 1.25;
+  margin: 44px 0 16px;
+}
+
+.rich-content h3 {
+  font-family: var(--font-playfair-display), serif;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--color-negro-bordo);
+  margin: 40px 0 14px;
+}
+
+.rich-content h2:first-child,
+.rich-content h3:first-child {
+  margin-top: 0;
+}
+
+.rich-content a {
+  color: var(--color-bordo);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(102, 0, 31, 0.25);
+}
+
+.rich-content a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rich-content ul,
+.rich-content ol {
+  padding-left: 24px;
+  margin: 0 0 20px;
+  color: var(--color-gris-bordo);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.rich-content ul { list-style: disc; }
+.rich-content ol { list-style: decimal; }
+
+.rich-content li { margin-bottom: 8px; }
+.rich-content li::marker { color: var(--color-dorado); }
+
+.rich-content blockquote {
+  border-left: 3px solid var(--color-dorado);
+  background: var(--color-arena);
+  border-radius: 0 12px 12px 0;
+  padding: clamp(16px, 3vw, 24px) clamp(20px, 3vw, 28px);
+  margin: 0 0 32px;
+  font-style: italic;
+  color: var(--color-gris-bordo);
+}
+
+.rich-content blockquote p { margin-bottom: 0; }
+.rich-content blockquote p + p { margin-top: 12px; }
+
+.rich-content blockquote footer {
+  font-family: var(--font-dm-mono), monospace;
+  font-size: 10px;
+  font-style: normal;
+  color: var(--color-bordo);
+  opacity: 0.6;
+  margin-top: 10px;
+}
+
+/* Variante legacy de las campañas seedeadas */
+.rich-content blockquote.dark {
+  background: var(--color-bordo);
+  border: none;
+  border-radius: 12px;
+}
+.rich-content blockquote.dark p { color: var(--color-hueso); }
+.rich-content blockquote.dark footer { color: var(--color-hueso); }
+
+/* ── RichTextEditor (admin) ── */
+
+.rte-wrapper {
+  border: 1px solid rgba(201, 168, 130, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-hueso);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rte-wrapper:focus-within {
+  border-color: var(--color-bordo);
+  box-shadow: 0 0 0 3px rgba(102, 0, 31, 0.08);
+}
+
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--color-hueso-oscuro);
+  border-bottom: 1px solid rgba(201, 168, 130, 0.3);
+}
+
+.rte-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 7px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-gris-bordo);
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.rte-btn:hover {
+  background: var(--color-arena);
+  color: var(--color-negro-bordo);
+}
+
+.rte-btn.is-active {
+  background: var(--color-bordo);
+  color: var(--color-hueso);
+}
+
+.rte-wrapper .ProseMirror {
+  padding: 16px;
+  min-height: 200px;
+  outline: none;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-negro-bordo);
+}
+
+/* Dentro del editor los párrafos respiran menos que en la página pública */
+.rte-wrapper .ProseMirror p { font-size: 15px; margin-bottom: 12px; }
+.rte-wrapper .ProseMirror h2 { margin: 24px 0 10px; font-size: 22px; }
+.rte-wrapper .ProseMirror h3 { margin: 20px 0 8px; }
+.rte-wrapper .ProseMirror blockquote { margin-bottom: 16px; }
+

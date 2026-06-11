@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase"
+import { normalizeStatus } from "@/lib/types/campaign"
 
 export const dynamic = "force-dynamic"
 
@@ -20,6 +22,25 @@ export default async function DashboardPage() {
   } catch {
     email = ""
   }
+
+  // Contadores de campañas para la tarjeta (si Supabase falla, texto genérico).
+  let campaignsDesc = "Crear, editar y publicar campañas de prensa con fotos."
+  try {
+    const admin = createAdminClient()
+    const { data } = await admin.from("campaigns").select("status")
+    if (data) {
+      const statuses = data.map((r) => normalizeStatus(r.status as string))
+      const active = statuses.filter((s) => s === "active").length
+      const drafts = statuses.filter((s) => s === "draft").length
+      campaignsDesc = `${active} campaña${active === 1 ? "" : "s"} activa${active === 1 ? "" : "s"} · ${drafts} borrador${drafts === 1 ? "" : "es"}.`
+    }
+  } catch {
+    // se queda el texto genérico
+  }
+
+  const cards = EDITABLES.map((card) =>
+    card.href === "/admin/campanas" ? { ...card, desc: campaignsDesc } : card,
+  )
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -43,7 +64,7 @@ export default async function DashboardPage() {
 
       {/* Tarjetas por página editable */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {EDITABLES.map((card) => (
+        {cards.map((card) => (
           <Link
             key={card.href}
             href={card.href}
@@ -84,6 +105,7 @@ const EDITABLES = [
   { title: "Mis valores", href: "/admin/edit/mis-valores", desc: "Hero, historia, pilares y cierre." },
   { title: "Casos de éxito", href: "/admin/edit/casos-de-exito", desc: "Encabezado y estadísticas." },
   { title: "Casos de éxito / Clippings", href: "/admin/clippings", desc: "Apariciones en medios por cliente: cargar, editar y eliminar." },
+  { title: "Campañas", href: "/admin/campanas", desc: "Crear, editar y publicar campañas de prensa con fotos." },
   { title: "Contacto", href: "/admin/edit/contacto", desc: "Hero, datos de contacto y preguntas frecuentes." },
   { title: "Menú y footer", href: "/admin/edit/global", desc: "Textos que aparecen en todas las páginas." },
   { title: "SEO", href: "/admin/edit/seo", desc: "Títulos y descripciones para Google de cada página." },
