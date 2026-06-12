@@ -166,7 +166,11 @@ export async function deleteClipping(id: string): Promise<ClippingResult> {
 
 // ─── Auto-completar desde URL ─────────────────────────────────────────────────
 
-export type { UrlMetadata }
+// OJO: no re-exportar tipos desde este archivo. Es "use server": el build de
+// producción (Turbopack) convierte `export type { X }` en una referencia de
+// runtime a un identificador que no existe y TODO el módulo crashea con
+// "ReferenceError: X is not defined" (HTTP 500 en cada server action).
+// Importar UrlMetadata directo desde "@/lib/extract-metadata".
 
 /**
  * Lee la nota y extrae medio / título / fecha desde los meta tags
