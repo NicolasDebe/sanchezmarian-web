@@ -191,6 +191,8 @@ export function ClippingsManager({
           : await updateClipping(modal.id, payload)
 
       if (!result.success) {
+        // Visible en DevTools para diagnosticar qué rechazó Supabase.
+        console.error("[clipping] guardado falló:", result.error, payload)
         setErrors((e) => ({ ...e, _global: result.error }))
         return
       }

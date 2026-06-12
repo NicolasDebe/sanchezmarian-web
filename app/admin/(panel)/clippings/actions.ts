@@ -85,9 +85,16 @@ export async function createClipping(data: ClippingInput): Promise<ClippingResul
     })
 
     if (error) {
+      console.error("[createClipping] supabase insert error:", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      })
       return { success: false, error: `No se pudo guardar: ${error.message}` }
     }
   } catch (err) {
+    console.error("[createClipping] throw:", err)
     const msg = err instanceof Error ? err.message : "error desconocido"
     return { success: false, error: `Ocurrió un error al guardar: ${msg}` }
   }
@@ -123,9 +130,16 @@ export async function updateClipping(
       .eq("id", id)
 
     if (error) {
+      console.error("[updateClipping] supabase update error:", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      })
       return { success: false, error: `No se pudo guardar: ${error.message}` }
     }
   } catch (err) {
+    console.error("[updateClipping] throw:", err)
     const msg = err instanceof Error ? err.message : "error desconocido"
     return { success: false, error: `Ocurrió un error al guardar: ${msg}` }
   }
