@@ -170,7 +170,10 @@ export function ClippingsManager({
   }
 
   async function handleSave(addAnother: boolean) {
-    if (!modal || !validate()) return
+    if (!modal) return
+    // Limpiamos el error global previo antes de revalidar/guardar.
+    setErrors((e) => ({ ...e, _global: "" }))
+    if (!validate()) return
     setSaving(true)
     const payload: ClippingInput = {
       client_id: clientId,
@@ -181,25 +184,37 @@ export function ClippingsManager({
       format: form.format,
       url: form.url.trim(),
     }
-    const result =
-      modal.mode === "create"
-        ? await createClipping(payload)
-        : await updateClipping(modal.id, payload)
-    setSaving(false)
+    try {
+      const result =
+        modal.mode === "create"
+          ? await createClipping(payload)
+          : await updateClipping(modal.id, payload)
 
-    if (!result.success) {
-      setErrors((e) => ({ ...e, _global: result.error }))
-      return
-    }
+      if (!result.success) {
+        setErrors((e) => ({ ...e, _global: result.error }))
+        return
+      }
 
-    setToast(modal.mode === "create" ? "Clipping guardado." : "Cambios guardados.")
-    router.refresh()
-    if (addAnother && modal.mode === "create") {
-      setForm(EMPTY_FORM)
-      setErrors({})
-      setExtractMsg(null)
-    } else {
-      setModal(null)
+      setToast(modal.mode === "create" ? "Clipping guardado." : "Cambios guardados.")
+      router.refresh()
+      if (addAnother && modal.mode === "create") {
+        setForm(EMPTY_FORM)
+        setErrors({})
+        setExtractMsg(null)
+      } else {
+        setModal(null)
+      }
+    } catch {
+      // Si la server action lanza (red, sesión, migración faltante, etc.) la
+      // promesa se rechaza: mostramos el error en vez de quedar en "Guardando…".
+      setErrors((e) => ({
+        ...e,
+        _global:
+          "No se pudo guardar. Revisá tu conexión y volvé a intentar. Si el problema persiste, puede faltar correr la migración de la base.",
+      }))
+    } finally {
+      // SIEMPRE liberamos el botón, resuelva o rechace la promesa.
+      setSaving(false)
     }
   }
 

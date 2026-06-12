@@ -84,9 +84,12 @@ export async function createClipping(data: ClippingInput): Promise<ClippingResul
       updated_by: user.email || user.id,
     })
 
-    if (error) return { success: false, error: "No se pudo guardar. Intentá de nuevo." }
-  } catch {
-    return { success: false, error: "Ocurrió un error al guardar. Intentá de nuevo." }
+    if (error) {
+      return { success: false, error: `No se pudo guardar: ${error.message}` }
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "error desconocido"
+    return { success: false, error: `Ocurrió un error al guardar: ${msg}` }
   }
 
   revalidatePath("/casos-de-exito")
@@ -119,9 +122,12 @@ export async function updateClipping(
       })
       .eq("id", id)
 
-    if (error) return { success: false, error: "No se pudo guardar. Intentá de nuevo." }
-  } catch {
-    return { success: false, error: "Ocurrió un error al guardar. Intentá de nuevo." }
+    if (error) {
+      return { success: false, error: `No se pudo guardar: ${error.message}` }
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "error desconocido"
+    return { success: false, error: `Ocurrió un error al guardar: ${msg}` }
   }
 
   revalidatePath("/casos-de-exito")
