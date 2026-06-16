@@ -25,6 +25,10 @@ import { MentoriaMobile } from "./mentoria-mobile"
 type Stage = "opening" | "reveal" | "anchor" | "transition" | "sub" | "description"
 type Frame = { stage: Stage; start: number; end: number; subIdx?: number }
 
+/* Altura del nav fijo (header sticky bordo, h-[72px]). El sticky interno y el
+   header de capítulo respetan este offset para no tocar nunca el nav. */
+const NAV_H = 72
+
 function buildFrames(s: Servicio) {
   const items: { stage: Stage; weight: number; subIdx?: number }[] = []
   items.push({ stage: "opening", weight: 1.2 })
@@ -142,6 +146,31 @@ function MentoriaDesktop({ s, sectionId }: { s: Servicio; sectionId: string }) {
   const wght = useTransform(scrollYProgress, wX, wY)
   const fontVariationSettings = useMotionTemplate`"wght" ${wght}`
 
+  /* CROSS-FADE título grande → header de capítulo. El título grande (centrado)
+     cubre opening/reveal/anchor y se desvanece a mitad de la transición,
+     mientras el header pequeño (single-line, izquierda, --bordo, bajo el nav)
+     entra y persiste durante sub-servicios + descripción. Garantiza el estado
+     final correcto sin depender de un único elemento que morfee text-align. */
+  const transSpan = trans.end - trans.start
+  const bigTitleOpacity = useTransform(
+    scrollYProgress,
+    ...stops([
+      [0, 1],
+      [anchorEnd, 1],
+      [trans.start + transSpan * 0.5, 0],
+      [1, 0],
+    ]),
+  )
+  const headerOpacity = useTransform(
+    scrollYProgress,
+    ...stops([
+      [0, 0],
+      [trans.start + transSpan * 0.4, 0],
+      [trans.end, 1],
+      [1, 1],
+    ]),
+  )
+
   /* ── FOTO ───────────────────────────────────────────────────────────────
      Reveal con clip-path circle, luego se compacta a la izquierda (scale +
      origin left), y sale como cortinilla en el frame de descripción. */
@@ -198,7 +227,10 @@ function MentoriaDesktop({ s, sectionId }: { s: Servicio; sectionId: string }) {
   return (
     <section id={sectionId} className="relative bg-hueso" aria-label={s.nombre} data-frames={frames.length}>
       <div ref={ref} style={{ height: "800vh" }}>
-        <div className="sticky top-0 h-screen w-full overflow-hidden">
+        <div
+          className="sticky w-full overflow-hidden"
+          style={{ top: NAV_H, height: `calc(100vh - ${NAV_H}px)` }}
+        >
           {/* fondo + textura */}
           <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(120% 90% at 100% 0%, var(--color-arena) 0%, transparent 55%)", opacity: 0.45 }} />
           <TextureOverlay texture="paperGrain" opacity={0.12} />
@@ -216,21 +248,55 @@ function MentoriaDesktop({ s, sectionId }: { s: Servicio; sectionId: string }) {
             <span className="ms-asterisk inline-block" style={{ animationDuration: "40s" }}>✳</span>
           </motion.span>
 
-          {/* contador "01 / MENTORÍA" abajo a la derecha */}
-          <motion.div aria-hidden className="absolute text-right" style={{ bottom: "clamp(28px, 5vh, 56px)", right: "clamp(28px, 5vw, 80px)", opacity: decorOpacity }}>
+          {/* contador "01 / MENTORÍA" abajo a la derecha — alejado del borde
+              para no chocar con el indicador lateral */}
+          <motion.div aria-hidden className="absolute text-right" style={{ bottom: 32, right: "clamp(80px, 8vw, 120px)", opacity: decorOpacity }}>
             <div className="font-mono text-bordo" style={{ fontSize: 14, letterSpacing: "0.12em" }}>01</div>
             <div className="mt-1 font-mono uppercase text-gris-bordo" style={{ fontSize: 11, letterSpacing: "0.28em" }}>{firstWord(s.nombre)}</div>
           </motion.div>
 
-          {/* TÍTULO que morfea (z medio) — aparece UNA sola vez, un solo elemento */}
+          {/* TÍTULO grande que morfea (z medio) — entra una vez, se desvanece
+              en la transición cediendo al header de capítulo */}
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center" style={{ paddingInline: "clamp(24px, 6vw, 96px)" }}>
             <motion.div
               className="relative w-full text-center"
-              style={{ maxWidth: 1150, transform: translate, transformOrigin: "50% 50%", letterSpacing, fontVariationSettings, fontFamily: "var(--font-playfair-var), serif", willChange: "transform" }}
+              style={{ maxWidth: 1150, opacity: bigTitleOpacity, transform: translate, transformOrigin: "50% 50%", letterSpacing, fontVariationSettings, fontFamily: "var(--font-playfair-var), serif", willChange: "transform, opacity" }}
             >
               <MorphTitle text={s.nombre} />
             </motion.div>
           </div>
+
+          {/* HEADER DE CAPÍTULO — estado FINAL del título: pequeño, single-line,
+              izquierda, peso liviano, --bordo, con padding consciente del nav */}
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute"
+            style={{
+              top: `calc(${NAV_H}px + clamp(32px, 5vh, 72px))`,
+              left: "clamp(24px, 6vw, 96px)",
+              right: "clamp(24px, 6vw, 96px)",
+              opacity: headerOpacity,
+              willChange: "opacity",
+            }}
+          >
+            <span className="block font-mono uppercase text-dorado" style={{ fontSize: 11, letterSpacing: "0.26em", marginBottom: 10 }}>
+              01 — {firstWord(s.nombre)}
+            </span>
+            <span
+              className="block text-bordo"
+              style={{
+                fontFamily: "var(--font-playfair-var), serif",
+                fontVariationSettings: '"wght" 400',
+                fontWeight: 300,
+                fontSize: "clamp(14px, 1.4vw, 20px)",
+                lineHeight: 1.2,
+                letterSpacing: "0.01em",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {s.nombre}
+            </span>
+          </motion.div>
 
           {/* FRASE ANCLA (frame propio, parallax contrario) */}
           {anchorFrame && (
@@ -332,7 +398,7 @@ function SubPanel({ subs, subFrames, progress, startReveal, fadeOut }: { subs: S
   return (
     <motion.div
       className="absolute inset-y-0 flex flex-col justify-center"
-      style={{ left: "60%", right: "clamp(56px, 6vw, 100px)", gap: 26 }}
+      style={{ left: "58%", right: "clamp(80px, 8vw, 128px)", gap: 48 }}
       animate={{ opacity: shown ? 1 : 0 }}
       transition={{ duration: 0.4, ease: EASE }}
     >
@@ -349,7 +415,7 @@ function SubItem({ sub, idx, active }: { sub: SubServicio; idx: number; active: 
   const variants: Variants = {
     pending: { opacity: 0, y: 40, scale: 1, filter: "blur(8px)" },
     active: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" },
-    passed: { opacity: 0.32, y: 0, scale: 0.97, filter: "blur(0px)" },
+    passed: { opacity: 0.25, y: 0, scale: 0.95, filter: "blur(0px)" },
   }
   return (
     <motion.div
@@ -357,7 +423,7 @@ function SubItem({ sub, idx, active }: { sub: SubServicio; idx: number; active: 
       initial={reduced ? undefined : "pending"}
       animate={reduced ? undefined : state}
       transition={{ duration: 0.55, ease: EASE }}
-      style={{ transformOrigin: "0% 50%", willChange: "opacity, transform", opacity: reduced ? (state === "pending" ? 0 : 1) : undefined }}
+      style={{ transformOrigin: "0% 50%", paddingBlock: "clamp(10px, 1.6vh, 20px)", willChange: "opacity, transform", opacity: reduced ? (state === "pending" ? 0 : 1) : undefined }}
     >
       <span className="font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em" }}>{two(idx + 1)} — Sub-servicio</span>
       <motion.div

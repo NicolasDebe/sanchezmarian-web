@@ -69,7 +69,7 @@ export function LateralIndicator({ segments, scrollyId }: { segments: Seg[]; scr
     <div
       aria-hidden
       className="pointer-events-none fixed top-1/2 z-30 hidden -translate-y-1/2 flex-col items-center md:flex"
-      style={{ right: "clamp(16px, 3vw, 40px)", gap: 24 }}
+      style={{ right: "clamp(16px, 2vw, 32px)", gap: 24 }}
     >
       {segments.map((seg, i) => {
         const isActive = i === active
