@@ -15,6 +15,7 @@ import { fallbacksFor } from "@/lib/servicios-schema"
 import { useMediaQuery } from "@/lib/use-media-query"
 import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
+import { cn } from "@/lib/utils"
 
 /* ════════════════════════════════════════════════════════════════════════
    TIPOS Y PARSEO DE CONTENIDO
@@ -36,8 +37,12 @@ type Servicio = {
 
 const SERVICE_KEYS = ["servicio_01", "servicio_02", "servicio_03"] as const
 
-/** Foto destacada del servicio protagonista (la única foto de la página). */
+/** Foto del servicio destacado (única foto de la página). */
 const FEATURED_PHOTO = "/images/NAC_4230.jpg"
+
+const PENDING = "[Pendiente — editable desde admin]"
+/** Curva elegante (ease-out enfático). */
+const EASE = [0.22, 1, 0.36, 1] as const
 
 function buildServicio(key: string, c: Record<string, string>): Servicio {
   const subServicios = [1, 2, 3]
@@ -56,68 +61,106 @@ function buildServicio(key: string, c: Record<string, string>): Servicio {
   }
 }
 
-const PENDING = "[Contenido pendiente — editable desde admin]"
-const EASE = [0.16, 1, 0.3, 1] as const
-
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 1 — HERO INTRO
+   SECCIÓN 1 — HERO (contenido + satélites creativos)
    ════════════════════════════════════════════════════════════════════════ */
 
 const heroContainer: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } },
 }
 const heroWord: Variants = {
-  hidden: { opacity: 0, y: "0.4em", filter: "blur(20px)" },
+  hidden: { opacity: 0, y: 20, filter: "blur(12px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.7, ease: EASE },
+    transition: { duration: 0.8, ease: EASE },
   },
 }
 
-function HeroSection({ hero }: { hero: Record<string, string> }) {
+function HeroSection({
+  hero,
+  serviceCount,
+}: {
+  hero: Record<string, string>
+  serviceCount: number
+}) {
   const reduced = useReducedMotion()
   const words = (hero.h1 ?? "").split(/\s+/).filter(Boolean)
+  // Los satélites entran después de las palabras.
+  const satelliteDelay = reduced ? 0 : words.length * 0.06 + 0.45
+  const eyebrow = (hero.eyebrow ?? "Servicios").trim()
+
+  const satellite = (delay: number) =>
+    reduced
+      ? {}
+      : {
+          initial: { opacity: 0, y: 10 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.7, ease: EASE, delay: satelliteDelay + delay },
+        }
 
   return (
     <section
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-hueso"
-      style={{ paddingInline: "clamp(24px, 6vw, 96px)", paddingBlock: "120px 96px" }}
+      className="relative flex min-h-[80vh] flex-col justify-center overflow-hidden bg-hueso sm:min-h-[90vh]"
+      style={{ paddingInline: "clamp(32px, 8vw, 120px)", paddingBlock: "120px 96px" }}
     >
-      {/* Gradiente radial sutil en arena, top-right */}
+      {/* (f) Gradiente radial sutil arena, esquina superior derecha */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 90% at 100% 0%, var(--color-arena) 0%, transparent 55%)",
+            "radial-gradient(110% 80% at 100% 0%, var(--color-arena) 0%, transparent 55%)",
+          opacity: 0.4,
         }}
       />
-      <TextureOverlay texture="paperGrain" opacity={0.16} />
+      <TextureOverlay texture="paperGrain" opacity={0.14} />
 
-      <div className="relative mx-auto w-full max-w-[1400px]">
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: EASE }}
-          className="mb-7 font-mono uppercase text-bordo"
-          style={{ fontSize: 12, letterSpacing: "0.22em" }}
-        >
-          {hero.eyebrow}
-        </motion.p>
+      {/* (c) Asterisco animado en la esquina superior derecha */}
+      <motion.span
+        aria-hidden
+        {...satellite(0.1)}
+        className="pointer-events-none absolute select-none font-playfair text-dorado"
+        style={{ top: "clamp(80px, 12vh, 140px)", right: "clamp(28px, 6vw, 96px)", fontSize: "clamp(48px, 6vw, 92px)", lineHeight: 1 }}
+      >
+        <span className={reduced ? "" : "ms-asterisk inline-block"}>✳</span>
+      </motion.span>
 
+      <div className="relative mx-auto w-full" style={{ maxWidth: 1100 }}>
+        {/* (a) Badge pill eyebrow */}
+        <motion.div {...satellite(0)} className="mb-7">
+          <span
+            className="inline-flex items-center gap-2 rounded-full border border-dorado/60 bg-arena/40 font-mono uppercase text-bordo"
+            style={{ fontSize: 11, letterSpacing: "0.2em", padding: "8px 16px" }}
+          >
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-dorado" />
+            {eyebrow}
+          </span>
+        </motion.div>
+
+        {/* (b) Línea decorativa dorada que crece */}
+        <motion.div
+          aria-hidden
+          initial={reduced ? false : { scaleX: 0 }}
+          animate={reduced ? undefined : { scaleX: 1 }}
+          transition={{ duration: 0.7, ease: EASE, delay: satelliteDelay + 0.05 }}
+          className="mb-8 h-px origin-left bg-dorado"
+          style={{ width: "clamp(60px, 10vw, 120px)" }}
+        />
+
+        {/* Título contenido */}
         <motion.h1
           variants={reduced ? undefined : heroContainer}
           initial={reduced ? undefined : "hidden"}
           animate={reduced ? undefined : "visible"}
           className="font-playfair font-bold text-negro-bordo"
           style={{
-            fontSize: "clamp(40px, 7.5vw, 120px)",
-            lineHeight: 1.02,
+            fontSize: "clamp(36px, 5.4vw, 88px)",
+            lineHeight: 1.05,
             letterSpacing: "-0.03em",
-            maxWidth: "16ch",
+            maxWidth: "18ch",
           }}
         >
           {reduced
@@ -134,37 +177,40 @@ function HeroSection({ hero }: { hero: Record<string, string> }) {
               ))}
         </motion.h1>
 
+        {/* Subtítulo */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE, delay: reduced ? 0 : 0.5 }}
-          className="mt-9 font-sans text-gris-bordo"
-          style={{ fontSize: "clamp(16px, 1.6vw, 21px)", lineHeight: 1.65, maxWidth: 620 }}
+          {...satellite(0.15)}
+          className="mt-8 font-sans text-gris-bordo"
+          style={{ fontSize: "clamp(16px, 1.4vw, 20px)", lineHeight: 1.65, maxWidth: 560 }}
         >
           <RichText html={hero.description} className="rich-inline" />
         </motion.div>
       </div>
 
-      {/* Indicador de scroll — línea dorada animada */}
+      {/* (d) Texto satélite inferior derecho */}
+      <motion.span
+        aria-hidden
+        {...satellite(0.25)}
+        className="absolute font-mono uppercase text-bordo/55"
+        style={{ bottom: 36, right: "clamp(28px, 6vw, 96px)", fontSize: 11, letterSpacing: "0.22em" }}
+      >
+        0{serviceCount} — {eyebrow}
+      </motion.span>
+
+      {/* (e) Indicador de scroll: círculo + texto rotado */}
       <div
         aria-hidden
-        className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center"
-        style={{ bottom: 32 }}
+        className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center gap-3"
+        style={{ bottom: 30 }}
       >
         <span
-          className="mb-3 font-mono uppercase text-bordo/60"
-          style={{ fontSize: 10, letterSpacing: "0.2em" }}
+          className="font-mono uppercase text-bordo/60"
+          style={{ fontSize: 10, letterSpacing: "0.3em", writingMode: "vertical-rl" }}
         >
           Scroll
         </span>
-        <div className="relative h-12 w-px overflow-hidden bg-dorado/30">
-          {!reduced && (
-            <motion.div
-              className="absolute left-0 top-0 h-1/2 w-full bg-dorado"
-              animate={{ y: ["-100%", "200%"] }}
-              transition={{ duration: 1.8, ease: "easeInOut", repeat: Infinity }}
-            />
-          )}
+        <div className="relative flex h-9 w-5 items-start justify-center rounded-full border border-dorado/50 pt-1.5">
+          <span className={cn("h-1.5 w-1.5 rounded-full bg-dorado", !reduced && "ms-scroll-dot")} />
         </div>
       </div>
     </section>
@@ -172,166 +218,162 @@ function HeroSection({ hero }: { hero: Record<string, string> }) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 2 — SERVICIO DESTACADO
+   CUERPO — decide desktop scrollytelling vs mobile apilado
    ════════════════════════════════════════════════════════════════════════ */
 
-function FeaturedSection({ s }: { s: Servicio }) {
+function ServiciosBody(props: {
+  featured: Servicio
+  secondaries: Servicio[]
+  cta: Record<string, string>
+}) {
   const isDesktop = useMediaQuery("(min-width: 1024px)")
   const reduced = useReducedMotion()
-
-  // SSR / mobile / reduced-motion → versión apilada (todo el contenido en DOM).
-  if (isDesktop === true && !reduced) return <FeaturedDesktop s={s} />
-  return <FeaturedMobile s={s} reduced={!!reduced} />
+  if (isDesktop === true && !reduced) return <ScrollytellingDesktop {...props} />
+  return <StackedMobile {...props} reduced={!!reduced} />
 }
 
-/* ─── Desktop: scrollytelling sticky 400vh ──────────────────────────────── */
+/* ─── plan de frames (compartido) ──────────────────────────────────────── */
 
-function FeaturedDesktop({ s }: { s: Servicio }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
+type Frame =
+  | { kind: "photo"; range: [number, number] }
+  | { kind: "anchor"; range: [number, number] }
+  | { kind: "sub"; range: [number, number]; sub: SubServicio }
+  | { kind: "card"; range: [number, number]; servicio: Servicio; num: string; dark: boolean }
+  | { kind: "cta"; range: [number, number] }
+
+/** Construye los 8 frames del scrollytelling unificado. */
+function buildFrames(featured: Servicio, secondaries: Servicio[]): Frame[] {
+  const subs = featured.subServicios.slice(0, 3)
+  const subStart = 0.22
+  const subEnd = 0.58
+  const step = (subEnd - subStart) / Math.max(subs.length, 1)
+
+  const frames: Frame[] = [
+    { kind: "photo", range: [0, 0.1] },
+    { kind: "anchor", range: [0.1, subStart] },
+  ]
+  subs.forEach((sub, i) => {
+    frames.push({ kind: "sub", range: [subStart + step * i, subStart + step * (i + 1)], sub })
   })
+  if (secondaries[0])
+    frames.push({ kind: "card", range: [0.58, 0.72], servicio: secondaries[0], num: "02", dark: false })
+  if (secondaries[1])
+    frames.push({ kind: "card", range: [0.72, 0.85], servicio: secondaries[1], num: "03", dark: true })
+  frames.push({ kind: "cta", range: [0.85, 1] })
+  return frames
+}
 
-  const lineScale = useTransform(scrollYProgress, [0.02, 0.95], [0, 1])
+/* ════════════════════════════════════════════════════════════════════════
+   DESKTOP — scrollytelling unificado sticky 1000vh
+   ════════════════════════════════════════════════════════════════════════ */
 
-  // Opacidad por frame (con cross-fade en los bordes).
-  const f1 = useTransform(scrollYProgress, [0, 0.04, 0.2, 0.27], [1, 1, 1, 0])
-  const f2 = useTransform(scrollYProgress, [0.24, 0.3, 0.46, 0.52], [0, 1, 1, 0])
-  const f3 = useTransform(scrollYProgress, [0.49, 0.55, 0.71, 0.77], [0, 1, 1, 0])
-  const f4 = useTransform(scrollYProgress, [0.74, 0.8, 1], [0, 1, 1])
+function ScrollytellingDesktop({
+  featured,
+  secondaries,
+  cta,
+}: {
+  featured: Servicio
+  secondaries: Servicio[]
+  cta: Record<string, string>
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] })
 
-  const photoScale = useTransform(scrollYProgress, [0, 0.27], [1.06, 1])
+  const frames = buildFrames(featured, secondaries)
+  const photoScale = useTransform(scrollYProgress, [0, 0.1], [1.06, 1])
+  const nFeaturedDots = 2 + featured.subServicios.slice(0, 3).length // foto + ancla + subs
+
+  // Estados del panel izquierdo (cambian de servicio con el scroll).
+  const panels = [
+    { range: [0, 0.58] as [number, number], eyebrow: "01 — Servicio destacado", title: featured.nombre, tagline: featured.tagline, desc: featured.descripcion },
+    secondaries[0] && { range: [0.58, 0.72] as [number, number], eyebrow: "02 — Servicio", title: secondaries[0].nombre, tagline: secondaries[0].tagline, desc: secondaries[0].descripcion },
+    secondaries[1] && { range: [0.72, 0.85] as [number, number], eyebrow: "03 — Servicio", title: secondaries[1].nombre, tagline: secondaries[1].tagline, desc: secondaries[1].descripcion },
+    { range: [0.85, 1] as [number, number], eyebrow: (cta.eyebrow ?? "").trim() || "Hablemos", title: cta.button_text || "Conversemos", tagline: "", desc: "" },
+  ].filter(Boolean) as { range: [number, number]; eyebrow: string; title: string; tagline: string; desc: string }[]
 
   return (
-    <section className="relative bg-hueso" aria-label={s.nombre}>
-      <div ref={ref} style={{ height: "400vh" }}>
+    <section className="relative bg-hueso" aria-label="Servicios">
+      <div ref={ref} style={{ height: "1000vh" }}>
         <div className="sticky top-0 flex h-screen items-stretch overflow-hidden">
-          {/* Panel izquierdo sticky (40%) */}
-          <div
-            className="flex w-2/5 flex-col justify-center"
-            style={{ paddingInline: "clamp(40px, 5vw, 88px)" }}
-          >
-            <p
-              className="font-mono uppercase text-bordo"
-              style={{ fontSize: 12, letterSpacing: "0.2em" }}
-            >
-              01 — Servicio destacado
-            </p>
-            <motion.div
-              className="mt-6 mb-8 h-px w-full origin-left bg-dorado"
-              style={{ scaleX: lineScale }}
-            />
-            <h2
-              className="font-playfair font-bold text-negro-bordo"
-              style={{
-                fontSize: "clamp(40px, 4.6vw, 76px)",
-                lineHeight: 1.04,
-                letterSpacing: "-0.03em",
-              }}
-            >
-              {s.nombre}
-            </h2>
-            {s.tagline && (
-              <p
-                className="mt-5 font-playfair italic text-bordo"
-                style={{ fontSize: "clamp(18px, 1.6vw, 24px)" }}
+          {/* PANEL IZQUIERDO sticky (40%) — contenido cambiante */}
+          <div className="relative w-2/5" style={{ paddingInline: "clamp(40px, 5vw, 88px)" }}>
+            {panels.map((p, i) => (
+              <PanelLayer
+                key={i}
+                progress={scrollYProgress}
+                range={p.range}
+                first={i === 0}
+                last={i === panels.length - 1}
               >
-                {s.tagline}
-              </p>
-            )}
-            <div
-              className="mt-7 font-sans text-gris-bordo"
-              style={{ fontSize: 18, lineHeight: 1.7, maxWidth: 480 }}
-            >
-              <RichText html={s.descripcion} className="rich-inline" />
-            </div>
+                <p className="font-mono uppercase text-bordo" style={{ fontSize: 12, letterSpacing: "0.2em" }}>
+                  {p.eyebrow}
+                </p>
+                <div className="mt-6 mb-8 h-px w-16 bg-dorado" />
+                <h2
+                  className="font-playfair font-bold text-negro-bordo"
+                  style={{ fontSize: "clamp(38px, 4.4vw, 72px)", lineHeight: 1.04, letterSpacing: "-0.03em" }}
+                >
+                  {p.title}
+                </h2>
+                {p.tagline && (
+                  <p className="mt-5 font-playfair italic text-bordo" style={{ fontSize: "clamp(18px, 1.5vw, 23px)" }}>
+                    {p.tagline}
+                  </p>
+                )}
+                <div className="mt-6 font-sans text-gris-bordo" style={{ fontSize: 17, lineHeight: 1.7, maxWidth: 460 }}>
+                  <RichText html={p.desc} className="rich-inline" />
+                </div>
+              </PanelLayer>
+            ))}
           </div>
 
-          {/* Panel derecho (60%) — frames */}
+          {/* PANEL DERECHO (60%) — frames */}
           <div className="relative w-3/5 overflow-hidden">
-            {/* Frame 1 — foto */}
-            <motion.div className="absolute inset-0" style={{ opacity: f1 }}>
-              <motion.div className="relative h-full w-full" style={{ scale: photoScale }}>
-                <Image
-                  src={FEATURED_PHOTO}
-                  alt={s.nombre}
-                  fill
-                  sizes="60vw"
-                  className="object-cover"
-                  priority={false}
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(120deg, rgba(102,0,31,0.42) 0%, rgba(26,0,8,0.18) 45%, transparent 100%)",
-                  }}
-                />
-                <TextureOverlay texture="paperGrain" opacity={0.14} />
-              </motion.div>
-            </motion.div>
+            {frames.map((f, i) => {
+              const first = i === 0
+              const last = i === frames.length - 1
+              if (f.kind === "photo")
+                return (
+                  <FrameLayer key={i} progress={scrollYProgress} range={f.range} first={first}>
+                    <motion.div className="relative h-full w-full" style={{ scale: photoScale }}>
+                      <Image src={FEATURED_PHOTO} alt={featured.nombre} fill sizes="60vw" className="object-cover" loading="lazy" />
+                      <div className="absolute inset-0" style={{ background: "linear-gradient(120deg, rgba(102,0,31,0.42) 0%, rgba(26,0,8,0.18) 45%, transparent 100%)" }} />
+                      <TextureOverlay texture="paperGrain" opacity={0.14} />
+                    </motion.div>
+                  </FrameLayer>
+                )
+              if (f.kind === "anchor")
+                return (
+                  <FrameLayer key={i} progress={scrollYProgress} range={f.range} className="flex items-center bg-arena" style={{ paddingInline: "clamp(40px, 5vw, 80px)" }}>
+                    {featured.anchorPhrase ? (
+                      <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(40px, 5vw, 80px)", lineHeight: 1.08, letterSpacing: "-0.02em" }}>
+                        {featured.anchorPhrase}
+                      </p>
+                    ) : (
+                      <p className="font-sans text-bordo/60" style={{ fontSize: 18, maxWidth: 460 }}>{PENDING}</p>
+                    )}
+                  </FrameLayer>
+                )
+              if (f.kind === "sub")
+                return (
+                  <FrameLayer key={i} progress={scrollYProgress} range={f.range} className="flex items-center justify-center bg-hueso-oscuro" style={{ paddingInline: "clamp(40px, 5vw, 80px)" }}>
+                    <SubCard sub={f.sub} />
+                  </FrameLayer>
+                )
+              if (f.kind === "card")
+                return (
+                  <FrameLayer key={i} progress={scrollYProgress} range={f.range} className={f.dark ? "bg-bordo" : "bg-hueso-oscuro"}>
+                    <SecondaryCard servicio={f.servicio} num={f.num} dark={f.dark} progress={scrollYProgress} range={f.range} />
+                  </FrameLayer>
+                )
+              return (
+                <FrameLayer key={i} progress={scrollYProgress} range={f.range} last={last} className="flex flex-col items-start justify-center bg-bordo" style={{ paddingInline: "clamp(40px, 5vw, 80px)" }}>
+                  <CtaCard cta={cta} />
+                </FrameLayer>
+              )
+            })}
 
-            {/* Frame 2 — frase ancla */}
-            <motion.div
-              className="absolute inset-0 flex items-center bg-arena"
-              style={{ opacity: f2, paddingInline: "clamp(40px, 5vw, 80px)" }}
-            >
-              <AnchorPhrase phrase={s.anchorPhrase} progress={scrollYProgress} />
-            </motion.div>
-
-            {/* Frame 3 — sub-servicios flotantes */}
-            <motion.div
-              className="absolute inset-0 overflow-hidden bg-hueso-oscuro"
-              style={{ opacity: f3 }}
-            >
-              <FloatingTags subs={s.subServicios} progress={scrollYProgress} />
-            </motion.div>
-
-            {/* Frame 4 — cierre editorial */}
-            <motion.div
-              className="absolute inset-0 flex flex-col items-start justify-center bg-bordo"
-              style={{ opacity: f4, paddingInline: "clamp(40px, 5vw, 80px)" }}
-            >
-              {s.testimonial ? (
-                <figure
-                  className="rounded-2xl bg-hueso/10 p-9 backdrop-blur-sm"
-                  style={{ maxWidth: 540, border: "1px solid rgba(254,252,239,0.18)" }}
-                >
-                  <blockquote
-                    className="font-playfair italic text-hueso"
-                    style={{ fontSize: "clamp(22px, 2vw, 30px)", lineHeight: 1.4 }}
-                  >
-                    “{s.testimonial}”
-                  </blockquote>
-                  {s.testimonialAuthor && (
-                    <figcaption
-                      className="mt-5 font-mono uppercase text-dorado"
-                      style={{ fontSize: 11, letterSpacing: "0.18em" }}
-                    >
-                      {s.testimonialAuthor}
-                    </figcaption>
-                  )}
-                </figure>
-              ) : (
-                <p
-                  className="font-playfair italic text-hueso/80"
-                  style={{ fontSize: "clamp(26px, 2.6vw, 44px)", lineHeight: 1.25, maxWidth: 620 }}
-                >
-                  {s.tagline || s.nombre}
-                </p>
-              )}
-              <Link
-                href="/#contacto"
-                className="group mt-10 inline-flex items-center gap-2 rounded-lg bg-hueso px-8 py-4 font-sans font-semibold text-bordo transition-all duration-200 hover:bg-arena"
-                style={{ fontSize: 15 }}
-              >
-                Conversemos
-                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-              </Link>
-            </motion.div>
-
-            <ProgressDots progress={scrollYProgress} />
+            <ProgressDots frames={frames} progress={scrollYProgress} featuredCount={nFeaturedDots} />
           </div>
         </div>
       </div>
@@ -339,553 +381,409 @@ function FeaturedDesktop({ s }: { s: Servicio }) {
   )
 }
 
-/* Frase ancla: revelado palabra por palabra atado al scroll (rango ~0.30–0.46). */
-function AnchorPhrase({
-  phrase,
+/* ─── capas con plateau (aparece rápido, se queda, se va rápido) ────────── */
+
+function FrameLayer({
   progress,
+  range,
+  first,
+  last,
+  className,
+  style,
+  children,
 }: {
-  phrase: string
   progress: MotionValue<number>
+  range: [number, number]
+  first?: boolean
+  last?: boolean
+  className?: string
+  style?: React.CSSProperties
+  children: React.ReactNode
 }) {
-  if (!phrase) {
-    return (
-      <p
-        className="font-sans text-bordo/60"
-        style={{ fontSize: 18, maxWidth: 480 }}
-      >
-        {PENDING}
-      </p>
-    )
-  }
-  const words = phrase.split(/\s+/).filter(Boolean)
-  const START = 0.3
-  const END = 0.46
-  const step = (END - START) / words.length
-
+  const [s, e] = range
+  const f = 0.03
+  // Dominio completo [0,1] para que NO haya extrapolación fuera de la banda
+  // (motion v12 no clampea por defecto): la capa queda en 0 fuera de su tramo.
+  const input = first ? [0, e - f, e, 1] : last ? [0, s, s + f, 1] : [0, s, s + f, e - f, e, 1]
+  const out = first ? [1, 1, 0, 0] : last ? [0, 0, 1, 1] : [0, 0, 1, 1, 0, 0]
+  const opacity = useTransform(progress, input, out)
   return (
-    <p
-      className="font-playfair font-bold text-negro-bordo"
-      style={{
-        fontSize: "clamp(40px, 5.4vw, 84px)",
-        lineHeight: 1.08,
-        letterSpacing: "-0.02em",
-      }}
-    >
-      {words.map((w, i) => (
-        <AnchorWord
-          key={i}
-          word={w}
-          progress={progress}
-          start={START + step * i}
-          end={START + step * (i + 0.9)}
-        />
-      ))}
-    </p>
-  )
-}
-
-function AnchorWord({
-  word,
-  progress,
-  start,
-  end,
-}: {
-  word: string
-  progress: MotionValue<number>
-  start: number
-  end: number
-}) {
-  const opacity = useTransform(progress, [start, end], [0.12, 1])
-  return (
-    <motion.span className="inline-block" style={{ opacity, marginRight: "0.25em" }}>
-      {word}
-    </motion.span>
-  )
-}
-
-/* Sub-servicios como tags flotantes en posiciones orgánicas. */
-const TAG_POS = [
-  { top: "18%", left: "8%", rotate: -4 },
-  { top: "44%", left: "40%", rotate: 3 },
-  { top: "70%", left: "14%", rotate: -2 },
-]
-
-function FloatingTags({
-  subs,
-  progress,
-}: {
-  subs: SubServicio[]
-  progress: MotionValue<number>
-}) {
-  return (
-    <>
-      {subs.slice(0, 3).map((sub, i) => (
-        <FloatingTag key={i} sub={sub} progress={progress} index={i} />
-      ))}
-    </>
-  )
-}
-
-function FloatingTag({
-  sub,
-  progress,
-  index,
-}: {
-  sub: SubServicio
-  progress: MotionValue<number>
-  index: number
-}) {
-  const pos = TAG_POS[index] ?? TAG_POS[0]
-  const start = 0.55 + index * 0.05
-  const opacity = useTransform(progress, [start, start + 0.06], [0, 1])
-  const y = useTransform(progress, [start, start + 0.08], [40, 0])
-  const rotate = useTransform(progress, [start, start + 0.08], [pos.rotate * 2.5, pos.rotate])
-
-  return (
-    <motion.div
-      className="absolute rounded-2xl bg-hueso p-6 shadow-[0_18px_50px_-20px_rgba(102,0,31,0.45)]"
-      style={{
-        top: pos.top,
-        left: pos.left,
-        maxWidth: 320,
-        opacity,
-        y,
-        rotate,
-        border: "1px solid rgba(201,168,130,0.4)",
-      }}
-    >
-      <p
-        className="font-sans font-semibold text-negro-bordo"
-        style={{ fontSize: 16, lineHeight: 1.35 }}
-      >
-        {sub.titulo}
-      </p>
-      <RichText
-        html={sub.desc}
-        className="rich-inline mt-2 font-sans text-gris-bordo"
-        style={{ fontSize: 13.5, lineHeight: 1.6 }}
-      />
+    <motion.div className={cn("absolute inset-0", className)} style={{ opacity, willChange: "opacity", ...style }}>
+      {children}
     </motion.div>
   )
 }
 
-/* Indicador lateral de progreso (4 dots). */
-function ProgressDots({ progress }: { progress: MotionValue<number> }) {
+/** Panel izquierdo: cross-fade con leve slide + blur (counter feel). */
+function PanelLayer({
+  progress,
+  range,
+  first,
+  last,
+  children,
+}: {
+  progress: MotionValue<number>
+  range: [number, number]
+  first?: boolean
+  last?: boolean
+  children: React.ReactNode
+}) {
+  const [s, e] = range
+  const f = 0.04
+  const input = first ? [0, e - f, e, 1] : last ? [0, s, s + f, 1] : [0, s, s + f, e - f, e, 1]
+  const opacity = useTransform(progress, input, first ? [1, 1, 0, 0] : last ? [0, 0, 1, 1] : [0, 0, 1, 1, 0, 0])
+  const y = useTransform(progress, input, first ? [0, 0, -28, -28] : last ? [34, 34, 0, 0] : [34, 34, 0, 0, -28, -28])
+  const filter = useTransform(
+    progress,
+    input,
+    first
+      ? ["blur(0px)", "blur(0px)", "blur(8px)", "blur(8px)"]
+      : last
+        ? ["blur(8px)", "blur(8px)", "blur(0px)", "blur(0px)"]
+        : ["blur(8px)", "blur(8px)", "blur(0px)", "blur(0px)", "blur(8px)", "blur(8px)"],
+  )
   return (
-    <div className="absolute right-7 top-1/2 flex -translate-y-1/2 flex-col items-center gap-3">
-      <div className="absolute top-0 h-full w-px bg-dorado/30" />
-      {[0, 1, 2, 3].map((i) => (
-        <Dot key={i} progress={progress} index={i} />
+    <motion.div className="absolute inset-0 flex flex-col justify-center" style={{ opacity, y, filter, willChange: "opacity, transform" }}>
+      {children}
+    </motion.div>
+  )
+}
+
+/* ─── sub-servicio card (Mentoría) ─────────────────────────────────────── */
+function SubCard({ sub }: { sub: SubServicio }) {
+  return (
+    <div
+      className="ms-breathe rounded-3xl bg-hueso p-10 shadow-[0_24px_70px_-28px_rgba(102,0,31,0.45)]"
+      style={{ maxWidth: 460, border: "1px solid rgba(201,168,130,0.45)" }}
+    >
+      <span className="font-mono uppercase text-bordo/60" style={{ fontSize: 11, letterSpacing: "0.18em" }}>
+        Sub-servicio
+      </span>
+      <p className="mt-4 font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(24px, 2.2vw, 34px)", lineHeight: 1.15 }}>
+        {sub.titulo}
+      </p>
+      <RichText html={sub.desc} className="rich-inline mt-4 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }} />
+    </div>
+  )
+}
+
+/* ─── card de servicio secundario 02 / 03 ──────────────────────────────── */
+function SecondaryCard({
+  servicio,
+  num,
+  dark,
+  progress,
+  range,
+}: {
+  servicio: Servicio
+  num: string
+  dark: boolean
+  progress: MotionValue<number>
+  range: [number, number]
+}) {
+  const numY = useTransform(progress, range, [70, -70])
+  const titleColor = dark ? "text-hueso" : "text-negro-bordo"
+  const taglineColor = dark ? "text-dorado" : "text-bordo"
+  const descColor = dark ? "text-hueso/85" : "text-gris-bordo"
+  const subColor = dark ? "text-hueso/80" : "text-gris-bordo"
+  const stroke = dark ? "var(--color-hueso)" : "var(--color-bordo)"
+
+  return (
+    <div className="relative flex h-full w-full items-center overflow-hidden" style={{ paddingInline: "clamp(40px, 5vw, 80px)" }}>
+      {/* Número gigante de fondo (con parallax vertical) */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 flex items-center justify-end"
+        style={{ y: numY }}
+      >
+        <span
+          className="select-none font-playfair font-bold leading-none"
+          style={{
+            marginRight: "-2%",
+            fontSize: "clamp(240px, 30vw, 420px)",
+            color: "transparent",
+            WebkitTextStroke: `2px ${stroke}`,
+            opacity: 0.1,
+          }}
+        >
+          {num}
+        </span>
+      </motion.div>
+
+      <div className="relative z-10" style={{ maxWidth: 480 }}>
+        <span
+          className={cn("inline-flex items-center gap-2 rounded-full font-mono uppercase", taglineColor)}
+          style={{ fontSize: 11, letterSpacing: "0.18em", padding: "7px 14px", border: `1px solid ${dark ? "rgba(254,252,239,0.4)" : "rgba(201,168,130,0.6)"}` }}
+        >
+          Servicio {num}
+        </span>
+        <h3 className={cn("mt-6 font-playfair font-bold", titleColor)} style={{ fontSize: "clamp(36px, 4vw, 64px)", lineHeight: 1.05, letterSpacing: "-0.02em" }}>
+          {servicio.nombre}
+        </h3>
+        {servicio.tagline && (
+          <p className={cn("mt-4 font-playfair italic", taglineColor)} style={{ fontSize: "clamp(17px, 1.4vw, 21px)" }}>
+            {servicio.tagline}
+          </p>
+        )}
+        <ul className="mt-8 flex flex-col gap-4">
+          {servicio.subServicios.map((sub, i) => (
+            <li key={i} className="flex gap-3">
+              <span className={cn("select-none font-playfair", taglineColor)} style={{ fontSize: 20, lineHeight: 1.3 }}>—</span>
+              <div>
+                <p className={cn("font-sans font-semibold", titleColor)} style={{ fontSize: 15.5, lineHeight: 1.4 }}>{sub.titulo}</p>
+                <RichText html={sub.desc} className={cn("rich-inline mt-1 font-sans", subColor)} style={{ fontSize: 13.5, lineHeight: 1.6 }} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+/* ─── card CTA (frame final) ───────────────────────────────────────────── */
+function CtaCard({ cta }: { cta: Record<string, string> }) {
+  return (
+    <div style={{ maxWidth: 560 }}>
+      <span className="font-mono uppercase text-dorado" style={{ fontSize: 11, letterSpacing: "0.2em" }}>
+        {(cta.eyebrow ?? "").trim() || "Hablemos"}
+      </span>
+      <h3 className="mt-6 font-playfair font-bold text-hueso" style={{ fontSize: "clamp(36px, 4vw, 64px)", lineHeight: 1.06, letterSpacing: "-0.02em" }}>
+        {cta.title_pre} <em className="text-dorado">{cta.title_accent}</em>
+      </h3>
+      {cta.description && (
+        <div className="mt-6 font-sans text-hueso/85" style={{ fontSize: 17, lineHeight: 1.7 }}>
+          <RichText html={cta.description} className="rich-inline" />
+        </div>
+      )}
+      <Link
+        href="/#contacto"
+        className="group mt-10 inline-flex items-center gap-2 rounded-xl bg-hueso px-9 py-4 font-sans font-semibold text-bordo transition-all duration-300 hover:bg-arena"
+        style={{ fontSize: 16 }}
+      >
+        {cta.button_text || "Conversemos"}
+        <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
+      </Link>
+    </div>
+  )
+}
+
+/* ─── indicador lateral de progreso (un dot por frame) ─────────────────── */
+function ProgressDots({
+  frames,
+  progress,
+  featuredCount,
+}: {
+  frames: Frame[]
+  progress: MotionValue<number>
+  featuredCount: number
+}) {
+  return (
+    <div className="absolute right-7 top-1/2 z-20 flex -translate-y-1/2 flex-col items-center gap-4">
+      <div className="absolute top-0 h-full w-px bg-dorado/25" />
+      {frames.map((f, i) => (
+        <Dot key={i} progress={progress} range={f.range} ring={i < featuredCount} />
       ))}
     </div>
   )
 }
 
-function Dot({ progress, index }: { progress: MotionValue<number>; index: number }) {
-  const center = index * 0.25 + 0.125
-  const scale = useTransform(
-    progress,
-    [center - 0.13, center, center + 0.13],
-    [1, 1.7, 1],
-  )
-  const bg = useTransform(
-    progress,
-    [center - 0.13, center, center + 0.13],
-    ["#C9A882", "#66001F", "#C9A882"],
-  )
+function Dot({
+  progress,
+  range,
+  ring,
+}: {
+  progress: MotionValue<number>
+  range: [number, number]
+  ring: boolean
+}) {
+  const [s, e] = range
+  const mid = (s + e) / 2
+  const a = Math.max(s, 0.0001)
+  const b = Math.min(e, 0.9999)
+  // Dominio completo: fuera de su tramo el dot queda en reposo (sin extrapolar).
+  const scale = useTransform(progress, [0, a, mid, b, 1], [1, 1, 1.7, 1, 1])
+  const bg = useTransform(progress, [0, a, mid, b, 1], ["#C9A882", "#C9A882", "#66001F", "#C9A882", "#C9A882"])
   return (
-    <motion.span
-      className="relative z-10 rounded-full"
-      style={{ width: 9, height: 9, scale, backgroundColor: bg }}
-    />
+    <span className="relative z-10 flex items-center justify-center" style={{ width: 16, height: 16 }}>
+      {ring && <span className="absolute inset-0 rounded-full border" style={{ borderColor: "rgba(201,168,130,0.7)" }} />}
+      <motion.span className="rounded-full" style={{ width: 9, height: 9, scale, backgroundColor: bg }} />
+    </span>
   )
 }
 
-/* ─── Mobile: frames apilados con entrada al viewport ───────────────────── */
+/* ════════════════════════════════════════════════════════════════════════
+   MOBILE — bloques apilados con entrada al viewport
+   ════════════════════════════════════════════════════════════════════════ */
 
-const springIn = {
-  hidden: { opacity: 0, y: 36 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring" as const, stiffness: 100, damping: 15 },
-  },
-}
 const mvp = { once: true, margin: "-60px" } as const
+const springIn: Variants = {
+  hidden: { opacity: 0, y: 36 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 18 } },
+}
 
-function FeaturedMobile({ s, reduced }: { s: Servicio; reduced: boolean }) {
-  const anim = (v: Variants) =>
-    reduced
-      ? {}
-      : { variants: v, initial: "hidden" as const, whileInView: "visible" as const, viewport: mvp }
+function StackedMobile({
+  featured,
+  secondaries,
+  cta,
+  reduced,
+}: {
+  featured: Servicio
+  secondaries: Servicio[]
+  cta: Record<string, string>
+  reduced: boolean
+}) {
+  const anim = reduced
+    ? {}
+    : { variants: springIn, initial: "hidden" as const, whileInView: "visible" as const, viewport: mvp }
 
   return (
-    <section className="bg-hueso" aria-label={s.nombre}>
-      {/* Hero del servicio */}
-      <div style={{ padding: "72px 24px 40px" }}>
-        <p
-          className="font-mono uppercase text-bordo"
-          style={{ fontSize: 11, letterSpacing: "0.2em" }}
-        >
+    <section className="bg-hueso" aria-label="Servicios">
+      {/* Hero del servicio destacado */}
+      <div style={{ padding: "64px 24px 36px" }}>
+        <p className="font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em" }}>
           01 — Servicio destacado
         </p>
         <div className="mt-4 mb-6 h-px w-16 bg-dorado" />
-        <h2
-          className="font-playfair font-bold text-negro-bordo"
-          style={{ fontSize: "clamp(34px, 10vw, 56px)", lineHeight: 1.06, letterSpacing: "-0.02em" }}
-        >
-          {s.nombre}
+        <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(32px, 9vw, 52px)", lineHeight: 1.06, letterSpacing: "-0.02em" }}>
+          {featured.nombre}
         </h2>
-        {s.tagline && (
-          <p className="mt-4 font-playfair italic text-bordo" style={{ fontSize: 19 }}>
-            {s.tagline}
-          </p>
+        {featured.tagline && (
+          <p className="mt-4 font-playfair italic text-bordo" style={{ fontSize: 19 }}>{featured.tagline}</p>
         )}
-        <div
-          className="mt-5 font-sans text-gris-bordo"
-          style={{ fontSize: 16, lineHeight: 1.7 }}
-        >
-          <RichText html={s.descripcion} className="rich-inline" />
+        <div className="mt-5 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>
+          <RichText html={featured.descripcion} className="rich-inline" />
         </div>
       </div>
 
-      {/* Bloque 1 — foto */}
-      <motion.div
-        {...anim(springIn)}
-        className="relative mx-6 overflow-hidden rounded-2xl"
-        style={{ aspectRatio: "4 / 5" }}
-      >
-        <Image src={FEATURED_PHOTO} alt={s.nombre} fill sizes="100vw" className="object-cover" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: "linear-gradient(160deg, rgba(102,0,31,0.35), transparent 60%)",
-          }}
-        />
+      {/* Foto */}
+      <motion.div {...anim} className="relative mx-6 overflow-hidden rounded-2xl" style={{ aspectRatio: "4 / 5" }}>
+        <Image src={FEATURED_PHOTO} alt={featured.nombre} fill sizes="100vw" className="object-cover" loading="lazy" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, rgba(102,0,31,0.35), transparent 60%)" }} />
       </motion.div>
 
-      {/* Bloque 2 — frase ancla */}
-      <div className="mt-10 bg-arena" style={{ padding: "80px 24px" }}>
-        {s.anchorPhrase ? (
-          <motion.p
-            {...anim({
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.08 } },
-            })}
-            className="font-playfair font-bold text-negro-bordo"
-            style={{ fontSize: "clamp(30px, 8vw, 44px)", lineHeight: 1.12, letterSpacing: "-0.02em" }}
-          >
-            {reduced
-              ? s.anchorPhrase
-              : s.anchorPhrase.split(/\s+/).map((w, i) => (
-                  <motion.span
-                    key={i}
-                    variants={{
-                      hidden: { opacity: 0, y: 14 },
-                      visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
-                    }}
-                    className="inline-block"
-                    style={{ marginRight: "0.25em" }}
-                  >
-                    {w}
-                  </motion.span>
-                ))}
+      {/* Frase ancla */}
+      <div className="mt-10 bg-arena" style={{ padding: "72px 24px" }}>
+        {featured.anchorPhrase ? (
+          <motion.p {...anim} className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(30px, 8vw, 44px)", lineHeight: 1.12, letterSpacing: "-0.02em" }}>
+            {featured.anchorPhrase}
           </motion.p>
         ) : (
-          <p className="font-sans text-bordo/60" style={{ fontSize: 15 }}>
-            {PENDING}
-          </p>
+          <p className="font-sans text-bordo/60" style={{ fontSize: 15 }}>{PENDING}</p>
         )}
       </div>
 
-      {/* Bloque 3 — sub-servicios apilados */}
-      <div style={{ padding: "56px 24px 16px" }}>
-        <p
-          className="mb-6 font-mono uppercase text-bordo"
-          style={{ fontSize: 11, letterSpacing: "0.18em" }}
-        >
-          Sub-servicios
-        </p>
-        <div className="flex flex-col gap-4">
-          {s.subServicios.map((sub, i) => (
+      {/* Sub-servicios del destacado (cards) */}
+      <div style={{ padding: "48px 24px 8px" }}>
+        <p className="mb-6 font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.18em" }}>Sub-servicios</p>
+        <div className="flex flex-col gap-5">
+          {featured.subServicios.map((sub, i) => (
             <motion.div
               key={i}
-              {...(reduced
-                ? {}
-                : {
-                    variants: springIn,
-                    initial: "hidden" as const,
-                    whileInView: "visible" as const,
-                    viewport: mvp,
-                    transition: { delay: i * 0.06 },
-                  })}
-              className="rounded-2xl bg-hueso p-6"
+              {...(reduced ? {} : { variants: springIn, initial: "hidden" as const, whileInView: "visible" as const, viewport: mvp })}
+              className="rounded-2xl bg-hueso-oscuro p-7"
               style={{ border: "1px solid rgba(201,168,130,0.4)" }}
             >
-              <p
-                className="font-sans font-semibold text-negro-bordo"
-                style={{ fontSize: 16, lineHeight: 1.35 }}
-              >
-                {sub.titulo}
-              </p>
-              <RichText
-                html={sub.desc}
-                className="rich-inline mt-2 font-sans text-gris-bordo"
-                style={{ fontSize: 14, lineHeight: 1.65 }}
-              />
+              <span className="font-mono uppercase text-bordo/60" style={{ fontSize: 10, letterSpacing: "0.18em" }}>Sub-servicio</span>
+              <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: 22, lineHeight: 1.2 }}>{sub.titulo}</p>
+              <RichText html={sub.desc} className="rich-inline mt-3 font-sans text-gris-bordo" style={{ fontSize: 14.5, lineHeight: 1.65 }} />
             </motion.div>
           ))}
         </div>
       </div>
 
-      {/* Bloque 4 — cierre editorial */}
-      <div className="mt-8 bg-bordo" style={{ padding: "64px 24px" }}>
-        {s.testimonial && (
-          <figure
-            className="mb-9 rounded-2xl bg-hueso/10 p-7"
-            style={{ border: "1px solid rgba(254,252,239,0.18)" }}
+      {/* Servicios secundarios 02 / 03 */}
+      {secondaries.map((s, i) => (
+        <SecondaryBlockMobile key={s.key} s={s} num={i === 0 ? "02" : "03"} dark={i === 1} reduced={reduced} />
+      ))}
+
+      {/* CTA final */}
+      <div className="mt-2 bg-bordo" style={{ padding: "72px 24px" }}>
+        <motion.div {...anim}>
+          <span className="font-mono uppercase text-dorado" style={{ fontSize: 11, letterSpacing: "0.2em" }}>
+            {(cta.eyebrow ?? "").trim() || "Hablemos"}
+          </span>
+          <h3 className="mt-5 font-playfair font-bold text-hueso" style={{ fontSize: "clamp(30px, 8vw, 46px)", lineHeight: 1.08, letterSpacing: "-0.02em" }}>
+            {cta.title_pre} <em className="text-dorado">{cta.title_accent}</em>
+          </h3>
+          {cta.description && (
+            <div className="mt-5 font-sans text-hueso/85" style={{ fontSize: 16, lineHeight: 1.7 }}>
+              <RichText html={cta.description} className="rich-inline" />
+            </div>
+          )}
+          <Link
+            href="/#contacto"
+            className="group mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-hueso px-8 py-4 font-sans font-semibold text-bordo"
+            style={{ fontSize: 16 }}
           >
-            <blockquote
-              className="font-playfair italic text-hueso"
-              style={{ fontSize: "clamp(20px, 5.5vw, 26px)", lineHeight: 1.4 }}
-            >
-              “{s.testimonial}”
-            </blockquote>
-            {s.testimonialAuthor && (
-              <figcaption
-                className="mt-4 font-mono uppercase text-dorado"
-                style={{ fontSize: 11, letterSpacing: "0.18em" }}
-              >
-                {s.testimonialAuthor}
-              </figcaption>
-            )}
-          </figure>
-        )}
-        <Link
-          href="/#contacto"
-          className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-hueso px-8 py-4 font-sans font-semibold text-bordo"
-          style={{ fontSize: 15 }}
-        >
-          Conversemos
-          <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-        </Link>
+            {cta.button_text || "Conversemos"}
+            <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
+          </Link>
+        </motion.div>
       </div>
     </section>
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════════
-   SECCIONES 3 y 4 — SERVICIOS SECUNDARIOS
-   ════════════════════════════════════════════════════════════════════════ */
-
-function SecondarySection({
+function SecondaryBlockMobile({
   s,
   num,
   dark,
+  reduced,
 }: {
   s: Servicio
   num: string
   dark: boolean
+  reduced: boolean
 }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const reduced = useReducedMotion()
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  })
-  const numY = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [80, -80])
-
+  const anim = reduced
+    ? {}
+    : { variants: springIn, initial: "hidden" as const, whileInView: "visible" as const, viewport: mvp }
   const bg = dark ? "bg-bordo" : "bg-hueso-oscuro"
   const titleColor = dark ? "text-hueso" : "text-negro-bordo"
   const taglineColor = dark ? "text-dorado" : "text-bordo"
   const descColor = dark ? "text-hueso/85" : "text-gris-bordo"
-  const subTitleColor = dark ? "text-hueso" : "text-negro-bordo"
-  const subDescColor = dark ? "text-hueso/70" : "text-gris-bordo"
+  const subColor = dark ? "text-hueso/80" : "text-gris-bordo"
   const stroke = dark ? "var(--color-hueso)" : "var(--color-bordo)"
 
   return (
-    <section
-      ref={ref}
-      className={`relative overflow-hidden ${bg}`}
-      aria-label={s.nombre}
-      style={{ padding: "clamp(72px, 12vh, 140px) clamp(24px, 6vw, 88px)" }}
-    >
-      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-12 lg:flex-row lg:items-center lg:gap-16">
-        {/* Texto (60%) */}
-        <div className="order-2 lg:order-1 lg:w-3/5">
-          <motion.p
-            initial={reduced ? false : { opacity: 0, y: 16 }}
-            whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-            viewport={mvp}
-            transition={{ duration: 0.6, ease: EASE }}
-            className={`font-mono uppercase ${taglineColor}`}
-            style={{ fontSize: 12, letterSpacing: "0.2em" }}
-          >
-            {num} — Servicio
-          </motion.p>
-          <motion.h2
-            initial={reduced ? false : { opacity: 0, y: 22 }}
-            whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-            viewport={mvp}
-            transition={{ duration: 0.65, ease: EASE, delay: 0.05 }}
-            className={`mt-5 font-playfair font-bold ${titleColor}`}
-            style={{
-              fontSize: "clamp(34px, 4.4vw, 72px)",
-              lineHeight: 1.05,
-              letterSpacing: "-0.03em",
-            }}
-          >
-            {s.nombre}
-          </motion.h2>
-          {s.tagline && (
-            <p className={`mt-4 font-playfair italic ${taglineColor}`} style={{ fontSize: "clamp(17px, 1.5vw, 22px)" }}>
-              {s.tagline}
-            </p>
-          )}
-          <div
-            className={`mt-6 font-sans ${descColor}`}
-            style={{ fontSize: 17, lineHeight: 1.7, maxWidth: 620 }}
-          >
-            <RichText html={s.descripcion} className="rich-inline" />
-          </div>
-
-          {/* Sub-servicios como lista editorial con guiones largos */}
-          <motion.ul
-            initial={reduced ? false : "hidden"}
-            whileInView={reduced ? undefined : "visible"}
-            viewport={mvp}
-            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }}
-            className="mt-10 flex flex-col gap-6"
-          >
-            {s.subServicios.map((sub, i) => (
-              <motion.li
-                key={i}
-                variants={{
-                  hidden: { opacity: 0, x: -16 },
-                  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: EASE } },
-                }}
-                className="flex gap-4"
-              >
-                <span className={`select-none font-playfair ${taglineColor}`} style={{ fontSize: 22, lineHeight: 1.3 }}>
-                  —
-                </span>
-                <div>
-                  <p className={`font-sans font-semibold ${subTitleColor}`} style={{ fontSize: 16, lineHeight: 1.4 }}>
-                    {sub.titulo}
-                  </p>
-                  <RichText
-                    html={sub.desc}
-                    className={`rich-inline mt-1 font-sans ${subDescColor}`}
-                    style={{ fontSize: 14, lineHeight: 1.65 }}
-                  />
-                </div>
-              </motion.li>
-            ))}
-          </motion.ul>
-        </div>
-
-        {/* Número outline gigante (40%) */}
-        <div className="order-1 flex justify-center lg:order-2 lg:w-2/5 lg:justify-end">
-          <motion.span
-            className="outline-number select-none font-playfair font-bold leading-none"
-            aria-hidden
-            style={{
-              y: numY,
-              fontSize: "clamp(120px, 22vw, 300px)",
-              color: "transparent",
-              WebkitTextStroke: `2px ${stroke}`,
-              // @ts-expect-error vendor prop sin tipos en CSSProperties
-              textStroke: `2px ${stroke}`,
-              ["--fill" as string]: stroke,
-            }}
-          >
-            {num}
-          </motion.span>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 5 — CTA FINAL
-   ════════════════════════════════════════════════════════════════════════ */
-
-function FinalCTA({ cta }: { cta: Record<string, string> }) {
-  const reduced = useReducedMotion()
-  return (
-    <section
-      className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-hueso text-center"
-      style={{ padding: "120px clamp(24px, 6vw, 88px)" }}
-    >
-      <div
+    <div className={cn("relative mt-2 overflow-hidden", bg)} style={{ padding: "72px 24px" }}>
+      <span
         aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(120% 80% at 50% 100%, var(--color-arena) 0%, transparent 60%)",
-        }}
-      />
-      <TextureOverlay texture="paperGrain" opacity={0.16} />
-
-      <motion.p
-        initial={reduced ? false : { opacity: 0, y: 14 }}
-        whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-        viewport={mvp}
-        transition={{ duration: 0.6, ease: EASE }}
-        className="relative mb-8 font-mono uppercase text-bordo"
-        style={{ fontSize: 12, letterSpacing: "0.22em" }}
+        className="pointer-events-none absolute select-none font-playfair font-bold leading-none"
+        style={{ right: "-4%", top: 24, fontSize: 200, color: "transparent", WebkitTextStroke: `2px ${stroke}`, opacity: 0.12 }}
       >
-        {cta.eyebrow}
-      </motion.p>
-
-      <motion.h2
-        initial={reduced ? false : { opacity: 0, y: 26 }}
-        whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-        viewport={mvp}
-        transition={{ duration: 0.7, ease: EASE, delay: 0.05 }}
-        className="relative font-playfair font-bold text-negro-bordo"
-        style={{
-          fontSize: "clamp(40px, 7vw, 110px)",
-          lineHeight: 1.02,
-          letterSpacing: "-0.03em",
-          maxWidth: "16ch",
-        }}
-      >
-        {cta.title_pre}{" "}
-        <em className="text-bordo">{cta.title_accent}</em>
-      </motion.h2>
-
-      {cta.description && (
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 16 }}
-          whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-          viewport={mvp}
-          transition={{ duration: 0.6, ease: EASE, delay: 0.12 }}
-          className="relative mt-8 font-sans text-gris-bordo"
-          style={{ fontSize: "clamp(16px, 1.5vw, 20px)", lineHeight: 1.65, maxWidth: 560 }}
+        {num}
+      </span>
+      <motion.div {...anim} className="relative z-10">
+        <span
+          className={cn("inline-flex items-center rounded-full font-mono uppercase", taglineColor)}
+          style={{ fontSize: 11, letterSpacing: "0.18em", padding: "7px 14px", border: `1px solid ${dark ? "rgba(254,252,239,0.4)" : "rgba(201,168,130,0.6)"}` }}
         >
-          <RichText html={cta.description} className="rich-inline" />
-        </motion.div>
-      )}
-
-      <motion.div
-        initial={reduced ? false : { opacity: 0, y: 16 }}
-        whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-        viewport={mvp}
-        transition={{ duration: 0.6, ease: EASE, delay: 0.18 }}
-        className="relative mt-12 w-full sm:w-auto"
-      >
-        <Link
-          href="/#contacto"
-          className="cta-final-btn group inline-flex w-full items-center justify-center gap-3 rounded-xl bg-bordo font-sans font-semibold text-hueso transition-all duration-300 hover:bg-bordo-oscuro sm:w-auto"
-          style={{ fontSize: "clamp(16px, 1.4vw, 20px)", padding: "clamp(18px,2.2vw,26px) clamp(36px,4vw,56px)" }}
-        >
-          {cta.button_text || "Conversemos"}
-          <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
-        </Link>
+          Servicio {num}
+        </span>
+        <h3 className={cn("mt-5 font-playfair font-bold", titleColor)} style={{ fontSize: "clamp(30px, 8vw, 46px)", lineHeight: 1.06, letterSpacing: "-0.02em" }}>
+          {s.nombre}
+        </h3>
+        {s.tagline && (
+          <p className={cn("mt-3 font-playfair italic", taglineColor)} style={{ fontSize: 18 }}>{s.tagline}</p>
+        )}
+        <div className={cn("mt-5 font-sans", descColor)} style={{ fontSize: 15.5, lineHeight: 1.7 }}>
+          <RichText html={s.descripcion} className="rich-inline" />
+        </div>
+        <ul className="mt-7 flex flex-col gap-4">
+          {s.subServicios.map((sub, i) => (
+            <li key={i} className="flex gap-3">
+              <span className={cn("select-none font-playfair", taglineColor)} style={{ fontSize: 20, lineHeight: 1.3 }}>—</span>
+              <div>
+                <p className={cn("font-sans font-semibold", titleColor)} style={{ fontSize: 15, lineHeight: 1.4 }}>{sub.titulo}</p>
+                <RichText html={sub.desc} className={cn("rich-inline mt-1 font-sans", subColor)} style={{ fontSize: 13.5, lineHeight: 1.6 }} />
+              </div>
+            </li>
+          ))}
+        </ul>
       </motion.div>
-    </section>
+    </div>
   )
 }
 
@@ -914,10 +812,7 @@ export function ServiciosPageSections({
       : fallbacksFor("config").featured) || "servicio_02"
 
   const byKey = Object.fromEntries(
-    SERVICE_KEYS.map((k) => [
-      k,
-      buildServicio(k, { ...fallbacksFor(k), ...content?.[k] }),
-    ]),
+    SERVICE_KEYS.map((k) => [k, buildServicio(k, { ...fallbacksFor(k), ...content?.[k] })]),
   ) as Record<string, Servicio>
 
   const featured = byKey[featuredKey]
@@ -925,12 +820,8 @@ export function ServiciosPageSections({
 
   return (
     <>
-      <HeroSection hero={hero} />
-      <FeaturedSection s={featured} />
-      {secondaries.map((s, i) => (
-        <SecondarySection key={s.key} s={s} num={i === 0 ? "02" : "03"} dark={i === 1} />
-      ))}
-      <FinalCTA cta={cta} />
+      <HeroSection hero={hero} serviceCount={SERVICE_KEYS.length} />
+      <ServiciosBody featured={featured} secondaries={secondaries} cta={cta} />
     </>
   )
 }

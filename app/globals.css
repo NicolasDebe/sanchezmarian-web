@@ -145,8 +145,39 @@ body::after {
   box-shadow: 0 18px 50px -12px rgba(102, 0, 31, 0.55);
 }
 
+/* ── /servicios — elementos creativos satélite ── */
+@keyframes ms-spin {
+  to { transform: rotate(360deg); }
+}
+.ms-asterisk {
+  animation: ms-spin 40s linear infinite;
+  will-change: transform;
+}
+
+@keyframes ms-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.006); }
+}
+.ms-breathe {
+  animation: ms-breathe 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes ms-scroll-dot {
+  0% { transform: translateY(0); opacity: 0; }
+  25% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { transform: translateY(22px); opacity: 0; }
+}
+.ms-scroll-dot {
+  animation: ms-scroll-dot 1.9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee { animation: none; }
+  .animate-marquee,
+  .ms-asterisk,
+  .ms-breathe,
+  .ms-scroll-dot { animation: none; }
 }
 
 /* ── Admin — inputs ── */
