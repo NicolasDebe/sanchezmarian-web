@@ -18,7 +18,7 @@ import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { cn } from "@/lib/utils"
 
 /* ════════════════════════════════════════════════════════════════════════
-   TIPOS Y PARSEO DE CONTENIDO
+   TIPOS Y PARSEO
    ════════════════════════════════════════════════════════════════════════ */
 
 type SubServicio = { titulo: string; desc: string }
@@ -31,17 +31,13 @@ type Servicio = {
   subServicios: SubServicio[]
   cta: string
   anchorPhrase: string
+  introText: string
   testimonial: string
   testimonialAuthor: string
 }
 
 const SERVICE_KEYS = ["servicio_01", "servicio_02", "servicio_03"] as const
-
-/** Foto del servicio destacado (única foto de la página). */
 const FEATURED_PHOTO = "/images/NAC_4230.jpg"
-
-const PENDING = "[Pendiente — editable desde admin]"
-/** Curva elegante (ease-out enfático). */
 const EASE = [0.22, 1, 0.36, 1] as const
 
 function buildServicio(key: string, c: Record<string, string>): Servicio {
@@ -50,19 +46,22 @@ function buildServicio(key: string, c: Record<string, string>): Servicio {
     .filter((s) => s.titulo.trim() !== "")
   return {
     key,
-    nombre: c.name ?? "",
-    tagline: c.tagline ?? "",
-    descripcion: c.description ?? "",
+    nombre: (c.name ?? "").trim(),
+    tagline: (c.tagline ?? "").trim(),
+    descripcion: (c.description ?? "").trim(),
     subServicios,
-    cta: c.cta_text ?? "Quiero este servicio",
+    cta: (c.cta_text ?? "").trim() || "Quiero este servicio",
     anchorPhrase: (c.anchor_phrase ?? "").trim(),
+    introText: (c.intro_text ?? "").trim(),
     testimonial: (c.testimonial ?? "").trim(),
     testimonialAuthor: (c.testimonial_author ?? "").trim(),
   }
 }
 
+const two = (n: number) => (n < 10 ? `0${n}` : `${n}`)
+
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 1 — HERO (contenido + satélites creativos)
+   SECCIÓN 1 — HERO (v4.1 — contenido + satélites)
    ════════════════════════════════════════════════════════════════════════ */
 
 const heroContainer: Variants = {
@@ -71,144 +70,59 @@ const heroContainer: Variants = {
 }
 const heroWord: Variants = {
   hidden: { opacity: 0, y: 20, filter: "blur(12px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.8, ease: EASE },
-  },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: EASE } },
 }
 
-function HeroSection({
-  hero,
-  serviceCount,
-}: {
-  hero: Record<string, string>
-  serviceCount: number
-}) {
+function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; serviceCount: number }) {
   const reduced = useReducedMotion()
   const words = (hero.h1 ?? "").split(/\s+/).filter(Boolean)
-  // Los satélites entran después de las palabras.
   const satelliteDelay = reduced ? 0 : words.length * 0.06 + 0.45
   const eyebrow = (hero.eyebrow ?? "Servicios").trim()
 
   const satellite = (delay: number) =>
     reduced
       ? {}
-      : {
-          initial: { opacity: 0, y: 10 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.7, ease: EASE, delay: satelliteDelay + delay },
-        }
+      : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, ease: EASE, delay: satelliteDelay + delay } }
 
   return (
     <section
       className="relative flex min-h-[80vh] flex-col justify-center overflow-hidden bg-hueso sm:min-h-[90vh]"
-      style={{ paddingInline: "clamp(32px, 8vw, 120px)", paddingBlock: "120px 96px" }}
+      style={{ paddingInline: "clamp(24px, 6vw, 96px)", paddingBlock: "120px 96px" }}
     >
-      {/* (f) Gradiente radial sutil arena, esquina superior derecha */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(110% 80% at 100% 0%, var(--color-arena) 0%, transparent 55%)",
-          opacity: 0.4,
-        }}
-      />
+      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(110% 80% at 100% 0%, var(--color-arena) 0%, transparent 55%)", opacity: 0.4 }} />
       <TextureOverlay texture="paperGrain" opacity={0.14} />
 
-      {/* (c) Asterisco animado en la esquina superior derecha */}
-      <motion.span
-        aria-hidden
-        {...satellite(0.1)}
-        className="pointer-events-none absolute select-none font-playfair text-dorado"
-        style={{ top: "clamp(80px, 12vh, 140px)", right: "clamp(28px, 6vw, 96px)", fontSize: "clamp(48px, 6vw, 92px)", lineHeight: 1 }}
-      >
+      <motion.span aria-hidden {...satellite(0.1)} className="pointer-events-none absolute select-none font-playfair text-dorado" style={{ top: "clamp(80px, 12vh, 140px)", right: "clamp(28px, 6vw, 96px)", fontSize: "clamp(48px, 6vw, 92px)", lineHeight: 1 }}>
         <span className={reduced ? "" : "ms-asterisk inline-block"}>✳</span>
       </motion.span>
 
       <div className="relative mx-auto w-full" style={{ maxWidth: 1100 }}>
-        {/* (a) Badge pill eyebrow */}
         <motion.div {...satellite(0)} className="mb-7">
-          <span
-            className="inline-flex items-center gap-2 rounded-full border border-dorado/60 bg-arena/40 font-mono uppercase text-bordo"
-            style={{ fontSize: 11, letterSpacing: "0.2em", padding: "8px 16px" }}
-          >
+          <span className="inline-flex items-center gap-2 rounded-full border border-dorado/60 bg-arena/40 font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em", padding: "8px 16px" }}>
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-dorado" />
             {eyebrow}
           </span>
         </motion.div>
 
-        {/* (b) Línea decorativa dorada que crece */}
-        <motion.div
-          aria-hidden
-          initial={reduced ? false : { scaleX: 0 }}
-          animate={reduced ? undefined : { scaleX: 1 }}
-          transition={{ duration: 0.7, ease: EASE, delay: satelliteDelay + 0.05 }}
-          className="mb-8 h-px origin-left bg-dorado"
-          style={{ width: "clamp(60px, 10vw, 120px)" }}
-        />
+        <motion.div aria-hidden initial={reduced ? false : { scaleX: 0 }} animate={reduced ? undefined : { scaleX: 1 }} transition={{ duration: 0.7, ease: EASE, delay: satelliteDelay + 0.05 }} className="mb-8 h-px origin-left bg-dorado" style={{ width: "clamp(60px, 10vw, 120px)" }} />
 
-        {/* Título contenido */}
-        <motion.h1
-          variants={reduced ? undefined : heroContainer}
-          initial={reduced ? undefined : "hidden"}
-          animate={reduced ? undefined : "visible"}
-          className="font-playfair font-bold text-negro-bordo"
-          style={{
-            fontSize: "clamp(36px, 5.4vw, 88px)",
-            lineHeight: 1.05,
-            letterSpacing: "-0.03em",
-            maxWidth: "18ch",
-          }}
-        >
-          {reduced
-            ? hero.h1
-            : words.map((w, i) => (
-                <motion.span
-                  key={i}
-                  variants={heroWord}
-                  className="inline-block"
-                  style={{ marginRight: "0.25em", willChange: "transform, filter" }}
-                >
-                  {w}
-                </motion.span>
-              ))}
+        <motion.h1 variants={reduced ? undefined : heroContainer} initial={reduced ? undefined : "hidden"} animate={reduced ? undefined : "visible"} className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(36px, 5.4vw, 88px)", lineHeight: 1.05, letterSpacing: "-0.03em", maxWidth: "18ch" }}>
+          {reduced ? hero.h1 : words.map((w, i) => (
+            <motion.span key={i} variants={heroWord} className="inline-block" style={{ marginRight: "0.25em", willChange: "transform, filter" }}>{w}</motion.span>
+          ))}
         </motion.h1>
 
-        {/* Subtítulo */}
-        <motion.div
-          {...satellite(0.15)}
-          className="mt-8 font-sans text-gris-bordo"
-          style={{ fontSize: "clamp(16px, 1.4vw, 20px)", lineHeight: 1.65, maxWidth: 560 }}
-        >
+        <motion.div {...satellite(0.15)} className="mt-8 font-sans text-gris-bordo" style={{ fontSize: "clamp(16px, 1.4vw, 20px)", lineHeight: 1.6, maxWidth: 560 }}>
           <RichText html={hero.description} className="rich-inline" />
         </motion.div>
       </div>
 
-      {/* (d) Texto satélite inferior derecho */}
-      <motion.span
-        aria-hidden
-        {...satellite(0.25)}
-        className="absolute font-mono uppercase text-bordo/55"
-        style={{ bottom: 36, right: "clamp(28px, 6vw, 96px)", fontSize: 11, letterSpacing: "0.22em" }}
-      >
-        0{serviceCount} — {eyebrow}
+      <motion.span aria-hidden {...satellite(0.25)} className="absolute font-mono uppercase text-bordo/55" style={{ bottom: 36, right: "clamp(28px, 6vw, 96px)", fontSize: 11, letterSpacing: "0.22em" }}>
+        {two(serviceCount)} — {eyebrow}
       </motion.span>
 
-      {/* (e) Indicador de scroll: círculo + texto rotado */}
-      <div
-        aria-hidden
-        className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center gap-3"
-        style={{ bottom: 30 }}
-      >
-        <span
-          className="font-mono uppercase text-bordo/60"
-          style={{ fontSize: 10, letterSpacing: "0.3em", writingMode: "vertical-rl" }}
-        >
-          Scroll
-        </span>
+      <div aria-hidden className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center gap-3" style={{ bottom: 30 }}>
+        <span className="font-mono uppercase text-bordo/60" style={{ fontSize: 10, letterSpacing: "0.3em", writingMode: "vertical-rl" }}>Scroll</span>
         <div className="relative flex h-9 w-5 items-start justify-center rounded-full border border-dorado/50 pt-1.5">
           <span className={cn("h-1.5 w-1.5 rounded-full bg-dorado", !reduced && "ms-scroll-dot")} />
         </div>
@@ -218,140 +132,119 @@ function HeroSection({
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   CUERPO — decide desktop scrollytelling vs mobile apilado
+   SECCIÓN 2 — SERVICIO DESTACADO (scrollytelling solo Mentoría)
    ════════════════════════════════════════════════════════════════════════ */
-
-function ServiciosBody(props: {
-  featured: Servicio
-  secondaries: Servicio[]
-  cta: Record<string, string>
-}) {
-  const isDesktop = useMediaQuery("(min-width: 1024px)")
-  const reduced = useReducedMotion()
-  if (isDesktop === true && !reduced) return <ScrollytellingDesktop {...props} />
-  return <StackedMobile {...props} reduced={!!reduced} />
-}
-
-/* ─── plan de frames (compartido) ──────────────────────────────────────── */
 
 type Frame =
   | { kind: "photo"; range: [number, number] }
   | { kind: "anchor"; range: [number, number] }
-  | { kind: "sub"; range: [number, number]; sub: SubServicio }
-  | { kind: "card"; range: [number, number]; servicio: Servicio; num: string; dark: boolean }
-  | { kind: "cta"; range: [number, number] }
+  | { kind: "sub"; range: [number, number]; sub: SubServicio; idx: number }
+  | { kind: "close"; range: [number, number] }
 
-/** Construye los 8 frames del scrollytelling unificado. */
-function buildFrames(featured: Servicio, secondaries: Servicio[]): Frame[] {
-  const subs = featured.subServicios.slice(0, 3)
-  const subStart = 0.22
-  const subEnd = 0.58
-  const step = (subEnd - subStart) / Math.max(subs.length, 1)
+function buildFeaturedFrames(f: Servicio): { frames: Frame[]; nSub: number } {
+  const subs = f.subServicios.slice(0, 3)
+  const items: { kind: Frame["kind"]; weight: number; sub?: SubServicio; idx?: number }[] = []
+  items.push({ kind: "photo", weight: 1 })
+  if (f.anchorPhrase) items.push({ kind: "anchor", weight: 1.5 })
+  subs.forEach((sub, i) => items.push({ kind: "sub", weight: 2, sub, idx: i }))
+  items.push({ kind: "close", weight: 1.5 })
 
-  const frames: Frame[] = [
-    { kind: "photo", range: [0, 0.1] },
-    { kind: "anchor", range: [0.1, subStart] },
-  ]
-  subs.forEach((sub, i) => {
-    frames.push({ kind: "sub", range: [subStart + step * i, subStart + step * (i + 1)], sub })
+  const total = items.reduce((a, it) => a + it.weight, 0)
+  let acc = 0
+  const frames = items.map((it) => {
+    const s = acc / total
+    acc += it.weight
+    const e = acc / total
+    if (it.kind === "sub") return { kind: "sub", range: [s, e], sub: it.sub!, idx: it.idx! } as Frame
+    return { kind: it.kind, range: [s, e] } as Frame
   })
-  if (secondaries[0])
-    frames.push({ kind: "card", range: [0.58, 0.72], servicio: secondaries[0], num: "02", dark: false })
-  if (secondaries[1])
-    frames.push({ kind: "card", range: [0.72, 0.85], servicio: secondaries[1], num: "03", dark: true })
-  frames.push({ kind: "cta", range: [0.85, 1] })
-  return frames
+  return { frames, nSub: subs.length }
 }
 
-/* ════════════════════════════════════════════════════════════════════════
-   DESKTOP — scrollytelling unificado sticky 1000vh
-   ════════════════════════════════════════════════════════════════════════ */
+function FeaturedBlock({ s }: { s: Servicio }) {
+  const isDesktop = useMediaQuery("(min-width: 1024px)")
+  const reduced = useReducedMotion()
+  if (isDesktop === true && !reduced) return <FeaturedDesktop s={s} />
+  return <FeaturedMobile s={s} reduced={!!reduced} />
+}
 
-function ScrollytellingDesktop({
-  featured,
-  secondaries,
-  cta,
-}: {
-  featured: Servicio
-  secondaries: Servicio[]
-  cta: Record<string, string>
-}) {
+/* ─── desktop sticky 600vh ─────────────────────────────────────────────── */
+function FeaturedDesktop({ s }: { s: Servicio }) {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] })
-
-  const frames = buildFrames(featured, secondaries)
-  const photoScale = useTransform(scrollYProgress, [0, 0.1], [1.06, 1])
-  const nFeaturedDots = 2 + featured.subServicios.slice(0, 3).length // foto + ancla + subs
-
-  // Estados del panel izquierdo (cambian de servicio con el scroll).
-  const panels = [
-    { range: [0, 0.58] as [number, number], eyebrow: "01 — Servicio destacado", title: featured.nombre, tagline: featured.tagline, desc: featured.descripcion },
-    secondaries[0] && { range: [0.58, 0.72] as [number, number], eyebrow: "02 — Servicio", title: secondaries[0].nombre, tagline: secondaries[0].tagline, desc: secondaries[0].descripcion },
-    secondaries[1] && { range: [0.72, 0.85] as [number, number], eyebrow: "03 — Servicio", title: secondaries[1].nombre, tagline: secondaries[1].tagline, desc: secondaries[1].descripcion },
-    { range: [0.85, 1] as [number, number], eyebrow: (cta.eyebrow ?? "").trim() || "Hablemos", title: cta.button_text || "Conversemos", tagline: "", desc: "" },
-  ].filter(Boolean) as { range: [number, number]; eyebrow: string; title: string; tagline: string; desc: string }[]
+  const { frames, nSub } = buildFeaturedFrames(s)
+  const fotoRange = frames[0].range
+  const photoScale = useTransform(scrollYProgress, [0, fotoRange[1]], [1.06, 1])
 
   return (
-    <section className="relative bg-hueso" aria-label="Servicios">
-      <div ref={ref} style={{ height: "1000vh" }}>
+    <section className="relative bg-hueso" aria-label={s.nombre}>
+      <div ref={ref} style={{ height: "600vh" }}>
         <div className="sticky top-0 flex h-screen items-stretch overflow-hidden">
-          {/* PANEL IZQUIERDO sticky (40%) — contenido cambiante */}
-          <div className="relative w-2/5" style={{ paddingInline: "clamp(40px, 5vw, 88px)" }}>
-            {panels.map((p, i) => (
-              <PanelLayer
-                key={i}
-                progress={scrollYProgress}
-                range={p.range}
-                first={i === 0}
-                last={i === panels.length - 1}
-              >
-                <p className="font-mono uppercase text-bordo" style={{ fontSize: 12, letterSpacing: "0.2em" }}>
-                  {p.eyebrow}
-                </p>
-                <div className="mt-6 mb-8 h-px w-16 bg-dorado" />
-                <h2
-                  className="font-playfair font-bold text-negro-bordo"
-                  style={{ fontSize: "clamp(38px, 4.4vw, 72px)", lineHeight: 1.04, letterSpacing: "-0.03em" }}
-                >
-                  {p.title}
-                </h2>
-                {p.tagline && (
-                  <p className="mt-5 font-playfair italic text-bordo" style={{ fontSize: "clamp(18px, 1.5vw, 23px)" }}>
-                    {p.tagline}
+          {/* PANEL IZQUIERDO (30%) — indicador editorial, sin título de servicio */}
+          <div className="relative flex w-[30%] flex-col justify-center" style={{ paddingInline: "clamp(32px, 4vw, 72px)" }}>
+            <p className="font-mono uppercase text-bordo" style={{ fontSize: 12, letterSpacing: "0.2em" }}>
+              01 — Servicio destacado
+            </p>
+            <div className="mt-6 h-px w-16 bg-dorado" />
+
+            {/* zona cambiante: intro (foto) + contadores (subs) */}
+            <div className="relative mt-10" style={{ minHeight: 180 }}>
+              {s.introText && (
+                <LeftLayer progress={scrollYProgress} range={fotoRange} first>
+                  <p className="font-playfair italic text-gris-bordo" style={{ fontSize: "clamp(20px, 1.7vw, 26px)", lineHeight: 1.35, maxWidth: 320 }}>
+                    {s.introText}
                   </p>
-                )}
-                <div className="mt-6 font-sans text-gris-bordo" style={{ fontSize: 17, lineHeight: 1.7, maxWidth: 460 }}>
-                  <RichText html={p.desc} className="rich-inline" />
-                </div>
-              </PanelLayer>
-            ))}
+                </LeftLayer>
+              )}
+              {frames.map((f, i) =>
+                f.kind === "sub" ? (
+                  <LeftLayer key={i} progress={scrollYProgress} range={f.range}>
+                    <div className="flex items-baseline gap-3 font-playfair font-bold text-negro-bordo leading-none">
+                      <span style={{ fontSize: "clamp(80px, 9vw, 150px)" }}>{two(f.idx + 1)}</span>
+                      <span className="text-bordo/40" style={{ fontSize: "clamp(28px, 3vw, 48px)" }}>/ {two(nSub)}</span>
+                    </div>
+                  </LeftLayer>
+                ) : null,
+              )}
+            </div>
           </div>
 
-          {/* PANEL DERECHO (60%) — frames */}
-          <div className="relative w-3/5 overflow-hidden">
+          {/* PANEL DERECHO (70%) — frames (acá vive el TÍTULO) */}
+          <div className="relative w-[70%] overflow-hidden">
             {frames.map((f, i) => {
               const first = i === 0
               const last = i === frames.length - 1
               if (f.kind === "photo")
                 return (
-                  <FrameLayer key={i} progress={scrollYProgress} range={f.range} first={first}>
-                    <motion.div className="relative h-full w-full" style={{ scale: photoScale }}>
-                      <Image src={FEATURED_PHOTO} alt={featured.nombre} fill sizes="60vw" className="object-cover" loading="lazy" />
-                      <div className="absolute inset-0" style={{ background: "linear-gradient(120deg, rgba(102,0,31,0.42) 0%, rgba(26,0,8,0.18) 45%, transparent 100%)" }} />
+                  <FrameLayer key={i} progress={scrollYProgress} range={f.range} first>
+                    <div className="relative h-full w-full">
+                      <motion.div className="absolute inset-0" style={{ scale: photoScale }}>
+                        <Image src={FEATURED_PHOTO} alt={s.nombre} fill sizes="70vw" className="object-cover" loading="lazy" />
+                      </motion.div>
+                      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(26,0,8,0.05) 0%, rgba(26,0,8,0.25) 55%, rgba(26,0,8,0.78) 100%)" }} />
                       <TextureOverlay texture="paperGrain" opacity={0.14} />
-                    </motion.div>
+                      <div className="absolute inset-x-0 bottom-0" style={{ padding: "clamp(40px, 5vw, 72px)" }}>
+                        <h2 className="font-playfair font-bold text-hueso" style={{ fontSize: "clamp(34px, 3.8vw, 60px)", lineHeight: 1.05, letterSpacing: "-0.02em", maxWidth: 760 }}>
+                          {s.nombre}
+                        </h2>
+                        {s.tagline && (
+                          <p className="mt-4 font-playfair italic text-dorado" style={{ fontSize: "clamp(18px, 1.5vw, 24px)" }}>{s.tagline}</p>
+                        )}
+                        {s.descripcion && (
+                          <div className="mt-5 font-sans text-hueso/85" style={{ fontSize: 17, lineHeight: 1.6, maxWidth: 620 }}>
+                            <RichText html={s.descripcion} className="rich-inline" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </FrameLayer>
                 )
               if (f.kind === "anchor")
                 return (
                   <FrameLayer key={i} progress={scrollYProgress} range={f.range} className="flex items-center bg-arena" style={{ paddingInline: "clamp(40px, 5vw, 80px)" }}>
-                    {featured.anchorPhrase ? (
-                      <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(40px, 5vw, 80px)", lineHeight: 1.08, letterSpacing: "-0.02em" }}>
-                        {featured.anchorPhrase}
-                      </p>
-                    ) : (
-                      <p className="font-sans text-bordo/60" style={{ fontSize: 18, maxWidth: 460 }}>{PENDING}</p>
-                    )}
+                    <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(40px, 5vw, 80px)", lineHeight: 1.08, letterSpacing: "-0.02em" }}>
+                      {s.anchorPhrase}
+                    </p>
                   </FrameLayer>
                 )
               if (f.kind === "sub")
@@ -360,20 +253,30 @@ function ScrollytellingDesktop({
                     <SubCard sub={f.sub} />
                   </FrameLayer>
                 )
-              if (f.kind === "card")
-                return (
-                  <FrameLayer key={i} progress={scrollYProgress} range={f.range} className={f.dark ? "bg-bordo" : "bg-hueso-oscuro"}>
-                    <SecondaryCard servicio={f.servicio} num={f.num} dark={f.dark} progress={scrollYProgress} range={f.range} />
-                  </FrameLayer>
-                )
+              // close
               return (
                 <FrameLayer key={i} progress={scrollYProgress} range={f.range} last={last} className="flex flex-col items-start justify-center bg-bordo" style={{ paddingInline: "clamp(40px, 5vw, 80px)" }}>
-                  <CtaCard cta={cta} />
+                  {s.testimonial ? (
+                    <figure className="rounded-3xl bg-hueso/10 p-9" style={{ maxWidth: 560, border: "1px solid rgba(254,252,239,0.18)" }}>
+                      <blockquote className="font-playfair italic text-hueso" style={{ fontSize: "clamp(22px, 2vw, 30px)", lineHeight: 1.4 }}>“{s.testimonial}”</blockquote>
+                      {s.testimonialAuthor && (
+                        <figcaption className="mt-5 font-mono uppercase text-dorado" style={{ fontSize: 11, letterSpacing: "0.18em" }}>{s.testimonialAuthor}</figcaption>
+                      )}
+                    </figure>
+                  ) : (
+                    s.tagline && (
+                      <p className="font-playfair italic text-hueso/80" style={{ fontSize: "clamp(26px, 2.6vw, 44px)", lineHeight: 1.25, maxWidth: 620 }}>{s.tagline}</p>
+                    )
+                  )}
+                  <Link href="/#contacto" className="group mt-10 inline-flex items-center gap-2 rounded-xl bg-hueso px-8 py-4 font-sans font-semibold text-bordo transition-all duration-300 hover:bg-arena" style={{ fontSize: 15 }}>
+                    Conversemos
+                    <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
+                  </Link>
                 </FrameLayer>
               )
             })}
 
-            <ProgressDots frames={frames} progress={scrollYProgress} featuredCount={nFeaturedDots} />
+            <ProgressDots frames={frames} progress={scrollYProgress} />
           </div>
         </div>
       </div>
@@ -381,29 +284,12 @@ function ScrollytellingDesktop({
   )
 }
 
-/* ─── capas con plateau (aparece rápido, se queda, se va rápido) ────────── */
-
-function FrameLayer({
-  progress,
-  range,
-  first,
-  last,
-  className,
-  style,
-  children,
-}: {
-  progress: MotionValue<number>
-  range: [number, number]
-  first?: boolean
-  last?: boolean
-  className?: string
-  style?: React.CSSProperties
-  children: React.ReactNode
+/* capas con plateau (dominio completo [0,1] — motion v12 no clampea) */
+function FrameLayer({ progress, range, first, last, className, style, children }: {
+  progress: MotionValue<number>; range: [number, number]; first?: boolean; last?: boolean; className?: string; style?: React.CSSProperties; children: React.ReactNode
 }) {
   const [s, e] = range
   const f = 0.03
-  // Dominio completo [0,1] para que NO haya extrapolación fuera de la banda
-  // (motion v12 no clampea por defecto): la capa queda en 0 fuera de su tramo.
   const input = first ? [0, e - f, e, 1] : last ? [0, s, s + f, 1] : [0, s, s + f, e - f, e, 1]
   const out = first ? [1, 1, 0, 0] : last ? [0, 0, 1, 1] : [0, 0, 1, 1, 0, 0]
   const opacity = useTransform(progress, input, out)
@@ -414,309 +300,204 @@ function FrameLayer({
   )
 }
 
-/** Panel izquierdo: cross-fade con leve slide + blur (counter feel). */
-function PanelLayer({
-  progress,
-  range,
-  first,
-  last,
-  children,
-}: {
-  progress: MotionValue<number>
-  range: [number, number]
-  first?: boolean
-  last?: boolean
-  children: React.ReactNode
+/* panel izquierdo: cross-fade + slide + blur (counter feel) */
+function LeftLayer({ progress, range, first, last, children }: {
+  progress: MotionValue<number>; range: [number, number]; first?: boolean; last?: boolean; children: React.ReactNode
 }) {
   const [s, e] = range
   const f = 0.04
   const input = first ? [0, e - f, e, 1] : last ? [0, s, s + f, 1] : [0, s, s + f, e - f, e, 1]
   const opacity = useTransform(progress, input, first ? [1, 1, 0, 0] : last ? [0, 0, 1, 1] : [0, 0, 1, 1, 0, 0])
-  const y = useTransform(progress, input, first ? [0, 0, -28, -28] : last ? [34, 34, 0, 0] : [34, 34, 0, 0, -28, -28])
-  const filter = useTransform(
-    progress,
-    input,
-    first
-      ? ["blur(0px)", "blur(0px)", "blur(8px)", "blur(8px)"]
-      : last
-        ? ["blur(8px)", "blur(8px)", "blur(0px)", "blur(0px)"]
-        : ["blur(8px)", "blur(8px)", "blur(0px)", "blur(0px)", "blur(8px)", "blur(8px)"],
-  )
+  const y = useTransform(progress, input, first ? [0, 0, -26, -26] : last ? [30, 30, 0, 0] : [30, 30, 0, 0, -26, -26])
+  const filter = useTransform(progress, input, first ? ["blur(0px)", "blur(0px)", "blur(8px)", "blur(8px)"] : last ? ["blur(8px)", "blur(8px)", "blur(0px)", "blur(0px)"] : ["blur(8px)", "blur(8px)", "blur(0px)", "blur(0px)", "blur(8px)", "blur(8px)"])
   return (
-    <motion.div className="absolute inset-0 flex flex-col justify-center" style={{ opacity, y, filter, willChange: "opacity, transform" }}>
+    <motion.div className="absolute inset-0 flex flex-col justify-start" style={{ opacity, y, filter, willChange: "opacity, transform" }}>
       {children}
     </motion.div>
   )
 }
 
-/* ─── sub-servicio card (Mentoría) ─────────────────────────────────────── */
 function SubCard({ sub }: { sub: SubServicio }) {
   return (
-    <div
-      className="ms-breathe rounded-3xl bg-hueso p-10 shadow-[0_24px_70px_-28px_rgba(102,0,31,0.45)]"
-      style={{ maxWidth: 460, border: "1px solid rgba(201,168,130,0.45)" }}
-    >
-      <span className="font-mono uppercase text-bordo/60" style={{ fontSize: 11, letterSpacing: "0.18em" }}>
-        Sub-servicio
-      </span>
-      <p className="mt-4 font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(24px, 2.2vw, 34px)", lineHeight: 1.15 }}>
-        {sub.titulo}
-      </p>
-      <RichText html={sub.desc} className="rich-inline mt-4 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }} />
+    <div className="ms-breathe rounded-3xl bg-hueso p-10 shadow-[0_24px_70px_-28px_rgba(102,0,31,0.45)]" style={{ maxWidth: 480, border: "1px solid rgba(201,168,130,0.45)" }}>
+      <span className="font-mono uppercase text-bordo/60" style={{ fontSize: 11, letterSpacing: "0.18em" }}>Sub-servicio</span>
+      <p className="mt-4 font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(24px, 2.2vw, 34px)", lineHeight: 1.15 }}>{sub.titulo}</p>
+      {sub.desc && <RichText html={sub.desc} className="rich-inline mt-4 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.6 }} />}
     </div>
   )
 }
 
-/* ─── card de servicio secundario 02 / 03 ──────────────────────────────── */
-function SecondaryCard({
-  servicio,
-  num,
-  dark,
-  progress,
-  range,
-}: {
-  servicio: Servicio
-  num: string
-  dark: boolean
-  progress: MotionValue<number>
-  range: [number, number]
-}) {
-  const numY = useTransform(progress, range, [70, -70])
-  const titleColor = dark ? "text-hueso" : "text-negro-bordo"
-  const taglineColor = dark ? "text-dorado" : "text-bordo"
-  const descColor = dark ? "text-hueso/85" : "text-gris-bordo"
-  const subColor = dark ? "text-hueso/80" : "text-gris-bordo"
-  const stroke = dark ? "var(--color-hueso)" : "var(--color-bordo)"
-
+function ProgressDots({ frames, progress }: { frames: Frame[]; progress: MotionValue<number> }) {
   return (
-    <div className="relative flex h-full w-full items-center overflow-hidden" style={{ paddingInline: "clamp(40px, 5vw, 80px)" }}>
-      {/* Número gigante de fondo (con parallax vertical) */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 flex items-center justify-end"
-        style={{ y: numY }}
-      >
-        <span
-          className="select-none font-playfair font-bold leading-none"
-          style={{
-            marginRight: "-2%",
-            fontSize: "clamp(240px, 30vw, 420px)",
-            color: "transparent",
-            WebkitTextStroke: `2px ${stroke}`,
-            opacity: 0.1,
-          }}
-        >
-          {num}
-        </span>
-      </motion.div>
-
-      <div className="relative z-10" style={{ maxWidth: 480 }}>
-        <span
-          className={cn("inline-flex items-center gap-2 rounded-full font-mono uppercase", taglineColor)}
-          style={{ fontSize: 11, letterSpacing: "0.18em", padding: "7px 14px", border: `1px solid ${dark ? "rgba(254,252,239,0.4)" : "rgba(201,168,130,0.6)"}` }}
-        >
-          Servicio {num}
-        </span>
-        <h3 className={cn("mt-6 font-playfair font-bold", titleColor)} style={{ fontSize: "clamp(36px, 4vw, 64px)", lineHeight: 1.05, letterSpacing: "-0.02em" }}>
-          {servicio.nombre}
-        </h3>
-        {servicio.tagline && (
-          <p className={cn("mt-4 font-playfair italic", taglineColor)} style={{ fontSize: "clamp(17px, 1.4vw, 21px)" }}>
-            {servicio.tagline}
-          </p>
-        )}
-        <ul className="mt-8 flex flex-col gap-4">
-          {servicio.subServicios.map((sub, i) => (
-            <li key={i} className="flex gap-3">
-              <span className={cn("select-none font-playfair", taglineColor)} style={{ fontSize: 20, lineHeight: 1.3 }}>—</span>
-              <div>
-                <p className={cn("font-sans font-semibold", titleColor)} style={{ fontSize: 15.5, lineHeight: 1.4 }}>{sub.titulo}</p>
-                <RichText html={sub.desc} className={cn("rich-inline mt-1 font-sans", subColor)} style={{ fontSize: 13.5, lineHeight: 1.6 }} />
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  )
-}
-
-/* ─── card CTA (frame final) ───────────────────────────────────────────── */
-function CtaCard({ cta }: { cta: Record<string, string> }) {
-  return (
-    <div style={{ maxWidth: 560 }}>
-      <span className="font-mono uppercase text-dorado" style={{ fontSize: 11, letterSpacing: "0.2em" }}>
-        {(cta.eyebrow ?? "").trim() || "Hablemos"}
-      </span>
-      <h3 className="mt-6 font-playfair font-bold text-hueso" style={{ fontSize: "clamp(36px, 4vw, 64px)", lineHeight: 1.06, letterSpacing: "-0.02em" }}>
-        {cta.title_pre} <em className="text-dorado">{cta.title_accent}</em>
-      </h3>
-      {cta.description && (
-        <div className="mt-6 font-sans text-hueso/85" style={{ fontSize: 17, lineHeight: 1.7 }}>
-          <RichText html={cta.description} className="rich-inline" />
-        </div>
-      )}
-      <Link
-        href="/#contacto"
-        className="group mt-10 inline-flex items-center gap-2 rounded-xl bg-hueso px-9 py-4 font-sans font-semibold text-bordo transition-all duration-300 hover:bg-arena"
-        style={{ fontSize: 16 }}
-      >
-        {cta.button_text || "Conversemos"}
-        <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
-      </Link>
-    </div>
-  )
-}
-
-/* ─── indicador lateral de progreso (un dot por frame) ─────────────────── */
-function ProgressDots({
-  frames,
-  progress,
-  featuredCount,
-}: {
-  frames: Frame[]
-  progress: MotionValue<number>
-  featuredCount: number
-}) {
-  return (
-    <div className="absolute right-7 top-1/2 z-20 flex -translate-y-1/2 flex-col items-center gap-4">
+    <div className="absolute right-8 top-1/2 z-20 flex -translate-y-1/2 flex-col items-center gap-4">
       <div className="absolute top-0 h-full w-px bg-dorado/25" />
       {frames.map((f, i) => (
-        <Dot key={i} progress={progress} range={f.range} ring={i < featuredCount} />
+        <Dot key={i} progress={progress} range={f.range} />
       ))}
     </div>
   )
 }
 
-function Dot({
-  progress,
-  range,
-  ring,
-}: {
-  progress: MotionValue<number>
-  range: [number, number]
-  ring: boolean
-}) {
+function Dot({ progress, range }: { progress: MotionValue<number>; range: [number, number] }) {
   const [s, e] = range
   const mid = (s + e) / 2
   const a = Math.max(s, 0.0001)
   const b = Math.min(e, 0.9999)
-  // Dominio completo: fuera de su tramo el dot queda en reposo (sin extrapolar).
   const scale = useTransform(progress, [0, a, mid, b, 1], [1, 1, 1.7, 1, 1])
   const bg = useTransform(progress, [0, a, mid, b, 1], ["#C9A882", "#C9A882", "#66001F", "#C9A882", "#C9A882"])
   return (
-    <span className="relative z-10 flex items-center justify-center" style={{ width: 16, height: 16 }}>
-      {ring && <span className="absolute inset-0 rounded-full border" style={{ borderColor: "rgba(201,168,130,0.7)" }} />}
-      <motion.span className="rounded-full" style={{ width: 9, height: 9, scale, backgroundColor: bg }} />
-    </span>
+    <motion.span className="relative z-10 rounded-full" style={{ width: 9, height: 9, scale, backgroundColor: bg }} />
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════════
-   MOBILE — bloques apilados con entrada al viewport
-   ════════════════════════════════════════════════════════════════════════ */
-
+/* ─── mobile: bloques apilados ─────────────────────────────────────────── */
 const mvp = { once: true, margin: "-60px" } as const
 const springIn: Variants = {
   hidden: { opacity: 0, y: 36 },
   visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 18 } },
 }
 
-function StackedMobile({
-  featured,
-  secondaries,
-  cta,
-  reduced,
-}: {
-  featured: Servicio
-  secondaries: Servicio[]
-  cta: Record<string, string>
-  reduced: boolean
-}) {
-  const anim = reduced
-    ? {}
-    : { variants: springIn, initial: "hidden" as const, whileInView: "visible" as const, viewport: mvp }
-
+function FeaturedMobile({ s, reduced }: { s: Servicio; reduced: boolean }) {
+  const anim = reduced ? {} : { variants: springIn, initial: "hidden" as const, whileInView: "visible" as const, viewport: mvp }
   return (
-    <section className="bg-hueso" aria-label="Servicios">
-      {/* Hero del servicio destacado */}
-      <div style={{ padding: "64px 24px 36px" }}>
-        <p className="font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em" }}>
-          01 — Servicio destacado
-        </p>
+    <section className="bg-hueso" aria-label={s.nombre}>
+      <div style={{ padding: "80px 24px 36px" }}>
+        <p className="font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em" }}>01 — Servicio destacado</p>
         <div className="mt-4 mb-6 h-px w-16 bg-dorado" />
-        <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(32px, 9vw, 52px)", lineHeight: 1.06, letterSpacing: "-0.02em" }}>
-          {featured.nombre}
-        </h2>
-        {featured.tagline && (
-          <p className="mt-4 font-playfair italic text-bordo" style={{ fontSize: 19 }}>{featured.tagline}</p>
-        )}
-        <div className="mt-5 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>
-          <RichText html={featured.descripcion} className="rich-inline" />
-        </div>
+        <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(32px, 9vw, 52px)", lineHeight: 1.06, letterSpacing: "-0.02em" }}>{s.nombre}</h2>
+        {s.tagline && <p className="mt-4 font-playfair italic text-bordo" style={{ fontSize: 19 }}>{s.tagline}</p>}
+        {s.descripcion && <div className="mt-5 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.6 }}><RichText html={s.descripcion} className="rich-inline" /></div>}
       </div>
 
-      {/* Foto */}
       <motion.div {...anim} className="relative mx-6 overflow-hidden rounded-2xl" style={{ aspectRatio: "4 / 5" }}>
-        <Image src={FEATURED_PHOTO} alt={featured.nombre} fill sizes="100vw" className="object-cover" loading="lazy" />
+        <Image src={FEATURED_PHOTO} alt={s.nombre} fill sizes="100vw" className="object-cover" loading="lazy" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, rgba(102,0,31,0.35), transparent 60%)" }} />
       </motion.div>
 
-      {/* Frase ancla */}
-      <div className="mt-10 bg-arena" style={{ padding: "72px 24px" }}>
-        {featured.anchorPhrase ? (
-          <motion.p {...anim} className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(30px, 8vw, 44px)", lineHeight: 1.12, letterSpacing: "-0.02em" }}>
-            {featured.anchorPhrase}
-          </motion.p>
-        ) : (
-          <p className="font-sans text-bordo/60" style={{ fontSize: 15 }}>{PENDING}</p>
-        )}
-      </div>
+      {s.anchorPhrase && (
+        <div className="mt-10 bg-arena" style={{ padding: "72px 24px" }}>
+          <motion.p {...anim} className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(30px, 8vw, 44px)", lineHeight: 1.12, letterSpacing: "-0.02em" }}>{s.anchorPhrase}</motion.p>
+        </div>
+      )}
 
-      {/* Sub-servicios del destacado (cards) */}
-      <div style={{ padding: "48px 24px 8px" }}>
+      <div style={{ padding: "56px 24px 8px" }}>
         <p className="mb-6 font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.18em" }}>Sub-servicios</p>
-        <div className="flex flex-col gap-5">
-          {featured.subServicios.map((sub, i) => (
-            <motion.div
-              key={i}
-              {...(reduced ? {} : { variants: springIn, initial: "hidden" as const, whileInView: "visible" as const, viewport: mvp })}
-              className="rounded-2xl bg-hueso-oscuro p-7"
-              style={{ border: "1px solid rgba(201,168,130,0.4)" }}
-            >
-              <span className="font-mono uppercase text-bordo/60" style={{ fontSize: 10, letterSpacing: "0.18em" }}>Sub-servicio</span>
+        <div className="flex flex-col" style={{ gap: 20 }}>
+          {s.subServicios.map((sub, i) => (
+            <motion.div key={i} {...(reduced ? {} : { variants: springIn, initial: "hidden" as const, whileInView: "visible" as const, viewport: mvp })} className="rounded-2xl bg-hueso-oscuro p-7" style={{ border: "1px solid rgba(201,168,130,0.4)" }}>
+              <span className="font-mono uppercase text-bordo/60" style={{ fontSize: 10, letterSpacing: "0.18em" }}>{two(i + 1)} / {two(s.subServicios.length)}</span>
               <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: 22, lineHeight: 1.2 }}>{sub.titulo}</p>
-              <RichText html={sub.desc} className="rich-inline mt-3 font-sans text-gris-bordo" style={{ fontSize: 14.5, lineHeight: 1.65 }} />
+              {sub.desc && <RichText html={sub.desc} className="rich-inline mt-3 font-sans text-gris-bordo" style={{ fontSize: 14.5, lineHeight: 1.6 }} />}
             </motion.div>
           ))}
         </div>
       </div>
 
-      {/* Servicios secundarios 02 / 03 */}
-      {secondaries.map((s, i) => (
-        <SecondaryBlockMobile key={s.key} s={s} num={i === 0 ? "02" : "03"} dark={i === 1} reduced={reduced} />
-      ))}
+      {s.testimonial && (
+        <div className="mt-10 bg-bordo" style={{ padding: "64px 24px" }}>
+          <motion.figure {...anim} className="rounded-2xl bg-hueso/10 p-7" style={{ border: "1px solid rgba(254,252,239,0.18)" }}>
+            <blockquote className="font-playfair italic text-hueso" style={{ fontSize: "clamp(20px, 5.5vw, 26px)", lineHeight: 1.4 }}>“{s.testimonial}”</blockquote>
+            {s.testimonialAuthor && <figcaption className="mt-4 font-mono uppercase text-dorado" style={{ fontSize: 11, letterSpacing: "0.18em" }}>{s.testimonialAuthor}</figcaption>}
+          </motion.figure>
+        </div>
+      )}
+    </section>
+  )
+}
 
-      {/* CTA final */}
-      <div className="mt-2 bg-bordo" style={{ padding: "72px 24px" }}>
-        <motion.div {...anim}>
-          <span className="font-mono uppercase text-dorado" style={{ fontSize: 11, letterSpacing: "0.2em" }}>
-            {(cta.eyebrow ?? "").trim() || "Hablemos"}
+/* ════════════════════════════════════════════════════════════════════════
+   SECCIÓN 3 — TRANSICIÓN CONCEPTUAL
+   ════════════════════════════════════════════════════════════════════════ */
+function TransitionSection({ phrase }: { phrase: string }) {
+  const reduced = useReducedMotion()
+  return (
+    <section className="flex min-h-[50vh] flex-col items-center justify-center overflow-hidden bg-arena text-center" style={{ padding: "120px clamp(24px, 6vw, 96px)" }}>
+      {phrase ? (
+        <motion.p
+          initial={reduced ? false : { opacity: 0, y: 20 }}
+          whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+          viewport={mvp}
+          transition={{ duration: 0.8, ease: EASE }}
+          className="font-playfair text-negro-bordo"
+          style={{ fontSize: "clamp(40px, 5vw, 80px)", lineHeight: 1.1, letterSpacing: "-0.02em", maxWidth: 900 }}
+        >
+          {phrase}
+        </motion.p>
+      ) : (
+        /* Divisor decorativo cuando no hay frase aprobada */
+        <div className="flex flex-col items-center gap-6" aria-hidden>
+          <span className={cn("font-playfair text-dorado", !reduced && "ms-asterisk")} style={{ fontSize: 44, lineHeight: 1 }}>✳</span>
+          <div className="h-px w-24 bg-dorado/60" />
+          <span className="font-mono uppercase text-bordo/45" style={{ fontSize: 11, letterSpacing: "0.3em" }}>02 · 03</span>
+        </div>
+      )}
+    </section>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECCIONES 4 y 5 — SERVICIOS SECUNDARIOS (single-column manifiesto)
+   ════════════════════════════════════════════════════════════════════════ */
+function SingleColumnService({ s, num, dark }: { s: Servicio; num: string; dark: boolean }) {
+  const reduced = useReducedMotion()
+  const bg = dark ? "bg-bordo" : "bg-hueso"
+  const titleColor = dark ? "text-hueso" : "text-negro-bordo"
+  const accent = dark ? "text-dorado" : "text-bordo"
+  const descColor = dark ? "text-hueso/85" : "text-gris-bordo"
+  const subTitle = dark ? "text-hueso" : "text-negro-bordo"
+  const subDesc = dark ? "text-hueso/75" : "text-gris-bordo"
+  const lineColor = dark ? "rgba(254,252,239,0.25)" : "rgba(201,168,130,0.4)"
+  const pillBorder = dark ? "rgba(254,252,239,0.5)" : "rgba(201,168,130,0.7)"
+
+  const item = (delay: number) =>
+    reduced
+      ? {}
+      : { initial: { opacity: 0, y: 16 }, whileInView: { opacity: 1, y: 0 }, viewport: mvp, transition: { duration: 0.6, ease: EASE, delay } }
+
+  return (
+    <section className={cn("overflow-hidden", bg)} aria-label={s.nombre} style={{ padding: "clamp(80px, 12vh, 140px) clamp(24px, 6vw, 96px)" }}>
+      <div className="mx-auto" style={{ maxWidth: 900 }}>
+        <motion.div {...item(0)}>
+          <span className={cn("inline-flex items-center rounded-full font-mono uppercase", accent)} style={{ fontSize: 11, letterSpacing: "0.2em", padding: "10px 18px", border: `1px solid ${pillBorder}` }}>
+            {num} — Servicio
           </span>
-          <h3 className="mt-5 font-playfair font-bold text-hueso" style={{ fontSize: "clamp(30px, 8vw, 46px)", lineHeight: 1.08, letterSpacing: "-0.02em" }}>
-            {cta.title_pre} <em className="text-dorado">{cta.title_accent}</em>
-          </h3>
-          {cta.description && (
-            <div className="mt-5 font-sans text-hueso/85" style={{ fontSize: 16, lineHeight: 1.7 }}>
-              <RichText html={cta.description} className="rich-inline" />
-            </div>
-          )}
-          <Link
-            href="/#contacto"
-            className="group mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-hueso px-8 py-4 font-sans font-semibold text-bordo"
-            style={{ fontSize: 16 }}
-          >
-            {cta.button_text || "Conversemos"}
+        </motion.div>
+
+        <motion.h2 {...item(0.05)} className={cn("mt-8 font-playfair font-bold", titleColor)} style={{ fontSize: "clamp(40px, 6vw, 88px)", lineHeight: 1.04, letterSpacing: "-0.03em" }}>
+          {s.nombre}
+        </motion.h2>
+
+        {s.tagline && (
+          <motion.p {...item(0.1)} className={cn("mt-5 font-playfair italic", accent)} style={{ fontSize: "clamp(18px, 1.6vw, 24px)" }}>
+            {s.tagline}
+          </motion.p>
+        )}
+
+        {s.descripcion && (
+          <motion.div {...item(0.15)} className={cn("mt-7 font-sans", descColor)} style={{ fontSize: 18, lineHeight: 1.6, maxWidth: 720 }}>
+            <RichText html={s.descripcion} className="rich-inline" />
+          </motion.div>
+        )}
+
+        {s.subServicios.length > 0 && (
+          <div className="mt-16 flex flex-col">
+            {s.subServicios.map((sub, i) => (
+              <motion.div key={i} {...item(0.1 + i * 0.06)} className="flex flex-col" style={{ paddingBlock: 48, borderTop: i === 0 ? "none" : `1px solid ${lineColor}` }}>
+                <div className="flex items-baseline gap-4">
+                  <span className={cn("font-mono", accent)} style={{ fontSize: 13 }}>{two(i + 1)}</span>
+                  <p className={cn("font-playfair font-bold", subTitle)} style={{ fontSize: "clamp(22px, 2.4vw, 30px)", lineHeight: 1.2 }}>{sub.titulo}</p>
+                </div>
+                {sub.desc && (
+                  <RichText html={sub.desc} className={cn("rich-inline mt-3 font-sans", subDesc)} style={{ fontSize: 16, lineHeight: 1.6, maxWidth: 680, marginLeft: 36 }} />
+                )}
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        <motion.div {...item(0.1)} className="mt-14">
+          <Link href="/#contacto" className={cn("group inline-flex items-center gap-2 rounded-xl px-9 py-4 font-sans font-semibold transition-all duration-300", dark ? "bg-hueso text-bordo hover:bg-arena" : "bg-bordo text-hueso hover:bg-bordo-oscuro")} style={{ fontSize: 15 }}>
+            {s.cta}
             <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
           </Link>
         </motion.div>
@@ -725,72 +506,51 @@ function StackedMobile({
   )
 }
 
-function SecondaryBlockMobile({
-  s,
-  num,
-  dark,
-  reduced,
-}: {
-  s: Servicio
-  num: string
-  dark: boolean
-  reduced: boolean
-}) {
-  const anim = reduced
-    ? {}
-    : { variants: springIn, initial: "hidden" as const, whileInView: "visible" as const, viewport: mvp }
-  const bg = dark ? "bg-bordo" : "bg-hueso-oscuro"
-  const titleColor = dark ? "text-hueso" : "text-negro-bordo"
-  const taglineColor = dark ? "text-dorado" : "text-bordo"
-  const descColor = dark ? "text-hueso/85" : "text-gris-bordo"
-  const subColor = dark ? "text-hueso/80" : "text-gris-bordo"
-  const stroke = dark ? "var(--color-hueso)" : "var(--color-bordo)"
+/* ════════════════════════════════════════════════════════════════════════
+   SECCIÓN 6 — CTA FINAL (full-bleed --bordo, centrado)
+   ════════════════════════════════════════════════════════════════════════ */
+function FinalCTA({ cta }: { cta: Record<string, string> }) {
+  const reduced = useReducedMotion()
+  const eyebrow = (cta.eyebrow ?? "").trim()
+  const titlePre = (cta.title_pre ?? "").trim()
+  const titleAccent = (cta.title_accent ?? "").trim()
+  const desc = (cta.description ?? "").trim()
+  const button = (cta.button_text ?? "").trim() || "Conversemos"
+
+  const item = (delay: number) =>
+    reduced ? {} : { initial: { opacity: 0, y: 18 }, whileInView: { opacity: 1, y: 0 }, viewport: mvp, transition: { duration: 0.65, ease: EASE, delay } }
 
   return (
-    <div className={cn("relative mt-2 overflow-hidden", bg)} style={{ padding: "72px 24px" }}>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute select-none font-playfair font-bold leading-none"
-        style={{ right: "-4%", top: 24, fontSize: 200, color: "transparent", WebkitTextStroke: `2px ${stroke}`, opacity: 0.12 }}
-      >
-        {num}
-      </span>
-      <motion.div {...anim} className="relative z-10">
-        <span
-          className={cn("inline-flex items-center rounded-full font-mono uppercase", taglineColor)}
-          style={{ fontSize: 11, letterSpacing: "0.18em", padding: "7px 14px", border: `1px solid ${dark ? "rgba(254,252,239,0.4)" : "rgba(201,168,130,0.6)"}` }}
-        >
-          Servicio {num}
-        </span>
-        <h3 className={cn("mt-5 font-playfair font-bold", titleColor)} style={{ fontSize: "clamp(30px, 8vw, 46px)", lineHeight: 1.06, letterSpacing: "-0.02em" }}>
-          {s.nombre}
-        </h3>
-        {s.tagline && (
-          <p className={cn("mt-3 font-playfair italic", taglineColor)} style={{ fontSize: 18 }}>{s.tagline}</p>
+    <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-bordo text-center" style={{ padding: "120px clamp(24px, 6vw, 96px)" }}>
+      <TextureOverlay texture="paperGrain" opacity={0.1} />
+      <div className="relative mx-auto" style={{ maxWidth: 800 }}>
+        {eyebrow && (
+          <motion.p {...item(0)} className="mb-8 font-mono uppercase text-dorado" style={{ fontSize: 12, letterSpacing: "0.22em" }}>{eyebrow}</motion.p>
         )}
-        <div className={cn("mt-5 font-sans", descColor)} style={{ fontSize: 15.5, lineHeight: 1.7 }}>
-          <RichText html={s.descripcion} className="rich-inline" />
-        </div>
-        <ul className="mt-7 flex flex-col gap-4">
-          {s.subServicios.map((sub, i) => (
-            <li key={i} className="flex gap-3">
-              <span className={cn("select-none font-playfair", taglineColor)} style={{ fontSize: 20, lineHeight: 1.3 }}>—</span>
-              <div>
-                <p className={cn("font-sans font-semibold", titleColor)} style={{ fontSize: 15, lineHeight: 1.4 }}>{sub.titulo}</p>
-                <RichText html={sub.desc} className={cn("rich-inline mt-1 font-sans", subColor)} style={{ fontSize: 13.5, lineHeight: 1.6 }} />
-              </div>
-            </li>
-          ))}
-        </ul>
-      </motion.div>
-    </div>
+        {(titlePre || titleAccent) && (
+          <motion.h2 {...item(0.05)} className="font-playfair font-bold text-hueso" style={{ fontSize: "clamp(40px, 6.5vw, 96px)", lineHeight: 1.04, letterSpacing: "-0.03em" }}>
+            {titlePre} {titleAccent && <em className="text-dorado">{titleAccent}</em>}
+          </motion.h2>
+        )}
+        {desc && (
+          <motion.div {...item(0.12)} className="mt-8 font-sans text-hueso/80" style={{ fontSize: "clamp(16px, 1.5vw, 20px)", lineHeight: 1.6, maxWidth: 560, marginInline: "auto" }}>
+            <RichText html={desc} className="rich-inline" />
+          </motion.div>
+        )}
+        <motion.div {...item(0.18)} className="mt-12">
+          <Link href="/#contacto" className="cta-invert group inline-flex items-center gap-3 rounded-xl border-2 border-hueso bg-hueso px-10 font-sans font-semibold text-bordo transition-all duration-300" style={{ fontSize: "clamp(16px, 1.4vw, 19px)", paddingBlock: "clamp(16px,2vw,22px)" }}>
+            {button}
+            <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
+          </Link>
+        </motion.div>
+      </div>
+    </section>
   )
 }
 
 /* ════════════════════════════════════════════════════════════════════════
    ORQUESTADOR
    ════════════════════════════════════════════════════════════════════════ */
-
 export function ServiciosPageSections({
   content,
 }: {
@@ -800,11 +560,13 @@ export function ServiciosPageSections({
     servicio_01?: Record<string, string>
     servicio_02?: Record<string, string>
     servicio_03?: Record<string, string>
+    transition?: Record<string, string>
     cta?: Record<string, string>
   }
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
   const cta = { ...fallbacksFor("cta"), ...content?.cta }
+  const transitionPhrase = ({ ...fallbacksFor("transition"), ...content?.transition }.phrase ?? "").trim()
 
   const featuredKey =
     (content?.config?.featured && SERVICE_KEYS.includes(content.config.featured as (typeof SERVICE_KEYS)[number])
@@ -821,7 +583,12 @@ export function ServiciosPageSections({
   return (
     <>
       <HeroSection hero={hero} serviceCount={SERVICE_KEYS.length} />
-      <ServiciosBody featured={featured} secondaries={secondaries} cta={cta} />
+      <FeaturedBlock s={featured} />
+      <TransitionSection phrase={transitionPhrase} />
+      {secondaries.map((s, i) => (
+        <SingleColumnService key={s.key} s={s} num={i === 0 ? "02" : "03"} dark={i === 1} />
+      ))}
+      <FinalCTA cta={cta} />
     </>
   )
 }

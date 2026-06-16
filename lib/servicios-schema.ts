@@ -73,6 +73,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       { field: "sub_3_desc", type: "longtext", label: "Sub-servicio 3 — Descripción", fallback: "Medición cualitativa del impacto de tu negocio en el ecosistema de medios de comunicación." },
       { field: "cta_text", type: "text", label: "Texto del botón", fallback: "Quiero este servicio" },
       { field: "anchor_phrase", type: "text", label: "Frase ancla (solo si es el destacado — frase grande del frame central)", fallback: "" },
+      { field: "intro_text", type: "longtext", plain: true, label: "Texto contextual (panel izquierdo del scrollytelling, solo si es el destacado)", fallback: "" },
       { field: "testimonial", type: "longtext", plain: true, label: "Testimonio / cita (solo si es el destacado — vacío = no se muestra)", fallback: "" },
       { field: "testimonial_author", type: "text", label: "Autor del testimonio", fallback: "" },
     ],
@@ -101,6 +102,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       { field: "sub_3_desc", type: "longtext", label: "Sub-servicio 3 — Descripción", fallback: "Formo equipo con profesionales especializados en marketing y redes sociales para ofrecerte soluciones integrales." },
       { field: "cta_text", type: "text", label: "Texto del botón", fallback: "Quiero este servicio" },
       { field: "anchor_phrase", type: "text", label: "Frase ancla (solo si es el destacado — frase grande del frame central)", fallback: "" },
+      { field: "intro_text", type: "longtext", plain: true, label: "Texto contextual (panel izquierdo del scrollytelling, solo si es el destacado)", fallback: "" },
       { field: "testimonial", type: "longtext", plain: true, label: "Testimonio / cita (solo si es el destacado — vacío = no se muestra)", fallback: "" },
       { field: "testimonial_author", type: "text", label: "Autor del testimonio", fallback: "" },
     ],
@@ -127,8 +129,18 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       { field: "sub_2_desc", type: "longtext", label: "Sub-servicio 2 — Descripción", fallback: "Coordinación integral de la convocatoria de prensa y cobertura mediática para eventos." },
       { field: "cta_text", type: "text", label: "Texto del botón", fallback: "Quiero este servicio" },
       { field: "anchor_phrase", type: "text", label: "Frase ancla (solo si es el destacado — frase grande del frame central)", fallback: "" },
+      { field: "intro_text", type: "longtext", plain: true, label: "Texto contextual (panel izquierdo del scrollytelling, solo si es el destacado)", fallback: "" },
       { field: "testimonial", type: "longtext", plain: true, label: "Testimonio / cita (solo si es el destacado — vacío = no se muestra)", fallback: "" },
       { field: "testimonial_author", type: "text", label: "Autor del testimonio", fallback: "" },
+    ],
+  },
+  {
+    section: "transition",
+    title: "Frase de transición",
+    legend:
+      "Frase puente entre el servicio destacado y los servicios secundarios. Si la dejás vacía, se muestra solo un divisor decorativo (línea dorada + asterisco).",
+    fields: [
+      { field: "phrase", type: "text", label: "Frase de transición", fallback: "" },
     ],
   },
   {

@@ -33,7 +33,7 @@ async function run() {
     const tallWrapper = await page.evaluate(() =>
       Array.from(document.querySelectorAll("div")).some((d) => {
         const h = (d as HTMLElement).style.height
-        return h === "1000vh"
+        return h === "600vh"
       }),
     )
 
@@ -43,7 +43,7 @@ async function run() {
     console.log(`  errores consola: ${errors.length}`)
     if (errors.length) errors.slice(0, 5).forEach((e) => console.log("   · " + e))
     console.log(`  overflow horizontal: ${overflow}`)
-    console.log(`  wrapper 1000vh presente: ${tallWrapper} (desktop esperado true, mobile false)`)
+    console.log(`  wrapper 600vh presente: ${tallWrapper} (desktop esperado true, mobile false)`)
     console.log(`  contiene "Mentoría": ${hasMentoria > 0}`)
 
     if (errors.length > 0 || overflow) failed = true
