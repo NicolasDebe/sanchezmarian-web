@@ -8,6 +8,25 @@ import { fallbacksForIn, fallbackOfIn } from "@/lib/content-schema"
 
 export const SERVICIOS_SECTIONS: SectionDef[] = [
   {
+    section: "config",
+    title: "Configuración",
+    legend:
+      "Elegí qué servicio es el DESTACADO: recibe el tratamiento visual protagonista (scrollytelling en desktop). Los otros dos quedan como servicios secundarios.",
+    fields: [
+      {
+        field: "featured",
+        type: "text",
+        label: "Servicio destacado",
+        fallback: "servicio_02",
+        options: [
+          { value: "servicio_01", label: "Prensa y Comunicación Multiplataforma" },
+          { value: "servicio_02", label: "Mentoría y Asesoramiento en Comunicación Estratégica" },
+          { value: "servicio_03", label: "Relaciones Públicas" },
+        ],
+      },
+    ],
+  },
+  {
     section: "hero",
     title: "Hero",
     fields: [
@@ -53,6 +72,9 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       { field: "sub_3_title", type: "text", label: "Sub-servicio 3 — Título", fallback: "Monitoreo" },
       { field: "sub_3_desc", type: "longtext", label: "Sub-servicio 3 — Descripción", fallback: "Medición cualitativa del impacto de tu negocio en el ecosistema de medios de comunicación." },
       { field: "cta_text", type: "text", label: "Texto del botón", fallback: "Quiero este servicio" },
+      { field: "anchor_phrase", type: "text", label: "Frase ancla (solo si es el destacado — frase grande del frame central)", fallback: "" },
+      { field: "testimonial", type: "longtext", plain: true, label: "Testimonio / cita (solo si es el destacado — vacío = no se muestra)", fallback: "" },
+      { field: "testimonial_author", type: "text", label: "Autor del testimonio", fallback: "" },
     ],
   },
   {
@@ -78,6 +100,9 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       { field: "sub_3_title", type: "text", label: "Sub-servicio 3 — Título", fallback: "Gestión de Alianzas Estratégicas" },
       { field: "sub_3_desc", type: "longtext", label: "Sub-servicio 3 — Descripción", fallback: "Formo equipo con profesionales especializados en marketing y redes sociales para ofrecerte soluciones integrales." },
       { field: "cta_text", type: "text", label: "Texto del botón", fallback: "Quiero este servicio" },
+      { field: "anchor_phrase", type: "text", label: "Frase ancla (solo si es el destacado — frase grande del frame central)", fallback: "" },
+      { field: "testimonial", type: "longtext", plain: true, label: "Testimonio / cita (solo si es el destacado — vacío = no se muestra)", fallback: "" },
+      { field: "testimonial_author", type: "text", label: "Autor del testimonio", fallback: "" },
     ],
   },
   {
@@ -101,6 +126,28 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       { field: "sub_2_title", type: "text", label: "Sub-servicio 2 — Título", fallback: "Lanzamientos" },
       { field: "sub_2_desc", type: "longtext", label: "Sub-servicio 2 — Descripción", fallback: "Coordinación integral de la convocatoria de prensa y cobertura mediática para eventos." },
       { field: "cta_text", type: "text", label: "Texto del botón", fallback: "Quiero este servicio" },
+      { field: "anchor_phrase", type: "text", label: "Frase ancla (solo si es el destacado — frase grande del frame central)", fallback: "" },
+      { field: "testimonial", type: "longtext", plain: true, label: "Testimonio / cita (solo si es el destacado — vacío = no se muestra)", fallback: "" },
+      { field: "testimonial_author", type: "text", label: "Autor del testimonio", fallback: "" },
+    ],
+  },
+  {
+    section: "cta",
+    title: "CTA Final",
+    legend:
+      "Cierre de la página. La segunda parte del título se muestra en cursiva dorada automáticamente.",
+    fields: [
+      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Hagamos que las cosas pasen." },
+      { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Creo en el valor de las buenas historias" },
+      { field: "title_accent", type: "text", label: "Título — destacado (cursiva dorada)", fallback: "y en el poder de las conexiones reales." },
+      {
+        field: "description",
+        type: "longtext",
+        label: "Descripción",
+        fallback:
+          "Si querés comunicar mejor lo que hacés, empezamos por una charla. Hablemos de la historia que tu negocio tiene para contar.",
+      },
+      { field: "button_text", type: "text", label: "Texto del botón", fallback: "Conversemos" },
     ],
   },
 ]

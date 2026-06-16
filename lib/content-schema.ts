@@ -18,6 +18,11 @@
 
 export type FieldType = "text" | "longtext" | "number"
 
+export interface SelectOption {
+  value: string
+  label: string
+}
+
 export interface FieldDef {
   field: string
   type: FieldType
@@ -29,6 +34,12 @@ export interface FieldDef {
    * meta descriptions de SEO, títulos H1 y partes del patrón pre/accent/post.
    */
   plain?: boolean
+  /**
+   * Si está presente, el campo (type "text") se edita con un <select> en el
+   * admin en vez de un input libre. Útil para toggles/elecciones cerradas
+   * como "qué servicio está destacado".
+   */
+  options?: SelectOption[]
 }
 
 export interface SectionDef {

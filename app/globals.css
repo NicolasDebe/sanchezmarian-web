@@ -132,6 +132,23 @@ body::after {
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
+/* ── /servicios — número outline de los servicios secundarios ── */
+.outline-number {
+  transition: color 0.4s ease;
+}
+.outline-number:hover {
+  color: var(--fill);
+}
+
+/* ── /servicios — botón del CTA final ── */
+.cta-final-btn:hover {
+  box-shadow: 0 18px 50px -12px rgba(102, 0, 31, 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
+}
+
 /* ── Admin — inputs ── */
 .admin-input,
 .admin-textarea {

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { saveContentSection } from "@/app/admin/actions"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { hasHtmlTags, htmlToPlainText, plainToHtml } from "@/lib/rich-text"
-import type { FieldType } from "@/lib/content-schema"
+import type { FieldType, SelectOption } from "@/lib/content-schema"
 
 const MAX = { text: 250, longtext: 2000, number: 20 } as const
 
@@ -15,6 +15,8 @@ export interface EditorField {
   value: string
   /** longtext que NO admite HTML (SEO, H1, pre/accent) → textarea plano */
   plain?: boolean
+  /** Si está presente, el campo se edita con un <select> (elección cerrada). */
+  options?: SelectOption[]
 }
 
 /** ¿Este campo usa el editor enriquecido? */
@@ -191,7 +193,20 @@ export function ContentEditor({
                         >
                           {f.label}
                         </label>
-                        {isRich(f) ? (
+                        {f.options ? (
+                          <select
+                            id={`${sec.section}-${f.field}`}
+                            value={v}
+                            onChange={(e) => setField(sec.section, f.field, e.target.value)}
+                            className="admin-input"
+                          >
+                            {f.options.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        ) : isRich(f) ? (
                           <RichTextEditor
                             value={v}
                             onChange={(html) => setField(sec.section, f.field, html)}

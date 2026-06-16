@@ -148,6 +148,57 @@ export async function updateClipping(
   return { success: true }
 }
 
+export async function reorderClients(orderedIds: string[]): Promise<ClippingResult> {
+  const user = await requireUser()
+  if (!user) return { success: false, error: "No autenticado" }
+
+  if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+    return { success: false, error: "Lista de clientes vacía." }
+  }
+
+  try {
+    const admin = createAdminClient()
+
+    // Update individual por id: Supabase no soporta bulk update con valores
+    // distintos por fila en una sola query. Con <50 clientes va de sobra.
+    const results = await Promise.all(
+      orderedIds.map((id, idx) =>
+        admin
+          .from("clients")
+          .update({ order_position: (idx + 1) * 10 })
+          .eq("id", id),
+      ),
+    )
+
+    const failed = results
+      .map((r, i) => ({ r, id: orderedIds[i] }))
+      .filter(({ r }) => r.error)
+
+    if (failed.length > 0) {
+      for (const f of failed) {
+        console.error("[reorderClients] update fallido:", {
+          id: f.id,
+          code: f.r.error?.code,
+          message: f.r.error?.message,
+          details: f.r.error?.details,
+        })
+      }
+      return {
+        success: false,
+        error: `No se pudo guardar el orden de ${failed.length} cliente${failed.length === 1 ? "" : "s"}.`,
+      }
+    }
+  } catch (err) {
+    console.error("[reorderClients] throw:", err)
+    const msg = err instanceof Error ? err.message : "error desconocido"
+    return { success: false, error: `Ocurrió un error al guardar: ${msg}` }
+  }
+
+  revalidatePath("/casos-de-exito")
+  revalidatePath("/admin/clippings")
+  return { success: true }
+}
+
 export async function deleteClipping(id: string): Promise<ClippingResult> {
   const user = await requireUser()
   if (!user) return { success: false, error: "Tu sesión expiró. Volvé a iniciar sesión." }
