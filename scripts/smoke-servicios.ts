@@ -29,11 +29,11 @@ async function run() {
       () => document.documentElement.scrollWidth > window.innerWidth + 1,
     )
 
-    // Desktop: debe existir el wrapper de 1000vh (scrollytelling).
+    // Desktop: debe existir el wrapper del scrollytelling (sticky 800vh).
     const tallWrapper = await page.evaluate(() =>
       Array.from(document.querySelectorAll("div")).some((d) => {
         const h = (d as HTMLElement).style.height
-        return h === "600vh"
+        return h === "800vh"
       }),
     )
 
@@ -43,7 +43,7 @@ async function run() {
     console.log(`  errores consola: ${errors.length}`)
     if (errors.length) errors.slice(0, 5).forEach((e) => console.log("   · " + e))
     console.log(`  overflow horizontal: ${overflow}`)
-    console.log(`  wrapper 600vh presente: ${tallWrapper} (desktop esperado true, mobile false)`)
+    console.log(`  wrapper 800vh presente: ${tallWrapper} (desktop esperado true, mobile false)`)
     console.log(`  contiene "Mentoría": ${hasMentoria > 0}`)
 
     if (errors.length > 0 || overflow) failed = true

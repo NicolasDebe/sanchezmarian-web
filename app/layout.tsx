@@ -10,6 +10,16 @@ const playfairDisplay = Playfair_Display({
   weight: ["400", "500", "600", "700", "800", "900"],
 })
 
+// Instancia VARIABLE (eje wght 400–900) aislada: solo la usa el typography
+// morph de /servicios vía --font-playfair-var. El resto del sitio sigue con
+// las instancias estáticas de arriba (sin cambios de render).
+const playfairVariable = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair-var",
+  display: "swap",
+  weight: "variable",
+})
+
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
@@ -93,7 +103,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${playfairDisplay.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
+      className={`${playfairDisplay.variable} ${playfairVariable.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
     >
       <head>
         <link
