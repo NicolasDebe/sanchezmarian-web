@@ -1,7 +1,7 @@
 /**
  * Smoke test del rediseño de /servicios (desktop + mobile).
  * Carga la página con Edge headless, verifica que hidrate sin errores de
- * consola y que el scrollytelling desktop se monte (contenedor sticky 1000vh).
+ * consola y que el scrollytelling desktop se monte (contenedor sticky 500vh).
  * Ejecutar con el dev/prod server corriendo: npx tsx scripts/smoke-servicios.ts
  */
 import { chromium } from "playwright-core"
@@ -29,11 +29,11 @@ async function run() {
       () => document.documentElement.scrollWidth > window.innerWidth + 1,
     )
 
-    // Desktop: debe existir el wrapper del scrollytelling (sticky 800vh).
+    // Desktop: debe existir el wrapper del scrollytelling (sticky 500vh).
     const tallWrapper = await page.evaluate(() =>
       Array.from(document.querySelectorAll("div")).some((d) => {
         const h = (d as HTMLElement).style.height
-        return h === "800vh"
+        return h === "500vh"
       }),
     )
 
@@ -43,7 +43,7 @@ async function run() {
     console.log(`  errores consola: ${errors.length}`)
     if (errors.length) errors.slice(0, 5).forEach((e) => console.log("   · " + e))
     console.log(`  overflow horizontal: ${overflow}`)
-    console.log(`  wrapper 800vh presente: ${tallWrapper} (desktop esperado true, mobile false)`)
+    console.log(`  wrapper 500vh presente: ${tallWrapper} (desktop esperado true, mobile false)`)
     console.log(`  contiene "Mentoría": ${hasMentoria > 0}`)
 
     if (errors.length > 0 || overflow) failed = true

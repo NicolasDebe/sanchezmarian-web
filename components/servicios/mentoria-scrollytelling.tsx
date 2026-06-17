@@ -1,12 +1,11 @@
 "use client"
 
-import { Fragment, useMemo, useRef, useState } from "react"
+import { Fragment, useRef, useState } from "react"
 import Image from "next/image"
 import {
   motion,
   useScroll,
   useTransform,
-  useMotionTemplate,
   useMotionValueEvent,
   useReducedMotion,
   type MotionValue,
@@ -19,320 +18,174 @@ import { EASE, FEATURED_PHOTO, two, type Servicio, type SubServicio } from "./ty
 import { MentoriaMobile } from "./mentoria-mobile"
 
 /* ════════════════════════════════════════════════════════════════════════
-   MODELO DE FRAMES (dinámico — solo se incluyen frames con contenido real)
+   /servicios v4.4 — scrollytelling de Mentoría, arquitectura de 4 frames.
+   Wrapper sticky 500vh; contenido sticky 100vh con offset bajo el nav.
+   SOLO UN FRAME visible por vez (la foto persiste entre frames 2-3).
+   Sin acumulación de sub-servicios, sin typography morph, indicador
+   minimalista (progress bar + 4 dots).
    ════════════════════════════════════════════════════════════════════════ */
 
-type Stage = "opening" | "reveal" | "anchor" | "transition" | "sub" | "description"
-type Frame = { stage: Stage; start: number; end: number; subIdx?: number }
+const NAV_H = 72 // header sticky bordo (h-[72px])
+const OFFSET = NAV_H + 24 // 96px — respiro consciente bajo el nav
 
-/* Altura del nav fijo (header sticky bordo, h-[72px]). El sticky interno y el
-   header de capítulo respetan este offset para no tocar nunca el nav. */
-const NAV_H = 72
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
-function buildFrames(s: Servicio) {
-  const items: { stage: Stage; weight: number; subIdx?: number }[] = []
-  items.push({ stage: "opening", weight: 1.2 })
-  items.push({ stage: "reveal", weight: 1.2 })
-  if (s.anchorPhrase) items.push({ stage: "anchor", weight: 1.2 })
-  items.push({ stage: "transition", weight: 1 })
-  s.subServicios.forEach((_, i) => items.push({ stage: "sub", weight: 1.4, subIdx: i }))
-  if (s.descripcion) items.push({ stage: "description", weight: 1.4 })
-
-  const total = items.reduce((a, it) => a + it.weight, 0)
-  let acc = 0
-  const frames: Frame[] = items.map((it) => {
-    const start = acc / total
-    acc += it.weight
-    return { stage: it.stage, start, end: acc / total, subIdx: it.subIdx }
-  })
-
-  const find = (st: Stage) => frames.find((f) => f.stage === st)
-  const openEnd = find("opening")!.end
-  const revealEnd = find("reveal")!.end
-  const anchorFrame = find("anchor")
-  const anchorEnd = anchorFrame ? anchorFrame.end : revealEnd
-  const trans = find("transition")!
-  const subFrames = frames.filter((f) => f.stage === "sub")
-  const descFrame = find("description")
-
-  return { frames, openEnd, revealEnd, anchorFrame, anchorEnd, trans, subFrames, descFrame }
-}
-
-/* arrays de stops estrictamente crecientes (motion exige input ascendente) */
-function stops(pairs: [number, number][]): [number[], number[]] {
-  const xs: number[] = []
-  const ys: number[] = []
-  for (const [x, y] of pairs) {
-    if (xs.length === 0 || x > xs[xs.length - 1] + 1e-4) {
-      xs.push(x)
-      ys.push(y)
-    } else {
-      ys[ys.length - 1] = y // colapsa stops coincidentes conservando el último valor
+/* Interpolación lineal por tramos sobre stops ascendentes. La usamos dentro de
+   useTransform en su forma de FUNCIÓN (no la forma de arrays): en esta versión
+   de motion la forma `useTransform(value, number[], number[])` no re-evalúa al
+   scrollear, pero la forma de función sí. */
+function piecewise(p: number, xs: number[], ys: number[]) {
+  if (p <= xs[0]) return ys[0]
+  const n = xs.length
+  if (p >= xs[n - 1]) return ys[n - 1]
+  for (let i = 1; i < n; i++) {
+    if (p <= xs[i]) {
+      const t = (p - xs[i - 1]) / (xs[i] - xs[i - 1])
+      return ys[i - 1] + (ys[i] - ys[i - 1]) * t
     }
   }
-  return [xs, ys]
+  return ys[n - 1]
 }
 
-/* ════════════════════════════════════════════════════════════════════════
-   ORQUESTADOR — elige desktop scrollytelling o mobile apilado
-   ════════════════════════════════════════════════════════════════════════ */
-
-export function MentoriaScrollytelling({ s, sectionId }: { s: Servicio; sectionId: string }) {
+/* Orquestador: desktop scrollytelling, o bloques apilados en mobile /
+   prefers-reduced-motion (sin secuestro de scroll). */
+export function MentoriaScrollytelling({ s, sectionId, count }: { s: Servicio; sectionId: string; count: number }) {
   const isDesktop = useMediaQuery("(min-width: 768px)")
   const reduced = useReducedMotion()
-  if (isDesktop === true && !reduced) return <MentoriaDesktop s={s} sectionId={sectionId} />
-  return <MentoriaMobile s={s} reduced={!!reduced} sectionId={sectionId} />
+  if (!s.nombre) return null // sin nombre no hay nada que contar
+  if (isDesktop === true && !reduced) return <MentoriaDesktop s={s} sectionId={sectionId} count={count} />
+  return <MentoriaMobile s={s} reduced={!!reduced} sectionId={sectionId} count={count} />
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   DESKTOP — sticky 800vh, apertura editorial + typography morph
+   DESKTOP
    ════════════════════════════════════════════════════════════════════════ */
-
-function MentoriaDesktop({ s, sectionId }: { s: Servicio; sectionId: string }) {
+function MentoriaDesktop({ s, sectionId, count }: { s: Servicio; sectionId: string; count: number }) {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] })
-  const M = useMemo(() => buildFrames(s), [s])
-  const { frames, openEnd, revealEnd, anchorFrame, anchorEnd, trans, subFrames, descFrame } = M
 
-  /* ── TYPOGRAPHY MORPH ──────────────────────────────────────────────────
-     Playfair se carga como variable font AISLADA (var(--font-playfair-var),
-     eje wght 400–900) solo para este título. Un ÚNICO elemento morfea:
-       · peso vía font-variation-settings "wght" (900→700→500→400)
-       · tamaño + posición vía transform scale/translateY (GPU, sin reflow)
-       · letter-spacing
-     Nota: el eje wght mínimo de Playfair es 400, así que el "300" del brief se
-     mapea a 400 (el más liviano disponible). */
-  const t0 = 0
-  const tEnd = trans.end
+  const subs = s.subServicios
+  const hasDesc = s.descripcion.trim() !== ""
+  const SUB_START = 0.45
+  const SUB_END = 0.85
+  const n = Math.max(subs.length, 1)
 
-  const [sizeX, sizeY] = stops([
-    [t0, 1],
-    [openEnd, 1],
-    [revealEnd, 0.72],
-    [anchorEnd, 0.5],
-    [tEnd, 0.2],
-    [1, 0.2],
-  ])
-  const scale = useTransform(scrollYProgress, sizeX, sizeY)
+  /* ── FRAME 1·2 — título grande centrado (estable, luego sube + achica) ── */
+  const bigOpacity = useTransform(scrollYProgress, (p) => piecewise(p, [0, 0.25, 0.42, 0.45], [1, 1, 1, 0]))
+  const bigScale = useTransform(scrollYProgress, (p) => piecewise(p, [0.25, 0.45], [1, 0.85]))
+  const bigY = useTransform(scrollYProgress, (p) => `${piecewise(p, [0.25, 0.45], [0, -8])}vh`)
 
-  const [tyX, tyY] = stops([
-    [t0, 0],
-    [openEnd, 0],
-    [revealEnd, 0],
-    [anchorEnd, -22],
-    [tEnd, -38],
-    [1, -38],
-  ])
-  const tyVh = useTransform(scrollYProgress, tyX, tyY)
-  const translate = useMotionTemplate`translateY(${tyVh}vh) scale(${scale})`
+  /* contador "01 / 0X" + asterisco: viven con el frame de apertura */
+  const decorOpacity = bigOpacity
 
-  const [lsX, lsY] = stops([
-    [t0, -0.02],
-    [anchorEnd, -0.015],
-    [tEnd, 0.03],
-    [1, 0.03],
-  ])
-  const lsEm = useTransform(scrollYProgress, lsX, lsY)
-  const letterSpacing = useMotionTemplate`${lsEm}em`
+  /* ── FRAME 3 — título compacto tipo header (arriba izquierda) ── */
+  const compactOpacity = useTransform(scrollYProgress, (p) => piecewise(p, [0.43, 0.46, 0.85, 0.9], [0, 1, 1, 0]))
+  const compactY = useTransform(scrollYProgress, (p) => piecewise(p, [0.85, 0.92], [0, -20]))
 
-  const [wX, wY] = stops([
-    [t0, 900],
-    [openEnd, 900],
-    [revealEnd, 700],
-    [anchorEnd, 500],
-    [tEnd, 400],
-    [1, 400],
-  ])
-  const wght = useTransform(scrollYProgress, wX, wY)
-  const fontVariationSettings = useMotionTemplate`"wght" ${wght}`
+  /* ── FOTO — un único clip-path continuo a lo largo de los frames 2·3·4:
+        circle reveal (2) → inset left strip (3) → cortinilla a la izq (4).
+        En el límite 0.45, circle(110%) ≈ inset(0 0 0 0): ambos = imagen
+        completa, así que el cambio de función no produce salto visible. ── */
+  const clipPath = useTransform(scrollYProgress, (p) => {
+    if (p < 0.45) {
+      const t = clamp((p - 0.25) / 0.05, 0, 1) // 0.25 → 0.30, luego plateau
+      return `circle(${t * 110}% at 50% 50%)`
+    }
+    if (p < 0.85) {
+      const t = clamp((p - 0.45) / 0.05, 0, 1) // 0.45 → 0.50, luego plateau a 65%
+      return `inset(0 ${t * 65}% 0 0)`
+    }
+    const t = clamp((p - 0.85) / 0.07, 0, 1) // 0.85 → 0.92: 65% → 100%
+    return `inset(0 ${65 + t * 35}% 0 0)`
+  })
 
-  /* CROSS-FADE título grande → header de capítulo. El título grande (centrado)
-     cubre opening/reveal/anchor y se desvanece a mitad de la transición,
-     mientras el header pequeño (single-line, izquierda, --bordo, bajo el nav)
-     entra y persiste durante sub-servicios + descripción. Garantiza el estado
-     final correcto sin depender de un único elemento que morfee text-align. */
-  const transSpan = trans.end - trans.start
-  const bigTitleOpacity = useTransform(
-    scrollYProgress,
-    ...stops([
-      [0, 1],
-      [anchorEnd, 1],
-      [trans.start + transSpan * 0.5, 0],
-      [1, 0],
-    ]),
-  )
-  const headerOpacity = useTransform(
-    scrollYProgress,
-    ...stops([
-      [0, 0],
-      [trans.start + transSpan * 0.4, 0],
-      [trans.end, 1],
-      [1, 1],
-    ]),
-  )
-
-  /* ── FOTO ───────────────────────────────────────────────────────────────
-     Reveal con clip-path circle, luego se compacta a la izquierda (scale +
-     origin left), y sale como cortinilla en el frame de descripción. */
-  const reveal = frames[1] // reveal es siempre el segundo frame
-  const [crX, crY] = stops([
-    [0, 0],
-    [reveal.start, 0],
-    [reveal.end, 115],
-    [1, 115],
-  ])
-  const clipPct = useTransform(scrollYProgress, crX, crY)
-  const clipPath = useMotionTemplate`circle(${clipPct}% at 50% 50%)`
-
-  const descStart = descFrame ? descFrame.start : 1
-  const descEnd = descFrame ? descFrame.end : 1
-
-  const photoX = useTransform(
-    scrollYProgress,
-    ...stops([
-      [0, 0],
-      [trans.start, 0],
-      [trans.end, 3],
-      [descStart, 3],
-      [descEnd, -45],
-    ]),
-  )
-  const photoXvw = useMotionTemplate`${photoX}vw`
-  const photoScale = useTransform(
-    scrollYProgress,
-    ...stops([
-      [0, 1],
-      [trans.start, 1],
-      [trans.end, 0.55],
-      [1, 0.55],
-    ]),
-  )
-  const photoTransform = useMotionTemplate`translateX(${photoXvw}) scale(${photoScale})`
-  const photoRadius = useTransform(scrollYProgress, ...stops([[trans.start, 0], [trans.end, 24], [1, 24]]))
-  const photoOpacity = useTransform(scrollYProgress, ...stops([[0, 1], [descStart, 1], [descEnd, 0]]))
-  const scrimOpacity = useTransform(
-    scrollYProgress,
-    ...stops([
-      [reveal.start, 0.6],
-      [reveal.end, 0.28],
-      [anchorEnd, 0.16],
-      [1, 0.16],
-    ]),
-  )
-
-  /* asterisco: gira constante (CSS) + empujón extra acoplado al reveal */
-  const astExtra = useTransform(scrollYProgress, [reveal.start, reveal.end], [0, 200])
-  const decorOpacity = useTransform(scrollYProgress, ...stops([[0, 1], [trans.start, 1], [trans.end, 0]]))
+  /* ── FRAME 4 — descripción word-by-word (activada por umbral) ── */
+  const [descActive, setDescActive] = useState(false)
+  useMotionValueEvent(scrollYProgress, "change", (p) => {
+    const on = p >= 0.86
+    if (on !== descActive) setDescActive(on)
+  })
 
   return (
-    <section id={sectionId} className="relative bg-hueso" aria-label={s.nombre} data-frames={frames.length}>
-      <div ref={ref} style={{ height: "800vh" }}>
-        <div
-          className="sticky w-full overflow-hidden"
-          style={{ top: NAV_H, height: `calc(100vh - ${NAV_H}px)` }}
-        >
+    <section id={sectionId} className="relative bg-hueso" aria-label={s.nombre} data-frames="4">
+      <div ref={ref} style={{ height: "500vh" }}>
+        <div className="sticky top-0 h-screen w-full overflow-hidden">
           {/* fondo + textura */}
           <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(120% 90% at 100% 0%, var(--color-arena) 0%, transparent 55%)", opacity: 0.45 }} />
           <TextureOverlay texture="paperGrain" opacity={0.12} />
 
-          {/* FOTO (z bajo) */}
-          <motion.div className="absolute inset-0" style={{ clipPath, opacity: photoOpacity, transformOrigin: "0% 50%", transform: photoTransform, willChange: "transform, clip-path" }}>
-            <motion.div className="absolute inset-0 overflow-hidden" style={{ borderRadius: photoRadius }}>
-              <Image src={FEATURED_PHOTO} alt={s.nombre} fill priority sizes="100vw" className="object-cover" style={{ objectPosition: "center 22%" }} />
-              <motion.div className="absolute inset-0" style={{ opacity: scrimOpacity, background: "linear-gradient(180deg, var(--color-hueso) 0%, rgba(254,252,239,0.35) 38%, transparent 70%)" }} />
-            </motion.div>
+          {/* FOTO (z-0) */}
+          <motion.div className="absolute inset-0 z-0" style={{ clipPath, willChange: "clip-path" }}>
+            <Image src={FEATURED_PHOTO} alt={s.nombre} fill priority sizes="100vw" className="object-cover" style={{ objectPosition: "center 22%" }} />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, var(--color-hueso) 0%, rgba(254,252,239,0.35) 35%, transparent 68%)" }} />
           </motion.div>
 
-          {/* asterisco decorativo arriba a la derecha */}
-          <motion.span aria-hidden className="pointer-events-none absolute select-none font-playfair text-dorado" style={{ top: "clamp(48px, 8vh, 96px)", right: "clamp(28px, 5vw, 80px)", fontSize: "clamp(40px, 5vw, 76px)", lineHeight: 1, rotate: astExtra, opacity: decorOpacity }}>
+          {/* asterisco rotando — esquina superior derecha (frame 1·2) */}
+          <motion.span aria-hidden className="pointer-events-none absolute z-10 select-none font-playfair text-dorado" style={{ top: "clamp(48px, 8vh, 96px)", right: "clamp(28px, 5vw, 80px)", fontSize: "clamp(40px, 5vw, 76px)", lineHeight: 1, opacity: decorOpacity }}>
             <span className="ms-asterisk inline-block" style={{ animationDuration: "40s" }}>✳</span>
           </motion.span>
 
-          {/* contador "01 / MENTORÍA" abajo a la derecha — alejado del borde
-              para no chocar con el indicador lateral */}
-          <motion.div aria-hidden className="absolute text-right" style={{ bottom: 32, right: "clamp(80px, 8vw, 120px)", opacity: decorOpacity }}>
-            <div className="font-mono text-bordo" style={{ fontSize: 14, letterSpacing: "0.12em" }}>01</div>
-            <div className="mt-1 font-mono uppercase text-gris-bordo" style={{ fontSize: 11, letterSpacing: "0.28em" }}>{firstWord(s.nombre)}</div>
+          {/* contador "01 / 0X" — esquina inferior derecha (único indicador textual) */}
+          <motion.div aria-hidden className="absolute z-10 font-mono text-bordo" style={{ bottom: 32, right: "clamp(28px, 5vw, 80px)", fontSize: 14, letterSpacing: "0.14em", opacity: decorOpacity }}>
+            01 / {two(count)}
           </motion.div>
 
-          {/* TÍTULO grande que morfea (z medio) — entra una vez, se desvanece
-              en la transición cediendo al header de capítulo */}
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center" style={{ paddingInline: "clamp(24px, 6vw, 96px)" }}>
-            <motion.div
-              className="relative w-full text-center"
-              style={{ maxWidth: 1150, opacity: bigTitleOpacity, transform: translate, transformOrigin: "50% 50%", letterSpacing, fontVariationSettings, fontFamily: "var(--font-playfair-var), serif", willChange: "transform, opacity" }}
-            >
-              <MorphTitle text={s.nombre} />
+          {/* TÍTULO grande centrado (frames 1·2) */}
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center" style={{ paddingTop: OFFSET, paddingInline: "clamp(24px, 6vw, 96px)" }}>
+            <motion.div className="w-full text-center" style={{ maxWidth: 1200, opacity: bigOpacity, y: bigY, scale: bigScale, willChange: "transform, opacity" }}>
+              <BigTitle text={s.nombre} />
             </motion.div>
           </div>
 
-          {/* HEADER DE CAPÍTULO — estado FINAL del título: pequeño, single-line,
-              izquierda, peso liviano, --bordo, con padding consciente del nav */}
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute"
-            style={{
-              top: `calc(${NAV_H}px + clamp(32px, 5vh, 72px))`,
-              left: "clamp(24px, 6vw, 96px)",
-              right: "clamp(24px, 6vw, 96px)",
-              opacity: headerOpacity,
-              willChange: "opacity",
-            }}
-          >
-            <span className="block font-mono uppercase text-dorado" style={{ fontSize: 11, letterSpacing: "0.26em", marginBottom: 10 }}>
-              01 — {firstWord(s.nombre)}
-            </span>
-            <span
-              className="block text-bordo"
-              style={{
-                fontFamily: "var(--font-playfair-var), serif",
-                fontVariationSettings: '"wght" 400',
-                fontWeight: 300,
-                fontSize: "clamp(14px, 1.4vw, 20px)",
-                lineHeight: 1.2,
-                letterSpacing: "0.01em",
-                whiteSpace: "nowrap",
-              }}
-            >
+          {/* TÍTULO compacto tipo header (frame 3) — arriba a la izquierda */}
+          <motion.div aria-hidden className="pointer-events-none absolute z-10" style={{ top: OFFSET, left: "clamp(24px, 6vw, 96px)", right: "clamp(24px, 6vw, 96px)", opacity: compactOpacity, y: compactY }}>
+            <span className="block truncate font-playfair text-bordo" style={{ fontSize: "clamp(14px, 1.6vw, 22px)", fontWeight: 400, letterSpacing: "0.02em" }}>
               {s.nombre}
             </span>
           </motion.div>
 
-          {/* FRASE ANCLA (frame propio, parallax contrario) */}
-          {anchorFrame && (
-            <AnchorFrame phrase={s.anchorPhrase} progress={scrollYProgress} frame={anchorFrame} />
+          {/* SUB-SERVICIOS (frame 3) — uno por vez, reemplazo limpio */}
+          {subs.length > 0 && (
+            <div className="absolute z-10" style={{ top: OFFSET, bottom: 0, left: "38%", right: "clamp(40px, 6vw, 100px)" }}>
+              {subs.map((sub, i) => (
+                <SubItem
+                  key={i}
+                  sub={sub}
+                  idx={i}
+                  progress={scrollYProgress}
+                  start={SUB_START + ((SUB_END - SUB_START) * i) / n}
+                  end={SUB_START + ((SUB_END - SUB_START) * (i + 1)) / n}
+                />
+              ))}
+            </div>
           )}
 
-          {/* PANEL DE SUB-SERVICIOS (derecha, acumulativo) */}
-          {subFrames.length > 0 && (
-            <SubPanel subs={s.subServicios} subFrames={subFrames} progress={scrollYProgress} startReveal={trans.end} fadeOut={descStart} />
+          {/* DESCRIPCIÓN completa (frame 4) — centrada */}
+          {hasDesc && (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center" style={{ paddingTop: OFFSET, paddingInline: "clamp(24px, 6vw, 96px)" }}>
+              <WordReveal html={s.descripcion} active={descActive} />
+            </div>
           )}
 
-          {/* DESCRIPCIÓN COMPLETA (centro, cierre) */}
-          {descFrame && <DescriptionFrame html={s.descripcion} progress={scrollYProgress} frame={descFrame} />}
+          {/* INDICADOR — progress bar + 4 dots (absolute dentro del sticky:
+              solo visible mientras la sección está pinneada) */}
+          <ProgressIndicator progress={scrollYProgress} />
         </div>
       </div>
     </section>
   )
 }
 
-function firstWord(name: string) {
-  return (name.split(/\s+/)[0] ?? "").toUpperCase()
-}
-
-/* ── título único: entrada letter-by-letter agrupada por palabra ─────────
-   Las palabras son inline-block (no se parten) y se separan por un espacio
-   real → el wrapping es por palabra y estable mientras el peso morfea. */
+/* ── título grande: letter-by-letter agrupado por palabra ───────────────── */
 const titleContainer: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.025, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.04, delayChildren: 0.08 } },
 }
 const titleLetter: Variants = {
-  hidden: { opacity: 0, y: 30, filter: "blur(12px)" },
+  hidden: { opacity: 0, y: 20, filter: "blur(10px)" },
   visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: EASE } },
 }
-
-function MorphTitle({ text }: { text: string }) {
+function BigTitle({ text }: { text: string }) {
   const words = text.split(/\s+/).filter(Boolean)
   return (
     <motion.h2
@@ -340,12 +193,12 @@ function MorphTitle({ text }: { text: string }) {
       variants={titleContainer}
       initial="hidden"
       animate="visible"
-      className="text-negro-bordo"
-      style={{ fontSize: "clamp(40px, 6.2vw, 100px)", lineHeight: 0.98, margin: 0 }}
+      className="font-playfair text-negro-bordo"
+      style={{ fontSize: "clamp(48px, 7vw, 104px)", fontWeight: 700, lineHeight: 1.0, letterSpacing: "-0.02em", margin: 0 }}
     >
       {words.map((w, wi) => (
         <Fragment key={wi}>
-          <span aria-hidden className="inline-block align-baseline">
+          <span aria-hidden className="inline-block">
             {Array.from(w).map((c, ci) => (
               <motion.span key={ci} variants={titleLetter} className="inline-block" style={{ willChange: "transform, filter" }}>
                 {c}
@@ -359,113 +212,32 @@ function MorphTitle({ text }: { text: string }) {
   )
 }
 
-/* ── frame de frase ancla ───────────────────────────────────────────────── */
-function AnchorFrame({ phrase, progress, frame }: { phrase: string; progress: MotionValue<number>; frame: Frame }) {
-  const { start, end } = frame
-  const span = end - start
-  const opacity = useTransform(progress, [start, start + span * 0.25, end - span * 0.1, end], [0, 1, 1, 0])
-  const blur = useTransform(progress, [start, start + span * 0.3], [20, 0])
-  const filter = useMotionTemplate`blur(${blur}px)`
-  // parallax CONTRARIO: mientras todo sube, la frase flota hacia abajo→arriba
-  const y = useTransform(progress, [start, end], [80, -40])
-  const words = phrase.split(/\s+/).filter(Boolean)
-  return (
-    <motion.div className="pointer-events-none absolute inset-0 flex items-center justify-center" style={{ opacity, paddingInline: "clamp(24px, 6vw, 96px)", willChange: "opacity, transform" }}>
-      <motion.p className="text-center font-playfair italic text-dorado" style={{ fontSize: "clamp(48px, 7vw, 96px)", lineHeight: 1.1, fontWeight: 400, maxWidth: 1100, y, filter }}>
-        {words.map((w, i) => (
-          <span key={i} style={{ display: "inline-block", whiteSpace: "pre" }}>{w}{i < words.length - 1 ? " " : ""}</span>
-        ))}
-      </motion.p>
-    </motion.div>
-  )
-}
-
-/* ── panel de sub-servicios acumulativo (derecha) ─────────────────────────
-   State-driven (no scroll-scrub de opacity): un useMotionValueEvent calcula
-   el sub activo según el frame que contiene el progress, y cada item anima
-   con motion estándar (entra / queda atenuado al pasar al siguiente). */
-function SubPanel({ subs, subFrames, progress, startReveal, fadeOut }: { subs: SubServicio[]; subFrames: Frame[]; progress: MotionValue<number>; startReveal: number; fadeOut: number }) {
-  const [active, setActive] = useState(-1)
-  const [shown, setShown] = useState(false)
-  useMotionValueEvent(progress, "change", (p) => {
-    const nextShown = p >= startReveal - 0.02 && p < fadeOut
-    if (nextShown !== shown) setShown(nextShown)
-    let idx = -1
-    for (let i = 0; i < subFrames.length; i++) if (p >= subFrames[i].start) idx = i
-    if (p >= fadeOut) idx = subFrames.length - 1
-    if (idx !== active) setActive(idx)
-  })
+/* ── sub-servicio: opacity plateau + translateY, sin overlap simultáneo ──── */
+function SubItem({ sub, idx, progress, start, end }: { sub: SubServicio; idx: number; progress: MotionValue<number>; start: number; end: number }) {
+  const opacity = useTransform(progress, (p) => piecewise(p, [start, start + 0.02, end - 0.02, end], [0, 1, 1, 0]))
+  const y = useTransform(progress, (p) => piecewise(p, [start, end], [40, -40]))
   return (
     <motion.div
-      className="absolute inset-y-0 flex flex-col justify-center"
-      style={{ left: "58%", right: "clamp(80px, 8vw, 128px)", gap: 48 }}
-      animate={{ opacity: shown ? 1 : 0 }}
-      transition={{ duration: 0.4, ease: EASE }}
+      className="absolute inset-0 flex flex-col justify-center"
+      style={{ opacity, y, maxWidth: 600, paddingRight: "clamp(16px, 3vw, 48px)", willChange: "opacity, transform" }}
     >
-      {subs.map((sub, i) => (
-        <SubItem key={i} sub={sub} idx={i} active={active} />
-      ))}
+      <span className="font-mono text-bordo" style={{ fontSize: 12, letterSpacing: "0.22em" }}>{two(idx + 1)}</span>
+      <div aria-hidden className="bg-dorado" style={{ width: 40, height: 2, marginTop: 16 }} />
+      <p className="font-playfair text-bordo" style={{ fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.01em", marginTop: 24 }}>
+        {sub.titulo}
+      </p>
+      {sub.desc && <RichText html={sub.desc} className="rich-inline font-sans text-gris-bordo" style={{ fontSize: 17, lineHeight: 1.6, marginTop: 24, maxWidth: 540 }} />}
     </motion.div>
   )
 }
 
-function SubItem({ sub, idx, active }: { sub: SubServicio; idx: number; active: number }) {
-  const reduced = useReducedMotion()
-  const state = idx > active ? "pending" : idx === active ? "active" : "passed"
-  const variants: Variants = {
-    pending: { opacity: 0, y: 40, scale: 1, filter: "blur(8px)" },
-    active: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" },
-    passed: { opacity: 0.25, y: 0, scale: 0.95, filter: "blur(0px)" },
-  }
-  return (
-    <motion.div
-      variants={reduced ? undefined : variants}
-      initial={reduced ? undefined : "pending"}
-      animate={reduced ? undefined : state}
-      transition={{ duration: 0.55, ease: EASE }}
-      style={{ transformOrigin: "0% 50%", paddingBlock: "clamp(10px, 1.6vh, 20px)", willChange: "opacity, transform", opacity: reduced ? (state === "pending" ? 0 : 1) : undefined }}
-    >
-      <span className="font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em" }}>{two(idx + 1)} — Sub-servicio</span>
-      <motion.div
-        className="mt-3 mb-4 h-px bg-dorado"
-        animate={{ width: state === "pending" ? 0 : 40 }}
-        transition={{ duration: 0.5, ease: EASE, delay: state === "active" ? 0.1 : 0 }}
-        style={{ width: 0 }}
-      />
-      <p className="font-playfair font-bold text-bordo" style={{ fontSize: "clamp(28px, 3.2vw, 52px)", lineHeight: 1.08, letterSpacing: "-0.02em" }}>{sub.titulo}</p>
-      {sub.desc && <RichText html={sub.desc} className="rich-inline mt-4 font-sans text-gris-bordo" style={{ fontSize: 17, lineHeight: 1.6, maxWidth: 540 }} />}
-    </motion.div>
-  )
-}
-
-/* ── frame de descripción completa (cierre) ─────────────────────────────── */
-function DescriptionFrame({ html, progress, frame }: { html: string; progress: MotionValue<number>; frame: Frame }) {
-  const { start } = frame
-  const [active, setActive] = useState(false)
-  useMotionValueEvent(progress, "change", (v) => {
-    const on = v >= start - 0.01
-    if (on !== active) setActive(on)
-  })
-  return (
-    <motion.div
-      className="pointer-events-none absolute inset-0 flex items-center justify-center"
-      style={{ paddingInline: "clamp(24px, 6vw, 96px)", willChange: "opacity" }}
-      animate={{ opacity: active ? 1 : 0 }}
-      transition={{ duration: 0.5, ease: EASE }}
-    >
-      <WordReveal html={html} active={active} />
-    </motion.div>
-  )
-}
-
-const wordContainer: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.04 } } }
+/* ── descripción word-by-word (frame 4) ─────────────────────────────────── */
+const wordContainer: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }
 const wordItem: Variants = {
   hidden: { opacity: 0, filter: "blur(8px)", y: 8 },
   visible: { opacity: 1, filter: "blur(0px)", y: 0, transition: { duration: 0.5, ease: EASE } },
 }
-
 function WordReveal({ html, active }: { html: string; active: boolean }) {
-  // texto plano para el reveal palabra-por-palabra (la descripción es 1 párrafo)
   const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()
   const words = text.split(" ")
   return (
@@ -474,13 +246,52 @@ function WordReveal({ html, active }: { html: string; active: boolean }) {
       initial="hidden"
       animate={active ? "visible" : "hidden"}
       className="text-center font-sans text-gris-bordo"
-      style={{ fontSize: 18, lineHeight: 1.7, letterSpacing: "0.01em", maxWidth: 720 }}
+      style={{ fontSize: 18, lineHeight: 1.7, maxWidth: 760 }}
     >
       {words.map((w, i) => (
         <motion.span key={i} variants={wordItem} className="inline-block" style={{ whiteSpace: "pre", willChange: "transform, filter" }}>
-          {w}{i < words.length - 1 ? " " : ""}
+          {w}
+          {i < words.length - 1 ? " " : ""}
         </motion.span>
       ))}
     </motion.p>
+  )
+}
+
+/* ── indicador minimalista: barra vertical + relleno + 4 dots ────────────── */
+const FRAME_BOUNDS = [0.25, 0.45, 0.85] // 4 frames → 3 cortes
+function ProgressIndicator({ progress }: { progress: MotionValue<number> }) {
+  const [frame, setFrame] = useState(0)
+  useMotionValueEvent(progress, "change", (p) => {
+    const f = p < FRAME_BOUNDS[0] ? 0 : p < FRAME_BOUNDS[1] ? 1 : p < FRAME_BOUNDS[2] ? 2 : 3
+    if (f !== frame) setFrame(f)
+  })
+  return (
+    <div aria-hidden className="absolute z-20" style={{ right: "clamp(16px, 2vw, 32px)", top: "50%", transform: "translateY(-50%)", width: 2, height: 240 }}>
+      {/* riel */}
+      <div className="absolute inset-0 rounded-full" style={{ background: "var(--color-dorado)", opacity: 0.2 }} />
+      {/* relleno */}
+      <motion.div className="absolute left-0 top-0 h-full w-full rounded-full" style={{ background: "var(--color-bordo)", scaleY: progress, transformOrigin: "top" }} />
+      {/* dots por frame */}
+      {[0, 1, 2, 3].map((i) => {
+        const on = i === frame
+        return (
+          <span
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              left: "50%",
+              top: `${(i / 3) * 100}%`,
+              width: on ? 8 : 6,
+              height: on ? 8 : 6,
+              transform: "translate(-50%, -50%)",
+              background: on ? "var(--color-bordo)" : "var(--color-dorado)",
+              opacity: on ? 1 : 0.4,
+              transition: "width 0.3s ease, height 0.3s ease, background 0.3s ease, opacity 0.3s ease",
+            }}
+          />
+        )
+      })}
+    </div>
   )
 }

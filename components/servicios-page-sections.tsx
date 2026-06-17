@@ -9,12 +9,10 @@ import { cn } from "@/lib/utils"
 import { buildServicio, two, EASE, type Servicio } from "@/components/servicios/types"
 import { MentoriaScrollytelling } from "@/components/servicios/mentoria-scrollytelling"
 import { ServicioSegment } from "@/components/servicios/servicio-segment"
-import { LateralIndicator } from "@/components/servicios/lateral-indicator"
 
 const SERVICE_KEYS = ["servicio_01", "servicio_02", "servicio_03"] as const
 
 const mvp = { once: true, margin: "-60px" } as const
-const firstWord = (name: string) => (name.split(/\s+/)[0] ?? "").toUpperCase()
 
 /* ════════════════════════════════════════════════════════════════════════
    SECCIÓN 1 — HERO (v4.1 — sin indicador SCROLL inferior)
@@ -186,22 +184,16 @@ export function ServiciosPageSections({
   const secondaries = SERVICE_KEYS.filter((k) => k !== featuredKey).map((k) => byKey[k])
 
   const FEATURED_ID = "svc-featured"
-  const segments = [
-    { id: FEATURED_ID, label: firstWord(featured.nombre) },
-    { id: "svc-sec-0", label: firstWord(secondaries[0]?.nombre ?? "") },
-    { id: "svc-sec-1", label: firstWord(secondaries[1]?.nombre ?? "") },
-  ]
 
   return (
     <>
       <HeroSection hero={hero} serviceCount={SERVICE_KEYS.length} />
-      <MentoriaScrollytelling s={featured} sectionId={FEATURED_ID} />
+      <MentoriaScrollytelling s={featured} sectionId={FEATURED_ID} count={SERVICE_KEYS.length} />
       <TransitionSection phrase={transitionPhrase} />
       {secondaries.map((s, i) => (
         <ServicioSegment key={s.key} s={s} num={i === 0 ? "02" : "03"} dark={i === 1} id={`svc-sec-${i}`} />
       ))}
       <FinalCTA cta={cta} />
-      <LateralIndicator segments={segments} scrollyId={FEATURED_ID} />
     </>
   )
 }
