@@ -138,6 +138,14 @@ body::after {
   color: var(--color-hueso);
 }
 
+/* ── /servicios — botón con glow sutil al hover ── */
+.cta-arrow:hover {
+  box-shadow: 0 10px 32px -8px rgba(102, 0, 31, 0.45);
+}
+.cta-invert.cta-arrow:hover {
+  box-shadow: 0 10px 32px -8px rgba(254, 252, 239, 0.35);
+}
+
 /* ── /servicios — elementos creativos satélite ── */
 @keyframes ms-spin {
   to { transform: rotate(360deg); }

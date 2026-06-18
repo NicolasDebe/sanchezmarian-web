@@ -8,6 +8,7 @@ export type SubServicio = { titulo: string; desc: string }
 
 export type Servicio = {
   key: string
+  numero: string
   nombre: string
   tagline: string
   descripcion: string
@@ -26,6 +27,7 @@ export function buildServicio(key: string, c: Record<string, string>): Servicio 
     .filter((s) => s.titulo.trim() !== "")
   return {
     key,
+    numero: (c.number ?? "").trim(),
     nombre: (c.name ?? "").trim(),
     tagline: (c.tagline ?? "").trim(),
     descripcion: (c.description ?? "").trim(),
