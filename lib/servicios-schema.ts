@@ -11,12 +11,12 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     section: "config",
     title: "Configuración",
     legend:
-      "Elegí qué servicio es el DESTACADO: recibe el tratamiento visual protagonista (scrollytelling en desktop). Los otros dos quedan como servicios secundarios.",
+      "Elegí qué servicio es el PRINCIPAL: se muestra arriba, grande y con más peso visual. Los otros dos quedan como servicios secundarios, lado a lado.",
     fields: [
       {
         field: "featured",
         type: "text",
-        label: "Servicio destacado",
+        label: "Servicio principal",
         fallback: "servicio_02",
         options: [
           { value: "servicio_01", label: "Prensa y Comunicación Multiplataforma" },
@@ -72,10 +72,6 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       { field: "sub_3_title", type: "text", label: "Sub-servicio 3 — Título", fallback: "Monitoreo" },
       { field: "sub_3_desc", type: "longtext", label: "Sub-servicio 3 — Descripción", fallback: "Medición cualitativa del impacto de tu negocio en el ecosistema de medios de comunicación." },
       { field: "cta_text", type: "text", label: "Texto del botón", fallback: "Quiero este servicio" },
-      { field: "anchor_phrase", type: "text", label: "Frase ancla (solo si es el destacado — frase grande del frame central)", fallback: "" },
-      { field: "intro_text", type: "longtext", plain: true, label: "Texto contextual (panel izquierdo del scrollytelling, solo si es el destacado)", fallback: "" },
-      { field: "testimonial", type: "longtext", plain: true, label: "Testimonio / cita (solo si es el destacado — vacío = no se muestra)", fallback: "" },
-      { field: "testimonial_author", type: "text", label: "Autor del testimonio", fallback: "" },
     ],
   },
   {
@@ -101,10 +97,6 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       { field: "sub_3_title", type: "text", label: "Sub-servicio 3 — Título", fallback: "Gestión de Alianzas Estratégicas" },
       { field: "sub_3_desc", type: "longtext", label: "Sub-servicio 3 — Descripción", fallback: "Formo equipo con profesionales especializados en marketing y redes sociales para ofrecerte soluciones integrales." },
       { field: "cta_text", type: "text", label: "Texto del botón", fallback: "Quiero este servicio" },
-      { field: "anchor_phrase", type: "text", label: "Frase ancla (solo si es el destacado — frase grande del frame central)", fallback: "" },
-      { field: "intro_text", type: "longtext", plain: true, label: "Texto contextual (panel izquierdo del scrollytelling, solo si es el destacado)", fallback: "" },
-      { field: "testimonial", type: "longtext", plain: true, label: "Testimonio / cita (solo si es el destacado — vacío = no se muestra)", fallback: "" },
-      { field: "testimonial_author", type: "text", label: "Autor del testimonio", fallback: "" },
     ],
   },
   {
@@ -128,10 +120,6 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       { field: "sub_2_title", type: "text", label: "Sub-servicio 2 — Título", fallback: "Lanzamientos" },
       { field: "sub_2_desc", type: "longtext", label: "Sub-servicio 2 — Descripción", fallback: "Coordinación integral de la convocatoria de prensa y cobertura mediática para eventos." },
       { field: "cta_text", type: "text", label: "Texto del botón", fallback: "Quiero este servicio" },
-      { field: "anchor_phrase", type: "text", label: "Frase ancla (solo si es el destacado — frase grande del frame central)", fallback: "" },
-      { field: "intro_text", type: "longtext", plain: true, label: "Texto contextual (panel izquierdo del scrollytelling, solo si es el destacado)", fallback: "" },
-      { field: "testimonial", type: "longtext", plain: true, label: "Testimonio / cita (solo si es el destacado — vacío = no se muestra)", fallback: "" },
-      { field: "testimonial_author", type: "text", label: "Autor del testimonio", fallback: "" },
     ],
   },
   {
@@ -141,6 +129,23 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
       "Frase puente entre el servicio destacado y los servicios secundarios. Si la dejás vacía, se muestra solo un divisor decorativo (línea dorada + asterisco).",
     fields: [
       { field: "phrase", type: "text", label: "Frase de transición", fallback: "" },
+    ],
+  },
+  {
+    section: "alianzas",
+    title: "Alianzas / Conexiones",
+    legend:
+      "Banda de palabras clave que muestra las disciplinas con las que Marian forma equipo (alianzas). Escribí UNA palabra clave por línea en el campo de abajo: cada línea se muestra como una etiqueta. Si dejás la lista vacía, la sección entera se oculta.",
+    fields: [
+      { field: "eyebrow", type: "text", label: "Eyebrow (línea superior)", fallback: "Conexiones" },
+      { field: "title", type: "text", label: "Frase de presentación", fallback: "Formo equipo con especialistas en" },
+      {
+        field: "items",
+        type: "longtext",
+        plain: true,
+        label: "Palabras clave (una por línea)",
+        fallback: "Audiovisual\nMarketing\nVentas",
+      },
     ],
   },
   {

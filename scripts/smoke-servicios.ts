@@ -1,7 +1,8 @@
 /**
  * Smoke test del rediseño de /servicios (desktop + mobile).
  * Carga la página con Edge headless, verifica que hidrate sin errores de
- * consola y que el scrollytelling desktop se monte (contenedor sticky 500vh).
+ * consola, sin overflow horizontal, y que el layout estático v5 se monte
+ * (servicio principal + secundarios + alianzas).
  * Ejecutar con el dev/prod server corriendo: npx tsx scripts/smoke-servicios.ts
  */
 import { chromium } from "playwright-core"
@@ -29,25 +30,21 @@ async function run() {
       () => document.documentElement.scrollWidth > window.innerWidth + 1,
     )
 
-    // Desktop: debe existir el wrapper del scrollytelling (sticky 500vh).
-    const tallWrapper = await page.evaluate(() =>
-      Array.from(document.querySelectorAll("div")).some((d) => {
-        const h = (d as HTMLElement).style.height
-        return h === "500vh"
-      }),
-    )
-
+    // Layout estático v5: deben montar las secciones principales.
+    const hasPrincipal = await page.locator("#svc-principal").count()
+    const hasSecundarios = await page.locator("#svc-secundarios").count()
     const hasMentoria = await page.getByText("Mentoría", { exact: false }).count()
 
     console.log(`\n[${vp.name}] ${vp.width}px`)
     console.log(`  errores consola: ${errors.length}`)
     if (errors.length) errors.slice(0, 5).forEach((e) => console.log("   · " + e))
     console.log(`  overflow horizontal: ${overflow}`)
-    console.log(`  wrapper 500vh presente: ${tallWrapper} (desktop esperado true, mobile false)`)
+    console.log(`  servicio principal montado: ${hasPrincipal > 0}`)
+    console.log(`  servicios secundarios montados: ${hasSecundarios > 0}`)
     console.log(`  contiene "Mentoría": ${hasMentoria > 0}`)
 
     if (errors.length > 0 || overflow) failed = true
-    if (vp.name === "desktop" && !tallWrapper) failed = true
+    if (hasPrincipal === 0 || hasSecundarios === 0) failed = true
     await page.close()
   }
 

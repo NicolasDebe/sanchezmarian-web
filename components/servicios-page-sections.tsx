@@ -7,8 +7,9 @@ import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { cn } from "@/lib/utils"
 import { buildServicio, two, EASE, type Servicio } from "@/components/servicios/types"
-import { MentoriaScrollytelling } from "@/components/servicios/mentoria-scrollytelling"
-import { ServicioSegment } from "@/components/servicios/servicio-segment"
+import { ServicioPrincipal } from "@/components/servicios/servicio-principal"
+import { ServiciosSecundarios } from "@/components/servicios/servicios-secundarios"
+import { AlianzasSection } from "@/components/servicios/alianzas-section"
 
 const SERVICE_KEYS = ["servicio_01", "servicio_02", "servicio_03"] as const
 
@@ -164,12 +165,14 @@ export function ServiciosPageSections({
     servicio_02?: Record<string, string>
     servicio_03?: Record<string, string>
     transition?: Record<string, string>
+    alianzas?: Record<string, string>
     cta?: Record<string, string>
   }
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
   const cta = { ...fallbacksFor("cta"), ...content?.cta }
   const transitionPhrase = ({ ...fallbacksFor("transition"), ...content?.transition }.phrase ?? "").trim()
+  const alianzas = { ...fallbacksFor("alianzas"), ...content?.alianzas }
 
   const featuredKey =
     (content?.config?.featured && SERVICE_KEYS.includes(content.config.featured as (typeof SERVICE_KEYS)[number])
@@ -183,16 +186,13 @@ export function ServiciosPageSections({
   const featured = byKey[featuredKey]
   const secondaries = SERVICE_KEYS.filter((k) => k !== featuredKey).map((k) => byKey[k])
 
-  const FEATURED_ID = "svc-featured"
-
   return (
     <>
       <HeroSection hero={hero} serviceCount={SERVICE_KEYS.length} />
-      <MentoriaScrollytelling s={featured} sectionId={FEATURED_ID} count={SERVICE_KEYS.length} />
+      <ServicioPrincipal s={featured} id="svc-principal" />
       <TransitionSection phrase={transitionPhrase} />
-      {secondaries.map((s, i) => (
-        <ServicioSegment key={s.key} s={s} num={i === 0 ? "02" : "03"} dark={i === 1} id={`svc-sec-${i}`} />
-      ))}
+      <ServiciosSecundarios servicios={secondaries} heading="También ofrezco" id="svc-secundarios" />
+      <AlianzasSection eyebrow={alianzas.eyebrow} title={alianzas.title} items={alianzas.items} id="svc-alianzas" />
       <FinalCTA cta={cta} />
     </>
   )
