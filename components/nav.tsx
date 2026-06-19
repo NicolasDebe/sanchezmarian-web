@@ -75,7 +75,7 @@ export function Nav({ content }: { content?: Record<string, string> }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden border-t border-hueso/10 px-6 pb-6 pt-4"
+            className="md:hidden absolute top-full inset-x-0 border-t border-hueso/10 px-6 pb-6 pt-4 shadow-xl shadow-black/20"
             style={{ background: "var(--color-bordo)" }}
           >
             <ul className="flex flex-col gap-4">

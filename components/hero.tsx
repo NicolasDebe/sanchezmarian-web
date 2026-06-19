@@ -1,8 +1,10 @@
 "use client"
 
+import Image from "next/image"
 import { motion, useReducedMotion } from "motion/react"
 import { fallbacksFor } from "@/lib/home-schema"
 import { RichText } from "@/components/ui/RichText"
+import heroMarian from "@/public/images/hero-marian.jpg"
 
 const containerVariants = {
   hidden: {},
@@ -30,11 +32,16 @@ export function Hero({ content }: { content?: Record<string, string> }) {
   return (
     <section className="relative w-full overflow-hidden">
 
-      {/* CAPA 1: IMAGEN — define la altura del hero */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/hero-marian.jpg"
+      {/* CAPA 1: IMAGEN — define la altura del hero.
+          next/Image con import estático: width/height intrínsecos (reserva
+          espacio → sin CLS), srcset responsivo (payload menor en mobile) y
+          blur placeholder. El style replica el comportamiento cover/min/max. */}
+      <Image
+        src={heroMarian}
         alt="Marian Sánchez — Comunicación estratégica en Mendoza"
+        priority
+        placeholder="blur"
+        sizes="100vw"
         className="w-full block"
         style={{
           height: "auto",

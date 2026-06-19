@@ -43,8 +43,9 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
   const [isPaused, setIsPaused]             = useState(false)
   const [loadedSlides, setLoadedSlides]     = useState<Set<number>>(new Set())
   const [slideshowReady, setSlideshowReady] = useState(false)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const resumeRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const intervalRef  = useRef<ReturnType<typeof setInterval> | null>(null)
+  const resumeRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const touchStartX  = useRef<number | null>(null)
 
   const isLoaded = loadedSlides.has(currentIndex)
 
@@ -79,6 +80,18 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
     handleInteract()
   }
 
+  // Swipe táctil en mobile: gesto horizontal >40px cambia de slide.
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX
+  }
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStartX.current === null) return
+    const delta = e.changedTouches[0].clientX - touchStartX.current
+    if (delta > 40) goPrev()
+    else if (delta < -40) goNext()
+    touchStartX.current = null
+  }
+
   // El intervalo no arranca hasta que slideshowReady sea true
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
@@ -103,9 +116,9 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
         .cs-btn-next  { right: 20px; }
         @media (max-width: 767px) {
           .cs-container { aspect-ratio: 4/3; }
-          .cs-btn       { width: 36px !important; height: 36px !important; }
-          .cs-btn-prev  { left: 12px !important; }
-          .cs-btn-next  { right: 12px !important; }
+          .cs-btn       { width: 44px !important; height: 44px !important; }
+          .cs-btn-prev  { left: 10px !important; }
+          .cs-btn-next  { right: 10px !important; }
         }
       `}</style>
 
@@ -122,12 +135,15 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
         {/* Contenedor principal */}
         <div
           className="cs-container"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           style={{
             position:     "relative",
             width:        "100%",
             borderRadius: 16,
             overflow:     "hidden",
             background:   "var(--color-arena)",
+            touchAction:  "pan-y",
           }}
         >
           {/* Barra de progreso: espera a que slideshowReady sea true */}
@@ -292,16 +308,27 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
                 onClick={() => goTo(i)}
                 aria-label={`Ir a imagen ${i + 1}`}
                 style={{
-                  width:        i === currentIndex ? 20 : 6,
-                  height:       6,
-                  borderRadius: 100,
-                  background:   i === currentIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)",
-                  transition:   "all 0.3s ease",
-                  cursor:       "pointer",
-                  border:       "none",
-                  padding:      0,
+                  display:     "grid",
+                  placeItems:  "center",
+                  height:      28,
+                  padding:     "0 4px",
+                  background:  "transparent",
+                  border:      "none",
+                  cursor:      "pointer",
                 }}
-              />
+              >
+                <span
+                  aria-hidden
+                  style={{
+                    display:      "block",
+                    width:        i === currentIndex ? 20 : 6,
+                    height:       6,
+                    borderRadius: 100,
+                    background:   i === currentIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)",
+                    transition:   "all 0.3s ease",
+                  }}
+                />
+              </button>
             ))}
           </div>
 

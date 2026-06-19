@@ -137,7 +137,7 @@ export function ServicioPrincipal({ s, id }: { s: Servicio; id?: string }) {
                     )}
                     <motion.div
                       {...item(0.05 + i * 0.06)}
-                      className="group cursor-pointer transition-transform duration-300 hover:translate-x-0.5"
+                      className="group transition-transform duration-300 hover:translate-x-0.5"
                       style={{ paddingBlock: full ? 44 : 30 }}
                     >
                       <div className={full ? "" : "grid items-start gap-x-10 gap-y-2 md:grid-cols-2"}>

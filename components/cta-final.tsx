@@ -130,7 +130,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
           viewport={viewportOnce}
         >
           <div
-            className="rounded-[20px] p-10"
+            className="rounded-[20px] p-6 sm:p-10"
             style={{
               background: "rgba(255,255,255,0.06)",
               border: "1px solid rgba(254,252,239,0.12)",

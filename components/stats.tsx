@@ -40,18 +40,18 @@ function StatItem({
   return (
     <div
       ref={ref}
-      className="flex flex-col items-center text-center px-6 py-4"
+      className="flex flex-col items-center text-center px-3 py-4 sm:px-6"
       style={{
         opacity: visible ? 1 : 0.35,
         transform: visible ? "translateY(0)" : "translateY(14px)",
         transition: `opacity 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}s, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}s`,
       }}
     >
-      <p className="font-playfair font-bold text-negro-bordo leading-none text-[4rem] sm:text-[4.5rem] lg:text-[5rem] tabular-nums">
+      <p className="font-playfair font-bold text-negro-bordo leading-none text-[2.75rem] sm:text-[4rem] lg:text-[5rem] tabular-nums">
         {value}
         <span className="text-dorado">{suffix}</span>
       </p>
-      <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.22em] text-gris-bordo/60">
+      <p className="mt-4 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-gris-bordo/60">
         {label}
       </p>
     </div>

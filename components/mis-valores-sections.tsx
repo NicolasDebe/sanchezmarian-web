@@ -2,12 +2,14 @@
 
 import { motion } from "motion/react"
 import Link from "next/link"
+import Image from "next/image"
 import {
   fadeUp, fadeLeft,
   fadeUpStagger, viewportOnce,
 } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/mis-valores-schema"
 import { RichText } from "@/components/ui/RichText"
+import heroValores from "@/public/images/NAC_4208.jpg"
 
 const containerVariants = {
   hidden: {},
@@ -26,10 +28,12 @@ function HeroEditorial({ c }: { c: Record<string, string> }) {
   return (
     <section style={{ position: "relative", width: "100%", overflow: "hidden" }}>
 
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/NAC_4208.jpg"
+      <Image
+        src={heroValores}
         alt="Marian Sánchez en su espacio de trabajo"
+        priority
+        placeholder="blur"
+        sizes="100vw"
         className="max-h-[70vh] sm:max-h-[90vh]"
         style={{
           width: "100%",
@@ -172,7 +176,7 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
             {c.eyebrow}
           </motion.p>
           <motion.div variants={fadeUp} className="w-10 h-px bg-dorado mb-6" />
-          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[40px] leading-[1.1] mb-4">
+          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[clamp(28px,7vw,40px)] leading-[1.1] mb-4">
             {c.title_pre}{" "}
             <em className="italic text-bordo">{c.title_accent}</em>
           </motion.h2>
@@ -195,7 +199,7 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
               className="group pt-8 cursor-default"
             >
               <div className="w-full h-px bg-dorado/20 mb-8" />
-              <span className="block font-mono text-[10px] text-bordo opacity-30 group-hover:opacity-100 transition-opacity duration-300 mb-3">
+              <span className="block font-mono text-[10px] text-bordo opacity-60 group-hover:opacity-100 transition-opacity duration-300 mb-3">
                 {pilar.num}
               </span>
               <p className="font-playfair font-bold text-negro-bordo text-[20px] leading-[1.15] mb-3 transition-transform duration-300 ease-out group-hover:-translate-y-1">

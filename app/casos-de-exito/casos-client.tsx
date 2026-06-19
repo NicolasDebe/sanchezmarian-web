@@ -491,8 +491,8 @@ function IndexButton({
         color: hov ? "var(--color-bordo)" : "var(--color-gris-bordo)",
         background: "transparent",
         border: `1px solid ${hov ? "rgba(201,168,130,0.8)" : "rgba(201,168,130,0.3)"}`,
-        borderRadius: 20,
-        padding: "8px 16px",
+        borderRadius: 22,
+        padding: "12px 18px",
         transition: "color 0.15s ease, border-color 0.15s ease",
         whiteSpace: "nowrap",
       }}
@@ -524,7 +524,7 @@ function ToggleAllButton({
         background: "transparent",
         border: `1px solid ${hov ? "var(--color-dorado)" : "rgba(201,168,130,0.5)"}`,
         borderRadius: 4,
-        padding: "8px 16px",
+        padding: "11px 16px",
         transition: "border-color 0.15s ease",
         whiteSpace: "nowrap",
         marginBottom: 4,
@@ -593,7 +593,7 @@ export function CasosClient({
       {/* ── BLOQUE 1 — HERO ───────────────────────────────────────────────── */}
       <section
         className="relative bg-hueso overflow-hidden"
-        style={{ paddingTop: 160, paddingBottom: 80 }}
+        style={{ paddingTop: "clamp(120px, 20vw, 160px)", paddingBottom: 80 }}
       >
         <TextureOverlay texture="paperGrain" opacity={0.25} />
         <div className="relative max-w-7xl mx-auto px-6 lg:px-12">

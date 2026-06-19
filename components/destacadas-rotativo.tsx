@@ -155,8 +155,8 @@ export function DestacadasRotativo({ apariciones }: Props) {
 
       {/* Dots */}
       <div
-        className="flex items-center justify-center gap-3"
-        style={{ marginTop: 32 }}
+        className="flex items-center justify-center"
+        style={{ marginTop: 24 }}
         onMouseEnter={() => setDotHov(true)}
         onMouseLeave={() => setDotHov(false)}
       >
@@ -166,21 +166,33 @@ export function DestacadasRotativo({ apariciones }: Props) {
             onClick={() => handleDotClick(i)}
             aria-label={`Grupo ${i + 1}`}
             style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
+              width: 44,
+              height: 44,
+              display: "grid",
+              placeItems: "center",
+              background: "transparent",
+              border: "none",
               padding: 0,
               cursor: "pointer",
-              transition: "all 0.2s ease",
-              background: i === currentGroupIndex ? "var(--color-hueso)" : "transparent",
-              border: `1px solid ${
-                i === currentGroupIndex
-                  ? "var(--color-hueso)"
-                  : "rgba(254,252,239,0.3)"
-              }`,
-              opacity: dotHov ? 1 : i === currentGroupIndex ? 1 : 0.6,
             }}
-          />
+          >
+            <span
+              aria-hidden
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                transition: "all 0.2s ease",
+                background: i === currentGroupIndex ? "var(--color-hueso)" : "transparent",
+                border: `1px solid ${
+                  i === currentGroupIndex
+                    ? "var(--color-hueso)"
+                    : "rgba(254,252,239,0.3)"
+                }`,
+                opacity: dotHov ? 1 : i === currentGroupIndex ? 1 : 0.6,
+              }}
+            />
+          </button>
         ))}
       </div>
     </div>

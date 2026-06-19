@@ -130,7 +130,7 @@ export function EnMedias() {
       {/* ── BLOQUE B — Los nombres de los medios ── */}
       <div
         className="max-w-7xl mx-auto"
-        style={{ paddingLeft: 40, paddingRight: 40, paddingBottom: 80 }}
+        style={{ paddingLeft: "clamp(20px, 5vw, 40px)", paddingRight: "clamp(20px, 5vw, 40px)", paddingBottom: 80 }}
       >
         <motion.div
           variants={fadeUpStagger}
@@ -158,9 +158,10 @@ export function EnMedias() {
                 {fila.label}
               </span>
 
-              {/* Nombres — scroll horizontal en mobile */}
+              {/* Nombres — wrap en todos los tamaños (en mobile evita el
+                  scroll horizontal oculto, poco descubrible) */}
               <div
-                className="no-scrollbar flex items-center sm:flex-wrap overflow-x-auto sm:overflow-x-visible"
+                className="flex flex-wrap items-center"
                 style={{ gap: "0 0.5rem" }}
               >
                 {fila.medios.map((medio, mi) => (

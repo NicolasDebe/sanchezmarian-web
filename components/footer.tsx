@@ -64,12 +64,12 @@ export function Footer({
                 Marian Sánchez
               </span>
             </Link>
-            <p className="font-sans text-xs text-hueso/30 leading-relaxed max-w-[200px]">
+            <p className="font-sans text-xs text-hueso/45 leading-relaxed max-w-[200px]">
               {c.tagline}
             </p>
             <a
               href={`mailto:${c.email}`}
-              className="font-mono text-[10px] text-hueso/35 hover:text-hueso/70 transition-colors tracking-wide"
+              className="font-mono text-[11px] text-hueso/55 hover:text-hueso/80 transition-colors tracking-wide"
             >
               {c.email}
             </a>
@@ -82,7 +82,7 @@ export function Footer({
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="font-sans text-sm text-hueso/35 hover:text-hueso/70 transition-colors"
+                    className="font-sans text-sm text-hueso/60 hover:text-hueso/90 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -101,7 +101,7 @@ export function Footer({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="w-9 h-9 rounded-full border border-hueso/12 flex items-center justify-center text-hueso/35 hover:border-dorado/40 hover:text-dorado transition-colors"
+                  className="w-11 h-11 rounded-full border border-hueso/12 flex items-center justify-center text-hueso/45 hover:border-dorado/40 hover:text-dorado transition-colors"
                 >
                   <Icon />
                 </a>
@@ -119,18 +119,18 @@ export function Footer({
 
         {/* Bottom row */}
         <div className="pt-7 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="font-mono text-[10px] text-hueso/20 tracking-wide flex items-center gap-2 flex-wrap">
+          <p className="font-mono text-[11px] text-hueso/40 tracking-wide flex items-center gap-2 flex-wrap">
             © {new Date().getFullYear()} {c.copyright_name}
-            <span className="text-hueso/10">·</span>
-            <Link href="/privacidad" className="hover:text-hueso/40 transition-colors">
+            <span className="text-hueso/20">·</span>
+            <Link href="/privacidad" className="hover:text-hueso/70 transition-colors">
               Privacidad
             </Link>
-            <span className="text-hueso/10">·</span>
-            <Link href="/terminos" className="hover:text-hueso/40 transition-colors">
+            <span className="text-hueso/20">·</span>
+            <Link href="/terminos" className="hover:text-hueso/70 transition-colors">
               Términos
             </Link>
           </p>
-          <p className="font-mono text-[10px] text-hueso/15 tracking-wide">
+          <p className="font-mono text-[11px] text-hueso/30 tracking-wide">
             {c.signature}
           </p>
         </div>

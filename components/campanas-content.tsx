@@ -100,11 +100,15 @@ function CampanaStats({ campaigns }: { campaigns: Campaign[] }) {
           viewport={viewportOnce}
           className="grid grid-cols-2 lg:grid-cols-4"
         >
-          {STATS.map((s, i) => (
+          {STATS.map((s, i) => {
+            // El stat "última campaña" es una fecha de texto largo ("Junio 2026"):
+            // a tamaño de número gigante desborda la celda de 2 columnas en mobile.
+            const isText = /[a-zA-Z]/.test(s.n)
+            return (
             <motion.div
               key={s.label}
               variants={revealCard}
-              className="relative flex flex-col items-center text-center px-6 py-4"
+              className="relative flex flex-col items-center text-center px-3 sm:px-6 py-4"
             >
               {i < STATS.length - 1 && (
                 <span
@@ -114,7 +118,11 @@ function CampanaStats({ campaigns }: { campaigns: Campaign[] }) {
               )}
               <p
                 className="font-playfair leading-none"
-                style={{ fontSize: "clamp(36px, 4vw, 48px)", color: "var(--color-hueso)", fontWeight: 700 }}
+                style={{
+                  fontSize: isText ? "clamp(22px, 3vw, 34px)" : "clamp(34px, 4vw, 48px)",
+                  color: "var(--color-hueso)",
+                  fontWeight: 700,
+                }}
               >
                 {s.n}
               </p>
@@ -125,7 +133,8 @@ function CampanaStats({ campaigns }: { campaigns: Campaign[] }) {
                 {s.label}
               </p>
             </motion.div>
-          ))}
+            )
+          })}
         </motion.div>
       </div>
     </section>
