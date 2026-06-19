@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react"
 import Link from "next/link"
-import { fadeUp, revealCard, fadeUpStagger, viewportOnce } from "@/lib/animations"
+import { fadeUp, revealCard, fadeUpStagger, viewportOnce, springSnappy } from "@/lib/animations"
 
 const CARDS = [
   {
@@ -74,7 +74,13 @@ export function HomeServicios() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
           {CARDS.map((card) => (
-            <motion.div key={card.num} variants={revealCard} className="h-full">
+            <motion.div
+              key={card.num}
+              variants={revealCard}
+              whileTap={{ scale: 0.985 }}
+              transition={springSnappy}
+              className="h-full"
+            >
               <Link
                 href={card.href}
                 className={[

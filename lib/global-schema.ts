@@ -4,6 +4,7 @@
  */
 import type { SectionDef } from "@/lib/content-schema"
 import { fallbacksForIn } from "@/lib/content-schema"
+import { SITE_EMAIL, SITE_TAGLINE, SOCIAL_LINKS } from "@/lib/constants"
 
 export const GLOBAL_PAGE = "global"
 
@@ -23,11 +24,11 @@ export const GLOBAL_SECTIONS: SectionDef[] = [
     section: "footer",
     title: "Pie de página (Footer)",
     fields: [
-      { field: "tagline", type: "text", label: "Frase bajo el logo", fallback: "Comunicación con propósito · Mendoza, Argentina." },
-      { field: "email", type: "text", label: "Email de contacto", fallback: "contacto@sanchezmarian.com" },
+      { field: "tagline", type: "text", label: "Frase bajo el logo", fallback: SITE_TAGLINE },
+      { field: "email", type: "text", label: "Email de contacto", fallback: SITE_EMAIL },
       { field: "cta_text", type: "text", label: "Texto del botón CTA", fallback: "Conversemos" },
-      { field: "instagram_url", type: "text", label: "URL de Instagram", fallback: "https://www.instagram.com/marian15s/" },
-      { field: "linkedin_url", type: "text", label: "URL de LinkedIn", fallback: "https://www.linkedin.com/in/marians%C3%A1nchez/" },
+      { field: "instagram_url", type: "text", label: "URL de Instagram", fallback: SOCIAL_LINKS.instagram },
+      { field: "linkedin_url", type: "text", label: "URL de LinkedIn", fallback: SOCIAL_LINKS.linkedin },
       { field: "copyright_name", type: "text", label: "Nombre en el copyright", fallback: "Mariana Sánchez" },
       { field: "signature", type: "text", label: "Firma final", fallback: "Diseñado con intención." },
     ],

@@ -207,7 +207,7 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
               </p>
               <RichText
                 html={pilar.descripcion}
-                className="rich-inline font-sans text-[13px] text-gris-bordo leading-relaxed"
+                className="rich-inline font-sans text-[14px] text-gris-bordo leading-relaxed"
               />
             </motion.div>
           ))}

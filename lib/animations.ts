@@ -23,7 +23,8 @@ export const fadeUpStagger: Variants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.12,
+      // Stagger de lista 45ms (criterio 30-50ms): cascada perceptible sin demora.
+      staggerChildren: 0.045,
       delayChildren: 0.05,
     },
   },
@@ -78,6 +79,38 @@ export const scaleIn: Variants = {
 }
 
 export const viewportOnce = { once: true, margin: "-80px" } as const
+
+/* ════════════════════════════════════════════════════════════════════════
+   Micro-interacciones (hover / press / toggle) — criterios ui-ux-pro-max.
+   Springs de motion en lugar de cubic-bezier; 150-300ms percibidos.
+   Todas las animaciones de motion son interrumpibles por default (un nuevo
+   gesto reapunta el spring al instante), así que el tap cancela en curso.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/** Spring rápido para feedback de press/hover en CTAs y controles (~180ms). */
+export const springSnappy = { type: "spring", stiffness: 420, damping: 30, mass: 0.6 } as const
+
+/** Spring algo más suave para entradas de UI (barras, paneles). */
+export const springGentle = { type: "spring", stiffness: 320, damping: 30, mass: 0.7 } as const
+
+/** Escala de feedback al presionar un CTA principal. */
+export const tapScale = 0.97
+
+/**
+ * Props listas para un CTA principal con motion: hover sutil + press a 0.97,
+ * ambos con spring. Spread directo en `<motion.a>` / `<motion.button>` / MotionLink.
+ */
+export const pressableCta = {
+  whileHover: { y: -2 },
+  whileTap: { scale: tapScale },
+  transition: springSnappy,
+} as const
+
+/** Igual que pressableCta pero sin levantar en hover (para botones full-width). */
+export const pressableFlat = {
+  whileTap: { scale: tapScale },
+  transition: springSnappy,
+} as const
 
 /* ════════════════════════════════════════════════════════════════════════
    Polish /servicios (v5.1) — helpers de animación editorial.

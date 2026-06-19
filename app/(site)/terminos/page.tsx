@@ -1,7 +1,5 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Nav } from "@/components/nav"
-import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Términos y Condiciones — Marian Sánchez",
@@ -33,9 +31,7 @@ const SECTIONS = [
 
 export default function TerminosPage() {
   return (
-    <main>
-      <Nav />
-
+    <>
       <section className="bg-arena pt-32 pb-16">
         <div className="max-w-[800px] mx-auto px-6 lg:px-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-terracota mb-4">
@@ -69,8 +65,6 @@ export default function TerminosPage() {
           </div>
         </div>
       </article>
-
-      <Footer />
-    </main>
+    </>
   )
 }

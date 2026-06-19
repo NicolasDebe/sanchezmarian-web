@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function GraciasPage() {
   return (
-    <main className="min-h-screen bg-arena flex items-center justify-center px-6">
+    <main className="min-h-dvh bg-arena flex items-center justify-center px-6">
       <div className="flex flex-col items-center text-center gap-8 max-w-md">
 
         {/* Ícono */}

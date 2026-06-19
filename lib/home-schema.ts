@@ -15,6 +15,7 @@
 
 import type { FieldType, FieldDef, SectionDef } from "@/lib/content-schema"
 import { fallbacksForIn, fallbackOfIn } from "@/lib/content-schema"
+import { SITE_EMAIL } from "@/lib/constants"
 
 export type { FieldType, FieldDef, SectionDef }
 
@@ -156,7 +157,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         fallback:
           "Si querés comunicar mejor lo que hacés, empezamos por una charla. Hablemos de la historia que tu negocio tiene para contar.",
       },
-      { field: "email", type: "text", label: "Email de contacto", fallback: "contacto@sanchezmarian.com" },
+      { field: "email", type: "text", label: "Email de contacto", fallback: SITE_EMAIL },
       { field: "location", type: "text", label: "Ubicación", fallback: "Mendoza, Argentina" },
       { field: "form_button", type: "text", label: "Texto del botón del formulario", fallback: "Escribime" },
       { field: "whatsapp_text", type: "text", label: "Texto del link de WhatsApp", fallback: "Escribime por acá" },

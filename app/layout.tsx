@@ -1,13 +1,18 @@
 import type { Metadata } from "next"
 import { Playfair_Display, DM_Sans, DM_Mono } from "next/font/google"
+import { Toaster } from "react-hot-toast"
 import "./globals.css"
 
+// Solo los pesos realmente usados en el sitio: 400 (texto/H1 plano), 600
+// (rich-content h2/h3, detalle de campañas) y 700 (titulares font-bold), en
+// normal e itálica. Se quitaron 300/500/800/900 (sin consumidores) para
+// recortar el payload de fuentes en mobile.
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair-display",
   display: "swap",
   style: ["normal", "italic"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["400", "600", "700"],
 })
 
 // Instancia VARIABLE (eje wght 400–900) aislada: solo la usa el typography
@@ -26,11 +31,12 @@ const dmSans = DM_Sans({
   display: "swap",
 })
 
+// DM Mono se usa solo para eyebrows/labels/números a peso regular.
 const dmMono = DM_Mono({
   subsets: ["latin"],
   variable: "--font-dm-mono",
   display: "swap",
-  weight: ["300", "400", "500"],
+  weight: ["400"],
 })
 
 const BASE_URL = "https://sanchezmarian.com"
@@ -105,22 +111,24 @@ export default function RootLayout({
       lang="es"
       className={`${playfairDisplay.variable} ${playfairVariable.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
     >
-      <head>
-        <link
-          rel="preload"
-          as="image"
-          href="/images/hero-marian.jpg"
-          // @ts-ignore — imagesrcset/imagesizes son atributos HTML válidos no tipados en React
-          imagesrcset="/images/hero-marian.jpg 1200w"
-          imagesizes="100vw"
-        />
-      </head>
       <body className="min-h-full flex flex-col">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            style: {
+              background: "#3D000F",
+              color: "#FEFCEF",
+              fontFamily: "var(--font-dm-sans), sans-serif",
+              fontSize: "14px",
+              borderRadius: "12px",
+            },
+          }}
+        />
       </body>
     </html>
   )

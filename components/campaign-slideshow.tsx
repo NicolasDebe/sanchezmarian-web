@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { motion, AnimatePresence } from "motion/react"
+import { motion, AnimatePresence, useReducedMotion } from "motion/react"
 
 interface SlideImage {
   src: string
@@ -46,6 +46,7 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
   const intervalRef  = useRef<ReturnType<typeof setInterval> | null>(null)
   const resumeRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const touchStartX  = useRef<number | null>(null)
+  const reduced      = useReducedMotion()
 
   const isLoaded = loadedSlides.has(currentIndex)
 
@@ -92,16 +93,18 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
     touchStartX.current = null
   }
 
-  // El intervalo no arranca hasta que slideshowReady sea true
+  // El intervalo no arranca hasta que slideshowReady sea true. Con
+  // prefers-reduced-motion el auto-avance se desactiva (la persona navega
+  // manualmente con flechas, dots o swipe).
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
-    if (!isPaused && slideshowReady) {
+    if (!isPaused && slideshowReady && !reduced) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex(i => (i + 1) % images.length)
       }, 4000)
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [isPaused, images.length, slideshowReady])
+  }, [isPaused, images.length, slideshowReady, reduced])
 
   useEffect(() => {
     return () => { if (resumeRef.current) clearTimeout(resumeRef.current) }
@@ -159,7 +162,7 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
               background: "rgba(254,252,239,0.2)",
             }}
           >
-            <ProgressBar duration={4000} isPaused={isPaused || !slideshowReady} />
+            <ProgressBar duration={4000} isPaused={isPaused || !slideshowReady || !!reduced} />
           </div>
 
           {/* Imagen activa — fade-in solo después del onLoad */}

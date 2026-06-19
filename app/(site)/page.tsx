@@ -1,4 +1,3 @@
-import { Nav } from "@/components/nav"
 import { Hero } from "@/components/hero"
 import { Stats } from "@/components/stats"
 import { Ideas } from "@/components/ideas"
@@ -7,10 +6,8 @@ import { HomeServicios } from "@/components/home-servicios"
 import { Bio } from "@/components/bio"
 import { EnMedias } from "@/components/en-medios"
 import { CtaFinal } from "@/components/cta-final"
-import { Footer } from "@/components/footer"
 import { getContentBatch } from "@/lib/content"
 import { fallbacksFor } from "@/lib/home-schema"
-import { getGlobalContent } from "@/lib/global-content"
 import { buildMetadata } from "@/lib/seo"
 import type { Metadata } from "next"
 
@@ -25,8 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   // Lectura resiliente: getContentBatch nunca tira excepción y ya trae fallbacks,
   // así que el build de Vercel jamás rompe por una falla de Supabase.
-  const [global, hero, stats, metodo, bio, ctaFinal] = await Promise.all([
-    getGlobalContent(),
+  const [hero, stats, metodo, bio, ctaFinal] = await Promise.all([
     getContentBatch("home", "hero", fallbacksFor("hero")),
     getContentBatch("home", "stats", fallbacksFor("stats")),
     getContentBatch("home", "metodo", fallbacksFor("metodo")),
@@ -35,8 +31,7 @@ export default async function Home() {
   ])
 
   return (
-    <main>
-      <Nav content={global.nav} />
+    <>
       <Hero content={hero} />
       <Stats content={stats} />
       <Ideas content={metodo} />
@@ -45,7 +40,6 @@ export default async function Home() {
       <Bio content={bio} />
       <EnMedias />
       <CtaFinal content={ctaFinal} />
-      <Footer content={global.footer} nav={global.nav} />
-    </main>
+    </>
   )
 }

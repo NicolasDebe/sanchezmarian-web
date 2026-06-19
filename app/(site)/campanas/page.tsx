@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
-import { Nav } from "@/components/nav"
-import { Footer } from "@/components/footer"
 import { CampanasContent } from "@/components/campanas-content"
+import { MobileCtaBar } from "@/components/ui/mobile-cta-bar"
 import { getPublicCampaigns } from "@/lib/campaigns"
 
 // Igual que el home: estática con revalidación. getPublicCampaigns nunca
@@ -30,10 +29,9 @@ export default async function CampanasPage() {
   const campaigns = await getPublicCampaigns()
 
   return (
-    <main>
-      <Nav />
+    <>
       <CampanasContent campaigns={campaigns} />
-      <Footer />
-    </main>
+      <MobileCtaBar label="Hablemos" />
+    </>
   )
 }

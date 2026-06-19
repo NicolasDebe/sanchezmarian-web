@@ -3,7 +3,8 @@
 import Link from "next/link"
 import { motion } from "motion/react"
 import { ArrowLeft, ArrowRight } from "lucide-react"
-import { fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
+import { fadeUp, fadeUpStagger, viewportOnce, springSnappy, tapScale } from "@/lib/animations"
+import { MotionLink } from "@/components/ui/motion-link"
 import { CampaignSlideshow } from "@/components/campaign-slideshow"
 import { RichText } from "@/components/ui/RichText"
 import { STATUS_LABELS, type Campaign } from "@/lib/types/campaign"
@@ -170,9 +171,12 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
             Hablemos de cómo llevarla a los medios.
           </motion.p>
           <motion.div variants={fadeUp}>
-            <Link
+            <MotionLink
               href="/#contacto"
-              className="font-sans inline-flex items-center gap-2 transition-transform hover:-translate-y-px"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: tapScale }}
+              transition={springSnappy}
+              className="font-sans inline-flex items-center gap-2"
               style={{
                 marginTop: 32,
                 background: "var(--color-hueso)",
@@ -186,7 +190,7 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
             >
               Conversemos
               <ArrowRight size={14} strokeWidth={2.5} />
-            </Link>
+            </MotionLink>
           </motion.div>
         </motion.div>
       </div>

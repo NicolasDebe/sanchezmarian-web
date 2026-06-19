@@ -2,11 +2,13 @@
 
 import { useState } from "react"
 import { motion } from "motion/react"
+import toast from "react-hot-toast"
 import { ArrowRight } from "lucide-react"
+import { SITE_EMAIL, WHATSAPP_HREF } from "@/lib/constants"
+import { springSnappy, tapScale } from "@/lib/animations"
 
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
-// TODO: reemplazar por número WA Business real
-const WA_HREF = "https://wa.me/542615433882?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
+const WA_HREF = WHATSAPP_HREF
 
 function IconWA() {
   return (
@@ -17,7 +19,8 @@ function IconWA() {
 }
 
 const LABEL = "font-mono text-[10px] uppercase tracking-[0.15em] text-gris-tx"
-const INPUT_BASE = "bg-white border rounded-xl px-4 py-3 font-sans text-sm text-marino placeholder:text-gris-tx/40 focus:outline-none transition-colors w-full"
+// text-base (16px) evita el zoom automático de iOS al enfocar inputs.
+const INPUT_BASE = "bg-white border rounded-xl px-4 py-3 font-sans text-base text-marino placeholder:text-gris-tx/40 focus:outline-none transition-colors w-full"
 const INPUT_OK = "border-marino/15 focus:border-terracota/60"
 const INPUT_ERR = "border-bordo/60 focus:border-bordo/60"
 
@@ -75,10 +78,16 @@ export function ContactForm() {
           mensaje: form.mensaje,
         }),
       })
-      if (res.ok) setSuccess(true)
-      else setServerError(true)
+      if (res.ok) {
+        setSuccess(true)
+        toast.success("¡Gracias! Te respondo pronto.")
+      } else {
+        setServerError(true)
+        toast.error("No se pudo enviar. Probá de nuevo o escribime directo.")
+      }
     } catch {
       setServerError(true)
+      toast.error("No se pudo enviar. Probá de nuevo o escribime directo.")
     } finally {
       setSubmitting(false)
     }
@@ -100,14 +109,16 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate aria-busy={submitting}>
 
       {/* Nombre */}
       <div className="flex flex-col gap-1.5">
         <label htmlFor="cf-nombre" className={LABEL}>Nombre</label>
         <input
           id="cf-nombre"
+          name="nombre"
           type="text"
+          autoComplete="name"
           value={form.nombre}
           onChange={(e) => setForm({ ...form, nombre: e.target.value })}
           onBlur={() => handleBlur("nombre")}
@@ -122,7 +133,10 @@ export function ContactForm() {
         <label htmlFor="cf-email" className={LABEL}>Email</label>
         <input
           id="cf-email"
+          name="email"
           type="email"
+          inputMode="email"
+          autoComplete="email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           onBlur={() => handleBlur("email")}
@@ -140,7 +154,9 @@ export function ContactForm() {
         </label>
         <input
           id="cf-empresa"
+          name="empresa"
           type="text"
+          autoComplete="organization"
           value={form.empresa}
           onChange={(e) => setForm({ ...form, empresa: e.target.value })}
           placeholder="Nombre de tu empresa o proyecto"
@@ -153,6 +169,7 @@ export function ContactForm() {
         <label htmlFor="cf-etapa" className={LABEL}>¿En qué etapa está tu proyecto?</label>
         <select
           id="cf-etapa"
+          name="etapa"
           value={form.etapa}
           onChange={(e) => setForm({ ...form, etapa: e.target.value })}
           className={`${INPUT_BASE} ${INPUT_OK} cursor-pointer`}
@@ -178,6 +195,7 @@ export function ContactForm() {
         <label htmlFor="cf-mensaje" className={LABEL}>Mensaje</label>
         <textarea
           id="cf-mensaje"
+          name="mensaje"
           rows={5}
           value={form.mensaje}
           onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
@@ -189,14 +207,17 @@ export function ContactForm() {
       </div>
 
       {/* Submit */}
-      <button
+      <motion.button
         type="submit"
         disabled={submitting}
-        className="mt-1 inline-flex items-center justify-center gap-2 bg-terracota text-white px-6 py-3.5 rounded-full font-sans text-sm font-semibold hover:bg-terracota/90 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+        aria-busy={submitting}
+        whileTap={submitting ? undefined : { scale: tapScale }}
+        transition={springSnappy}
+        className="mt-1 inline-flex items-center justify-center gap-2 bg-terracota text-white px-6 py-3.5 rounded-full font-sans text-sm font-semibold hover:bg-terracota/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {submitting ? "Enviando…" : "Enviar consulta"}
         {!submitting && <ArrowRight size={15} strokeWidth={2.5} />}
-      </button>
+      </motion.button>
 
       {/* WhatsApp — alternativa secundaria */}
       <div className="flex items-center justify-center gap-2">
@@ -214,7 +235,7 @@ export function ContactForm() {
 
       {serverError && (
         <p className="font-mono text-[10px] text-bordo/80 text-center">
-          Algo falló. Escribime a contacto@sanchezmarian.com
+          Algo falló. Escribime a {SITE_EMAIL}
         </p>
       )}
     </form>

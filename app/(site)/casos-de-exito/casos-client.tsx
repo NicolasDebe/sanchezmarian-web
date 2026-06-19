@@ -13,7 +13,8 @@ import {
   type DbClient,
   type DbClipping,
 } from "@/lib/clippings"
-import { fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
+import { fadeUp, fadeUpStagger, revealCard, viewportOnce, springSnappy, tapScale } from "@/lib/animations"
+import { MotionLink } from "@/components/ui/motion-link"
 import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { DestacadasRotativo } from "@/components/destacadas-rotativo"
@@ -443,7 +444,8 @@ function TimelineClientBlock({
             key="body"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+            // Colapso (exit) más rápido que la apertura (~60%).
+            exit={{ height: 0, opacity: 0, transition: { duration: 0.22, ease: "easeIn" } }}
             transition={{ duration: 0.35, ease: "easeOut" }}
             style={{ overflow: "hidden" }}
           >
@@ -552,7 +554,11 @@ export function CasosClient({
     n: statsContent[`stat_${n}_number`] ?? "",
     label: statsContent[`stat_${n}_label`] ?? "",
   }))
-  const [openClients, setOpenClients] = useState<Set<string>>(new Set())
+  // El primer cliente arranca expandido por default (el resto colapsado), para
+  // que la sección no se vea vacía y se entienda el patrón de acordeón.
+  const [openClients, setOpenClients] = useState<Set<string>>(
+    () => new Set(clientsData[0] ? [clientsData[0].client.slug] : []),
+  )
   const allExpanded = openClients.size === clientsData.length
 
   const handleIndexClick = (slug: string) => {
@@ -804,8 +810,10 @@ export function CasosClient({
             </em>
           </motion.h2>
           <motion.div variants={fadeUp} className="mt-10">
-            <Link
+            <MotionLink
               href="/#contacto"
+              whileTap={{ scale: tapScale }}
+              transition={springSnappy}
               className="inline-flex items-center gap-2 font-sans font-semibold transition-opacity hover:opacity-85 group"
               style={{
                 background: "var(--color-hueso)",
@@ -821,7 +829,7 @@ export function CasosClient({
                 strokeWidth={2.5}
                 className="group-hover:translate-x-1 transition-transform"
               />
-            </Link>
+            </MotionLink>
           </motion.div>
         </motion.div>
       </section>

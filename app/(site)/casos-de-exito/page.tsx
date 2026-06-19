@@ -1,10 +1,8 @@
 import type { Metadata } from "next"
-import { Nav } from "@/components/nav"
-import { Footer } from "@/components/footer"
 import { CasosClient } from "./casos-client"
+import { ScrollProgress } from "@/components/ui/scroll-progress"
 import { getPageContent } from "@/lib/content"
 import { CASOS_SECTIONS } from "@/lib/casos-schema"
-import { getGlobalContent } from "@/lib/global-content"
 import { getClientsWithClippings } from "@/lib/clippings"
 import { buildMetadata } from "@/lib/seo"
 
@@ -15,17 +13,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CasosDeExitoPage() {
-  const [global, content, clientsData] = await Promise.all([
-    getGlobalContent(),
+  const [content, clientsData] = await Promise.all([
     getPageContent("casos_de_exito", CASOS_SECTIONS),
     getClientsWithClippings(),
   ])
 
   return (
-    <main>
-      <Nav content={global.nav} />
+    <>
+      <ScrollProgress />
       <CasosClient content={content} clientsData={clientsData} />
-      <Footer content={global.footer} nav={global.nav} />
-    </main>
+    </>
   )
 }

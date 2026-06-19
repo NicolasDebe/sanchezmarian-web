@@ -1,7 +1,5 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { Nav } from "@/components/nav"
-import { Footer } from "@/components/footer"
 import { CampanaDetail } from "@/components/campana-detail"
 import { getCampaignBySlug } from "@/lib/campaigns"
 import { createClient } from "@/lib/supabase/server"
@@ -47,7 +45,7 @@ async function isAuthenticated(): Promise<boolean> {
 function DraftBanner() {
   return (
     <div
-      className="fixed inset-x-0 top-0 z-[60] text-center"
+      className="text-center"
       style={{ background: "var(--color-bordo-oscuro)", padding: "10px 16px" }}
     >
       <p
@@ -73,13 +71,9 @@ export default async function CampanaPage({ params, searchParams }: Props) {
   }
 
   return (
-    <main>
+    <>
       {isDraft && <DraftBanner />}
-      <div style={isDraft ? { paddingTop: 38 } : undefined}>
-        <Nav />
-        <CampanaDetail campaign={campaign} />
-        <Footer />
-      </div>
-    </main>
+      <CampanaDetail campaign={campaign} />
+    </>
   )
 }

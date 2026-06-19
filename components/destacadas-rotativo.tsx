@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "motion/react"
+import { motion, AnimatePresence, useReducedMotion } from "motion/react"
 import { ExternalLink } from "lucide-react"
 import type { Clipping } from "@/data/clippings"
 
@@ -22,6 +22,13 @@ const cardVariants = {
   hidden:  { opacity: 0, x: -60 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: EASE_OUT } },
   exit:    { opacity: 0, x:  60, transition: { duration: 0.25, ease: EASE_IN } },
+}
+
+// Bajo prefers-reduced-motion: solo fundido, sin desplazamiento horizontal.
+const cardVariantsReduced = {
+  hidden:  { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.25 } },
+  exit:    { opacity: 0, transition: { duration: 0.15 } },
 }
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
@@ -115,14 +122,16 @@ export function DestacadasRotativo({ apariciones }: Props) {
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [dotHov, setDotHov] = useState(false)
+  const reduced = useReducedMotion()
 
+  // Con prefers-reduced-motion no auto-rota: la persona cambia de grupo con los dots.
   useEffect(() => {
-    if (isPaused) return
+    if (isPaused || reduced) return
     const timer = setInterval(() => {
       setCurrentGroupIndex((i) => (i + 1) % GROUPS)
     }, 3000)
     return () => clearInterval(timer)
-  }, [isPaused])
+  }, [isPaused, reduced])
 
   const handleDotClick = (idx: number) => {
     setCurrentGroupIndex(idx)
@@ -146,7 +155,7 @@ export function DestacadasRotativo({ apariciones }: Props) {
           className="grid grid-cols-1 sm:grid-cols-3 gap-6"
         >
           {group.map((c) => (
-            <motion.div key={c.id} variants={cardVariants} className="flex flex-col">
+            <motion.div key={c.id} variants={reduced ? cardVariantsReduced : cardVariants} className="flex flex-col">
               <DestacadaCard c={c} />
             </motion.div>
           ))}

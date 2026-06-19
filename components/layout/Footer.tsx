@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { globalFallbacksFor } from "@/lib/global-schema"
+import { NAV_ITEMS, SOCIAL_LINKS, SITE_EMAIL, SITE_TAGLINE } from "@/lib/constants"
+import { Logo } from "@/components/layout/Logo"
 
 function IconLinkedin() {
   return (
@@ -29,17 +31,17 @@ export function Footer({
   nav?: Record<string, string>
 }) {
   const c = { ...globalFallbacksFor("footer"), ...content }
-  const n = { ...globalFallbacksFor("nav"), ...nav }
+  const tagline = c.tagline || SITE_TAGLINE
+  const email = c.email || SITE_EMAIL
 
-  const NAV_LINKS = [
-    { label: n.link_servicios, href: "/servicios" },
-    { label: n.link_valores, href: "/mis-valores" },
-    { label: n.link_casos, href: "/casos-de-exito" },
-    { label: n.link_campanas, href: "/campanas" },
-  ]
+  // Navegación: un único array (NAV_ITEMS), con texto editable desde el CMS.
+  const NAV_LINKS = NAV_ITEMS.map((item) => ({
+    label: nav?.[item.key] ?? item.label,
+    href: item.href,
+  }))
   const SOCIAL = [
-    { label: "LinkedIn", href: c.linkedin_url, Icon: IconLinkedin },
-    { label: "Instagram", href: c.instagram_url, Icon: IconInstagram },
+    { label: "LinkedIn", href: c.linkedin_url || SOCIAL_LINKS.linkedin, Icon: IconLinkedin },
+    { label: "Instagram", href: c.instagram_url || SOCIAL_LINKS.instagram, Icon: IconInstagram },
   ]
 
   return (
@@ -59,19 +61,15 @@ export function Footer({
 
           {/* Logo + tagline */}
           <div className="flex flex-col gap-3">
-            <Link href="/" className="hover:opacity-80 transition-opacity w-fit">
-              <span className="font-playfair italic text-[1.5rem] leading-none" style={{ color: "var(--color-hueso)" }}>
-                Marian Sánchez
-              </span>
-            </Link>
+            <Logo variant="negative" height={38} />
             <p className="font-sans text-xs text-hueso/45 leading-relaxed max-w-[200px]">
-              {c.tagline}
+              {tagline}
             </p>
             <a
-              href={`mailto:${c.email}`}
+              href={`mailto:${email}`}
               className="font-mono text-[11px] text-hueso/55 hover:text-hueso/80 transition-colors tracking-wide"
             >
-              {c.email}
+              {email}
             </a>
           </div>
 

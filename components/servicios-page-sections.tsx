@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { fallbacksFor } from "@/lib/servicios-schema"
+import { MotionLink } from "@/components/ui/motion-link"
+import { springSnappy, tapScale } from "@/lib/animations"
 import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { IsotipoInfinito } from "@/components/ui/isotipo-infinito"
@@ -208,10 +210,10 @@ function FinalCTA({ cta }: { cta: Record<string, string> }) {
           </motion.div>
         )}
         <motion.div {...item(0.24)} className="mt-12">
-          <Link href="/#contacto" className="cta-invert cta-arrow group inline-flex items-center gap-3 rounded-xl border-2 border-hueso bg-hueso px-10 font-sans font-semibold text-bordo transition-all duration-300 active:scale-[0.98]" style={{ fontSize: "clamp(16px, 1.4vw, 19px)", paddingBlock: "clamp(16px,2vw,22px)" }}>
+          <MotionLink href="/#contacto" whileTap={{ scale: tapScale }} transition={springSnappy} className="cta-invert cta-arrow group inline-flex items-center gap-3 rounded-xl border-2 border-hueso bg-hueso px-10 font-sans font-semibold text-bordo transition-colors duration-300" style={{ fontSize: "clamp(16px, 1.4vw, 19px)", paddingBlock: "clamp(16px,2vw,22px)" }}>
             {button}
             <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
-          </Link>
+          </MotionLink>
         </motion.div>
       </div>
     </section>

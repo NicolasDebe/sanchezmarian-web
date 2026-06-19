@@ -3,6 +3,7 @@
  */
 import type { SectionDef } from "@/lib/content-schema"
 import { fallbacksForIn, fallbackOfIn } from "@/lib/content-schema"
+import { SITE_EMAIL, SOCIAL_LINKS } from "@/lib/constants"
 
 export const CONTACTO_SECTIONS: SectionDef[] = [
   {
@@ -25,11 +26,11 @@ export const CONTACTO_SECTIONS: SectionDef[] = [
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Datos de contacto" },
       { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Estoy disponible para" },
       { field: "title_accent", type: "text", label: "Título — texto destacado (cursiva terracota)", fallback: "nuevos proyectos." },
-      { field: "email", type: "text", label: "Email", fallback: "contacto@sanchezmarian.com" },
+      { field: "email", type: "text", label: "Email", fallback: SITE_EMAIL },
       { field: "location", type: "text", label: "Ubicación", fallback: "Mendoza, Argentina" },
       { field: "availability", type: "text", label: "Disponibilidad", fallback: "Agendar sesión" },
-      { field: "instagram_url", type: "text", label: "URL de Instagram", fallback: "https://www.instagram.com/marian15s/" },
-      { field: "linkedin_url", type: "text", label: "URL de LinkedIn", fallback: "https://www.linkedin.com/in/marians%C3%A1nchez/" },
+      { field: "instagram_url", type: "text", label: "URL de Instagram", fallback: SOCIAL_LINKS.instagram },
+      { field: "linkedin_url", type: "text", label: "URL de LinkedIn", fallback: SOCIAL_LINKS.linkedin },
       { field: "form_eyebrow", type: "text", label: "Formulario — eyebrow", fallback: "Formulario de contacto" },
       { field: "form_title", type: "text", label: "Formulario — título", fallback: "Contame en qué puedo ayudarte." },
     ],

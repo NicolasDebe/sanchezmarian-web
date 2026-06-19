@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
+import toast from "react-hot-toast"
 import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
-import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce } from "@/lib/animations"
+import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce, springSnappy, tapScale } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/home-schema"
 import { RichText } from "@/components/ui/RichText"
+import { SITE_EMAIL, WHATSAPP_HREF } from "@/lib/constants"
 
-const WA_HREF = "https://wa.me/542615433882?text=Hola%20Marian%2C%20me%20gustar%C3%ADa%20consultarte."
+const WA_HREF = WHATSAPP_HREF
 
 function IconWA() {
   return (
@@ -19,8 +21,9 @@ function IconWA() {
 
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
 
+// text-base (16px) evita el zoom automático de iOS al enfocar inputs.
 const INPUT_CLASS =
-  "w-full rounded-lg px-4 py-3 font-sans text-sm text-hueso placeholder:text-hueso/30 focus:outline-none transition-colors"
+  "w-full rounded-lg px-4 py-3 font-sans text-base text-hueso placeholder:text-hueso/30 focus:outline-none transition-colors"
 
 const INPUT_STYLE = {
   background: "rgba(255,255,255,0.08)",
@@ -49,10 +52,16 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({ nombre: form.nombre, email: form.email, mensaje: form.mensaje }),
       })
-      if (res.ok) setSuccess(true)
-      else setError(true)
+      if (res.ok) {
+        setSuccess(true)
+        toast.success("¡Gracias! Te respondo pronto.")
+      } else {
+        setError(true)
+        toast.error("No se pudo enviar. Probá de nuevo o escribime directo.")
+      }
     } catch {
       setError(true)
+      toast.error("No se pudo enviar. Probá de nuevo o escribime directo.")
     } finally {
       setSubmitting(false)
     }
@@ -148,7 +157,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
                 </p>
               </motion.div>
             ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5" aria-busy={submitting}>
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="cf-nombre"
@@ -158,7 +167,9 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
                 </label>
                 <input
                   id="cf-nombre"
+                  name="nombre"
                   type="text"
+                  autoComplete="name"
                   required
                   value={form.nombre}
                   onChange={(e) => setForm({ ...form, nombre: e.target.value })}
@@ -179,7 +190,10 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
                 </label>
                 <input
                   id="cf-email"
+                  name="email"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   required
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -200,6 +214,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
                 </label>
                 <textarea
                   id="cf-mensaje"
+                  name="mensaje"
                   required
                   rows={4}
                   value={form.mensaje}
@@ -212,10 +227,13 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
                 />
               </div>
 
-              <button
+              <motion.button
                 type="submit"
                 disabled={submitting}
-                className="mt-1 w-full flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-3.5 rounded-lg font-sans text-sm font-semibold hover:bg-arena active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                aria-busy={submitting}
+                whileTap={submitting ? undefined : { scale: tapScale }}
+                transition={springSnappy}
+                className="mt-1 w-full flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-3.5 rounded-lg font-sans text-sm font-semibold hover:bg-arena transition-colors disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
               >
                 <AnimatePresence mode="popLayout" initial={false}>
                   {submitting ? (
@@ -244,7 +262,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
                     </motion.span>
                   )}
                 </AnimatePresence>
-              </button>
+              </motion.button>
 
               <div className="flex items-center justify-center gap-2 mt-1">
                 <span className="font-sans text-xs text-hueso/35">¿Preferís WhatsApp?</span>
@@ -261,7 +279,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
 
               {error && (
                 <p className="font-mono text-[9px] text-dorado/70 text-center">
-                  Algo falló. Escribime a contacto@sanchezmarian.com
+                  Algo falló. Escribime a {SITE_EMAIL}
                 </p>
               )}
             </form>

@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { motion, useReducedMotion } from "motion/react"
 import { fallbacksFor } from "@/lib/home-schema"
+import { springSnappy, tapScale } from "@/lib/animations"
 import { RichText } from "@/components/ui/RichText"
 import heroMarian from "@/public/images/hero-marian.jpg"
 
@@ -135,8 +136,12 @@ export function Hero({ content }: { content?: Record<string, string> }) {
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-3"
             >
-              <a
+              <motion.a
                 href="/#contacto"
+                className="justify-center text-center"
+                whileHover={{ y: -2, boxShadow: "0 6px 22px rgba(254,252,239,0.22)" }}
+                whileTap={{ scale: tapScale }}
+                transition={springSnappy}
                 style={{
                   backgroundColor: "#FEFCEF",
                   color: "#66001F",
@@ -150,24 +155,21 @@ export function Hero({ content }: { content?: Record<string, string> }) {
                   alignItems: "center",
                   gap: "6px",
                   letterSpacing: "0.01em",
-                  transition: "transform 0.15s ease, box-shadow 0.15s ease",
-                  whiteSpace: "nowrap",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-1px)"
-                  e.currentTarget.style.boxShadow = "0 4px 20px rgba(254,252,239,0.2)"
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)"
-                  e.currentTarget.style.boxShadow = "none"
+                  lineHeight: 1.35,
                 }}
               >
                 {c.cta_primary}
                 <span aria-hidden="true">→</span>
-              </a>
+              </motion.a>
 
-              <a
+              <motion.a
                 href="/mis-valores"
+                whileHover={{
+                  backgroundColor: "rgba(254,252,239,0.12)",
+                  borderColor: "rgba(254,252,239,0.6)",
+                }}
+                whileTap={{ scale: tapScale }}
+                transition={springSnappy}
                 style={{
                   backgroundColor: "rgba(254,252,239,0.06)",
                   color: "#FEFCEF",
@@ -182,20 +184,11 @@ export function Hero({ content }: { content?: Record<string, string> }) {
                   alignItems: "center",
                   gap: "6px",
                   letterSpacing: "0.01em",
-                  transition: "background-color 0.15s ease, border-color 0.15s ease",
                   whiteSpace: "nowrap",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(254,252,239,0.12)"
-                  e.currentTarget.style.borderColor = "rgba(254,252,239,0.6)"
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(254,252,239,0.06)"
-                  e.currentTarget.style.borderColor = "rgba(254,252,239,0.35)"
                 }}
               >
                 {c.cta_secondary}
-              </a>
+              </motion.a>
             </motion.div>
 
           </motion.div>
