@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
-import { CustomCursor } from "@/components/ui/custom-cursor"
 import { WhatsAppFloat } from "@/components/whatsapp-float"
 import { getGlobalContent } from "@/lib/global-content"
 
@@ -25,7 +24,6 @@ export default async function SiteLayout({
       >
         Saltar al contenido
       </a>
-      <CustomCursor />
       <Navbar content={global.nav} />
       <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
         {children}

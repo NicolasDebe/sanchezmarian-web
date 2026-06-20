@@ -9,8 +9,6 @@ import { fallbacksFor } from "@/lib/home-schema"
 import { RichText } from "@/components/ui/RichText"
 import { SITE_EMAIL, WHATSAPP_HREF } from "@/lib/constants"
 
-const WA_HREF = WHATSAPP_HREF
-
 // Accesos rápidos de contacto (bloque "Conversemos" sobre el formulario).
 const EXPRESS_CARDS = [
   {
@@ -42,27 +40,21 @@ const EXPRESS_CARDS = [
   },
 ] as const
 
-function IconWA() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.38 1.26 4.79L2 22l5.41-1.36c1.35.74 2.9 1.16 4.63 1.16 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.52 14.08c-.23.65-1.35 1.25-1.85 1.32-.49.07-1.08.1-1.73-.11-.4-.13-.9-.3-1.55-.59-2.73-1.18-4.5-3.92-4.64-4.1-.13-.18-1.09-1.45-1.09-2.77 0-1.31.69-1.96.93-2.22.24-.26.53-.32.7-.32.18 0 .35.01.5.02.17.01.39-.06.61.47.23.55.77 1.88.84 2.02.07.14.12.3.02.48-.1.18-.15.29-.3.45-.14.16-.3.35-.42.47-.14.14-.29.29-.12.57.17.28.75 1.24 1.6 2.01 1.1 1 2.02 1.31 2.3 1.45.29.14.45.12.62-.07.17-.19.72-.84.91-1.13.19-.28.39-.24.65-.14.26.1 1.67.79 1.96.93.29.14.48.21.55.33.07.12.07.66-.16 1.3z" />
-    </svg>
-  )
-}
-
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
 
 // text-base (16px) evita el zoom automático de iOS al enfocar inputs.
 const INPUT_CLASS =
-  "w-full rounded-lg px-4 py-3 font-sans text-base text-hueso placeholder:text-hueso/30 focus:outline-none transition-colors"
+  "w-full rounded-lg px-4 py-3.5 font-sans text-base text-hueso placeholder:text-hueso/40 focus:outline-none transition-colors"
 
 const INPUT_STYLE = {
-  background: "rgba(255,255,255,0.08)",
-  border: "1px solid rgba(254,252,239,0.15)",
+  background: "rgba(254,252,239,0.06)",
+  border: "1px solid rgba(254,252,239,0.18)",
 }
 
 const INPUT_FOCUS_STYLE = {
-  borderColor: "rgba(254,252,239,0.5)",
+  borderColor: "rgba(254,252,239,1)",
+  background: "rgba(254,252,239,0.08)",
+  boxShadow: "0 0 0 3px rgba(254,252,239,0.1)",
 }
 
 export function CtaFinal({ content }: { content?: Record<string, string> }) {
@@ -129,31 +121,45 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
           </motion.p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
-            {EXPRESS_CARDS.map((card) => (
-              <motion.a
-                key={card.title}
-                href={card.href}
-                variants={fadeUp}
-                whileHover={{ y: -2 }}
-                transition={springSnappy}
-                {...(card.external
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                className="group flex flex-col gap-3 rounded-xl border border-dorado/30 bg-hueso p-6 transition-colors hover:border-bordo"
-              >
-                <card.Icon size={32} strokeWidth={1.5} className="text-bordo" />
-                <h3 className="font-playfair text-[18px] text-negro-bordo">
-                  {card.title}
-                </h3>
-                <p className="font-sans text-[13px] text-gris-bordo leading-relaxed">
-                  {card.desc}
-                </p>
-                <span className="mt-1 inline-flex items-center gap-1 font-sans text-[13px] font-medium text-bordo">
-                  {card.action}
-                  <span aria-hidden="true">{card.arrow}</span>
-                </span>
-              </motion.a>
-            ))}
+            {EXPRESS_CARDS.map((card, i) => {
+              const isWhatsApp = i === 0
+              return (
+                <motion.a
+                  key={card.title}
+                  href={card.href}
+                  variants={fadeUp}
+                  whileHover={{ y: -3, boxShadow: "0 8px 32px rgba(102,0,31,0.12)" }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  {...(card.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                  className="group relative flex flex-col gap-3 rounded-2xl border border-[rgba(102,0,31,0.15)] bg-hueso p-8 transition-colors duration-[250ms] hover:border-[rgba(102,0,31,0.4)]"
+                  style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}
+                >
+                  {isWhatsApp && (
+                    <span
+                      className="absolute right-4 top-4 rounded-full px-2 py-0.5 font-mono uppercase"
+                      style={{ fontSize: 9, letterSpacing: "0.08em", background: "#25D366", color: "#fff" }}
+                    >
+                      Rápido
+                    </span>
+                  )}
+                  <card.Icon size={36} strokeWidth={1.5} className="text-bordo" />
+                  <h3 className="font-playfair text-[19px] text-negro-bordo">
+                    {card.title}
+                  </h3>
+                  <p className="font-sans text-[14px] text-gris-bordo" style={{ lineHeight: 1.5 }}>
+                    {card.desc}
+                  </p>
+                  <span className="mt-1 inline-flex items-center gap-1 font-sans text-[13px] font-semibold text-bordo">
+                    {card.action}
+                    <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
+                      {card.arrow}
+                    </span>
+                  </span>
+                </motion.a>
+              )
+            })}
           </div>
         </motion.div>
 
@@ -197,12 +203,12 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">
               <div className="flex items-center gap-3">
-                <Mail size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
-                <span className="font-sans text-sm text-hueso/80">{c.email}</span>
+                <Mail size={16} strokeWidth={1.5} className="text-dorado shrink-0" />
+                <span className="font-sans text-[14px] text-hueso/90">{c.email}</span>
               </div>
               <div className="flex items-center gap-3">
-                <MapPin size={13} strokeWidth={1.5} className="text-hueso/50 shrink-0" />
-                <span className="font-sans text-sm text-hueso/60">{c.location}</span>
+                <MapPin size={16} strokeWidth={1.5} className="text-dorado shrink-0" />
+                <span className="font-sans text-[14px] text-hueso/75">{c.location}</span>
               </div>
             </motion.div>
           </motion.div>
@@ -240,7 +246,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="cf-nombre"
-                  className="font-sans text-[11px] uppercase tracking-[0.16em] text-hueso/50"
+                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-hueso/85"
                 >
                   Nombre
                 </label>
@@ -263,7 +269,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="cf-email"
-                  className="font-sans text-[11px] uppercase tracking-[0.16em] text-hueso/50"
+                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-hueso/85"
                 >
                   Email
                 </label>
@@ -287,7 +293,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="cf-mensaje"
-                  className="font-sans text-[11px] uppercase tracking-[0.16em] text-hueso/50"
+                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-hueso/85"
                 >
                   Mensaje
                 </label>
@@ -312,7 +318,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
                 aria-busy={submitting}
                 whileTap={submitting ? undefined : { scale: tapScale }}
                 transition={springSnappy}
-                className="mt-1 w-full flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-3.5 rounded-lg font-sans text-sm font-semibold hover:bg-arena transition-colors disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                className="mt-1 w-full flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-4 rounded-lg font-sans text-sm font-semibold hover:bg-arena transition-colors disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
               >
                 <AnimatePresence mode="popLayout" initial={false}>
                   {submitting ? (
@@ -342,19 +348,6 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
                   )}
                 </AnimatePresence>
               </motion.button>
-
-              <div className="flex items-center justify-center gap-2 mt-1">
-                <span className="font-sans text-xs text-hueso/35">¿Preferís WhatsApp?</span>
-                <a
-                  href={WA_HREF}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 font-sans text-xs font-medium text-hueso/50 hover:text-hueso transition-colors"
-                >
-                  <IconWA />
-                  {c.whatsapp_text}
-                </a>
-              </div>
 
               {error && (
                 <p className="font-mono text-[9px] text-dorado/70 text-center">

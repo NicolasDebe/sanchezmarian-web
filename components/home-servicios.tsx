@@ -19,6 +19,8 @@ const MENTORIA_SUBS = [
   { num: "03", title: "Gestión de Alianzas Estratégicas" },
 ]
 
+// Servicios secundarios: tratamiento cromático alternado (igual que /servicios).
+// Prensa → fondo --arena (cálido); RRPP → fondo --bordo (oscuro).
 const SECONDARIES = [
   {
     badge: "Servicio 02",
@@ -26,15 +28,17 @@ const SECONDARIES = [
     quote: "Historias con impacto real.",
     desc:
       "Construyo puentes honestos y duraderos con periodistas. Transformo el valor periodístico de tu negocio en contenido relevante para medios tradicionales y digitales.",
-    tags: ["Gestión de Medios", "Laboratorio de comunicación", "Monitoreo"],
+    subs: ["Gestión de Medios (Earned Media)", "Laboratorio de comunicación", "Monitoreo"],
+    dark: false,
   },
   {
     badge: "Servicio 03",
     title: "Relaciones Públicas",
     quote: "Conexión genuina para potenciar tu historia y tu red de contactos.",
     desc:
-      "Diseño y coordino acciones presenciales donde el diálogo es protagonista. Conecto a profesionales con stakeholders, autoridades y líderes de opinión.",
-    tags: ["RRPP y Networking Estratégico", "Lanzamientos"],
+      "Diseño y coordino acciones presenciales donde el diálogo es protagonista. Conecto a profesionales con stakeholders, autoridades y líderes de opinión, creando entornos de confianza mutua.",
+    subs: ["RRPP y Networking Estratégico", "Lanzamientos"],
+    dark: true,
   },
 ]
 
@@ -112,7 +116,7 @@ export function HomeServicios() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"
         >
 
           {/* CARD GRANDE — MENTORÍA (servicio principal) */}
@@ -217,69 +221,125 @@ export function HomeServicios() {
             </div>
           </motion.div>
 
-          {/* CARDS SECUNDARIAS — PRENSA + RRPP */}
-          <motion.div
-            variants={secondariesContainer}
-            className="contents"
-          >
-            {SECONDARIES.map((s) => (
-              <motion.div key={s.badge} variants={secondaryItem} className="h-full">
-                <Link
-                  href="/#contacto"
-                  className="group flex h-full flex-col rounded-2xl border border-dorado/30 bg-hueso-oscuro p-7 lg:p-10 transition-all duration-200 hover:-translate-y-0.5 hover:border-bordo/50"
-                  style={{ minHeight: 320 }}
+          {/* CARDS SECUNDARIAS — PRENSA (--arena) + RRPP (--bordo) */}
+          <motion.div variants={secondariesContainer} className="contents">
+            {SECONDARIES.map((s, idx) => {
+              const dark = s.dark
+              const titleId = `home-svc-${idx}`
+              return (
+                <motion.article
+                  key={s.badge}
+                  variants={secondaryItem}
+                  whileHover={{ scale: 1.01 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  aria-labelledby={titleId}
+                  className="h-full"
                 >
-                  <p
-                    className="flex items-center gap-2 font-mono uppercase text-bordo mb-5"
-                    style={{ fontSize: 10, letterSpacing: "0.16em" }}
+                  <Link
+                    href="/#contacto"
+                    className={[
+                      "group flex h-full flex-col rounded-[20px] p-8 lg:p-12 transition-shadow duration-[250ms] ease-out",
+                      dark
+                        ? "bg-bordo hover:shadow-[0_18px_50px_rgba(26,0,8,0.15)]"
+                        : "bg-arena hover:shadow-[0_18px_50px_rgba(102,0,31,0.06)]",
+                    ].join(" ")}
+                    style={{ minHeight: 420 }}
                   >
-                    <span className="inline-block h-1 w-1 rounded-full bg-bordo" />
-                    {s.badge}
-                  </p>
+                    {/* Badge */}
+                    <p
+                      className={`flex items-center gap-2 font-mono uppercase mb-5 ${dark ? "text-hueso/70" : "text-bordo"}`}
+                      style={{ fontSize: 10, letterSpacing: "0.16em" }}
+                    >
+                      <span className={`inline-block h-1 w-1 rounded-full ${dark ? "bg-hueso/70" : "bg-bordo"}`} />
+                      {s.badge}
+                    </p>
 
-                  <h3
-                    className="font-playfair font-bold text-negro-bordo mb-4"
-                    style={{ fontSize: 22, lineHeight: 1.2 }}
-                  >
-                    {s.title}
-                  </h3>
+                    {/* Título */}
+                    <h3
+                      id={titleId}
+                      className={`font-playfair font-bold ${dark ? "text-hueso" : "text-negro-bordo"}`}
+                      style={{ fontSize: 26, lineHeight: 1.15 }}
+                    >
+                      {s.title}
+                    </h3>
 
-                  <p
-                    className="font-playfair italic text-bordo mb-5"
-                    style={{
-                      fontSize: 14,
-                      lineHeight: 1.4,
-                      borderLeft: "2px solid var(--color-dorado)",
-                      paddingLeft: 12,
-                    }}
-                  >
-                    {s.quote}
-                  </p>
+                    {/* Quote decorativo */}
+                    <p
+                      className={`font-playfair italic ${dark ? "text-hueso/85" : "text-bordo"}`}
+                      style={{
+                        fontSize: 16,
+                        lineHeight: 1.4,
+                        borderLeft: "2px solid var(--color-dorado)",
+                        paddingLeft: 16,
+                        margin: "20px 0",
+                      }}
+                    >
+                      <span aria-hidden="true" className="text-dorado" style={{ fontSize: 24, marginRight: 2 }}>
+                        “
+                      </span>
+                      {s.quote}
+                    </p>
 
-                  <p
-                    className="font-sans text-gris-bordo mb-6"
-                    style={{ fontSize: 13, lineHeight: 1.6 }}
-                  >
-                    {s.desc}
-                  </p>
+                    {/* Descripción */}
+                    <p
+                      className={`font-sans ${dark ? "text-hueso/70" : "text-gris-bordo"}`}
+                      style={{ fontSize: 14, lineHeight: 1.65 }}
+                    >
+                      {s.desc}
+                    </p>
 
-                  <p
-                    className="font-mono text-gris-bordo mb-6"
-                    style={{ fontSize: 10, letterSpacing: "0.04em" }}
-                  >
-                    {s.tags.join("  ·  ")}
-                  </p>
+                    {/* Sub-servicios (con punto medio, sin números) */}
+                    <div className="mt-7" style={{ borderTop: "1px solid rgba(201,168,130,0.3)" }}>
+                      <p
+                        className={`font-mono uppercase mt-5 mb-1 ${dark ? "text-hueso/50" : "text-bordo/70"}`}
+                        style={{ fontSize: 10, letterSpacing: "0.16em" }}
+                      >
+                        Sub-servicios
+                      </p>
+                      <ul className="flex flex-col">
+                        {s.subs.map((sub, i) => (
+                          <li
+                            key={sub}
+                            className="flex items-center gap-2"
+                            style={{
+                              paddingBlock: 10,
+                              ...(i > 0
+                                ? {
+                                    borderTop: dark
+                                      ? "1px solid rgba(254,252,239,0.1)"
+                                      : "1px solid rgba(201,168,130,0.2)",
+                                  }
+                                : {}),
+                            }}
+                          >
+                            <span aria-hidden="true" className="text-dorado" style={{ fontSize: 14 }}>
+                              ·
+                            </span>
+                            <span
+                              className={`font-sans font-medium ${dark ? "text-hueso" : "text-negro-bordo"}`}
+                              style={{ fontSize: 13 }}
+                            >
+                              {sub}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-                  <span
-                    className="mt-auto inline-flex items-center gap-1.5 font-sans font-semibold text-bordo group-hover:underline underline-offset-4"
-                    style={{ fontSize: 13 }}
-                  >
-                    Quiero este servicio
-                    <span aria-hidden="true">→</span>
-                  </span>
-                </Link>
-              </motion.div>
-            ))}
+                    {/* CTA */}
+                    <span
+                      className={`mt-auto inline-flex items-center gap-1.5 font-sans font-semibold underline underline-offset-4 ${dark ? "text-hueso" : "text-bordo"}`}
+                      style={{ fontSize: 13, paddingTop: 24 }}
+                    >
+                      Quiero este servicio
+                      <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
+                        →
+                      </span>
+                    </span>
+                  </Link>
+                </motion.article>
+              )
+            })}
           </motion.div>
 
         </motion.div>
