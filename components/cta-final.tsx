@@ -3,13 +3,44 @@
 import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import toast from "react-hot-toast"
-import { Mail, MapPin, ArrowRight, Loader } from "lucide-react"
+import { Mail, MapPin, ArrowRight, Loader, MessageCircle, FileText } from "lucide-react"
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce, springSnappy, tapScale } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/home-schema"
 import { RichText } from "@/components/ui/RichText"
 import { SITE_EMAIL, WHATSAPP_HREF } from "@/lib/constants"
 
 const WA_HREF = WHATSAPP_HREF
+
+// Accesos rápidos de contacto (bloque "Conversemos" sobre el formulario).
+const EXPRESS_CARDS = [
+  {
+    Icon: MessageCircle,
+    title: "Por WhatsApp",
+    desc: "Respuesta rápida en horario laboral.",
+    action: "Escribir ahora",
+    arrow: "→",
+    href: WHATSAPP_HREF,
+    external: true,
+  },
+  {
+    Icon: Mail,
+    title: "Por email",
+    desc: "Para consultas detalladas o envío de archivos.",
+    action: "Enviar email",
+    arrow: "→",
+    href: `mailto:${SITE_EMAIL}`,
+    external: false,
+  },
+  {
+    Icon: FileText,
+    title: "Por formulario",
+    desc: "Contame sobre tu proyecto y te respondo en 24hs.",
+    action: "Completar formulario",
+    arrow: "↓",
+    href: "#formulario",
+    external: false,
+  },
+] as const
 
 function IconWA() {
   return (
@@ -80,7 +111,53 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
         background: "radial-gradient(ellipse at 25% 40%, rgba(140,26,53,0.35) 0%, transparent 65%), var(--color-bordo)",
       }}
     >
-<div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start relative">
+<div className="max-w-7xl mx-auto px-6 lg:px-12">
+
+        {/* ── ACCESOS RÁPIDOS — 3 vías de contacto sobre el formulario ── */}
+        <motion.div
+          variants={fadeUpStagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="mb-16 lg:mb-20"
+        >
+          <motion.p
+            variants={fadeUp}
+            className="font-mono text-[11px] uppercase tracking-[0.25em] text-hueso/60 mb-7"
+          >
+            Conversemos
+          </motion.p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+            {EXPRESS_CARDS.map((card) => (
+              <motion.a
+                key={card.title}
+                href={card.href}
+                variants={fadeUp}
+                whileHover={{ y: -2 }}
+                transition={springSnappy}
+                {...(card.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+                className="group flex flex-col gap-3 rounded-xl border border-dorado/30 bg-hueso p-6 transition-colors hover:border-bordo"
+              >
+                <card.Icon size={32} strokeWidth={1.5} className="text-bordo" />
+                <h3 className="font-playfair text-[18px] text-negro-bordo">
+                  {card.title}
+                </h3>
+                <p className="font-sans text-[13px] text-gris-bordo leading-relaxed">
+                  {card.desc}
+                </p>
+                <span className="mt-1 inline-flex items-center gap-1 font-sans text-[13px] font-medium text-bordo">
+                  {card.action}
+                  <span aria-hidden="true">{card.arrow}</span>
+                </span>
+              </motion.a>
+            ))}
+          </div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start relative">
 
         {/* ── IZQUIERDA — texto ── */}
         <motion.div
@@ -133,6 +210,8 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
 
         {/* ── DERECHA — card formulario ── */}
         <motion.div
+          id="formulario"
+          className="scroll-mt-24"
           variants={revealCard}
           initial="hidden"
           whileInView="visible"
@@ -287,6 +366,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
           </div>
         </motion.div>
 
+        </div>
       </div>
     </section>
   )

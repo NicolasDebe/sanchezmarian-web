@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { motion, useReducedMotion } from "motion/react"
+import { MapPin } from "lucide-react"
 import { fallbacksFor } from "@/lib/home-schema"
 import { springSnappy, tapScale } from "@/lib/animations"
 import { RichText } from "@/components/ui/RichText"
@@ -81,6 +82,33 @@ export function Hero({ content }: { content?: Record<string, string> }) {
             animate="visible"
             className="max-w-lg"
           >
+
+            {/* PILL GEOLOCALIZACIÓN — solo en el hero del home */}
+            <motion.div
+              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6"
+              style={{
+                background: "rgba(254,252,239,0.10)",
+                backdropFilter: "blur(4px)",
+                WebkitBackdropFilter: "blur(4px)",
+                border: "1px solid rgba(254,252,239,0.20)",
+              }}
+            >
+              <MapPin size={14} strokeWidth={1.5} style={{ color: "#FEFCEF" }} />
+              <span
+                style={{
+                  fontFamily: "var(--font-dm-mono), monospace",
+                  fontSize: "11px",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "#FEFCEF",
+                }}
+              >
+                Mendoza, Argentina · Trabajo en todo LATAM
+              </span>
+            </motion.div>
 
             {/* EYEBROW */}
             <motion.p

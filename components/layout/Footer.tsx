@@ -1,6 +1,7 @@
 import Link from "next/link"
+import { MessageCircle, MapPin } from "lucide-react"
 import { globalFallbacksFor } from "@/lib/global-schema"
-import { NAV_ITEMS, SOCIAL_LINKS, SITE_EMAIL, SITE_TAGLINE } from "@/lib/constants"
+import { NAV_ITEMS, SOCIAL_LINKS, SITE_EMAIL, SITE_TAGLINE, WHATSAPP_HREF } from "@/lib/constants"
 import { Logo } from "@/components/layout/Logo"
 
 function IconLinkedin() {
@@ -71,6 +72,21 @@ export function Footer({
             >
               {email}
             </a>
+
+            <a
+              href={WHATSAPP_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-flex items-center gap-2 font-sans text-[13px] text-hueso/60 hover:text-hueso transition-colors"
+            >
+              <MessageCircle size={14} strokeWidth={1.5} className="shrink-0" />
+              +54 261 543-3882
+            </a>
+
+            <p className="inline-flex items-center gap-2 font-sans text-[13px] text-hueso/45">
+              <MapPin size={14} strokeWidth={1.5} className="shrink-0" />
+              Mendoza, Argentina · Trabajo remoto en LATAM
+            </p>
           </div>
 
           {/* Nav links */}

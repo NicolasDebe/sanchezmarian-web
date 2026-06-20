@@ -4,10 +4,11 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Mail, MapPin } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { NAV_ITEMS } from "@/lib/constants"
+import { NAV_ITEMS, WHATSAPP_HREF, SITE_EMAIL } from "@/lib/constants"
 import { Logo } from "@/components/layout/Logo"
+import { IconWhatsApp } from "@/components/ui/icon-whatsapp"
 
 export function Navbar({ content }: { content?: Record<string, string> }) {
   // El texto de cada link puede sobrescribirse desde el CMS (global/nav);
@@ -67,6 +68,26 @@ export function Navbar({ content }: { content?: Record<string, string> }) {
         </ul>
 
         <div className="flex items-center gap-3">
+          {/* CTA desktop. El header siempre tiene fondo --bordo, así que el botón
+              va en variante --hueso/--bordo (consistente con el resto del nav). */}
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/#contacto"
+              className="rounded-md bg-hueso px-5 py-2.5 font-sans text-[13px] font-medium text-bordo transition-colors hover:bg-arena"
+            >
+              Conversemos
+            </Link>
+            <a
+              href={WHATSAPP_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Contactar por WhatsApp"
+              className="flex items-center justify-center text-hueso transition-colors hover:text-hueso/70"
+            >
+              <IconWhatsApp size={20} />
+            </a>
+          </div>
+
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden flex items-center justify-center min-h-11 min-w-11 -mr-2 text-hueso/70 hover:text-hueso transition-colors"
@@ -121,6 +142,33 @@ export function Navbar({ content }: { content?: Record<string, string> }) {
                   </li>
                 ))}
               </ul>
+
+              {/* Accesos de contacto directo */}
+              <div className="mt-5 flex flex-col gap-3 border-t border-hueso/10 pt-6">
+                <a
+                  href={WHATSAPP_HREF}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex w-full items-center justify-center gap-2.5 rounded-lg py-3.5 font-sans text-base font-semibold text-white"
+                  style={{ background: "#25D366" }}
+                >
+                  <IconWhatsApp size={20} />
+                  Conversemos por WhatsApp
+                </a>
+                <a
+                  href={`mailto:${SITE_EMAIL}`}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-hueso/40 py-3.5 font-sans text-base font-medium text-hueso"
+                >
+                  <Mail size={18} strokeWidth={1.5} />
+                  Escribime por email
+                </a>
+                <p className="flex items-center justify-center gap-1.5 pt-1 font-sans text-xs text-hueso/50">
+                  <MapPin size={13} strokeWidth={1.5} />
+                  Mendoza, Argentina
+                </p>
+              </div>
             </motion.div>
           </>
         )}

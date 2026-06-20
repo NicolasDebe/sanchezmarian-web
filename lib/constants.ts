@@ -8,7 +8,8 @@
 export const SITE_EMAIL = "contacto@sanchezmarian.com"
 
 export const WHATSAPP_NUMBER = "542615433882"
-export const WHATSAPP_MESSAGE = "Hola Marian, me gustaría consultarte."
+export const WHATSAPP_MESSAGE =
+  "Hola Marian, me gustaría consultarte sobre comunicación para mi negocio."
 
 /** Link de WhatsApp listo para usar (texto pre-cargado y codificado). */
 export const WHATSAPP_HREF = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(

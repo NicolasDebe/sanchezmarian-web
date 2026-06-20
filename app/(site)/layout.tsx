@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { CustomCursor } from "@/components/ui/custom-cursor"
+import { WhatsAppFloat } from "@/components/whatsapp-float"
 import { getGlobalContent } from "@/lib/global-content"
 
 /**
@@ -30,6 +31,7 @@ export default async function SiteLayout({
         {children}
       </main>
       <Footer content={global.footer} nav={global.nav} />
+      <WhatsAppFloat />
     </>
   )
 }
