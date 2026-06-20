@@ -71,6 +71,11 @@ async function seed() {
     { page: "home", section: "metodo", field: "title" },
     { page: "home", section: "bio", field: "title" },
     { page: "home", section: "cta_final", field: "title" },
+    // Hero: CTAs largos reemplazados por label/link cortos (sesión home v2).
+    { page: "home", section: "hero", field: "cta_primary" },
+    { page: "home", section: "hero", field: "cta_secondary" },
+    // CTA final: link de WhatsApp redundante eliminado del diseño.
+    { page: "home", section: "cta_final", field: "whatsapp_text" },
   ]
   for (const o of OBSOLETE) {
     await admin

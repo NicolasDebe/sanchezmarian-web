@@ -15,7 +15,7 @@
 
 import type { FieldType, FieldDef, SectionDef } from "@/lib/content-schema"
 import { fallbacksForIn, fallbackOfIn } from "@/lib/content-schema"
-import { SITE_EMAIL } from "@/lib/constants"
+import { SITE_EMAIL, WHATSAPP_HREF } from "@/lib/constants"
 
 export type { FieldType, FieldDef, SectionDef }
 
@@ -45,17 +45,100 @@ export const HOME_SECTIONS: SectionDef[] = [
           "Diseño estrategias de comunicación multiplataforma con visión de futuro que transforman tu valor diferencial en visibilidad real. Te acompaño a construir puentes honestos con los medios y la comunidad para que el mensaje de tu negocio resuene con fuerza, claridad y el impacto que realmente merece.",
       },
       {
-        field: "cta_primary",
+        field: "location_tag",
         type: "text",
-        label: "Botón principal",
-        fallback: "Tengo un negocio con una historia para contar",
+        label: "Pill de ubicación (sobre el título)",
+        fallback: "Mendoza, Argentina",
       },
       {
-        field: "cta_secondary",
+        field: "cta_primary_label",
         type: "text",
-        label: "Botón secundario",
+        label: "Botón principal — texto",
+        fallback: "Conversemos",
+      },
+      {
+        field: "cta_primary_link",
+        type: "text",
+        label: "Botón principal — destino (link)",
+        fallback: "/#contacto",
+      },
+      {
+        field: "cta_secondary_label",
+        type: "text",
+        label: "Botón secundario — texto",
         fallback: "Mis valores",
       },
+      {
+        field: "cta_secondary_link",
+        type: "text",
+        label: "Botón secundario — destino (link)",
+        fallback: "/mis-valores",
+      },
+    ],
+  },
+  {
+    section: "servicios",
+    title: "Servicios (vidriera del home)",
+    legend:
+      "Encabezado y pie de la sección de servicios del home. Los TÍTULOS, frases y descripciones de cada servicio (Mentoría, Prensa, RRPP) se leen de la página de Servicios; acá solo editás el marco. La parte destacada del título se muestra en cursiva bordó automáticamente.",
+    fields: [
+      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Servicios" },
+      {
+        field: "title_pre",
+        type: "text",
+        label: "Título — parte normal",
+        fallback: "Conexión genuina para potenciar la voz",
+      },
+      {
+        field: "title_accent",
+        type: "text",
+        label: "Título — destacado (cursiva bordó)",
+        fallback: "y el mensaje de tu negocio.",
+      },
+      {
+        field: "subtitle",
+        type: "longtext",
+        label: "Subtítulo",
+        fallback:
+          "Tres servicios alineados que se adaptan a cada etapa de tu negocio. Mentoría como columna vertebral, Prensa y Relaciones Públicas como brazos operativos.",
+      },
+      {
+        field: "card_cta_label",
+        type: "text",
+        label: "Texto del link de cada card",
+        fallback: "Conocer este servicio",
+      },
+      {
+        field: "footer_link_pre",
+        type: "text",
+        label: "Pie — texto previo",
+        fallback: "Conocé los tres servicios en detalle",
+      },
+      {
+        field: "footer_link_label",
+        type: "text",
+        label: "Pie — texto del link",
+        fallback: "Ver página de servicios",
+      },
+    ],
+  },
+  {
+    section: "contact",
+    title: "Contacto — accesos rápidos (3 cards)",
+    legend:
+      "Las tres tarjetas de canales que aparecen sobre el formulario del home. Solo el canal y el identificador, sin descripciones ni tiempos de respuesta.",
+    fields: [
+      { field: "eyebrow", type: "text", label: "Eyebrow (sobre las cards)", fallback: "Conversemos" },
+      { field: "whatsapp_label", type: "text", label: "WhatsApp — canal", fallback: "WhatsApp" },
+      { field: "whatsapp_value", type: "text", label: "WhatsApp — número", fallback: "+54 261 543 3882" },
+      { field: "whatsapp_link", type: "text", label: "WhatsApp — link", fallback: WHATSAPP_HREF },
+      { field: "whatsapp_cta", type: "text", label: "WhatsApp — texto del link", fallback: "Abrir conversación" },
+      { field: "email_label", type: "text", label: "Email — canal", fallback: "Email" },
+      { field: "email_value", type: "text", label: "Email — dirección", fallback: SITE_EMAIL },
+      { field: "email_cta", type: "text", label: "Email — texto del link", fallback: "Enviar email" },
+      { field: "form_label", type: "text", label: "Formulario — canal", fallback: "Formulario" },
+      { field: "form_value", type: "text", label: "Formulario — identificador", fallback: "Más abajo" },
+      { field: "form_cta", type: "text", label: "Formulario — texto del link", fallback: "Ir al formulario" },
     ],
   },
   {
@@ -160,7 +243,6 @@ export const HOME_SECTIONS: SectionDef[] = [
       { field: "email", type: "text", label: "Email de contacto", fallback: SITE_EMAIL },
       { field: "location", type: "text", label: "Ubicación", fallback: "Mendoza, Argentina" },
       { field: "form_button", type: "text", label: "Texto del botón del formulario", fallback: "Escribime" },
-      { field: "whatsapp_text", type: "text", label: "Texto del link de WhatsApp", fallback: "Escribime por acá" },
     ],
   },
 ]

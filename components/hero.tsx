@@ -2,9 +2,9 @@
 
 import Image from "next/image"
 import { motion, useReducedMotion } from "motion/react"
-import { MapPin } from "lucide-react"
+import { MapPin, ArrowRight } from "lucide-react"
 import { fallbacksFor } from "@/lib/home-schema"
-import { springSnappy, tapScale } from "@/lib/animations"
+import { springSnappy } from "@/lib/animations"
 import { RichText } from "@/components/ui/RichText"
 import heroMarian from "@/public/images/hero-marian.jpg"
 
@@ -42,6 +42,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
         src={heroMarian}
         alt="Marian Sánchez — Comunicación estratégica en Mendoza"
         priority
+        quality={90}
         placeholder="blur"
         sizes="100vw"
         className="w-full block"
@@ -106,7 +107,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
                   color: "#FEFCEF",
                 }}
               >
-                Mendoza, Argentina · Trabajo en todo LATAM
+                {c.location_tag}
               </span>
             </motion.div>
 
@@ -159,53 +160,60 @@ export function Hero({ content }: { content?: Record<string, string> }) {
               <RichText html={c.subtitle} className="rich-inline" />
             </motion.div>
 
-            {/* BOTONES */}
+            {/* BOTONES — primario (fill --hueso) + secundario (outline).
+                Misma altura y curva; la diferencia es solo fill vs outline. */}
             <motion.div
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-3"
             >
               <motion.a
-                href="/#contacto"
-                className="justify-center text-center"
-                whileHover={{ y: -2, boxShadow: "0 6px 22px rgba(254,252,239,0.22)" }}
-                whileTap={{ scale: tapScale }}
+                href={c.cta_primary_link}
+                className="group justify-center text-center"
+                whileHover={{ scale: 1.02, backgroundColor: "#F0E8D8" }}
+                whileTap={{ scale: 0.98 }}
                 transition={springSnappy}
                 style={{
                   backgroundColor: "#FEFCEF",
                   color: "#66001F",
-                  padding: "13px 28px",
-                  borderRadius: "100px",
+                  padding: "16px 28px",
+                  borderRadius: "999px",
                   fontFamily: "var(--font-dm-sans), sans-serif",
-                  fontSize: "0.875rem",
+                  fontSize: "14px",
                   fontWeight: 600,
                   textDecoration: "none",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "6px",
+                  gap: "8px",
                   letterSpacing: "0.01em",
                   lineHeight: 1.35,
                 }}
               >
-                {c.cta_primary}
-                <span aria-hidden="true">→</span>
+                {c.cta_primary_label}
+                <ArrowRight
+                  size={16}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                  className="transition-transform duration-200 group-hover:translate-x-1"
+                />
               </motion.a>
 
               <motion.a
-                href="/mis-valores"
+                href={c.cta_secondary_link}
+                className="justify-center text-center"
                 whileHover={{
-                  backgroundColor: "rgba(254,252,239,0.12)",
-                  borderColor: "rgba(254,252,239,0.6)",
+                  backgroundColor: "rgba(254,252,239,0.08)",
+                  borderColor: "rgba(254,252,239,1)",
                 }}
-                whileTap={{ scale: tapScale }}
+                whileTap={{ scale: 0.98 }}
                 transition={springSnappy}
                 style={{
-                  backgroundColor: "rgba(254,252,239,0.06)",
+                  backgroundColor: "transparent",
                   color: "#FEFCEF",
-                  padding: "13px 28px",
-                  borderRadius: "100px",
-                  border: "1.5px solid rgba(254,252,239,0.35)",
+                  padding: "16px 28px",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(254,252,239,0.4)",
                   fontFamily: "var(--font-dm-sans), sans-serif",
-                  fontSize: "0.875rem",
+                  fontSize: "14px",
                   fontWeight: 500,
                   textDecoration: "none",
                   display: "inline-flex",
@@ -215,7 +223,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
                   whiteSpace: "nowrap",
                 }}
               >
-                {c.cta_secondary}
+                {c.cta_secondary_label}
               </motion.a>
             </motion.div>
 

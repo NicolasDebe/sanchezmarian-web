@@ -7,38 +7,7 @@ import { Mail, MapPin, ArrowRight, Loader, MessageCircle, FileText } from "lucid
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce, springSnappy, tapScale } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/home-schema"
 import { RichText } from "@/components/ui/RichText"
-import { SITE_EMAIL, WHATSAPP_HREF } from "@/lib/constants"
-
-// Accesos rápidos de contacto (bloque "Conversemos" sobre el formulario).
-const EXPRESS_CARDS = [
-  {
-    Icon: MessageCircle,
-    title: "Por WhatsApp",
-    desc: "Respuesta rápida en horario laboral.",
-    action: "Escribir ahora",
-    arrow: "→",
-    href: WHATSAPP_HREF,
-    external: true,
-  },
-  {
-    Icon: Mail,
-    title: "Por email",
-    desc: "Para consultas detalladas o envío de archivos.",
-    action: "Enviar email",
-    arrow: "→",
-    href: `mailto:${SITE_EMAIL}`,
-    external: false,
-  },
-  {
-    Icon: FileText,
-    title: "Por formulario",
-    desc: "Contame sobre tu proyecto y te respondo en 24hs.",
-    action: "Completar formulario",
-    arrow: "↓",
-    href: "#formulario",
-    external: false,
-  },
-] as const
+import { SITE_EMAIL } from "@/lib/constants"
 
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
 
@@ -57,8 +26,44 @@ const INPUT_FOCUS_STYLE = {
   boxShadow: "0 0 0 3px rgba(254,252,239,0.1)",
 }
 
-export function CtaFinal({ content }: { content?: Record<string, string> }) {
+export function CtaFinal({
+  content,
+  contact,
+}: {
+  content?: Record<string, string>
+  contact?: Record<string, string>
+}) {
   const c = { ...fallbacksFor("cta_final"), ...content }
+  const ct = { ...fallbacksFor("contact"), ...contact }
+
+  // Accesos rápidos: solo canal + identificador + link (sin descripciones ni
+  // tiempos de respuesta). Editables desde home.contact.
+  const cards = [
+    {
+      Icon: MessageCircle,
+      label: ct.whatsapp_label,
+      value: ct.whatsapp_value,
+      cta: ct.whatsapp_cta,
+      href: ct.whatsapp_link,
+      external: true,
+    },
+    {
+      Icon: Mail,
+      label: ct.email_label,
+      value: ct.email_value,
+      cta: ct.email_cta,
+      href: `mailto:${ct.email_value}`,
+      external: false,
+    },
+    {
+      Icon: FileText,
+      label: ct.form_label,
+      value: ct.form_value,
+      cta: ct.form_cta,
+      href: "#form-contacto",
+      external: false,
+    },
+  ]
   const [error, setError] = useState(false)
   const [success, setSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -117,49 +122,41 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
             variants={fadeUp}
             className="font-mono text-[11px] uppercase tracking-[0.25em] text-hueso/60 mb-7"
           >
-            Conversemos
+            {ct.eyebrow}
           </motion.p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
-            {EXPRESS_CARDS.map((card, i) => {
-              const isWhatsApp = i === 0
-              return (
-                <motion.a
-                  key={card.title}
-                  href={card.href}
-                  variants={fadeUp}
-                  whileHover={{ y: -3, boxShadow: "0 8px 32px rgba(102,0,31,0.12)" }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  {...(card.external
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
-                  className="group relative flex flex-col gap-3 rounded-2xl border border-[rgba(102,0,31,0.15)] bg-hueso p-8 transition-colors duration-[250ms] hover:border-[rgba(102,0,31,0.4)]"
-                  style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}
+            {cards.map((card) => (
+              <motion.a
+                key={card.label}
+                href={card.href}
+                variants={fadeUp}
+                whileHover={{ y: -3, boxShadow: "0 8px 32px rgba(102,0,31,0.12)" }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                {...(card.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+                className="group flex flex-col items-start gap-3 rounded-2xl border border-[rgba(102,0,31,0.15)] bg-hueso p-8 transition-colors duration-[250ms] hover:border-[rgba(102,0,31,0.4)]"
+                style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}
+              >
+                <card.Icon size={32} strokeWidth={1.5} className="text-bordo" />
+                <span
+                  className="font-mono uppercase text-bordo/60"
+                  style={{ fontSize: 11, letterSpacing: "0.12em" }}
                 >
-                  {isWhatsApp && (
-                    <span
-                      className="absolute right-4 top-4 rounded-full px-2 py-0.5 font-mono uppercase"
-                      style={{ fontSize: 9, letterSpacing: "0.08em", background: "#25D366", color: "#fff" }}
-                    >
-                      Rápido
-                    </span>
-                  )}
-                  <card.Icon size={36} strokeWidth={1.5} className="text-bordo" />
-                  <h3 className="font-playfair text-[19px] text-negro-bordo">
-                    {card.title}
-                  </h3>
-                  <p className="font-sans text-[14px] text-gris-bordo" style={{ lineHeight: 1.5 }}>
-                    {card.desc}
-                  </p>
-                  <span className="mt-1 inline-flex items-center gap-1 font-sans text-[13px] font-semibold text-bordo">
-                    {card.action}
-                    <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
-                      {card.arrow}
-                    </span>
+                  {card.label}
+                </span>
+                <span className="font-playfair text-[20px] text-negro-bordo">
+                  {card.value}
+                </span>
+                <span className="mt-1 inline-flex items-center gap-1 font-sans text-[12px] font-semibold text-bordo">
+                  {card.cta}
+                  <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
+                    →
                   </span>
-                </motion.a>
-              )
-            })}
+                </span>
+              </motion.a>
+            ))}
           </div>
         </motion.div>
 
@@ -216,7 +213,7 @@ export function CtaFinal({ content }: { content?: Record<string, string> }) {
 
         {/* ── DERECHA — card formulario ── */}
         <motion.div
-          id="formulario"
+          id="form-contacto"
           className="scroll-mt-24"
           variants={revealCard}
           initial="hidden"
