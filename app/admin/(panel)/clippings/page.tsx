@@ -1,6 +1,7 @@
-import Link from "next/link"
-import Image from "next/image"
 import { createAdminClient } from "@/lib/supabase"
+import SortableClientsList, {
+  type SortableClient,
+} from "@/components/admin/SortableClientsList"
 
 export const dynamic = "force-dynamic"
 
@@ -13,7 +14,7 @@ interface ClientRow {
 }
 
 export default async function ClippingsListPage() {
-  let clients: ClientRow[] = []
+  let clients: SortableClient[] = []
   let loadError = false
 
   try {
@@ -22,38 +23,55 @@ export default async function ClippingsListPage() {
       .from("clients")
       .select("id, slug, name, logo_url, clippings(count)")
       .eq("is_active", true)
-      .order("order_position", { ascending: true })
-    if (error) loadError = true
-    else clients = (data ?? []) as ClientRow[]
+      // Mismo orden que /casos-de-exito: order_position ASC, NULLS al final,
+      // name ASC como desempate.
+      .order("order_position", { ascending: true, nullsFirst: false })
+      .order("name", { ascending: true })
+
+    if (error) {
+      loadError = true
+    } else {
+      clients = ((data ?? []) as ClientRow[]).map((c) => ({
+        id: c.id,
+        slug: c.slug,
+        name: c.name,
+        logo_url: c.logo_url,
+        clippings_count: c.clippings?.[0]?.count ?? 0,
+      }))
+    }
   } catch {
     loadError = true
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <p
-        className="font-mono uppercase"
-        style={{ fontSize: 11, letterSpacing: "0.18em", color: "var(--color-bordo)" }}
-      >
-        Casos de éxito
-      </p>
-      <h1
-        className="mt-2 font-playfair font-bold"
-        style={{ fontSize: "2.25rem", color: "var(--color-negro-bordo)" }}
-      >
-        Clippings
-      </h1>
-      <p
-        className="mt-3 font-sans text-sm leading-relaxed"
-        style={{ color: "var(--color-gris-bordo)" }}
-      >
-        Elegí un cliente para ver, agregar o editar sus apariciones en medios.
-        Los cambios se publican en /casos-de-exito en aproximadamente un minuto.
-      </p>
+    <div className="mx-auto" style={{ maxWidth: 960 }}>
+      {/* Header */}
+      <div style={{ marginBottom: 48 }}>
+        <p
+          className="font-mono uppercase"
+          style={{ fontSize: 11, letterSpacing: "0.18em", color: "var(--color-bordo)" }}
+        >
+          Casos de éxito
+        </p>
+        <h1
+          className="mt-2 font-playfair font-bold"
+          style={{ fontSize: "clamp(40px, 5vw, 56px)", color: "var(--color-negro-bordo)" }}
+        >
+          Clippings
+        </h1>
+        <p
+          className="mt-3 font-sans text-sm leading-relaxed"
+          style={{ color: "var(--color-gris-bordo)", maxWidth: 620 }}
+        >
+          Elegí un cliente para ver, agregar o editar sus apariciones en medios.
+          Arrastrá desde el ícono <span aria-hidden>≡</span> para reordenar — el
+          orden se refleja en /casos-de-exito.
+        </p>
+      </div>
 
       {loadError ? (
         <div
-          className="mt-8 rounded-2xl border p-6 font-sans text-sm leading-relaxed"
+          className="rounded-2xl border p-6 font-sans text-sm leading-relaxed"
           style={{
             borderColor: "rgba(201,168,130,0.4)",
             backgroundColor: "rgba(201,168,130,0.1)",
@@ -74,71 +92,7 @@ export default async function ClippingsListPage() {
           </p>
         </div>
       ) : (
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {clients.map((c) => {
-            const count = c.clippings?.[0]?.count ?? 0
-            return (
-              <Link
-                key={c.id}
-                href={`/admin/clippings/${c.slug}`}
-                className="group rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:border-[var(--color-bordo)] hover:shadow-sm"
-                style={{
-                  backgroundColor: "var(--color-hueso-oscuro)",
-                  borderColor: "rgba(201,168,130,0.3)",
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="flex shrink-0 items-center justify-center rounded-lg"
-                    style={{
-                      width: 48,
-                      height: 48,
-                      background: "white",
-                      border: "1px solid rgba(0,0,0,0.06)",
-                    }}
-                  >
-                    {c.logo_url ? (
-                      <Image
-                        src={c.logo_url}
-                        alt={`Logo ${c.name}`}
-                        width={40}
-                        height={40}
-                        style={{ objectFit: "contain" }}
-                      />
-                    ) : (
-                      <span
-                        className="font-mono font-bold"
-                        style={{ color: "var(--color-bordo)", fontSize: 18 }}
-                      >
-                        {c.name.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <h2
-                      className="truncate font-playfair font-bold"
-                      style={{ fontSize: 15, color: "var(--color-negro-bordo)" }}
-                    >
-                      {c.name}
-                    </h2>
-                    <p
-                      className="mt-0.5 font-mono"
-                      style={{
-                        fontSize: 10,
-                        letterSpacing: "0.06em",
-                        color: count === 0 ? "var(--color-dorado)" : "var(--color-gris-bordo)",
-                      }}
-                    >
-                      {count === 0
-                        ? "0 clippings — agregar el primero"
-                        : `${count} clipping${count === 1 ? "" : "s"}`}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            )
-          })}
-        </div>
+        <SortableClientsList clients={clients} />
       )}
     </div>
   )

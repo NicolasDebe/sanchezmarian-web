@@ -1,26 +1,30 @@
 "use client"
 
 /**
- * Lista de clientes de /admin/clippings con drag & drop para reordenar.
- * Auto-save al soltar (optimistic UI con revert + toast en caso de error).
- * Cada fila es navegable (click → /admin/clippings/{slug}) excepto el handle
- * que es exclusivamente dragueable.
+ * Lista vertical de clientes de /admin/clippings con drag & drop para
+ * reordenar — coherente con la estética editorial de /casos-de-exito (lista
+ * plana, no grid de cards). Auto-save al soltar (optimistic UI con revert +
+ * toast). Cada fila navega a /admin/clippings/{slug} excepto el handle, que es
+ * exclusivamente dragueable.
  *
- * Accesibilidad: KeyboardSensor — focus en el handle, Space para "tomar",
- * flechas arriba/abajo, Space/Enter para soltar.
+ * Accesibilidad: KeyboardSensor — Tab para enfocar el handle, Espacio para
+ * "tomar", flechas arriba/abajo para mover, Espacio/Enter para soltar.
  */
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { AnimatePresence, motion } from "motion/react"
 import {
   DndContext,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
 } from "@dnd-kit/core"
 import {
   restrictToParentElement,
@@ -34,7 +38,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { ChevronRight, GripVertical, Loader2 } from "lucide-react"
+import { AlertCircle, Check, ChevronRight, GripVertical } from "lucide-react"
 import { reorderClients } from "@/app/admin/(panel)/clippings/actions"
 
 export interface SortableClient {
@@ -45,33 +49,33 @@ export interface SortableClient {
   clippings_count: number
 }
 
-interface Props {
+type ToastState = { kind: "success" | "error"; message: string } | null
+
+const GOLD_BORDER = "1px solid rgba(201,168,130,0.2)"
+const ROW_HEIGHT = 88
+
+export default function SortableClientsList({
+  clients,
+}: {
   clients: SortableClient[]
-}
-
-type ToastState =
-  | { kind: "success"; message: string }
-  | { kind: "error"; message: string }
-  | null
-
-export default function SortableClientsList({ clients }: Props) {
+}) {
   const [items, setItems] = useState<SortableClient[]>(clients)
   const [savingId, setSavingId] = useState<string | null>(null)
+  const [activeId, setActiveId] = useState<string | null>(null)
   const [toast, setToast] = useState<ToastState>(null)
   const [, startTransition] = useTransition()
-  const router = useRouter()
 
-  // Mantener el estado local sincronizado si el server vuelve a fetcheaer
-  // con un orden distinto (ej: después de revalidatePath).
-  const lastIncomingRef = useRef<string>("")
+  // Resync si el server vuelve con un orden distinto (tras revalidatePath).
+  const sigRef = useRef("")
   useEffect(() => {
     const sig = clients.map((c) => c.id).join("|")
-    if (sig !== lastIncomingRef.current) {
-      lastIncomingRef.current = sig
+    if (sig !== sigRef.current) {
+      sigRef.current = sig
       setItems(clients)
     }
   }, [clients])
 
+  // Auto-dismiss del toast: éxito 2s, error 4s.
   useEffect(() => {
     if (!toast) return
     const ms = toast.kind === "error" ? 4000 : 2000
@@ -80,13 +84,20 @@ export default function SortableClientsList({ clients }: Props) {
   }, [toast])
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    // delay 150 + tolerance 5: evita drag accidental al hacer click/tap.
+    useSensor(PointerSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
-  const itemIds = useMemo(() => items.map((c) => c.id), [items])
+  const ids = useMemo(() => items.map((c) => c.id), [items])
+  const activeClient = activeId ? items.find((c) => c.id === activeId) ?? null : null
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(String(event.active.id))
+  }
 
   function handleDragEnd(event: DragEndEvent) {
+    setActiveId(null)
     const { active, over } = event
     if (!over || active.id === over.id) return
 
@@ -94,234 +105,256 @@ export default function SortableClientsList({ clients }: Props) {
     const newIndex = items.findIndex((c) => c.id === over.id)
     if (oldIndex < 0 || newIndex < 0) return
 
+    // 1. Update optimista.
     const previous = items
     const next = arrayMove(items, oldIndex, newIndex)
     setItems(next)
     setSavingId(String(active.id))
 
-    const newIds = next.map((c) => c.id)
+    // 2. Persistir; revertir si falla.
     startTransition(async () => {
-      const res = await reorderClients(newIds)
-      setSavingId(null)
-      if (res.success) {
-        setToast({ kind: "success", message: "Orden actualizado" })
-        router.refresh()
-      } else {
+      try {
+        const res = await reorderClients(next.map((c) => c.id))
+        if (res.success) {
+          setToast({ kind: "success", message: "Orden actualizado" })
+        } else {
+          setItems(previous)
+          setToast({ kind: "error", message: `No se pudo guardar: ${res.error}` })
+        }
+      } catch {
         setItems(previous)
-        setToast({
-          kind: "error",
-          message: res.error
-            ? `No se pudo guardar el orden — se revirtió (${res.error})`
-            : "No se pudo guardar el orden — se revirtió",
-        })
+        setToast({ kind: "error", message: "Error de conexión" })
+      } finally {
+        setSavingId(null)
       }
     })
   }
 
   return (
-    <>
+    <div className="mx-auto" style={{ maxWidth: 960 }}>
       <DndContext
+        id="clippings-clients-dnd"
         sensors={sensors}
         collisionDetection={closestCenter}
         modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        onDragCancel={() => setActiveId(null)}
       >
-        <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-          <ul className="mt-8 flex flex-col gap-3" role="list">
+        <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+          <ul role="list" style={{ borderTop: GOLD_BORDER }}>
             {items.map((c) => (
-              <SortableRow key={c.id} client={c} saving={savingId === c.id} />
+              <SortableRow
+                key={c.id}
+                client={c}
+                saving={savingId === c.id}
+                dimmed={activeId === c.id}
+              />
             ))}
           </ul>
         </SortableContext>
+
+        {/* Clon flotante que sigue al cursor mientras se arrastra. */}
+        <DragOverlay>
+          {activeClient ? (
+            <div
+              className="flex items-center"
+              style={{
+                height: ROW_HEIGHT,
+                paddingInline: 24,
+                gap: 24,
+                backgroundColor: "var(--color-hueso)",
+                border: "1px solid rgba(102,0,31,0.3)",
+                borderRadius: 8,
+                boxShadow: "0 12px 40px rgba(102,0,31,0.15)",
+                transform: "scale(1.015) rotate(1deg)",
+              }}
+            >
+              <GripVertical size={20} style={{ color: "rgba(102,0,31,0.4)" }} className="shrink-0" />
+              <RowInner client={activeClient} />
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
 
-      <p
-        className="mt-4 font-mono"
-        style={{
-          fontSize: 11,
-          letterSpacing: "0.06em",
-          color: "var(--color-gris-bordo)",
-        }}
-      >
-        Arrastrá los clientes desde el ícono <span aria-hidden>≡</span> para
-        cambiar el orden en que aparecen en /casos-de-exito. También podés usar
-        el teclado: Tab para enfocar, Espacio para tomar, flechas para mover y
-        Espacio para soltar.
-      </p>
-
-      {toast && <Toast toast={toast} />}
-    </>
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key="toast"
+            role="status"
+            aria-live="polite"
+            initial={{ opacity: 0, x: "-50%", y: 40 }}
+            animate={{ opacity: 1, x: "-50%", y: 0 }}
+            exit={{ opacity: 0, x: "-50%", y: 40 }}
+            transition={{ type: "spring", stiffness: 380, damping: 30 }}
+            className="fixed z-50 flex items-center gap-2 font-sans"
+            style={{
+              left: "50%",
+              bottom: 24,
+              padding: "14px 24px",
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 500,
+              color: "var(--color-hueso)",
+              backgroundColor:
+                toast.kind === "success" ? "var(--color-negro-bordo)" : "var(--color-bordo)",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+            }}
+          >
+            {toast.kind === "success" ? <Check size={16} /> : <AlertCircle size={16} />}
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
-// ─── Fila ─────────────────────────────────────────────────────────────────────
+// ─── Fila sortable ──────────────────────────────────────────────────────────
 
 function SortableRow({
   client,
   saving,
+  dimmed,
 }: {
   client: SortableClient
   saving: boolean
+  dimmed: boolean
 }) {
-  const router = useRouter()
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: client.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: client.id })
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.4 : 1,
-    boxShadow: isDragging
-      ? "0 18px 40px -12px rgba(102,0,31,0.35), 0 4px 12px rgba(102,0,31,0.18)"
-      : undefined,
-    scale: isDragging ? "1.02" : undefined,
+    // El original queda atenuado mientras el clon flota (DragOverlay).
+    opacity: dimmed || isDragging ? 0.4 : 1,
     zIndex: isDragging ? 5 : undefined,
     position: "relative",
+    height: ROW_HEIGHT,
     backgroundColor: "var(--color-hueso)",
-    borderColor: "rgba(201,168,130,0.3)",
-  }
-
-  function goToClient() {
-    router.push(`/admin/clippings/${client.slug}`)
+    borderBottom: GOLD_BORDER,
   }
 
   return (
     <li
       ref={setNodeRef}
       style={style}
-      className="group flex items-center gap-4 rounded-xl border px-4 transition-colors duration-200 hover:bg-[var(--color-arena)]"
+      className="group flex items-center transition-colors duration-200 hover:bg-[rgba(240,232,216,0.5)]"
     >
-      {/* Drag handle */}
+      {/* Drag handle — exclusivamente dragueable, no navega */}
       <button
         type="button"
-        aria-label={`Reordenar ${client.name}`}
+        aria-label="Arrastrar para reordenar"
         {...attributes}
         {...listeners}
         onClick={(e) => e.stopPropagation()}
-        className="flex h-12 w-8 shrink-0 items-center justify-center rounded-md outline-none focus-visible:ring-2"
+        className="flex shrink-0 items-center justify-center rounded-md text-[rgba(102,0,31,0.4)] outline-none transition-colors hover:text-[rgba(102,0,31,1)] focus-visible:ring-2 focus-visible:ring-[var(--color-bordo)]"
         style={{
+          width: 32,
+          height: 32,
+          marginLeft: 24,
           cursor: isDragging ? "grabbing" : "grab",
-          color: "var(--color-gris-bordo)",
           touchAction: "none",
         }}
       >
-        <GripVertical size={18} />
+        <GripVertical size={20} />
       </button>
 
-      {/* Fila clickeable */}
-      <button
-        type="button"
-        onClick={goToClient}
-        className="flex flex-1 items-center gap-4 py-4 text-left outline-none focus-visible:underline"
-        style={{ minHeight: 80 - 32 }}
+      {/* Resto de la fila — Link navegable */}
+      <Link
+        href={`/admin/clippings/${client.slug}`}
+        className="flex h-full flex-1 items-center outline-none focus-visible:underline"
+        style={{ gap: 24, paddingLeft: 24, paddingRight: 24 }}
       >
-        <div
-          className="flex shrink-0 items-center justify-center rounded-lg"
-          style={{
-            width: 48,
-            height: 48,
-            background: "white",
-            border: "1px solid rgba(0,0,0,0.06)",
-          }}
-        >
-          {client.logo_url ? (
-            <Image
-              src={client.logo_url}
-              alt={`Logo ${client.name}`}
-              width={40}
-              height={40}
-              style={{ objectFit: "contain" }}
-            />
-          ) : (
-            <span
-              className="font-mono font-bold"
-              style={{ color: "var(--color-bordo)", fontSize: 18 }}
-            >
-              {client.name.charAt(0).toUpperCase()}
-            </span>
-          )}
-        </div>
+        <RowInner client={client} />
+      </Link>
 
-        <div className="min-w-0 flex-1">
-          <h2
-            className="truncate font-playfair font-bold"
-            style={{ fontSize: 16, color: "var(--color-negro-bordo)" }}
-          >
-            {client.name}
-          </h2>
-          <p
-            className="mt-1 font-mono"
-            style={{
-              fontSize: 10,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color:
-                client.clippings_count === 0
-                  ? "var(--color-dorado)"
-                  : "var(--color-gris-bordo)",
-            }}
-          >
-            {client.clippings_count === 0
-              ? "Sin clippings — agregar el primero"
-              : `${client.clippings_count} clipping${client.clippings_count === 1 ? "" : "s"}`}
-          </p>
-        </div>
-
-        <ChevronRight
-          size={18}
-          aria-hidden
-          className="shrink-0 transition-transform group-hover:translate-x-0.5"
-          style={{ color: "var(--color-dorado)" }}
-        />
-      </button>
-
-      {/* Badge "Guardando..." */}
+      {/* Badge "Guardando…" */}
       {saving && (
         <span
-          className="pointer-events-none absolute -top-2 right-4 inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono"
+          className="pointer-events-none absolute animate-pulse font-mono"
           style={{
+            top: 8,
+            right: 24,
             fontSize: 10,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            backgroundColor: "var(--color-bordo)",
-            color: "var(--color-hueso)",
-            boxShadow: "0 2px 6px rgba(102,0,31,0.25)",
+            letterSpacing: "0.06em",
+            padding: "4px 8px",
+            borderRadius: 9999,
+            backgroundColor: "var(--color-arena)",
+            color: "rgba(102,0,31,0.7)",
           }}
         >
-          <Loader2 size={10} className="animate-spin" />
-          Guardando
+          Guardando…
         </span>
       )}
     </li>
   )
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
+// ─── Contenido de la fila (compartido por la fila y el DragOverlay) ──────────
 
-function Toast({ toast }: { toast: NonNullable<ToastState> }) {
-  const ok = toast.kind === "success"
+function RowInner({ client }: { client: SortableClient }) {
+  const zero = client.clippings_count === 0
+
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full px-5 py-2.5 font-sans font-medium shadow-lg"
-      style={{
-        fontSize: 13,
-        backgroundColor: ok ? "#1c4d2f" : "var(--color-bordo)",
-        color: "var(--color-hueso)",
-        boxShadow: "0 12px 28px -8px rgba(0,0,0,0.35)",
-      }}
-    >
-      <span aria-hidden style={{ marginRight: 8 }}>
-        {ok ? "✓" : "✕"}
+    <>
+      {/* Logo */}
+      <div
+        className="flex shrink-0 items-center justify-center"
+        style={{
+          width: 56,
+          height: 56,
+          borderRadius: 8,
+          background: "white",
+          padding: 6,
+          border: "1px solid rgba(0,0,0,0.06)",
+        }}
+      >
+        {client.logo_url ? (
+          <Image
+            src={client.logo_url}
+            alt={`Logo ${client.name}`}
+            width={44}
+            height={44}
+            style={{ objectFit: "contain", maxHeight: "100%", width: "auto" }}
+          />
+        ) : (
+          <span className="font-mono font-bold" style={{ color: "var(--color-bordo)", fontSize: 20 }}>
+            {client.name.charAt(0).toUpperCase()}
+          </span>
+        )}
+      </div>
+
+      {/* Nombre */}
+      <span
+        className="line-clamp-1 min-w-0 flex-1 font-sans"
+        style={{ fontSize: 17, fontWeight: 500, color: "var(--color-negro-bordo)" }}
+      >
+        {client.name}
       </span>
-      {toast.message}
-    </div>
+
+      {/* Contador */}
+      <span
+        className="shrink-0 font-mono"
+        style={{
+          fontSize: 12,
+          marginRight: 16,
+          color: zero ? "var(--color-dorado)" : "var(--color-gris-bordo)",
+        }}
+      >
+        {zero
+          ? "agregar el primero"
+          : `${client.clippings_count} clipping${client.clippings_count === 1 ? "" : "s"}`}
+      </span>
+
+      {/* Flecha */}
+      <ChevronRight
+        size={18}
+        aria-hidden
+        className="shrink-0 text-[rgba(102,0,31,0.4)] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-[rgba(102,0,31,1)]"
+      />
+    </>
   )
 }
