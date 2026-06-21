@@ -30,7 +30,7 @@ export function Logo({
       alt="Marian Sánchez"
       width={220}
       height={55}
-      priority={priority}
+      preload={priority}
       className={`object-contain ${className ?? ""}`}
       style={{ width: "auto", height: `${height}px` }}
     />

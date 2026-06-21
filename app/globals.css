@@ -32,6 +32,10 @@
 
 html {
   scroll-padding-top: 80px;
+  /* El contenedor de scroll es <html>: aquí se mide el overflow. `clip` corta
+     el scroll horizontal transitorio de las animaciones de entrada sin crear
+     contenedor de scroll (no rompe el header sticky ni el scroll vertical). */
+  overflow-x: clip;
 }
 
 body {
@@ -40,6 +44,10 @@ body {
   font-family: var(--font-dm-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   position: relative;
+  /* Evita el scroll horizontal transitorio de las animaciones de entrada
+     (motion fadeLeft/x-offset). `clip` no crea contenedor de scroll, así que
+     el header sticky y el scroll vertical no se ven afectados. */
+  overflow-x: clip;
 }
 
 body::after {

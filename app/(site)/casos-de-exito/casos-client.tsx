@@ -494,7 +494,11 @@ function IndexButton({
         background: "transparent",
         border: `1px solid ${hov ? "rgba(201,168,130,0.8)" : "rgba(201,168,130,0.3)"}`,
         borderRadius: 22,
-        padding: "12px 18px",
+        // Área táctil ≥44px (mobile): minHeight + centrado flex.
+        minHeight: 44,
+        display: "inline-flex",
+        alignItems: "center",
+        padding: "10px 18px",
         transition: "color 0.15s ease, border-color 0.15s ease",
         whiteSpace: "nowrap",
       }}
@@ -526,7 +530,12 @@ function ToggleAllButton({
         background: "transparent",
         border: `1px solid ${hov ? "var(--color-dorado)" : "rgba(201,168,130,0.5)"}`,
         borderRadius: 4,
-        padding: "11px 16px",
+        // Área táctil ≥44px (mobile): minHeight + centrado flex.
+        minHeight: 44,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "10px 16px",
         transition: "border-color 0.15s ease",
         whiteSpace: "nowrap",
         marginBottom: 4,
@@ -757,7 +766,7 @@ export function CasosClient({
             initial="hidden"
             whileInView="visible"
             viewport={viewportOnce}
-            className="flex flex-wrap gap-2 mb-14"
+            className="flex flex-wrap gap-3 mb-14"
           >
             {clientsData.map(({ client }) => (
               <motion.div key={client.slug} variants={fadeUp}>

@@ -31,7 +31,7 @@ function HeroEditorial({ c }: { c: Record<string, string> }) {
       <Image
         src={heroValores}
         alt="Marian Sánchez en su espacio de trabajo"
-        priority
+        preload
         placeholder="blur"
         sizes="100vw"
         className="max-h-[70vh] sm:max-h-[90vh]"

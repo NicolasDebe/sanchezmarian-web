@@ -41,7 +41,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
       <Image
         src={heroMarian}
         alt="Marian Sánchez — Comunicación estratégica en Mendoza"
-        priority
+        preload
         quality={90}
         placeholder="blur"
         sizes="100vw"

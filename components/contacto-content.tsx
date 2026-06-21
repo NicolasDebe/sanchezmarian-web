@@ -1,8 +1,10 @@
 "use client"
 
 import { motion } from "motion/react"
+import Image from "next/image"
 import { Mail, MapPin, MessageCircle } from "lucide-react"
 import { ContactForm } from "@/components/contact-form"
+import portraitContacto from "@/public/images/NAC_4230.jpg"
 import {
   fadeUp, fadeLeft, revealCard,
   fadeUpStagger, viewportOnce,
@@ -37,10 +39,11 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
         transition={{ duration: 0.55, ease: "easeOut" }}
         style={{ flexShrink: 0 }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/NAC_4230.jpg"
+        <Image
+          src={portraitContacto}
           alt="Marian Sánchez — conversemos"
+          placeholder="blur"
+          sizes="(min-width: 640px) 210px, 110px"
           className="w-[110px] h-[110px] sm:w-[clamp(130px,16vw,210px)] sm:h-[clamp(130px,16vw,210px)]"
           style={{
             borderRadius: "50%",

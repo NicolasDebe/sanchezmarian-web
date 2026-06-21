@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    // Next 16 exige declarar las calidades permitidas. 75 = default del resto
+    // del sitio; 90 = imágenes hero (mejor nitidez en el LCP).
+    qualities: [75, 90],
     remotePatterns: [
       {
         protocol: "https",
