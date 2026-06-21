@@ -34,6 +34,8 @@ export function Footer({
   const c = { ...globalFallbacksFor("footer"), ...content }
   const tagline = c.tagline || SITE_TAGLINE
   const email = c.email || SITE_EMAIL
+  const phone = c.phone || "+54 261 543-3882"
+  const locationTag = c.location_tag || "Mendoza, Argentina · Trabajo remoto en LATAM"
 
   // Navegación: un único array (NAV_ITEMS), con texto editable desde el CMS.
   const NAV_LINKS = NAV_ITEMS.map((item) => ({
@@ -80,12 +82,12 @@ export function Footer({
               className="mt-1 inline-flex items-center gap-2 font-sans text-[13px] text-hueso/60 hover:text-hueso transition-colors"
             >
               <MessageCircle size={14} strokeWidth={1.5} className="shrink-0" />
-              +54 261 543-3882
+              {phone}
             </a>
 
             <p className="inline-flex items-center gap-2 font-sans text-[13px] text-hueso/45">
               <MapPin size={14} strokeWidth={1.5} className="shrink-0" />
-              Mendoza, Argentina · Trabajo remoto en LATAM
+              {locationTag}
             </p>
           </div>
 

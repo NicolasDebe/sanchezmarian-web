@@ -26,6 +26,8 @@ export const GLOBAL_SECTIONS: SectionDef[] = [
     fields: [
       { field: "tagline", type: "text", label: "Frase bajo el logo", fallback: SITE_TAGLINE },
       { field: "email", type: "text", label: "Email de contacto", fallback: SITE_EMAIL },
+      { field: "phone", type: "text", label: "Teléfono", fallback: "+54 261 543-3882" },
+      { field: "location_tag", type: "text", label: "Ubicación / cobertura", fallback: "Mendoza, Argentina · Trabajo remoto en LATAM" },
       { field: "cta_text", type: "text", label: "Texto del botón CTA", fallback: "Conversemos" },
       { field: "instagram_url", type: "text", label: "URL de Instagram", fallback: SOCIAL_LINKS.instagram },
       { field: "linkedin_url", type: "text", label: "URL de LinkedIn", fallback: SOCIAL_LINKS.linkedin },

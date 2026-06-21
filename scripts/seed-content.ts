@@ -54,9 +54,12 @@ async function seed() {
     ),
   )
 
+  // Idempotente: solo inserta los campos que NO existen todavía. ignoreDuplicates
+  // deja intactas las filas ya presentes (NO pisa lo que Mariana editó en PROD).
+  // Con ignoreDuplicates, .select() devuelve solo las filas realmente insertadas.
   const { data, error } = await admin
     .from("content_blocks")
-    .upsert(rows, { onConflict: "page,section,field" })
+    .upsert(rows, { onConflict: "page,section,field", ignoreDuplicates: true })
     .select()
 
   if (error) {
@@ -64,7 +67,14 @@ async function seed() {
     process.exit(1)
   }
 
-  console.log(`✓ ${data?.length ?? 0} filas insertadas/actualizadas.\n`)
+  const inserted = data?.length ?? 0
+  console.log(`✓ ${inserted} campos nuevos insertados (los existentes quedaron intactos).\n`)
+  if (inserted > 0) {
+    for (const r of data ?? []) {
+      console.log(`  + ${r.page}/${r.section}/${r.field}`)
+    }
+    console.log("")
+  }
 
   // Limpieza de campos obsoletos (reemplazados por el patrón pre/accent).
   const OBSOLETE = [
