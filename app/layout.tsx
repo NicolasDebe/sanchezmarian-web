@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Playfair_Display, DM_Sans, DM_Mono } from "next/font/google"
 import { Toaster } from "react-hot-toast"
+import { getOgDefaults, absoluteUrl, SITE_URL } from "@/lib/seo"
 import "./globals.css"
 
 // Solo los pesos realmente usados en el sitio: 400 (texto/H1 plano), 600
@@ -39,40 +40,52 @@ const dmMono = DM_Mono({
   weight: ["400"],
 })
 
-const BASE_URL = "https://sanchezmarian.com"
+const BASE_URL = SITE_URL
 
-export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
-  title: "Marian Sánchez — Comunicación estratégica · Mendoza",
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-    ],
-    apple: [{ url: "/favicon-180.png", sizes: "180x180" }],
-  },
-  description:
-    "Comunicación estratégica y narrativas multiplataforma para negocios. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
-  openGraph: {
-    type: "website",
-    url: BASE_URL,
-    siteName: "Marian Sánchez",
-    title: "Marian Sánchez — Comunicación estratégica · Mendoza",
-    description:
-      "Comunicación estratégica y narrativas multiplataforma para negocios. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
-    locale: "es_AR",
-    images: [{ url: "/images/logo-marian-positivo.png" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Marian Sánchez — Comunicación estratégica · Mendoza",
-    description:
-      "Comunicación estratégica y narrativas multiplataforma para negocios. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina.",
-    images: ["/images/logo-marian-positivo.png"],
-  },
-  alternates: {
-    canonical: BASE_URL,
-  },
+/**
+ * Metadata por defecto del sitio. Lee los defaults OG editables
+ * (global/metadata) y arma OpenGraph + Twitter con imagen ABSOLUTA. Las
+ * páginas que definen su propio generateMetadata (vía buildMetadata) lo
+ * sobrescriben; las que no, heredan esto.
+ *
+ * Sin `title.template`: los títulos por página ya incluyen el sufijo de marca
+ * ("… — Marian Sánchez"), así que un template duplicaría el nombre.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const g = await getOgDefaults()
+  const imageUrl = absoluteUrl(g.og_default_image)
+
+  return {
+    metadataBase: new URL(BASE_URL),
+    title: g.og_default_title,
+    description: g.og_default_description,
+    icons: {
+      icon: [
+        { url: "/favicon.ico" },
+        { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      ],
+      apple: [{ url: "/favicon-180.png", sizes: "180x180" }],
+    },
+    openGraph: {
+      type: "website",
+      url: BASE_URL,
+      siteName: g.og_site_name,
+      title: g.og_default_title,
+      description: g.og_default_description,
+      locale: "es_AR",
+      images: [{ url: imageUrl, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: g.og_default_title,
+      description: g.og_default_description,
+      images: [imageUrl],
+      ...(g.twitter_handle?.trim() ? { creator: g.twitter_handle.trim(), site: g.twitter_handle.trim() } : {}),
+    },
+    alternates: {
+      canonical: BASE_URL,
+    },
+  }
 }
 
 const jsonLd = {

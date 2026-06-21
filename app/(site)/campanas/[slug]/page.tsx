@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { CampanaDetail } from "@/components/campana-detail"
 import { getCampaignBySlug } from "@/lib/campaigns"
 import { createClient } from "@/lib/supabase/server"
+import { absoluteUrl, getOgDefaults, SITE_URL } from "@/lib/seo"
 
 // Siempre fresca: lee Supabase en request time, nunca en build time,
 // y el preview de borradores depende de cookies de sesión.
@@ -19,13 +20,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!campaign || campaign.status === "draft") {
     return { title: "Campaña — Marian Sánchez" }
   }
+
+  // Primera imagen de la campaña (images viene ordenada por position ASC en
+  // getCampaignBySlug). Si no tiene fotos, cae a la imagen OG global.
+  const g = await getOgDefaults()
+  const firstImage = campaign.images?.[0]?.url
+  const imageUrl = absoluteUrl(firstImage || g.og_default_image)
+  const title = `${campaign.title} — Marian Sánchez`
+
   return {
-    title: `${campaign.title} — Marian Sánchez`,
+    title,
     description: campaign.description,
     openGraph: {
-      title: `${campaign.title} — Marian Sánchez`,
+      type: "article",
+      title,
       description: campaign.description,
-      url: `https://sanchezmarian.com/campanas/${campaign.slug}`,
+      url: `${SITE_URL}/campanas/${campaign.slug}`,
+      siteName: g.og_site_name,
+      locale: "es_AR",
+      images: [{ url: imageUrl, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: campaign.description,
+      images: [imageUrl],
+      ...(g.twitter_handle?.trim() ? { creator: g.twitter_handle.trim(), site: g.twitter_handle.trim() } : {}),
     },
   }
 }

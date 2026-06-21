@@ -21,6 +21,19 @@ export const GLOBAL_SECTIONS: SectionDef[] = [
     ],
   },
   {
+    section: "metadata",
+    title: "Compartir en redes (OpenGraph por defecto)",
+    legend:
+      "Título, descripción e imagen que aparecen al compartir CUALQUIER página del sitio en WhatsApp, Twitter/X, LinkedIn o Facebook. Cada página puede tener su propia versión desde el editor de SEO; si no la tiene, usa estos valores.",
+    fields: [
+      { field: "og_default_title", type: "text", label: "Título por defecto", fallback: "Marian Sánchez — Comunicación estratégica · Mendoza" },
+      { field: "og_default_description", type: "longtext", plain: true, label: "Descripción por defecto", fallback: "Comunicación estratégica y narrativas multiplataforma para negocios. Más de 10 años construyendo relaciones reales con periodistas en Mendoza y Argentina." },
+      { field: "og_default_image", type: "text", label: "Imagen por defecto (URL, 1200×630px)", fallback: "/og/default.jpg" },
+      { field: "og_site_name", type: "text", label: "Nombre del sitio", fallback: "Marian Sánchez" },
+      { field: "twitter_handle", type: "text", label: "Usuario de Twitter/X (opcional, ej: @marian)", fallback: "" },
+    ],
+  },
+  {
     section: "footer",
     title: "Pie de página (Footer)",
     fields: [
