@@ -4,10 +4,13 @@ import { SEO_PAGE, seoFallbacksFor } from "@/lib/seo-schema"
 import { GLOBAL_PAGE, globalFallbacksFor } from "@/lib/global-schema"
 
 /**
- * URL base del sitio. Sin `www` para que coincida con el canonical existente
- * (evita mismatch canonical ↔ OG). Las imágenes OG deben ser ABSOLUTAS.
+ * URL base del sitio. CON `www`: es el dominio canónico real (el apex
+ * sanchezmarian.com hace 307 → www.sanchezmarian.com en Vercel). Usar www
+ * evita un salto de redirect en og:url/canonical y que los scrapers de OG
+ * (FB/Twitter/LinkedIn) tengan que seguir el redirect de la imagen.
+ * Las imágenes OG deben ser ABSOLUTAS.
  */
-export const SITE_URL = "https://sanchezmarian.com"
+export const SITE_URL = "https://www.sanchezmarian.com"
 
 /** Convierte una URL relativa ("/og/x.jpg") en absoluta; deja intactas las http(s). */
 export function absoluteUrl(pathOrUrl: string): string {

@@ -9,7 +9,7 @@ import { CtaFinal } from "@/components/cta-final"
 import { getContentBatch } from "@/lib/content"
 import { fallbacksFor } from "@/lib/home-schema"
 import { fallbacksFor as serviciosFallbacks } from "@/lib/servicios-schema"
-import { buildMetadata } from "@/lib/seo"
+import { buildMetadata, SITE_URL } from "@/lib/seo"
 import type { Metadata } from "next"
 
 // Revalidación incremental: combinada con revalidatePath('/') en el save action,
@@ -17,7 +17,7 @@ import type { Metadata } from "next"
 export const revalidate = 60
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildMetadata("home", "https://sanchezmarian.com")
+  return buildMetadata("home", SITE_URL)
 }
 
 export default async function Home() {
