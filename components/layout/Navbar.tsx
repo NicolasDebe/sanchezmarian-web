@@ -5,12 +5,22 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { Menu, X, Mail, MapPin } from "lucide-react"
+import { Instagram, Linkedin } from "@/components/ui/social-icons"
 import { cn } from "@/lib/utils"
-import { NAV_ITEMS, WHATSAPP_HREF, SITE_EMAIL } from "@/lib/constants"
+import { NAV_ITEMS, WHATSAPP_HREF, SITE_EMAIL, SOCIAL_LINKS } from "@/lib/constants"
 import { Logo } from "@/components/layout/Logo"
 import { IconWhatsApp } from "@/components/ui/icon-whatsapp"
 
-export function Navbar({ content }: { content?: Record<string, string> }) {
+export function Navbar({
+  content,
+  social,
+}: {
+  content?: Record<string, string>
+  social?: { instagram: string; linkedin: string }
+}) {
+  // URLs sociales desde el CMS (global/footer); fallback a las constantes.
+  const instagramUrl = social?.instagram || SOCIAL_LINKS.instagram
+  const linkedinUrl = social?.linkedin || SOCIAL_LINKS.linkedin
   // El texto de cada link puede sobrescribirse desde el CMS (global/nav);
   // si no, usa el label canónico de NAV_ITEMS.
   const navLinks = NAV_ITEMS.map((item) => ({
@@ -71,6 +81,28 @@ export function Navbar({ content }: { content?: Record<string, string> }) {
           {/* CTA desktop. El header siempre tiene fondo --bordo, así que el botón
               va en variante --hueso/--bordo (consistente con el resto del nav). */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Presencia social mínima permanente. El nav siempre es fondo bordo,
+                así que los íconos van en --hueso/70 → opacidad plena + scale al hover. */}
+            <div className="flex items-center gap-3">
+              <a
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram de Marian Sánchez"
+                className="text-hueso/70 transition-all duration-200 hover:text-hueso hover:scale-110"
+              >
+                <Instagram size={18} strokeWidth={1.75} />
+              </a>
+              <a
+                href={linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn de Marian Sánchez"
+                className="text-hueso/70 transition-all duration-200 hover:text-hueso hover:scale-110"
+              >
+                <Linkedin size={18} strokeWidth={1.75} />
+              </a>
+            </div>
             <Link
               href="/#contacto"
               className="rounded-md bg-hueso px-5 py-2.5 font-sans text-[13px] font-medium text-bordo transition-colors hover:bg-arena"
@@ -168,6 +200,32 @@ export function Navbar({ content }: { content?: Record<string, string> }) {
                   <MapPin size={13} strokeWidth={1.5} />
                   Mendoza, Argentina
                 </p>
+              </div>
+
+              {/* Presencia social en el menú mobile, al final, tras divisoria dorada. */}
+              <div className="mt-5 flex flex-col gap-1 border-t border-dorado/30 pt-5">
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram de Marian Sánchez"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex min-h-11 items-center gap-3 font-sans text-sm text-hueso/80 transition-colors hover:text-hueso"
+                >
+                  <Instagram size={18} strokeWidth={1.5} className="shrink-0" />
+                  Instagram @marian15s
+                </a>
+                <a
+                  href={linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn de Marian Sánchez"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex min-h-11 items-center gap-3 font-sans text-sm text-hueso/80 transition-colors hover:text-hueso"
+                >
+                  <Linkedin size={18} strokeWidth={1.5} className="shrink-0" />
+                  LinkedIn Marian Sánchez
+                </a>
               </div>
             </motion.div>
           </>

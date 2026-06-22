@@ -4,10 +4,11 @@ import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import toast from "react-hot-toast"
 import { Mail, MapPin, ArrowRight, Loader, MessageCircle, FileText } from "lucide-react"
+import { Instagram, Linkedin } from "@/components/ui/social-icons"
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce, springSnappy, tapScale } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/home-schema"
 import { RichText } from "@/components/ui/RichText"
-import { SITE_EMAIL } from "@/lib/constants"
+import { SITE_EMAIL, SOCIAL_LINKS } from "@/lib/constants"
 
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
 
@@ -29,12 +30,16 @@ const INPUT_FOCUS_STYLE = {
 export function CtaFinal({
   content,
   contact,
+  social,
 }: {
   content?: Record<string, string>
   contact?: Record<string, string>
+  social?: { instagram: string; linkedin: string }
 }) {
   const c = { ...fallbacksFor("cta_final"), ...content }
   const ct = { ...fallbacksFor("contact"), ...contact }
+  const instagramUrl = social?.instagram || SOCIAL_LINKS.instagram
+  const linkedinUrl = social?.linkedin || SOCIAL_LINKS.linkedin
 
   // Accesos rápidos: solo canal + identificador + link (sin descripciones ni
   // tiempos de respuesta). Editables desde home.contact.
@@ -206,6 +211,47 @@ export function CtaFinal({
               <div className="flex items-center gap-3">
                 <MapPin size={16} strokeWidth={1.5} className="text-dorado shrink-0" />
                 <span className="font-sans text-[14px] text-hueso/75">{c.location}</span>
+              </div>
+            </motion.div>
+
+            {/* También en redes — presencia social con la identidad del CTA. */}
+            <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3">
+              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-hueso/50">
+                También en redes
+              </p>
+              <div className="flex flex-col gap-3">
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram de Marian Sánchez"
+                  className="group inline-flex min-h-11 w-fit items-center gap-2.5"
+                >
+                  <Instagram size={16} strokeWidth={1.5} className="shrink-0 text-hueso/75 transition-opacity duration-200 group-hover:opacity-100" />
+                  <span className="relative font-sans text-[14px] text-hueso/85 transition-colors duration-200 group-hover:text-hueso">
+                    @marian15s
+                    <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-hueso/70 transition-transform duration-300 group-hover:scale-x-100" />
+                  </span>
+                  <span aria-hidden="true" className="font-sans text-hueso/40 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-hueso">
+                    →
+                  </span>
+                </a>
+                <a
+                  href={linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn de Marian Sánchez"
+                  className="group inline-flex min-h-11 w-fit items-center gap-2.5"
+                >
+                  <Linkedin size={16} strokeWidth={1.5} className="shrink-0 text-hueso/75 transition-opacity duration-200 group-hover:opacity-100" />
+                  <span className="relative font-sans text-[14px] text-hueso/85 transition-colors duration-200 group-hover:text-hueso">
+                    Marian Sánchez
+                    <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-hueso/70 transition-transform duration-300 group-hover:scale-x-100" />
+                  </span>
+                  <span aria-hidden="true" className="font-sans text-hueso/40 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-hueso">
+                    →
+                  </span>
+                </a>
               </div>
             </motion.div>
           </motion.div>

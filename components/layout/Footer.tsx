@@ -1,28 +1,9 @@
 import Link from "next/link"
 import { MessageCircle, MapPin } from "lucide-react"
+import { Instagram, Linkedin } from "@/components/ui/social-icons"
 import { globalFallbacksFor } from "@/lib/global-schema"
 import { NAV_ITEMS, SOCIAL_LINKS, SITE_EMAIL, SITE_TAGLINE, WHATSAPP_HREF } from "@/lib/constants"
 import { Logo } from "@/components/layout/Logo"
-
-function IconLinkedin() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-      <rect x="2" y="9" width="4" height="12" />
-      <circle cx="4" cy="4" r="2" />
-    </svg>
-  )
-}
-
-function IconInstagram() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
-    </svg>
-  )
-}
 
 export function Footer({
   content,
@@ -43,8 +24,18 @@ export function Footer({
     href: item.href,
   }))
   const SOCIAL = [
-    { label: "LinkedIn", href: c.linkedin_url || SOCIAL_LINKS.linkedin, Icon: IconLinkedin },
-    { label: "Instagram", href: c.instagram_url || SOCIAL_LINKS.instagram, Icon: IconInstagram },
+    {
+      label: "@marian15s",
+      aria: "Instagram de Marian Sánchez",
+      href: c.instagram_url || SOCIAL_LINKS.instagram,
+      Icon: Instagram,
+    },
+    {
+      label: "Marian Sánchez",
+      aria: "LinkedIn de Marian Sánchez",
+      href: c.linkedin_url || SOCIAL_LINKS.linkedin,
+      Icon: Linkedin,
+    },
   ]
 
   return (
@@ -109,17 +100,20 @@ export function Footer({
 
           {/* Social + CTA */}
           <div className="flex flex-col gap-5">
-            <div className="flex gap-3">
-              {SOCIAL.map(({ label, href, Icon }) => (
+            <div className="flex flex-col gap-3">
+              {SOCIAL.map(({ label, aria, href, Icon }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={label}
-                  className="w-11 h-11 rounded-full border border-hueso/12 flex items-center justify-center text-hueso/45 hover:border-dorado/40 hover:text-dorado transition-colors"
+                  aria-label={aria}
+                  className="group flex min-h-11 items-center gap-3 transition-colors"
                 >
-                  <Icon />
+                  <Icon size={22} strokeWidth={1.5} className="shrink-0 text-hueso/75 transition-colors group-hover:text-hueso" />
+                  <span className="font-sans text-xs text-hueso/60 transition-colors group-hover:text-hueso">
+                    {label}
+                  </span>
                 </a>
               ))}
             </div>

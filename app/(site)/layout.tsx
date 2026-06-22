@@ -24,7 +24,13 @@ export default async function SiteLayout({
       >
         Saltar al contenido
       </a>
-      <Navbar content={global.nav} />
+      <Navbar
+        content={global.nav}
+        social={{
+          instagram: global.footer.instagram_url,
+          linkedin: global.footer.linkedin_url,
+        }}
+      />
       <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
         {children}
       </main>

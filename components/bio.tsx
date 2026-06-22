@@ -4,14 +4,24 @@ import { motion } from "motion/react"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import { Instagram, Linkedin } from "@/components/ui/social-icons"
 import { TextureCardStyled } from "@/components/ui/texture-card"
 import { fadeRight, fadeUp, fadeUpStagger, viewportOnce } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/home-schema"
 import { RichText } from "@/components/ui/RichText"
+import { SOCIAL_LINKS } from "@/lib/constants"
 
-export function Bio({ content }: { content?: Record<string, string> }) {
+export function Bio({
+  content,
+  social,
+}: {
+  content?: Record<string, string>
+  social?: { instagram: string; linkedin: string }
+}) {
   const c = { ...fallbacksFor("bio"), ...content }
   const TAGS = [c.tag_1, c.tag_2, c.tag_3, c.tag_4].filter(Boolean)
+  const instagramUrl = social?.instagram || SOCIAL_LINKS.instagram
+  const linkedinUrl = social?.linkedin || SOCIAL_LINKS.linkedin
 
   return (
     <section id="bio" className="bg-hueso-oscuro py-[120px] lg:py-[160px]">
@@ -117,6 +127,36 @@ export function Bio({ content }: { content?: Record<string, string> }) {
                 </li>
               ))}
             </motion.ul>
+
+            {/* Seguime también — bloque social más prominente del sitio. Jerarquía
+                deliberadamente menor que el título y el link "Leer más". */}
+            <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-bordo/70">
+                Encontrame en
+              </p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram de Marian Sánchez"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-bordo/30 px-5 py-3 font-sans text-[13px] text-negro-bordo transition-all duration-[250ms] ease-out hover:bg-bordo hover:text-hueso"
+                >
+                  <Instagram size={16} strokeWidth={1.75} className="shrink-0" />
+                  @marian15s
+                </a>
+                <a
+                  href={linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn de Marian Sánchez"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-bordo/30 px-5 py-3 font-sans text-[13px] text-negro-bordo transition-all duration-[250ms] ease-out hover:bg-bordo hover:text-hueso"
+                >
+                  <Linkedin size={16} strokeWidth={1.75} className="shrink-0" />
+                  Marian Sánchez
+                </a>
+              </div>
+            </motion.div>
 
             <motion.div variants={fadeUp}>
               <Link

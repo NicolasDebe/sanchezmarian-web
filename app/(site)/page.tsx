@@ -9,6 +9,7 @@ import { CtaFinal } from "@/components/cta-final"
 import { getContentBatch } from "@/lib/content"
 import { fallbacksFor } from "@/lib/home-schema"
 import { fallbacksFor as serviciosFallbacks } from "@/lib/servicios-schema"
+import { globalFallbacksFor } from "@/lib/global-schema"
 import { buildMetadata, SITE_URL } from "@/lib/seo"
 import type { Metadata } from "next"
 
@@ -33,6 +34,7 @@ export default async function Home() {
     ctaFinal,
     serviciosHeader,
     contact,
+    footer,
     svcMentoria,
     svcPrensa,
     svcRrpp,
@@ -44,10 +46,17 @@ export default async function Home() {
     getContentBatch("home", "cta_final", fallbacksFor("cta_final")),
     getContentBatch("home", "servicios", fallbacksFor("servicios")),
     getContentBatch("home", "contact", fallbacksFor("contact")),
+    // Redes sociales editables desde el CMS (global/footer); única fuente de URLs.
+    getContentBatch("global", "footer", globalFallbacksFor("footer")),
     getContentBatch("servicios", "servicio_02", serviciosFallbacks("servicio_02")),
     getContentBatch("servicios", "servicio_01", serviciosFallbacks("servicio_01")),
     getContentBatch("servicios", "servicio_03", serviciosFallbacks("servicio_03")),
   ])
+
+  const social = {
+    instagram: footer.instagram_url,
+    linkedin: footer.linkedin_url,
+  }
 
   return (
     <>
@@ -61,9 +70,9 @@ export default async function Home() {
         prensa={svcPrensa}
         rrpp={svcRrpp}
       />
-      <Bio content={bio} />
+      <Bio content={bio} social={social} />
       <EnMedias />
-      <CtaFinal content={ctaFinal} contact={contact} />
+      <CtaFinal content={ctaFinal} contact={contact} social={social} />
     </>
   )
 }

@@ -17,7 +17,7 @@ export const WHATSAPP_HREF = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIC
 )}`
 
 export const SOCIAL_LINKS = {
-  linkedin: "https://www.linkedin.com/in/marian-sánchez/",
+  linkedin: "https://www.linkedin.com/in/marians%C3%A1nchez/",
   instagram: "https://www.instagram.com/marian15s/",
 } as const
 
