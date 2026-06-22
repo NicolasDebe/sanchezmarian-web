@@ -220,6 +220,51 @@ body::after {
   box-shadow: 0 0 0 3px rgba(102, 0, 31, 0.08);
 }
 
+/* ── NewsletterCard ── */
+.newsletter-input::placeholder {
+  color: rgba(74, 48, 64, 0.45);
+}
+.newsletter-input:focus {
+  border-color: var(--color-bordo) !important;
+  box-shadow: 0 0 0 4px rgba(102, 0, 31, 0.08);
+}
+.newsletter-btn:hover:not(:disabled) {
+  background: var(--color-bordo-oscuro) !important;
+  transform: scale(1.02);
+}
+.newsletter-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.newsletter-btn .nl-arrow {
+  transition: transform 0.2s ease;
+}
+.newsletter-btn:hover:not(:disabled) .nl-arrow {
+  transform: translateX(4px);
+}
+@keyframes newsletter-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .newsletter-btn:hover:not(:disabled),
+  .newsletter-btn:active:not(:disabled) {
+    transform: none;
+  }
+  .newsletter-btn:hover:not(:disabled) .nl-arrow {
+    transform: none;
+  }
+  .nl-asterisk {
+    animation: none !important;
+  }
+}
+
+/* ── Admin — tabla de suscriptores ── */
+.suscriptor-row {
+  transition: background 0.15s ease;
+}
+.suscriptor-row:hover {
+  background: rgba(240, 232, 216, 0.4);
+}
+
 /* ── Admin — cards de fotos (PhotoManager) ── */
 @keyframes photo-card-in {
   from { opacity: 0; transform: scale(0.96); }

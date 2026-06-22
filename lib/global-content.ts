@@ -15,3 +15,11 @@ export async function getGlobalContent(): Promise<{
   ])
   return { nav, footer }
 }
+
+/**
+ * Copy del NewsletterCard (page="global", section="newsletter"). Editable desde
+ * /admin/edit/global. Resiliente: trae los fallbacks del esquema si Supabase falla.
+ */
+export async function getNewsletterContent(): Promise<Record<string, string>> {
+  return getContentBatch(GLOBAL_PAGE, "newsletter", globalFallbacksFor("newsletter"))
+}

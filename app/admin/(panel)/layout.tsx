@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Mail } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { signOut } from "@/app/admin/actions"
 
@@ -11,6 +12,7 @@ const SECTIONS = [
   { label: "Casos de éxito", href: "/admin/edit/casos-de-exito", enabled: true },
   { label: "Clippings", href: "/admin/clippings", enabled: true },
   { label: "Campañas", href: "/admin/campanas", enabled: true },
+  { label: "Suscriptores", href: "/admin/suscriptores", enabled: true, icon: Mail },
   { label: "Contacto", href: "/admin/edit/contacto", enabled: true },
   { label: "Menú y footer", href: "/admin/edit/global", enabled: true },
   { label: "SEO", href: "/admin/edit/seo", enabled: true },
@@ -75,9 +77,10 @@ export default async function PanelLayout({
                 <li key={s.label}>
                   <Link
                     href={s.href}
-                    className="flex items-center justify-between rounded-lg px-3 py-2 font-sans text-sm transition-colors hover:bg-[rgba(102,0,31,0.06)]"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 font-sans text-sm transition-colors hover:bg-[rgba(102,0,31,0.06)]"
                     style={{ color: "var(--color-negro-bordo)" }}
                   >
+                    {s.icon && <s.icon size={15} strokeWidth={1.75} style={{ color: "var(--color-bordo)" }} />}
                     {s.label}
                   </Link>
                 </li>

@@ -44,3 +44,5 @@ next-env.d.ts
 
 # capturas locales de QA (scripts/shots-features.ts)
 /shots/
+
+.vercel

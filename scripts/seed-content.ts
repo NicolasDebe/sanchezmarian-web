@@ -86,6 +86,11 @@ async function seed() {
     { page: "home", section: "hero", field: "cta_secondary" },
     // CTA final: link de WhatsApp redundante eliminado del diseño.
     { page: "home", section: "cta_final", field: "whatsapp_text" },
+    // Newsletter: campos de la primera versión, reemplazados por el patrón
+    // pre/accent + nombre/email + success_title/message.
+    { page: "global", section: "newsletter", field: "title" },
+    { page: "global", section: "newsletter", field: "input_placeholder" },
+    { page: "global", section: "newsletter", field: "success_default" },
   ]
   for (const o of OBSOLETE) {
     await admin

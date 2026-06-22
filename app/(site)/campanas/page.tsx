@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { CampanasContent } from "@/components/campanas-content"
 import { MobileCtaBar } from "@/components/ui/mobile-cta-bar"
+import { NewsletterSection } from "@/components/newsletter-section"
 import { getPublicCampaigns } from "@/lib/campaigns"
 import { buildMetadata, SITE_URL } from "@/lib/seo"
 
@@ -18,6 +19,7 @@ export default async function CampanasPage() {
   return (
     <>
       <CampanasContent campaigns={campaigns} />
+      <NewsletterSection />
       <MobileCtaBar label="Hablemos" />
     </>
   )

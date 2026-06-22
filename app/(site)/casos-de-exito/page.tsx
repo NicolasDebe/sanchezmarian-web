@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { CasosClient } from "./casos-client"
 import { ScrollProgress } from "@/components/ui/scroll-progress"
+import { NewsletterSection } from "@/components/newsletter-section"
 import { getPageContent } from "@/lib/content"
 import { CASOS_SECTIONS } from "@/lib/casos-schema"
 import { getClientsWithClippings } from "@/lib/clippings"
@@ -22,6 +23,7 @@ export default async function CasosDeExitoPage() {
     <>
       <ScrollProgress />
       <CasosClient content={content} clientsData={clientsData} />
+      <NewsletterSection />
     </>
   )
 }
