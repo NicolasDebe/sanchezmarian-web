@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { CampanaDetail } from "@/components/campana-detail"
 import { getCampaignBySlug } from "@/lib/campaigns"
 import { createClient } from "@/lib/supabase/server"
-import { absoluteUrl, getOgDefaults, SITE_URL } from "@/lib/seo"
+import { ogImageUrl, getOgDefaults, SITE_URL } from "@/lib/seo"
 
 // Siempre fresca: lee Supabase en request time, nunca en build time,
 // y el preview de borradores depende de cookies de sesión.
@@ -23,9 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Primera imagen de la campaña (images viene ordenada por position ASC en
   // getCampaignBySlug). Si no tiene fotos, cae a la imagen OG global.
+  // ogImageUrl pasa la foto de Supabase Storage por el transform endpoint
+  // (1200×630, JPEG, <600KB) para que WhatsApp no la descarte por peso.
   const g = await getOgDefaults()
   const firstImage = campaign.images?.[0]?.url
-  const imageUrl = absoluteUrl(firstImage || g.og_default_image)
+  const imageUrl = ogImageUrl(firstImage || g.og_default_image)
   const title = `${campaign.title} — Marian Sánchez`
 
   return {

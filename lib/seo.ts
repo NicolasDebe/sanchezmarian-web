@@ -18,6 +18,28 @@ export function absoluteUrl(pathOrUrl: string): string {
   return pathOrUrl.startsWith("http") ? pathOrUrl : `${SITE_URL}${pathOrUrl.startsWith("/") ? "" : "/"}${pathOrUrl}`
 }
 
+const STORAGE_PUBLIC_PREFIX = "/storage/v1/object/public/"
+
+/**
+ * Prepara una imagen para compartir (og:image). Si es una URL pública de
+ * Supabase Storage, la pasa por el endpoint de transformación de Supabase
+ * Image (render/image) para servirla a 1200×630, recorte centrado y calidad
+ * 80. CLAVE para WhatsApp: el original (subido como .webp por el PhotoManager)
+ * puede pesar >1MB, y WhatsApp descarta sin avisar cualquier og:image >600KB.
+ * La versión transformada ronda los ~180KB en JPEG (formato que WhatsApp sí
+ * muestra). Cualquier otra URL (p. ej. /og/default.jpg local) se devuelve
+ * absoluta tal cual.
+ */
+export function ogImageUrl(pathOrUrl: string): string {
+  const url = absoluteUrl(pathOrUrl)
+  if (!url) return ""
+  if (!url.includes(STORAGE_PUBLIC_PREFIX)) return url
+
+  const transformed = url.replace(STORAGE_PUBLIC_PREFIX, "/storage/v1/render/image/public/")
+  const sep = transformed.includes("?") ? "&" : "?"
+  return `${transformed}${sep}width=1200&height=630&resize=cover&quality=80`
+}
+
 /** Defaults OG globales (global/metadata), editables desde /admin/edit/global. */
 export async function getOgDefaults() {
   return getContentBatch(GLOBAL_PAGE, "metadata", globalFallbacksFor("metadata"))
@@ -42,7 +64,7 @@ export async function buildMetadata(
     getOgDefaults(),
   ])
 
-  const imageUrl = absoluteUrl(c.og_image?.trim() || g.og_default_image)
+  const imageUrl = ogImageUrl(c.og_image?.trim() || g.og_default_image)
   const handle = g.twitter_handle?.trim()
 
   return {
