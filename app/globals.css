@@ -455,21 +455,6 @@ body::after {
 .rich-inline > :first-child { margin-top: 0; }
 .rich-inline > :last-child { margin-bottom: 0; }
 
-/* ── Hero del home (layout editorial split) ──
-   El subtitle admite varios párrafos: separación clara entre ellos y el
-   <strong> en negro-bordó para que resalte sobre el texto gris. */
-.hero-subtitle p {
-  margin: 0;
-}
-.hero-subtitle p + p {
-  margin-top: 16px;
-}
-.hero-subtitle strong,
-.hero-subtitle b {
-  font-weight: 600;
-  color: var(--color-negro-bordo);
-}
-
 /* ── RichTextEditor (admin) ── */
 
 .rte-wrapper {
