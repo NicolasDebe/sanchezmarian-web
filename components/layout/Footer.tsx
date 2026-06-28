@@ -56,7 +56,15 @@ export function Footer({
           {/* Logo + tagline */}
           <div className="flex flex-col gap-3">
             <Logo variant="negative" height={38} />
-            <p className="font-sans text-xs text-hueso/45 leading-relaxed max-w-[200px]">
+            <p
+              className="font-sans text-hueso/55"
+              style={{
+                fontSize: 12,
+                lineHeight: 1.65,
+                maxWidth: 340,
+                marginTop: 4,
+              }}
+            >
               {tagline}
             </p>
             <a
