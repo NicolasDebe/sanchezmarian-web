@@ -4,16 +4,33 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase"
+import { htmlToPlainText } from "@/lib/rich-text"
+import { PAGE_PATHS } from "@/lib/admin-paths"
+import type { FieldDef, SectionDef } from "@/lib/content-schema"
+import { HOME_SECTIONS } from "@/lib/home-schema"
+import { SERVICIOS_SECTIONS } from "@/lib/servicios-schema"
+import { MIS_VALORES_SECTIONS } from "@/lib/mis-valores-schema"
+import { CASOS_SECTIONS } from "@/lib/casos-schema"
+import { CONTACTO_SECTIONS } from "@/lib/contacto-schema"
+import { GLOBAL_SECTIONS } from "@/lib/global-schema"
+import { SEO_SECTIONS } from "@/lib/seo-schema"
 
 const PAGE_DEFAULT = "home"
 
-/** Ruta pública asociada a cada `page` de content_blocks (para revalidar). */
-const PAGE_PATHS: Record<string, string> = {
-  home: "/",
-  servicios: "/servicios",
-  mis_valores: "/mis-valores",
-  casos_de_exito: "/casos-de-exito",
-  contacto: "/contacto",
+/** Esquema editable por cada `page`. Sirve para validar límites en el server. */
+const SCHEMAS: Record<string, SectionDef[]> = {
+  home: HOME_SECTIONS,
+  servicios: SERVICIOS_SECTIONS,
+  mis_valores: MIS_VALORES_SECTIONS,
+  casos_de_exito: CASOS_SECTIONS,
+  contacto: CONTACTO_SECTIONS,
+  global: GLOBAL_SECTIONS,
+  seo: SEO_SECTIONS,
+}
+
+/** ¿Este campo usa texto enriquecido (longtext con HTML)? */
+function isRichField(f: FieldDef): boolean {
+  return f.type === "longtext" && !f.plain
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -90,6 +107,27 @@ export async function saveContentSection(
     userId = user.id
   } catch {
     return { error: "No pudimos verificar tu sesión. Intentá de nuevo." }
+  }
+
+  // 1.5 Validación de límites (defensa final). Si la page no tiene schema,
+  // dejamos pasar (retrocompat con páginas no migradas a maxChars).
+  const schema = SCHEMAS[page]
+  if (schema) {
+    const sectionDef = schema.find((s) => s.section === section)
+    if (sectionDef) {
+      for (const [field, { value }] of Object.entries(values)) {
+        const def = sectionDef.fields.find((f) => f.field === field)
+        if (!def || def.maxChars == null) continue
+        const len = isRichField(def)
+          ? htmlToPlainText(value ?? "").length
+          : (value ?? "").length
+        if (len > def.maxChars) {
+          return {
+            error: `El campo «${def.label}» supera el máximo (${len}/${def.maxChars}). Acortalo y guardá de nuevo.`,
+          }
+        }
+      }
+    }
   }
 
   try {

@@ -17,6 +17,10 @@ export interface EditorField {
   plain?: boolean
   /** Si está presente, el campo se edita con un <select> (elección cerrada). */
   options?: SelectOption[]
+  /** Límite duro de caracteres (texto visible si es rich). */
+  maxChars?: number
+  /** Ayuda mostrada bajo el label. */
+  help?: string
 }
 
 /** ¿Este campo usa el editor enriquecido? */
@@ -73,23 +77,31 @@ export function ContentEditor({
     }))
   }
 
-  function maxFor(type: FieldType) {
-    return MAX[type]
+  // El límite del campo prioriza f.maxChars; si no hay, cae al MAX por tipo.
+  function maxFor(f: EditorField) {
+    return f.maxChars ?? MAX[f.type]
+  }
+
+  /** Longitud visible del valor actual del campo (texto plano en rich). */
+  function lenOf(sec: EditorSection, f: EditorField) {
+    const raw = values[sec.section][f.field] ?? ""
+    return isRich(f) ? htmlToPlainText(raw).length : raw.length
+  }
+
+  /** Campos de la sección que superan su límite. */
+  function overFields(sec: EditorSection) {
+    return sec.fields.filter((f) => lenOf(sec, f) > maxFor(f))
   }
 
   async function handleSave(sec: EditorSection) {
-    for (const f of sec.fields) {
-      const raw = values[sec.section][f.field] ?? ""
-      // En campos rich el límite cuenta el texto visible, no los tags HTML.
-      const v = isRich(f) ? htmlToPlainText(raw) : raw
-      if (v.length > maxFor(f.type)) {
-        setStatus((s) => ({ ...s, [sec.section]: "error" }))
-        setMessages((m) => ({
-          ...m,
-          [sec.section]: `El campo "${f.label}" supera el máximo de ${maxFor(f.type)} caracteres.`,
-        }))
-        return
-      }
+    const over = overFields(sec)
+    if (over.length > 0) {
+      setStatus((s) => ({ ...s, [sec.section]: "error" }))
+      setMessages((m) => ({
+        ...m,
+        [sec.section]: `Pasaste el límite en ${over.length} campo(s). Acortá el texto y volvé a guardar.`,
+      }))
+      return
     }
 
     const empties = sec.fields.filter(
@@ -180,10 +192,17 @@ export function ContentEditor({
                 <div className="grid grid-cols-1 gap-5">
                   {sec.fields.map((f) => {
                     const v = values[sec.section][f.field] ?? ""
-                    const max = maxFor(f.type)
+                    const max = maxFor(f)
                     // En rich el contador mide el texto visible, no los tags.
                     const len = isRich(f) ? htmlToPlainText(v).length : v.length
                     const over = len > max
+                    // Resalta en bordó el control cuando se pasa del límite.
+                    const overStyle = over
+                      ? {
+                          boxShadow: "0 0 0 1px var(--color-bordo)",
+                          borderColor: "var(--color-bordo)",
+                        }
+                      : undefined
                     return (
                       <div key={f.field} className="flex flex-col gap-1.5">
                         <label
@@ -193,12 +212,26 @@ export function ContentEditor({
                         >
                           {f.label}
                         </label>
+                        {f.help && (
+                          <p
+                            style={{
+                              fontFamily: "var(--font-dm-sans), sans-serif",
+                              fontSize: 12,
+                              color: "rgba(74,48,64,0.7)",
+                              margin: "0 0 6px",
+                              lineHeight: 1.5,
+                            }}
+                          >
+                            {f.help}
+                          </p>
+                        )}
                         {f.options ? (
                           <select
                             id={`${sec.section}-${f.field}`}
                             value={v}
                             onChange={(e) => setField(sec.section, f.field, e.target.value)}
                             className="admin-input"
+                            style={overStyle}
                           >
                             {f.options.map((opt) => (
                               <option key={opt.value} value={opt.value}>
@@ -207,10 +240,12 @@ export function ContentEditor({
                             ))}
                           </select>
                         ) : isRich(f) ? (
-                          <RichTextEditor
-                            value={v}
-                            onChange={(html) => setField(sec.section, f.field, html)}
-                          />
+                          <div style={overStyle ? { ...overStyle, borderRadius: 10 } : undefined}>
+                            <RichTextEditor
+                              value={v}
+                              onChange={(html) => setField(sec.section, f.field, html)}
+                            />
+                          </div>
                         ) : f.type === "longtext" ? (
                           <textarea
                             id={`${sec.section}-${f.field}`}
@@ -218,6 +253,7 @@ export function ContentEditor({
                             value={v}
                             onChange={(e) => setField(sec.section, f.field, e.target.value)}
                             className="admin-textarea"
+                            style={overStyle}
                           />
                         ) : (
                           <input
@@ -226,6 +262,7 @@ export function ContentEditor({
                             value={v}
                             onChange={(e) => setField(sec.section, f.field, e.target.value)}
                             className="admin-input"
+                            style={overStyle}
                           />
                         )}
                         <span
@@ -254,23 +291,30 @@ export function ContentEditor({
                   </p>
                 )}
 
-                <button
-                  type="button"
-                  onClick={() => handleSave(sec)}
-                  disabled={st === "loading"}
-                  className="mt-4 rounded-lg px-5 py-2.5 font-sans text-sm font-semibold transition-opacity disabled:opacity-60"
-                  style={{
-                    backgroundColor:
-                      st === "success" ? "var(--color-dorado)" : "var(--color-bordo)",
-                    color: st === "success" ? "var(--color-negro-bordo)" : "var(--color-hueso)",
-                  }}
-                >
-                  {st === "loading"
-                    ? "Guardando…"
-                    : st === "success"
-                      ? "✓ Guardado"
-                      : "Guardar cambios"}
-                </button>
+                {(() => {
+                  const hasOver = overFields(sec).length > 0
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => handleSave(sec)}
+                      disabled={st === "loading" || hasOver}
+                      className="mt-4 rounded-lg px-5 py-2.5 font-sans text-sm font-semibold transition-opacity disabled:opacity-60"
+                      style={{
+                        backgroundColor:
+                          st === "success" ? "var(--color-dorado)" : "var(--color-bordo)",
+                        color: st === "success" ? "var(--color-negro-bordo)" : "var(--color-hueso)",
+                      }}
+                    >
+                      {hasOver
+                        ? "Ajustá los campos en rojo"
+                        : st === "loading"
+                          ? "Guardando…"
+                          : st === "success"
+                            ? "✓ Guardado"
+                            : "Guardar cambios"}
+                    </button>
+                  )
+                })()}
               </div>
             )}
           </section>

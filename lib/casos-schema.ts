@@ -15,15 +15,16 @@ export const CASOS_SECTIONS: SectionDef[] = [
     legend:
       "La segunda línea del título (destacada) se muestra en cursiva bordó automáticamente.",
     fields: [
-      { field: "eyebrow", type: "text", label: "Eyebrow (línea superior)", fallback: "Casos de éxito" },
-      { field: "h1_pre", type: "text", label: "Título — primera línea", fallback: "El impacto de una buena estrategia" },
-      { field: "h1_accent", type: "text", label: "Título — segunda línea (destacada, cursiva)", fallback: "se mide en presencia real." },
+      { field: "eyebrow", type: "text", label: "Eyebrow (línea superior)", fallback: "Casos de éxito", maxChars: 30 },
+      { field: "h1_pre", type: "text", label: "Título — primera línea", fallback: "El impacto de una buena estrategia", maxChars: 80 },
+      { field: "h1_accent", type: "text", label: "Título — segunda línea (destacada, cursiva)", fallback: "se mide en presencia real.", maxChars: 80 },
       {
         field: "description",
         type: "longtext",
         label: "Descripción",
         fallback:
           "Una selección de gestiones de prensa realizadas para marcas, empresas y profesionales que confiaron en la estrategia. Cada caso cuenta una historia.",
+        maxChars: 400,
       },
     ],
   },
@@ -31,14 +32,14 @@ export const CASOS_SECTIONS: SectionDef[] = [
     section: "stats",
     title: "Stats (estadísticas)",
     fields: [
-      { field: "stat_1_number", type: "text", label: "Estadística 1 — Número", fallback: "100+" },
-      { field: "stat_1_label", type: "text", label: "Estadística 1 — Label", fallback: "coberturas verificadas" },
-      { field: "stat_2_number", type: "text", label: "Estadística 2 — Número", fallback: "30+" },
-      { field: "stat_2_label", type: "text", label: "Estadística 2 — Label", fallback: "medios distintos" },
-      { field: "stat_3_number", type: "text", label: "Estadística 3 — Número", fallback: "5" },
-      { field: "stat_3_label", type: "text", label: "Estadística 3 — Label", fallback: "formatos cubiertos" },
-      { field: "stat_4_number", type: "text", label: "Estadística 4 — Número", fallback: "15" },
-      { field: "stat_4_label", type: "text", label: "Estadística 4 — Label", fallback: "marcas activas" },
+      { field: "stat_1_number", type: "text", label: "Estadística 1 — Número", fallback: "100+", maxChars: 8 },
+      { field: "stat_1_label", type: "text", label: "Estadística 1 — Label", fallback: "coberturas verificadas", maxChars: 36 },
+      { field: "stat_2_number", type: "text", label: "Estadística 2 — Número", fallback: "30+", maxChars: 8 },
+      { field: "stat_2_label", type: "text", label: "Estadística 2 — Label", fallback: "medios distintos", maxChars: 36 },
+      { field: "stat_3_number", type: "text", label: "Estadística 3 — Número", fallback: "5", maxChars: 8 },
+      { field: "stat_3_label", type: "text", label: "Estadística 3 — Label", fallback: "formatos cubiertos", maxChars: 36 },
+      { field: "stat_4_number", type: "text", label: "Estadística 4 — Número", fallback: "15", maxChars: 8 },
+      { field: "stat_4_label", type: "text", label: "Estadística 4 — Label", fallback: "marcas activas", maxChars: 36 },
     ],
   },
 ]

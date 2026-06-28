@@ -40,6 +40,10 @@ export interface FieldDef {
    * como "qué servicio está destacado".
    */
   options?: SelectOption[]
+  /** Límite duro de caracteres (texto visible si es rich). */
+  maxChars?: number
+  /** Ayuda mostrada bajo el label en el admin. */
+  help?: string
 }
 
 export interface SectionDef {

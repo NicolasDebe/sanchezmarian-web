@@ -37,6 +37,8 @@ export async function loadEditorSections(
       label: f.label,
       plain: f.plain,
       options: f.options,
+      maxChars: f.maxChars,
+      help: f.help,
       value: dbMap.get(`${s.section}.${f.field}`) ?? f.fallback,
     })),
   }))

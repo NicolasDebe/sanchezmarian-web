@@ -1,5 +1,6 @@
 import { loadEditorSections } from "@/lib/admin-content"
 import { ContentEditor } from "@/components/admin/content-editor"
+import { PAGE_PATHS } from "@/lib/admin-paths"
 import type { SectionDef } from "@/lib/content-schema"
 
 /**
@@ -19,6 +20,7 @@ export async function AdminEditPage({
   intro?: string
 }) {
   const { sections, error } = await loadEditorSections(page, schema)
+  const previewPath = PAGE_PATHS[page]
 
   if (error || !sections) {
     return (
@@ -42,12 +44,32 @@ export async function AdminEditPage({
       >
         Editar contenido
       </p>
-      <h1
-        className="mt-2 mb-2 font-playfair font-bold"
-        style={{ fontSize: "2.25rem", color: "var(--color-negro-bordo)" }}
-      >
-        {title}
-      </h1>
+      <div className="mt-2 mb-2 flex flex-wrap items-baseline">
+        <h1
+          className="font-playfair font-bold"
+          style={{ fontSize: "2.25rem", color: "var(--color-negro-bordo)" }}
+        >
+          {title}
+        </h1>
+        {previewPath && (
+          <a
+            href={previewPath}
+            target="_blank"
+            rel="noopener"
+            className="hover:underline"
+            style={{
+              fontFamily: "var(--font-dm-mono), monospace",
+              fontSize: 11,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--color-bordo)",
+              marginLeft: 16,
+            }}
+          >
+            Ver en el sitio →
+          </a>
+        )}
+      </div>
       {intro && (
         <p
           className="mb-6 font-sans text-sm leading-relaxed"
