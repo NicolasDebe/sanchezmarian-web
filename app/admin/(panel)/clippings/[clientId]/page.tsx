@@ -2,7 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { createAdminClient } from "@/lib/supabase"
-import type { DbClipping } from "@/lib/clippings"
+import { SELECT_WITH_AUDIO, SELECT_LEGACY, type DbClipping } from "@/lib/clippings"
 import { ClippingsManager } from "./clippings-manager"
 
 export const dynamic = "force-dynamic"
@@ -29,17 +29,37 @@ export default async function ClientClippingsPage({
     if (!clientRow) notFound()
     client = clientRow
 
-    const [clippingsRes, mediumsRes] = await Promise.all([
-      admin
+    // Las columnas de audio pueden no existir aún (migración manual): reintento
+    // legacy sin ellas para que el admin no se rompa antes de correr el SQL.
+    const fetchClippings = async () => {
+      const withAudio = await admin
         .from("clippings")
-        .select("id, client_id, medium, title, published_at, scope, format, url, order_position")
+        .select(SELECT_WITH_AUDIO)
         .eq("client_id", clientRow.id)
         .order("published_at", { ascending: false })
-        .order("order_position", { ascending: false }),
+        .order("order_position", { ascending: false })
+      if (!withAudio.error) return withAudio
+      return admin
+        .from("clippings")
+        .select(SELECT_LEGACY)
+        .eq("client_id", clientRow.id)
+        .order("published_at", { ascending: false })
+        .order("order_position", { ascending: false })
+    }
+
+    const [clippingsRes, mediumsRes] = await Promise.all([
+      fetchClippings(),
       admin.from("clippings").select("medium"),
     ])
 
-    clippings = (clippingsRes.data ?? []) as DbClipping[]
+    clippings = ((clippingsRes.data ?? []) as Record<string, unknown>[]).map(
+      (raw) =>
+        ({
+          audio_url: null,
+          audio_duration_seconds: null,
+          ...raw,
+        }) as unknown as DbClipping,
+    )
     mediums = Array.from(
       new Set((mediumsRes.data ?? []).map((r) => r.medium as string)),
     ).sort((a, b) => a.localeCompare(b, "es"))
@@ -102,6 +122,7 @@ export default async function ClientClippingsPage({
 
       <ClippingsManager
         clientId={client!.id}
+        clientSlug={client!.slug}
         clippings={clippings}
         mediums={mediums}
       />

@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Pencil, Trash2, Plus, Sparkles, X } from "lucide-react"
+import { Pencil, Trash2, Plus, Sparkles, X, Headphones, UploadCloud, Loader2 } from "lucide-react"
 import {
   SCOPES,
   FORMATS,
@@ -11,11 +11,16 @@ import {
   type ClippingScope,
   type ClippingFormat,
 } from "@/lib/clippings"
+import { audioFileError, AUDIO_ACCEPT_ATTR, audioFileLabel } from "@/lib/audio"
+import { AudioPlayer } from "@/components/audio-player"
 import {
   createClipping,
   updateClipping,
   deleteClipping,
   extractMetadataFromURL,
+  uploadClippingAudio,
+  removeClippingAudio,
+  updateAudioDuration,
   type ClippingInput,
 } from "../actions"
 
@@ -33,6 +38,8 @@ interface FormState {
   published_at: string
   scope: ClippingScope | ""
   format: ClippingFormat
+  audio_url: string | null
+  audio_duration_seconds: number | null
 }
 
 const EMPTY_FORM: FormState = {
@@ -42,6 +49,8 @@ const EMPTY_FORM: FormState = {
   published_at: "",
   scope: "",
   format: "Digital",
+  audio_url: null,
+  audio_duration_seconds: null,
 }
 
 function isHttpUrl(value: string): boolean {
@@ -62,14 +71,224 @@ function dateWarning(iso: string): string | null {
   return null
 }
 
+/** Calcula la duración (segundos) de un audio en el browser, sin bloquear. */
+function probeDuration(url: string): Promise<number | null> {
+  return new Promise((resolve) => {
+    try {
+      const a = new Audio()
+      a.preload = "metadata"
+      const done = (val: number | null) => {
+        a.removeEventListener("loadedmetadata", onMeta)
+        a.removeEventListener("error", onErr)
+        resolve(val)
+      }
+      const onMeta = () => done(Number.isFinite(a.duration) && a.duration > 0 ? a.duration : null)
+      const onErr = () => done(null)
+      a.addEventListener("loadedmetadata", onMeta)
+      a.addEventListener("error", onErr)
+      a.src = url
+      // Salvaguarda: si nunca dispara, resolvemos en 8s.
+      setTimeout(() => done(null), 8000)
+    } catch {
+      resolve(null)
+    }
+  })
+}
+
+// ─── Campo de audio (upload + player + eliminar) ──────────────────────────────
+
+function AudioField({
+  clientSlug,
+  clippingId,
+  audioUrl,
+  durationSeconds,
+  onChange,
+}: {
+  clientSlug: string
+  /** id del clipping si ya existe (modo edición); null en alta. */
+  clippingId: string | null
+  audioUrl: string | null
+  durationSeconds: number | null
+  onChange: (next: { audio_url: string | null; audio_duration_seconds: number | null }) => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [dragOver, setDragOver] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [removing, setRemoving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleFile(file: File) {
+    setError(null)
+    // Validación en cliente ANTES de subir (misma lógica que el servidor).
+    const invalid = audioFileError({ name: file.name, type: file.type, size: file.size })
+    if (invalid) {
+      setError(invalid)
+      return
+    }
+
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.set("audio", file)
+      fd.set("client_slug", clientSlug)
+      if (clippingId) fd.set("clipping_id", clippingId)
+
+      const result = await uploadClippingAudio(fd)
+      if (!result.success) {
+        setError(result.error)
+        return
+      }
+
+      onChange({ audio_url: result.url, audio_duration_seconds: null })
+
+      // Duración en el browser (no bloquea: el audio ya quedó asociado).
+      const dur = await probeDuration(result.url)
+      if (dur != null) {
+        onChange({ audio_url: result.url, audio_duration_seconds: Math.round(dur) })
+        if (clippingId) {
+          // En edición persistimos la duración aunque no se guarde el form.
+          void updateAudioDuration(clippingId, dur)
+        }
+      }
+    } catch {
+      setError("No se pudo subir el audio. Probá de nuevo.")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleRemove() {
+    if (!audioUrl) return
+    const ok = window.confirm("¿Eliminar el audio de este clipping?")
+    if (!ok) return
+    setRemoving(true)
+    setError(null)
+    try {
+      const result = await removeClippingAudio(clippingId, audioUrl)
+      if (!result.success) {
+        setError(result.error)
+        return
+      }
+      onChange({ audio_url: null, audio_duration_seconds: null })
+    } catch {
+      setError("No se pudo eliminar el audio. Probá de nuevo.")
+    } finally {
+      setRemoving(false)
+    }
+  }
+
+  // ── Ya hay audio: player compacto + eliminar ──
+  if (audioUrl) {
+    return (
+      <div className="flex flex-col gap-2.5">
+        <div
+          className="flex items-center justify-between gap-2 font-mono"
+          style={{ fontSize: 11, color: "var(--color-gris-bordo)" }}
+        >
+          <span className="flex items-center gap-1.5 truncate">
+            <Headphones size={12} style={{ color: "var(--color-bordo)", flexShrink: 0 }} />
+            <span className="truncate" title={audioFileLabel(audioUrl)}>
+              {audioFileLabel(audioUrl)}
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={handleRemove}
+            disabled={removing}
+            className="flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 font-sans text-xs font-semibold transition-opacity hover:opacity-85 disabled:opacity-60"
+            style={{ borderColor: "var(--color-bordo)", color: "var(--color-bordo)" }}
+          >
+            <Trash2 size={13} />
+            {removing ? "Eliminando…" : "Eliminar audio"}
+          </button>
+        </div>
+        <AudioPlayer src={audioUrl} duration={durationSeconds} variant="compact" />
+        {error && (
+          <p className="font-sans text-xs" style={{ color: "var(--color-bordo)" }}>
+            {error}
+          </p>
+        )}
+      </div>
+    )
+  }
+
+  // ── Sin audio: dropzone ──
+  return (
+    <div className="flex flex-col gap-1.5">
+      <button
+        type="button"
+        onClick={() => !uploading && inputRef.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault()
+          if (!uploading) setDragOver(true)
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setDragOver(false)
+          if (uploading) return
+          const file = e.dataTransfer.files?.[0]
+          if (file) void handleFile(file)
+        }}
+        disabled={uploading}
+        className="flex w-full flex-col items-center justify-center gap-2 text-center transition-colors"
+        style={{
+          border: `2px dashed ${dragOver ? "rgba(102,0,31,0.6)" : "rgba(102,0,31,0.3)"}`,
+          borderRadius: 12,
+          padding: 32,
+          background: dragOver ? "rgba(240,232,216,0.5)" : "transparent",
+          cursor: uploading ? "default" : "pointer",
+        }}
+      >
+        {uploading ? (
+          <>
+            <Loader2 size={22} className="animate-spin" style={{ color: "var(--color-bordo)" }} />
+            <span className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
+              Subiendo…
+            </span>
+          </>
+        ) : (
+          <>
+            <UploadCloud size={24} style={{ color: "var(--color-bordo)" }} />
+            <span className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
+              Arrastrá un archivo de audio acá o hacé click para elegir
+            </span>
+            <span className="font-mono" style={{ fontSize: 11, color: "var(--color-gris-bordo)" }}>
+              MP3, M4A, WAV u OGG · Máximo 30 MB
+            </span>
+          </>
+        )}
+      </button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={AUDIO_ACCEPT_ATTR}
+        hidden
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) void handleFile(file)
+          e.target.value = "" // permitir re-seleccionar el mismo archivo
+        }}
+      />
+      {error && (
+        <p className="font-sans text-xs" style={{ color: "var(--color-bordo)" }}>
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function ClippingsManager({
   clientId,
+  clientSlug,
   clippings,
   mediums,
 }: {
   clientId: string
+  clientSlug: string
   clippings: DbClipping[]
   mediums: string[]
 }) {
@@ -98,12 +317,14 @@ export function ClippingsManager({
 
   function openEdit(c: DbClipping) {
     setForm({
-      url: c.url,
+      url: c.url ?? "",
       medium: c.medium,
       title: c.title,
       published_at: c.published_at.slice(0, 10),
       scope: c.scope,
       format: c.format,
+      audio_url: c.audio_url,
+      audio_duration_seconds: c.audio_duration_seconds,
     })
     setErrors({})
     setExtractMsg(null)
@@ -117,7 +338,7 @@ export function ClippingsManager({
 
   function setField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
-    setErrors((prev) => ({ ...prev, [key]: "" }))
+    setErrors((prev) => ({ ...prev, [key]: "", _content: "" }))
   }
 
   // ── Auto-completar ──
@@ -159,8 +380,12 @@ export function ClippingsManager({
   // ── Guardado ──
   function validate(): boolean {
     const next: Record<string, string> = {}
-    if (!form.url.trim()) next.url = "La URL es obligatoria."
-    else if (!isHttpUrl(form.url.trim())) next.url = "La URL debe empezar con http:// o https://."
+    const hasUrl = !!form.url.trim()
+    const hasAudio = !!form.audio_url
+    if (hasUrl && !isHttpUrl(form.url.trim())) {
+      next.url = "La URL debe empezar con http:// o https://."
+    }
+    if (!hasUrl && !hasAudio) next._content = "Agregá una URL o un audio (al menos uno)."
     if (!form.medium.trim()) next.medium = "El medio es obligatorio."
     if (!form.title.trim()) next.title = "El título es obligatorio."
     if (!/^\d{4}-\d{2}-\d{2}$/.test(form.published_at)) next.published_at = "La fecha es obligatoria."
@@ -171,7 +396,6 @@ export function ClippingsManager({
 
   async function handleSave(addAnother: boolean) {
     if (!modal) return
-    // Limpiamos el error global previo antes de revalidar/guardar.
     setErrors((e) => ({ ...e, _global: "" }))
     if (!validate()) return
     setSaving(true)
@@ -182,7 +406,15 @@ export function ClippingsManager({
       published_at: form.published_at,
       scope: form.scope as ClippingScope,
       format: form.format,
-      url: form.url.trim(),
+      url: form.url.trim() || null,
+    }
+    // Solo adjuntamos los campos de audio cuando hay audio: así, mientras la
+    // migración 20260628 no esté corrida (columnas inexistentes), los clippings
+    // de solo-URL se siguen guardando sin tocar columnas que no existen. Cuando
+    // se elimina un audio, removeClippingAudio ya dejó la columna en null.
+    if (form.audio_url) {
+      payload.audio_url = form.audio_url
+      payload.audio_duration_seconds = form.audio_duration_seconds
     }
     try {
       const result =
@@ -191,7 +423,6 @@ export function ClippingsManager({
           : await updateClipping(modal.id, payload)
 
       if (!result.success) {
-        // Visible en DevTools para diagnosticar qué rechazó Supabase.
         console.error("[clipping] guardado falló:", result.error, payload)
         setErrors((e) => ({ ...e, _global: result.error }))
         return
@@ -207,24 +438,19 @@ export function ClippingsManager({
         setModal(null)
       }
     } catch {
-      // Si la server action lanza (red, sesión, migración faltante, etc.) la
-      // promesa se rechaza: mostramos el error en vez de quedar en "Guardando…".
       setErrors((e) => ({
         ...e,
         _global:
           "No se pudo guardar. Revisá tu conexión y volvé a intentar. Si el problema persiste, puede faltar correr la migración de la base.",
       }))
     } finally {
-      // SIEMPRE liberamos el botón, resuelva o rechace la promesa.
       setSaving(false)
     }
   }
 
   // ── Eliminar ──
   async function handleDelete(c: DbClipping) {
-    const ok = window.confirm(
-      "¿Eliminar este clipping? Esta acción no se puede deshacer.",
-    )
+    const ok = window.confirm("¿Eliminar este clipping? Esta acción no se puede deshacer.")
     if (!ok) return
     setDeletingId(c.id)
     const result = await deleteClipping(c.id)
@@ -288,10 +514,7 @@ export function ClippingsManager({
             </thead>
             <tbody>
               {clippings.map((c) => (
-                <tr
-                  key={c.id}
-                  style={{ borderBottom: "1px solid rgba(201,168,130,0.15)" }}
-                >
+                <tr key={c.id} style={{ borderBottom: "1px solid rgba(201,168,130,0.15)" }}>
                   <td
                     className="whitespace-nowrap px-4 py-3 font-mono"
                     style={{ fontSize: 12, color: "var(--color-negro-bordo)" }}
@@ -305,15 +528,32 @@ export function ClippingsManager({
                     {c.medium}
                   </td>
                   <td className="px-4 py-3 font-sans text-sm" style={{ color: "var(--color-gris-bordo)", maxWidth: 360 }}>
-                    <a
-                      href={c.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="line-clamp-2 transition-opacity hover:opacity-70"
-                      title={c.title}
-                    >
-                      {c.title}
-                    </a>
+                    <span className="flex items-start gap-1.5">
+                      {c.audio_url && (
+                        <Headphones
+                          size={14}
+                          aria-label="Tiene audio"
+                          style={{ color: "var(--color-bordo)", flexShrink: 0, marginTop: 2 }}
+                        >
+                          <title>Tiene audio</title>
+                        </Headphones>
+                      )}
+                      {c.url ? (
+                        <a
+                          href={c.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="line-clamp-2 transition-opacity hover:opacity-70"
+                          title={c.title}
+                        >
+                          {c.title}
+                        </a>
+                      ) : (
+                        <span className="line-clamp-2" title={c.title}>
+                          {c.title}
+                        </span>
+                      )}
+                    </span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
                     <span
@@ -376,10 +616,7 @@ export function ClippingsManager({
             }}
           >
             <div className="flex items-center justify-between">
-              <h2
-                className="font-playfair text-xl font-bold"
-                style={{ color: "var(--color-negro-bordo)" }}
-              >
+              <h2 className="font-playfair text-xl font-bold" style={{ color: "var(--color-negro-bordo)" }}>
                 {modal.mode === "create" ? "Nuevo clipping" : "Editar clipping"}
               </h2>
               <button
@@ -393,14 +630,14 @@ export function ClippingsManager({
               </button>
             </div>
 
+            <p className="mt-2 font-sans text-xs" style={{ color: "var(--color-gris-bordo)" }}>
+              Un clipping puede tener URL, audio, o ambos. Mínimo uno.
+            </p>
+
             {/* URL + auto-completar */}
-            <div className="mt-6 flex flex-col gap-1.5">
-              <label
-                htmlFor="clip-url"
-                className="font-sans text-sm font-medium"
-                style={{ color: "var(--color-negro-bordo)" }}
-              >
-                URL de la nota
+            <div className="mt-5 flex flex-col gap-1.5">
+              <label htmlFor="clip-url" className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
+                URL de la nota <span style={{ color: "var(--color-gris-bordo)", fontWeight: 400 }}>(opcional)</span>
               </label>
               <div className="flex flex-col gap-2 sm:flex-row">
                 <input
@@ -438,13 +675,35 @@ export function ClippingsManager({
               )}
             </div>
 
+            {/* Audio */}
+            <div className="mt-4 flex flex-col gap-1.5">
+              <label className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
+                Audio <span style={{ color: "var(--color-gris-bordo)", fontWeight: 400 }}>(opcional)</span>
+              </label>
+              <AudioField
+                clientSlug={clientSlug}
+                clippingId={modal.mode === "edit" ? modal.id : null}
+                audioUrl={form.audio_url}
+                durationSeconds={form.audio_duration_seconds}
+                onChange={(next) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    audio_url: next.audio_url,
+                    audio_duration_seconds: next.audio_duration_seconds,
+                  }))
+                }
+              />
+            </div>
+
+            {errors._content && (
+              <p className="mt-2 font-sans text-xs" style={{ color: "var(--color-bordo)" }}>
+                {errors._content}
+              </p>
+            )}
+
             {/* Medio */}
             <div className="mt-4 flex flex-col gap-1.5">
-              <label
-                htmlFor="clip-medium"
-                className="font-sans text-sm font-medium"
-                style={{ color: "var(--color-negro-bordo)" }}
-              >
+              <label htmlFor="clip-medium" className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
                 Medio
               </label>
               <input
@@ -470,11 +729,7 @@ export function ClippingsManager({
 
             {/* Título */}
             <div className="mt-4 flex flex-col gap-1.5">
-              <label
-                htmlFor="clip-title"
-                className="font-sans text-sm font-medium"
-                style={{ color: "var(--color-negro-bordo)" }}
-              >
+              <label htmlFor="clip-title" className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
                 Título de la nota
               </label>
               <input
@@ -494,11 +749,7 @@ export function ClippingsManager({
             {/* Fecha + Alcance + Formato */}
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="clip-date"
-                  className="font-sans text-sm font-medium"
-                  style={{ color: "var(--color-negro-bordo)" }}
-                >
+                <label htmlFor="clip-date" className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
                   Fecha
                 </label>
                 <input
@@ -515,11 +766,7 @@ export function ClippingsManager({
                 )}
               </div>
               <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="clip-scope"
-                  className="font-sans text-sm font-medium"
-                  style={{ color: "var(--color-negro-bordo)" }}
-                >
+                <label htmlFor="clip-scope" className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
                   Alcance
                 </label>
                 <select
@@ -544,11 +791,7 @@ export function ClippingsManager({
                 )}
               </div>
               <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="clip-format"
-                  className="font-sans text-sm font-medium"
-                  style={{ color: "var(--color-negro-bordo)" }}
-                >
+                <label htmlFor="clip-format" className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
                   Formato
                 </label>
                 <select
@@ -569,10 +812,7 @@ export function ClippingsManager({
             {warning && (
               <p
                 className="mt-3 rounded-lg px-3 py-2 font-sans text-xs"
-                style={{
-                  backgroundColor: "rgba(201,168,130,0.15)",
-                  color: "var(--color-negro-bordo)",
-                }}
+                style={{ backgroundColor: "rgba(201,168,130,0.15)", color: "var(--color-negro-bordo)" }}
               >
                 {warning}
               </p>

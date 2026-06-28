@@ -32,9 +32,22 @@ export interface DbClipping {
   published_at: string
   scope: ClippingScope
   format: ClippingFormat
-  url: string
+  /** Ahora nullable: un clipping puede tener solo audio (radios sin web). */
+  url: string | null
+  /** URL pública del audio en Storage (bucket clipping-audios). */
+  audio_url: string | null
+  /** Duración del audio en segundos (persistida al subir). */
+  audio_duration_seconds: number | null
   order_position: number
 }
+
+// Columnas leídas de la tabla `clippings`. Las de audio pueden no existir aún
+// (la migración 20260628 se corre a mano en el dashboard): por eso las lecturas
+// reintentan sin ellas. Ver SELECT_WITH_AUDIO / SELECT_LEGACY.
+export const SELECT_WITH_AUDIO =
+  "id, client_id, medium, title, published_at, scope, format, url, order_position, audio_url, audio_duration_seconds"
+export const SELECT_LEGACY =
+  "id, client_id, medium, title, published_at, scope, format, url, order_position"
 
 export interface ClientWithClippings {
   client: DbClient
@@ -113,6 +126,8 @@ function buildFallback(): ClientWithClippings[] {
         scope: LEGACY_SCOPE[c.alcance] ?? "local",
         format: c.formato as ClippingFormat,
         url: c.link,
+        audio_url: null,
+        audio_duration_seconds: null,
         order_position: i,
       }))
       // Mismo orden que la versión hardcoded: año desc, entradas nuevas primero.
@@ -132,17 +147,29 @@ function buildFallback(): ClientWithClippings[] {
  */
 export async function getClientsWithClippings(): Promise<ClientWithClippings[]> {
   try {
+    const clippingsQuery = async () => {
+      // Intento con columnas de audio; si todavía no existen, reintento legacy.
+      const withAudio = await supabase
+        .from("clippings")
+        .select(SELECT_WITH_AUDIO)
+        .order("published_at", { ascending: false })
+        .order("order_position", { ascending: false })
+      if (!withAudio.error) return withAudio
+      const legacy = await supabase
+        .from("clippings")
+        .select(SELECT_LEGACY)
+        .order("published_at", { ascending: false })
+        .order("order_position", { ascending: false })
+      return legacy
+    }
+
     const [clientsRes, clippingsRes] = await Promise.all([
       supabase
         .from("clients")
         .select("id, slug, name, logo_url, order_position, is_active")
         .eq("is_active", true)
         .order("order_position", { ascending: true }),
-      supabase
-        .from("clippings")
-        .select("id, client_id, medium, title, published_at, scope, format, url, order_position")
-        .order("published_at", { ascending: false })
-        .order("order_position", { ascending: false }),
+      clippingsQuery(),
     ])
 
     if (clientsRes.error || clippingsRes.error || !clientsRes.data?.length) {
@@ -150,7 +177,13 @@ export async function getClientsWithClippings(): Promise<ClientWithClippings[]> 
     }
 
     const byClient = new Map<string, DbClipping[]>()
-    for (const k of (clippingsRes.data ?? []) as DbClipping[]) {
+    for (const raw of clippingsRes.data ?? []) {
+      // El select legacy no trae audio_*: normalizamos a null.
+      const k = {
+        audio_url: null,
+        audio_duration_seconds: null,
+        ...(raw as Record<string, unknown>),
+      } as unknown as DbClipping
       if (!byClient.has(k.client_id)) byClient.set(k.client_id, [])
       byClient.get(k.client_id)!.push(k)
     }

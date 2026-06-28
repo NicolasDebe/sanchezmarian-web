@@ -4,8 +4,9 @@ import React, { useState, useMemo, useRef, useEffect } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
-import { ArrowRight, ChevronDown } from "lucide-react"
+import { ArrowRight, ChevronDown, Headphones } from "lucide-react"
 import { CLIPPINGS } from "@/data/clippings"
+import { AudioPlayer } from "@/components/audio-player"
 import {
   SCOPE_LABELS,
   clippingYear,
@@ -56,7 +57,102 @@ const GAP = 24         // column gap
 
 function TimelineCard({ ap }: { ap: DbClipping }) {
   const borderColor = FORMAT_BORDER[ap.format] ?? FORMAT_BORDER.Digital
+  const hasAudio = !!ap.audio_url
+  const hasUrl = !!ap.url
 
+  const head = (
+    <div className="flex items-start justify-between gap-2" style={{ marginBottom: 6 }}>
+      <span
+        className="font-mono uppercase"
+        style={{ fontSize: 10, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+      >
+        {ap.medium}
+      </span>
+      <span
+        className="font-mono shrink-0"
+        style={{
+          fontSize: 8,
+          padding: "2px 6px",
+          borderRadius: 4,
+          background: "var(--color-arena)",
+          color: "var(--color-gris-bordo)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {SCOPE_LABELS[ap.scope] ?? ap.scope}
+      </span>
+    </div>
+  )
+
+  const titleEl = (
+    <p
+      className="font-sans"
+      style={{
+        fontSize: 13,
+        color: "var(--color-negro-bordo)",
+        lineHeight: 1.4,
+        overflow: "hidden",
+        display: "-webkit-box",
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: "vertical",
+      } as React.CSSProperties}
+    >
+      {ap.title}
+    </p>
+  )
+
+  const yearEl = (
+    <span
+      className="font-mono"
+      style={{ display: "block", marginTop: 6, fontSize: 10, color: "var(--color-gris-bordo)", opacity: 0.5 }}
+    >
+      {clippingYear(ap.published_at)}
+    </span>
+  )
+
+  // ── Con audio: card NO clickeable (el player es interactivo) ──
+  if (hasAudio) {
+    return (
+      <div
+        style={{
+          background: "var(--color-hueso)",
+          borderRadius: 8,
+          padding: "16px 20px",
+          borderLeft: `2px solid ${borderColor}`,
+        }}
+      >
+        {/* Badge de tipo */}
+        <div
+          className="flex items-center gap-1 font-mono uppercase"
+          style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-bordo)", marginBottom: 8 }}
+        >
+          <Headphones size={11} />
+          {hasUrl ? "Audio + Nota" : "Audio"}
+        </div>
+
+        {head}
+        {titleEl}
+
+        <AudioPlayer src={ap.audio_url!} duration={ap.audio_duration_seconds} variant="full" />
+
+        {hasUrl && (
+          <a
+            href={ap.url!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono inline-flex items-center gap-1 transition-opacity hover:opacity-70"
+            style={{ marginTop: 10, fontSize: 11, color: "var(--color-bordo)" }}
+          >
+            Ver nota original →
+          </a>
+        )}
+
+        {yearEl}
+      </div>
+    )
+  }
+
+  // ── Solo URL (o sin acción): card clickeable como antes ──
   const inner = (
     <div
       style={{
@@ -66,49 +162,9 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
         borderLeft: `2px solid ${borderColor}`,
       }}
     >
-      <div className="flex items-start justify-between gap-2" style={{ marginBottom: 6 }}>
-        <span
-          className="font-mono uppercase"
-          style={{ fontSize: 10, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
-        >
-          {ap.medium}
-        </span>
-        <span
-          className="font-mono shrink-0"
-          style={{
-            fontSize: 8,
-            padding: "2px 6px",
-            borderRadius: 4,
-            background: "var(--color-arena)",
-            color: "var(--color-gris-bordo)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {SCOPE_LABELS[ap.scope] ?? ap.scope}
-        </span>
-      </div>
-
-      <p
-        className="font-sans"
-        style={{
-          fontSize: 13,
-          color: "var(--color-negro-bordo)",
-          lineHeight: 1.4,
-          overflow: "hidden",
-          display: "-webkit-box",
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: "vertical",
-        } as React.CSSProperties}
-      >
-        {ap.title}
-      </p>
-
-      <span
-        className="font-mono"
-        style={{ display: "block", marginTop: 6, fontSize: 10, color: "var(--color-gris-bordo)", opacity: 0.5 }}
-      >
-        {clippingYear(ap.published_at)}
-      </span>
+      {head}
+      {titleEl}
+      {yearEl}
     </div>
   )
 
@@ -153,6 +209,12 @@ function ZigzagTimeline({
   // Ya vienen ordenadas por published_at DESC desde el servidor.
   const sorted = apariciones
 
+  // Si algún clipping de este cliente tiene audio, las filas crecen para
+  // acomodar el player inline (la geometría del zigzag es uniforme por cliente).
+  const hasAnyAudio = sorted.some((a) => !!a.audio_url)
+  const rowH = hasAnyAudio ? 360 : ROW_H
+  const lineY = hasAnyAudio ? 320 : LINE_Y
+
   const isMobile = containerW > 0 && containerW < 640
   const rows = Math.ceil(sorted.length / COLS)
   const colW = containerW > 0 ? (containerW - GAP * (COLS - 1)) / COLS : 0
@@ -164,18 +226,18 @@ function ZigzagTimeline({
     const W = containerW
     let d = ""
     for (let r = 0; r < rows; r++) {
-      const y = r * ROW_H + LINE_Y
+      const y = r * rowH + lineY
       const ltr = r % 2 === 0
       if (r === 0) d = `M ${ltr ? 0 : W},${y}`
       d += ` L ${ltr ? W : 0},${y}`
       if (r < rows - 1) {
-        d += ` L ${ltr ? W : 0},${(r + 1) * ROW_H + LINE_Y}`
+        d += ` L ${ltr ? W : 0},${(r + 1) * rowH + lineY}`
       }
     }
     return d
-  }, [containerW, rows, sorted.length])
+  }, [containerW, rows, sorted.length, rowH, lineY])
 
-  const svgH = rows * ROW_H + 20
+  const svgH = rows * rowH + 20
 
   if (sorted.length === 0) return null
 
@@ -259,7 +321,7 @@ function ZigzagTimeline({
               <motion.circle
                 key={`dot-${ap.id}`}
                 cx={colCenter(actualCol)}
-                cy={row * ROW_H + LINE_Y}
+                cy={row * rowH + lineY}
                 r={4}
                 fill="var(--color-bordo)"
                 initial={{ scale: 0, opacity: 0 }}
@@ -306,7 +368,7 @@ function ZigzagTimeline({
                 display: "grid",
                 gridTemplateColumns: `repeat(${COLS}, 1fr)`,
                 gap: GAP,
-                height: ROW_H,
+                height: rowH,
                 alignItems: "flex-start",
                 paddingTop: 18,
               }}

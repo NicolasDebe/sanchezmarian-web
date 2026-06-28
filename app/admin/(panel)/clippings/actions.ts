@@ -5,11 +5,18 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase"
 import { SCOPES, FORMATS, type ClippingScope, type ClippingFormat } from "@/lib/clippings"
 import {
+  audioFileError,
+  safeAudioName,
+  audioPathFromPublicUrl,
+} from "@/lib/audio"
+import {
   fetchUrlMetadata,
   isHttpUrl,
   EMPTY_METADATA,
   type UrlMetadata,
 } from "@/lib/extract-metadata"
+
+const AUDIO_BUCKET = "clipping-audios"
 
 export type ClippingResult = { success: true } | { success: false; error: string }
 
@@ -21,7 +28,12 @@ export interface ClippingInput {
   published_at: string
   scope: ClippingScope
   format: ClippingFormat
-  url: string
+  /** Opcional: un clipping puede tener solo audio. */
+  url: string | null
+  /** Opcional: URL pública del audio en Storage. */
+  audio_url?: string | null
+  /** Opcional: duración del audio en segundos. */
+  audio_duration_seconds?: number | null
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -46,8 +58,28 @@ function validateInput(data: ClippingInput): string | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data.published_at ?? "")) return "La fecha no es válida."
   if (!SCOPES.includes(data.scope)) return "Elegí un alcance válido."
   if (!FORMATS.includes(data.format)) return "Elegí un formato válido."
-  if (!isHttpUrl(data.url ?? "")) return "La URL debe empezar con http:// o https://."
+  // URL ahora es opcional: un clipping puede tener solo audio. Mínimo uno.
+  const hasUrl = !!data.url?.trim()
+  const hasAudio = !!data.audio_url?.trim()
+  if (!hasUrl && !hasAudio) return "Agregá una URL o un audio (al menos uno)."
+  if (hasUrl && !isHttpUrl(data.url!.trim())) {
+    return "La URL debe empezar con http:// o https://."
+  }
   return null
+}
+
+/**
+ * Campos de audio para insert/update. Solo se incluyen cuando hay valor: así,
+ * mientras la migración 20260628 no se haya corrido (columnas inexistentes),
+ * los clippings de solo-URL siguen guardándose sin tocar columnas que no existen.
+ */
+function audioFields(data: ClippingInput): Record<string, unknown> {
+  const out: Record<string, unknown> = {}
+  if (data.audio_url !== undefined) out.audio_url = data.audio_url || null
+  if (data.audio_duration_seconds !== undefined) {
+    out.audio_duration_seconds = data.audio_duration_seconds ?? null
+  }
+  return out
 }
 
 // ─── CRUD ─────────────────────────────────────────────────────────────────────
@@ -78,7 +110,8 @@ export async function createClipping(data: ClippingInput): Promise<ClippingResul
       published_at: data.published_at,
       scope: data.scope,
       format: data.format,
-      url: data.url.trim(),
+      url: data.url?.trim() || null,
+      ...audioFields(data),
       order_position: (maxRow?.order_position ?? -1) + 1,
       created_by: user.email || user.id,
       updated_by: user.email || user.id,
@@ -123,7 +156,8 @@ export async function updateClipping(
         published_at: data.published_at,
         scope: data.scope,
         format: data.format,
-        url: data.url.trim(),
+        url: data.url?.trim() || null,
+        ...audioFields(data),
         updated_at: new Date().toISOString(),
         updated_by: user.email || user.id,
       })
@@ -232,4 +266,150 @@ export async function extractMetadataFromURL(url: string): Promise<UrlMetadata> 
   const user = await requireUser()
   if (!user) return EMPTY_METADATA
   return fetchUrlMetadata(url)
+}
+
+// ─── Audio (Storage) ────────────────────────────────────────────────────────
+
+export type AudioUploadResult =
+  | { success: true; url: string; path: string }
+  | { success: false; error: string }
+
+/**
+ * Sube un audio al bucket `clipping-audios` (service role) y devuelve la URL
+ * pública. Si viene `clipping_id`, además asocia el audio al clipping.
+ * Para clippings NUEVOS no hay id todavía: el form guarda la URL devuelta y la
+ * manda en createClipping.
+ */
+export async function uploadClippingAudio(
+  formData: FormData,
+): Promise<AudioUploadResult> {
+  const user = await requireUser()
+  if (!user) return { success: false, error: "Tu sesión expiró. Volvé a iniciar sesión." }
+
+  const file = formData.get("audio") as File | null
+  const clippingId = (formData.get("clipping_id") as string | null) || null
+  const clientSlug = (formData.get("client_slug") as string | null) || null
+
+  if (!file) return { success: false, error: "No se seleccionó archivo." }
+  if (!clientSlug) return { success: false, error: "Falta el cliente." }
+
+  // Validación de tipo y tamaño (misma lógica que en el cliente).
+  const invalid = audioFileError({ name: file.name, type: file.type, size: file.size })
+  if (invalid) return { success: false, error: invalid }
+
+  const path = `${clientSlug}/${Date.now()}-${safeAudioName(file.name)}`
+
+  try {
+    const admin = createAdminClient()
+
+    const { error: uploadErr } = await admin.storage
+      .from(AUDIO_BUCKET)
+      .upload(path, file, {
+        contentType: file.type || "audio/mpeg",
+        cacheControl: "3600",
+        upsert: false,
+      })
+
+    if (uploadErr) {
+      console.error("[uploadClippingAudio] upload error:", uploadErr)
+      return { success: false, error: "No se pudo subir el archivo." }
+    }
+
+    const { data: publicData } = admin.storage.from(AUDIO_BUCKET).getPublicUrl(path)
+    const publicUrl = publicData.publicUrl
+
+    if (clippingId) {
+      const { error: updateErr } = await admin
+        .from("clippings")
+        .update({ audio_url: publicUrl })
+        .eq("id", clippingId)
+      if (updateErr) {
+        console.error("[uploadClippingAudio] update error:", updateErr)
+        return {
+          success: false,
+          error: "Audio subido, pero no se pudo asociar al clipping.",
+        }
+      }
+      revalidatePath("/casos-de-exito")
+    }
+
+    return { success: true, url: publicUrl, path }
+  } catch (err) {
+    console.error("[uploadClippingAudio] throw:", err)
+    return { success: false, error: "Ocurrió un error al subir el audio." }
+  }
+}
+
+/**
+ * Borra el audio del Storage y limpia la referencia del clipping.
+ * `audioUrl` es opcional: si no hay clipping todavía (alta), solo borra el
+ * archivo subido del bucket.
+ */
+export async function removeClippingAudio(
+  clippingId: string | null,
+  audioUrl: string,
+): Promise<ClippingResult> {
+  const user = await requireUser()
+  if (!user) return { success: false, error: "Tu sesión expiró. Volvé a iniciar sesión." }
+
+  try {
+    const admin = createAdminClient()
+
+    const path = audioPathFromPublicUrl(audioUrl)
+    if (path) {
+      const { error: removeErr } = await admin.storage.from(AUDIO_BUCKET).remove([path])
+      if (removeErr) {
+        // No bloquea: igual limpiamos la referencia del clipping.
+        console.error("[removeClippingAudio] storage remove error:", removeErr)
+      }
+    }
+
+    if (clippingId) {
+      const { error: updateErr } = await admin
+        .from("clippings")
+        .update({ audio_url: null, audio_duration_seconds: null })
+        .eq("id", clippingId)
+      if (updateErr) {
+        console.error("[removeClippingAudio] update error:", updateErr)
+        return { success: false, error: "No se pudo eliminar el audio." }
+      }
+      revalidatePath("/casos-de-exito")
+    }
+
+    return { success: true }
+  } catch (err) {
+    console.error("[removeClippingAudio] throw:", err)
+    return { success: false, error: "Ocurrió un error al eliminar el audio." }
+  }
+}
+
+/** Persiste la duración del audio (segundos) calculada en el cliente. */
+export async function updateAudioDuration(
+  clippingId: string,
+  durationSeconds: number,
+): Promise<ClippingResult> {
+  const user = await requireUser()
+  if (!user) return { success: false, error: "No autenticado" }
+
+  if (!Number.isFinite(durationSeconds) || durationSeconds < 0 || durationSeconds > 7200) {
+    return { success: false, error: "Duración inválida" }
+  }
+
+  try {
+    const admin = createAdminClient()
+    const { error } = await admin
+      .from("clippings")
+      .update({ audio_duration_seconds: Math.round(durationSeconds) })
+      .eq("id", clippingId)
+    if (error) {
+      console.error("[updateAudioDuration] error:", error)
+      return { success: false, error: "No se pudo guardar la duración." }
+    }
+  } catch (err) {
+    console.error("[updateAudioDuration] throw:", err)
+    return { success: false, error: "Ocurrió un error al guardar la duración." }
+  }
+
+  revalidatePath("/casos-de-exito")
+  return { success: true }
 }
