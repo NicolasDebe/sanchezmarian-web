@@ -91,31 +91,8 @@ export const HOME_SECTIONS: SectionDef[] = [
     section: "servicios",
     title: "Servicios (vidriera del home)",
     legend:
-      "Encabezado y pie de la sección de servicios del home. Los TÍTULOS, frases y descripciones de cada servicio (Mentoría, Prensa, RRPP) se leen de la página de Servicios; acá solo editás el marco. La parte destacada del título se muestra en cursiva bordó automáticamente.",
+      "Texto del link de cada card y pie de sección. Los NOMBRES, taglines, descripciones y sub-servicios de cada servicio se editan en la pestaña «Servicios» del menú; cualquier cambio ahí se refleja en el home automáticamente.",
     fields: [
-      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Servicios", maxChars: 30 },
-      {
-        field: "title_pre",
-        type: "text",
-        label: "Título — parte normal",
-        fallback: "Conexión genuina para potenciar la voz",
-        maxChars: 80,
-      },
-      {
-        field: "title_accent",
-        type: "text",
-        label: "Título — destacado (cursiva bordó)",
-        fallback: "y el mensaje de tu negocio.",
-        maxChars: 80,
-      },
-      {
-        field: "subtitle",
-        type: "longtext",
-        label: "Subtítulo",
-        fallback:
-          "Tres servicios alineados que se adaptan a cada etapa de tu negocio. Mentoría como columna vertebral, Prensa y Relaciones Públicas como brazos operativos.",
-        maxChars: 280,
-      },
       {
         field: "card_cta_label",
         type: "text",

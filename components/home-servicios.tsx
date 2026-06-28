@@ -74,44 +74,8 @@ export function HomeServicios({
   const ctaLabel = sec.card_cta_label || "Conocer este servicio"
 
   return (
-    <section id="servicios" className="bg-hueso py-20 lg:py-[120px]">
+    <section id="servicios" className="bg-hueso pt-24 lg:pt-[140px] pb-20 lg:pb-[120px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-
-        {/* ── Encabezado de sección ── */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT}
-          className="mb-14 lg:mb-16"
-        >
-          <motion.p
-            variants={itemVariants}
-            className="font-mono uppercase text-bordo mb-4"
-            style={{ fontSize: 11, letterSpacing: "0.15em" }}
-          >
-            {sec.eyebrow}
-          </motion.p>
-
-          <motion.div variants={itemVariants} className="w-10 h-px bg-dorado mb-6" />
-
-          <motion.h2
-            variants={itemVariants}
-            className="font-playfair font-bold text-negro-bordo leading-[1.1] mb-5"
-            style={{ fontSize: "clamp(28px, 3.5vw, 44px)", maxWidth: 760 }}
-          >
-            {sec.title_pre}{" "}
-            <em className="font-playfair italic text-bordo">{sec.title_accent}</em>
-          </motion.h2>
-
-          <motion.p
-            variants={itemVariants}
-            className="font-sans text-gris-bordo"
-            style={{ fontSize: 16, lineHeight: 1.7, maxWidth: 640 }}
-          >
-            {sec.subtitle}
-          </motion.p>
-        </motion.div>
 
         {/* ── Bento grid ── */}
         <motion.div
