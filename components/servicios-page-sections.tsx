@@ -12,6 +12,9 @@ import { two, EASE } from "@/components/servicios/types"
 
 const SERVICE_COUNT = 4
 const mvp = { once: true, margin: "-80px" } as const
+const PAD_X = "clamp(24px, 6vw, 96px)"
+const CARD_BORDER_30 = "1px solid rgba(201, 168, 130, 0.3)"
+const CARD_BORDER_40 = "1px solid rgba(201, 168, 130, 0.4)"
 
 /* Convierte un longtext multilínea (un ítem por línea) en array no vacío. */
 function lines(raw?: string): string[] {
@@ -39,6 +42,7 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
   const words = (hero.h1 ?? "").split(/\s+/).filter(Boolean)
   const satelliteDelay = reduced ? 0 : words.length * 0.06 + 0.45
   const eyebrow = (hero.eyebrow ?? "Servicios").trim()
+  const description = (hero.description ?? "").trim()
 
   const satellite = (delay: number) => ({
     initial: { opacity: 0, y: reduced ? 0 : 10 },
@@ -49,7 +53,7 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
   return (
     <section
       className="relative flex min-h-[80vh] flex-col justify-center overflow-hidden bg-hueso sm:min-h-[90vh]"
-      style={{ paddingInline: "clamp(24px, 6vw, 96px)", paddingBlock: "120px 96px" }}
+      style={{ paddingInline: PAD_X, paddingBlock: "120px 96px" }}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(110% 80% at 100% 0%, var(--color-arena) 0%, transparent 55%)", opacity: 0.4 }} />
       <TextureOverlay texture="paperGrain" opacity={0.14} />
@@ -65,15 +69,17 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
 
           <motion.div aria-hidden initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: reduced ? 0 : 0.7, ease: EASE, delay: reduced ? 0 : satelliteDelay + 0.05 }} className="mb-8 h-px origin-left bg-dorado" style={{ width: "clamp(60px, 10vw, 120px)" }} />
 
-          <motion.h1 aria-label={hero.h1} variants={heroContainer(!!reduced)} initial="hidden" animate="visible" className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(36px, 5.4vw, 88px)", lineHeight: 1.05, letterSpacing: "-0.03em", maxWidth: "16ch" }}>
+          <motion.h1 aria-label={hero.h1} variants={heroContainer(!!reduced)} initial="hidden" animate="visible" className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(36px, 5.4vw, 88px)", lineHeight: 1.05, letterSpacing: "-0.03em", maxWidth: "18ch" }}>
             {words.map((w, i) => (
               <motion.span key={i} aria-hidden variants={heroWord(!!reduced)} className="inline-block" style={{ marginRight: "0.25em", willChange: "transform, filter" }}>{w}</motion.span>
             ))}
           </motion.h1>
 
-          <motion.div {...satellite(0.15)} className="mt-8 font-sans text-gris-bordo" style={{ fontSize: "clamp(16px, 1.4vw, 20px)", lineHeight: 1.6, maxWidth: 560 }}>
-            <RichText html={hero.description} className="rich-inline" />
-          </motion.div>
+          {description && (
+            <motion.div {...satellite(0.15)} className="mt-8 font-sans text-gris-bordo" style={{ fontSize: "clamp(16px, 1.4vw, 20px)", lineHeight: 1.6, maxWidth: 560 }}>
+              <RichText html={description} className="rich-inline" />
+            </motion.div>
+          )}
         </div>
 
         <motion.div
@@ -97,7 +103,7 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   ÁTOMOS TIPOGRÁFICOS (reglas de la página)
+   ÁTOMOS TIPOGRÁFICOS (reglas globales de la página)
    ════════════════════════════════════════════════════════════════════════ */
 function Eyebrow({ children, centered }: { children: ReactNode; centered?: boolean }) {
   return (
@@ -116,6 +122,7 @@ function BlockTitle({ children }: { children: ReactNode }) {
     </h2>
   )
 }
+/* Label: DM Mono 10px uppercase --bordo opacity 0.7. */
 function Label({ children }: { children: ReactNode }) {
   return (
     <p className="font-mono uppercase text-bordo/70" style={{ fontSize: 10, letterSpacing: "0.18em" }}>
@@ -123,10 +130,18 @@ function Label({ children }: { children: ReactNode }) {
     </p>
   )
 }
-/* Párrafos de descripción: DM Sans 16px / 1.7 --gris-bordo. */
-function Intro({ text }: { text?: string }) {
+/* Subtítulo de sub-bloque (PRENSA ORGÁNICA, etc.): DM Mono 12px uppercase --bordo. */
+function SubHeading({ children }: { children: ReactNode }) {
   return (
-    <div className="mt-6 flex flex-col gap-4">
+    <p className="font-mono uppercase text-bordo" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
+      {children}
+    </p>
+  )
+}
+/* Párrafos de descripción / cuerpo: DM Sans 16px / 1.7 --gris-bordo. */
+function Body({ text }: { text?: string }) {
+  return (
+    <div className="mt-6 flex flex-col gap-4" style={{ maxWidth: 760 }}>
       {paragraphs(text).map((p, i) => (
         <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{p}</p>
       ))}
@@ -150,7 +165,7 @@ function Bullets({ items }: { items?: string }) {
 /* Sección-bloque con fondo alterno y reveal al entrar en viewport. */
 function Block({ bg, children }: { bg: string; children: ReactNode }) {
   return (
-    <section className={`${bg} py-16 md:py-24`} style={{ paddingInline: "clamp(24px, 6vw, 96px)" }}>
+    <section className={`${bg} py-16 md:py-24`} style={{ paddingInline: PAD_X }}>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -171,14 +186,62 @@ function BlockHeader({ c }: { c: Record<string, string> }) {
       <Eyebrow>{c.eyebrow}</Eyebrow>
       <GoldLine />
       <BlockTitle>{c.title}</BlockTitle>
-      <Intro text={c.intro} />
+      <Body text={c.intro} />
     </div>
   )
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   BLOQUE 01 — Estrategia y consultoría general (4 sub-puntos título + desc)
+   SECCIÓN 2 — PILARES
    ════════════════════════════════════════════════════════════════════════ */
+function PilaresSection({ c }: { c: Record<string, string> }) {
+  const pilares = [
+    { num: "01", title: c.pilar_1_title, items: c.pilar_1_items },
+    { num: "02", title: c.pilar_2_title, items: c.pilar_2_items },
+    { num: "03", title: c.pilar_3_title, items: c.pilar_3_items },
+  ]
+  return (
+    <section className="bg-hueso-oscuro py-16 md:py-24" style={{ paddingInline: PAD_X }}>
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={mvp}
+        transition={{ duration: 0.6, ease: EASE }}
+        className="mx-auto w-full"
+        style={{ maxWidth: 1180 }}
+      >
+        <div className="mb-12 md:mb-16">
+          <Eyebrow>{c.eyebrow}</Eyebrow>
+          <GoldLine />
+          <BlockTitle>{c.title}</BlockTitle>
+        </div>
+
+        <div className="grid gap-10 md:grid-cols-3">
+          {pilares.map((p) => (
+            <div key={p.num}>
+              <p className="font-mono text-bordo/50" style={{ fontSize: 12, letterSpacing: "0.12em", marginBottom: 12 }}>{p.num}</p>
+              <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: 22, lineHeight: 1.2, marginBottom: 16 }}>{p.title}</p>
+              <Bullets items={p.items} />
+            </div>
+          ))}
+        </div>
+
+        <p
+          className="mx-auto mt-14 text-center font-sans text-gris-bordo"
+          style={{ fontSize: 16, lineHeight: 1.7, maxWidth: 720, fontStyle: "italic" }}
+        >
+          {c.intro_note}
+        </p>
+      </motion.div>
+    </section>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECCIÓN 3 — LOS 4 SERVICIOS
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* BLOQUE 01 — 4 sub-puntos (título bold + descripción). */
 function Bloque01({ c }: { c: Record<string, string> }) {
   const points = [1, 2, 3, 4]
     .map((n) => ({ title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
@@ -192,8 +255,8 @@ function Bloque01({ c }: { c: Record<string, string> }) {
         <div className="mt-7 grid gap-x-10 gap-y-8 md:grid-cols-2">
           {points.map((p) => (
             <div key={p.title}>
-              <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: 15 }}>{p.title}</p>
-              <p className="mt-2 font-sans text-gris-bordo" style={{ fontSize: 15, lineHeight: 1.6 }}>{p.desc}</p>
+              <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: 16 }}>{p.title}</p>
+              <p className="mt-2 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{p.desc}</p>
             </div>
           ))}
         </div>
@@ -202,27 +265,26 @@ function Bloque01({ c }: { c: Record<string, string> }) {
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════════
-   BLOQUE 02 — Prensa (2 sub-bloques + lista común)
-   ════════════════════════════════════════════════════════════════════════ */
-function SubBloquePrensa({ name, desc, items }: { name: string; desc: string; items: string }) {
+/* Mini-card de modalidad de prensa: borde dorado, sin fondo distinto. */
+function PrensaCard({ name, items }: { name: string; items: string }) {
   return (
-    <div className="rounded-2xl border border-dorado/25 p-6 md:p-7">
-      <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: 20, lineHeight: 1.2 }}>{name}</p>
-      <p className="mt-3 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{desc}</p>
-      <div className="mt-5">
+    <div className="rounded-2xl" style={{ border: CARD_BORDER_30, padding: 24 }}>
+      <SubHeading>{name}</SubHeading>
+      <div className="mt-4">
         <Bullets items={items} />
       </div>
     </div>
   )
 }
+
+/* BLOQUE 02 — Prensa: 2 modalidades + lista común. */
 function Bloque02({ c }: { c: Record<string, string> }) {
   return (
     <Block bg="bg-hueso-oscuro">
       <BlockHeader c={c} />
       <div className="mt-10 grid gap-6 md:grid-cols-2">
-        <SubBloquePrensa name={c.organica_label} desc={c.organica_desc} items={c.organica_items} />
-        <SubBloquePrensa name={c.pautada_label} desc={c.pautada_desc} items={c.pautada_items} />
+        <PrensaCard name={c.organica_label} items={c.organica_items} />
+        <PrensaCard name={c.pautada_label} items={c.pautada_items} />
       </div>
       <div className="mt-12">
         <Label>{c.includes_label}</Label>
@@ -234,31 +296,35 @@ function Bloque02({ c }: { c: Record<string, string> }) {
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════════
-   BLOQUE 03 — Relaciones públicas y eventos (lista + sub-servicio destacado)
-   ════════════════════════════════════════════════════════════════════════ */
+/* BLOQUE 03 — RRPP y eventos: lista + cierre + sub-servicio destacado. */
 function Bloque03({ c }: { c: Record<string, string> }) {
   return (
     <Block bg="bg-hueso">
       <BlockHeader c={c} />
-      <div className="mt-10">
+      <div className="mt-10" style={{ maxWidth: 820 }}>
         <Label>{c.includes_label}</Label>
-        <div className="mt-5" style={{ maxWidth: 820 }}>
+        <div className="mt-5">
           <Bullets items={c.includes_items} />
         </div>
+        {c.closing?.trim() && (
+          <p className="mt-7 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{c.closing}</p>
+        )}
       </div>
-      <div className="mt-12 rounded-2xl border border-dorado/30 bg-hueso-oscuro p-6 md:p-8" style={{ maxWidth: 820 }}>
+
+      <div className="mt-12 rounded-2xl" style={{ border: CARD_BORDER_40, padding: 24, maxWidth: 820 }}>
         <Label>{c.sub_label}</Label>
         <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: 22, lineHeight: 1.2 }}>{c.sub_title}</p>
-        <p className="mt-3 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{c.sub_desc}</p>
+        <div className="mt-3 flex flex-col gap-4">
+          {paragraphs(c.sub_desc).map((p, i) => (
+            <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{p}</p>
+          ))}
+        </div>
       </div>
     </Block>
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════════
-   BLOQUE 04 — Oratoria y asesoría de imagen (2 listas)
-   ════════════════════════════════════════════════════════════════════════ */
+/* BLOQUE 04 — Oratoria y asesoría de imagen: 2 sub-bloques. */
 function Bloque04({ c }: { c: Record<string, string> }) {
   return (
     <Block bg="bg-hueso-oscuro">
@@ -282,18 +348,18 @@ function Bloque04({ c }: { c: Record<string, string> }) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   CTA FINAL — centrada, minimalista (sin fondo --bordo)
+   SECCIÓN 4 — CTA FINAL (centrada, sin fondo --bordo)
    ════════════════════════════════════════════════════════════════════════ */
 function FinalCTA({ c }: { c: Record<string, string> }) {
   return (
-    <section className="bg-hueso text-center" style={{ paddingInline: "clamp(24px, 6vw, 96px)", paddingBlock: "96px" }}>
+    <section className="bg-hueso text-center" style={{ paddingInline: PAD_X, paddingBlock: "96px" }}>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={mvp}
         transition={{ duration: 0.6, ease: EASE }}
         className="mx-auto flex flex-col items-center"
-        style={{ maxWidth: 720 }}
+        style={{ maxWidth: 640 }}
       >
         <Eyebrow centered>{c.eyebrow}</Eyebrow>
         <GoldLine centered />
@@ -323,6 +389,7 @@ export function ServiciosPageSections({
 }: {
   content?: {
     hero?: Record<string, string>
+    pilares?: Record<string, string>
     servicio_01?: Record<string, string>
     servicio_02?: Record<string, string>
     servicio_03?: Record<string, string>
@@ -331,6 +398,7 @@ export function ServiciosPageSections({
   }
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
+  const pilares = { ...fallbacksFor("pilares"), ...content?.pilares }
   const s1 = { ...fallbacksFor("servicio_01"), ...content?.servicio_01 }
   const s2 = { ...fallbacksFor("servicio_02"), ...content?.servicio_02 }
   const s3 = { ...fallbacksFor("servicio_03"), ...content?.servicio_03 }
@@ -340,6 +408,7 @@ export function ServiciosPageSections({
   return (
     <>
       <HeroSection hero={hero} serviceCount={SERVICE_COUNT} />
+      <PilaresSection c={pilares} />
       <Bloque01 c={s1} />
       <Bloque02 c={s2} />
       <Bloque03 c={s3} />
