@@ -1,34 +1,30 @@
 "use client"
 
+import type { ReactNode } from "react"
 import Link from "next/link"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { fallbacksFor } from "@/lib/servicios-schema"
-import { MotionLink } from "@/components/ui/motion-link"
-import { springSnappy, tapScale } from "@/lib/animations"
 import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { IsotipoInfinito } from "@/components/ui/isotipo-infinito"
-import { SplitWords } from "@/components/ui/split-words"
 import { DrawnLine } from "@/components/ui/drawn-line"
-import { maskRevealVariants } from "@/lib/animations"
-import { buildServicio, two, EASE, type Servicio } from "@/components/servicios/types"
-import { ServicioPrincipal } from "@/components/servicios/servicio-principal"
-import { ServiciosSecundarios } from "@/components/servicios/servicios-secundarios"
-import { AlianzasSection } from "@/components/servicios/alianzas-section"
+import { two, EASE } from "@/components/servicios/types"
 
-const SERVICE_KEYS = ["servicio_01", "servicio_02", "servicio_03"] as const
+const SERVICE_COUNT = 4
+const mvp = { once: true, margin: "-80px" } as const
 
-const mvp = { once: true, margin: "-60px" } as const
+/* Convierte un longtext multilínea (un ítem por línea) en array no vacío. */
+function lines(raw?: string): string[] {
+  return (raw ?? "").split(/\n+/).map((s) => s.trim()).filter(Boolean)
+}
+/* Separa párrafos por línea(s) en blanco. */
+function paragraphs(raw?: string): string[] {
+  return (raw ?? "").split(/\n{2,}/).map((s) => s.trim()).filter(Boolean)
+}
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 1 — HERO (v4.1 — sin indicador SCROLL inferior)
+   SECCIÓN 1 — HERO (se mantiene el diseño existente)
    ════════════════════════════════════════════════════════════════════════ */
-
-/* Variantes reduced-aware. Clave: el cliente SIEMPRE anima a "visible" (no se
-   gatea `animate` por reduced), porque el SSR no conoce reduced y rinde el
-   estado "hidden"; si `animate` quedara undefined bajo reduced, las palabras
-   quedarían atascadas en hidden. Bajo reduced el movimiento se neutraliza
-   (sin blur/desplazamiento, duración 0): aparece al instante. */
 const heroContainer = (reduced: boolean): Variants => ({
   hidden: {},
   visible: { transition: { staggerChildren: reduced ? 0 : 0.06, delayChildren: reduced ? 0 : 0.08 } },
@@ -44,9 +40,6 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
   const satelliteDelay = reduced ? 0 : words.length * 0.06 + 0.45
   const eyebrow = (hero.eyebrow ?? "Servicios").trim()
 
-  // Siempre anima a visible; bajo reduced es instantáneo (sin desplazamiento).
-  // Si se gateara `animate` por reduced, el estado inicial del SSR quedaría
-  // atascado (el SSR no conoce reduced y rinde opacity:0).
   const satellite = (delay: number) => ({
     initial: { opacity: 0, y: reduced ? 0 : 10 },
     animate: { opacity: 1, y: 0 },
@@ -62,7 +55,6 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
       <TextureOverlay texture="paperGrain" opacity={0.14} />
 
       <div className="relative mx-auto grid w-full items-center gap-x-12 gap-y-14 lg:grid-cols-[1fr_auto]" style={{ maxWidth: 1180 }}>
-        {/* Columna izquierda — título y copy (en mobile va arriba) */}
         <div>
           <motion.div {...satellite(0)} className="mb-7">
             <span className="inline-flex items-center gap-2 rounded-full border border-dorado/60 bg-arena/40 font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em", padding: "8px 16px" }}>
@@ -73,8 +65,6 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
 
           <motion.div aria-hidden initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: reduced ? 0 : 0.7, ease: EASE, delay: reduced ? 0 : satelliteDelay + 0.05 }} className="mb-8 h-px origin-left bg-dorado" style={{ width: "clamp(60px, 10vw, 120px)" }} />
 
-          {/* Estructura estable (siempre spans por palabra) para no romper la
-              hidratación cuando reduced difiere server↔client (#418). */}
           <motion.h1 aria-label={hero.h1} variants={heroContainer(!!reduced)} initial="hidden" animate="visible" className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(36px, 5.4vw, 88px)", lineHeight: 1.05, letterSpacing: "-0.03em", maxWidth: "16ch" }}>
             {words.map((w, i) => (
               <motion.span key={i} aria-hidden variants={heroWord(!!reduced)} className="inline-block" style={{ marginRight: "0.25em", willChange: "transform, filter" }}>{w}</motion.span>
@@ -86,8 +76,6 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
           </motion.div>
         </div>
 
-        {/* Columna derecha — composición identitaria con el isotipo
-            (en mobile baja debajo del título) */}
         <motion.div
           {...satellite(0.1)}
           className="flex flex-col items-start gap-6 lg:items-center lg:pl-8"
@@ -109,113 +97,220 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN — TRANSICIÓN CONCEPTUAL
+   ÁTOMOS TIPOGRÁFICOS (reglas de la página)
    ════════════════════════════════════════════════════════════════════════ */
-function TransitionSection({ phrase, numbers, heading }: { phrase: string; numbers: string[]; heading: string }) {
-  const reduced = !!useReducedMotion()
-  const item = (delay: number) => ({
-    initial: { opacity: 0, y: reduced ? 0 : 16 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: mvp,
-    transition: { duration: reduced ? 0 : 0.65, ease: EASE, delay: reduced ? 0 : delay },
-  })
-
+function Eyebrow({ children, centered }: { children: ReactNode; centered?: boolean }) {
   return (
-    <section className="flex min-h-[50vh] flex-col items-center justify-center overflow-hidden bg-hueso text-center" style={{ padding: "clamp(120px, 16vh, 180px) clamp(24px, 6vw, 96px)" }}>
-      {/* Frase puente opcional (contenido editable; sólo si existe). */}
-      {phrase && (
-        <motion.p
-          {...item(0)}
-          className="mb-12 font-playfair text-negro-bordo"
-          style={{ fontSize: "clamp(32px, 4.4vw, 64px)", lineHeight: 1.12, letterSpacing: "-0.02em", maxWidth: 900 }}
-        >
-          {phrase}
-        </motion.p>
-      )}
+    <p className="font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em", textAlign: centered ? "center" : "left" }}>
+      {children}
+    </p>
+  )
+}
+function GoldLine({ centered }: { centered?: boolean }) {
+  return <div className="bg-dorado" style={{ width: 40, height: 1, margin: centered ? "16px auto 24px" : "16px 0 24px" }} />
+}
+function BlockTitle({ children }: { children: ReactNode }) {
+  return (
+    <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(28px, 4vw, 36px)", lineHeight: 1.12, letterSpacing: "-0.02em", maxWidth: "20ch" }}>
+      {children}
+    </h2>
+  )
+}
+function Label({ children }: { children: ReactNode }) {
+  return (
+    <p className="font-mono uppercase text-bordo/70" style={{ fontSize: 10, letterSpacing: "0.18em" }}>
+      {children}
+    </p>
+  )
+}
+/* Párrafos de descripción: DM Sans 16px / 1.7 --gris-bordo. */
+function Intro({ text }: { text?: string }) {
+  return (
+    <div className="mt-6 flex flex-col gap-4">
+      {paragraphs(text).map((p, i) => (
+        <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{p}</p>
+      ))}
+    </div>
+  )
+}
+/* Bullets: DM Sans 15px / 1.6 con marcador • en --bordo. */
+function Bullets({ items }: { items?: string }) {
+  return (
+    <ul className="flex flex-col gap-2.5">
+      {lines(items).map((it, i) => (
+        <li key={i} className="flex gap-2.5 font-sans text-gris-bordo" style={{ fontSize: 15, lineHeight: 1.6 }}>
+          <span aria-hidden className="text-bordo" style={{ flex: "none" }}>•</span>
+          <span>{it}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
 
-      <IsotipoInfinito size="transicion" color="var(--color-bordo)" />
-
-      {/* Dos líneas doradas creciendo desde el centro hacia los costados. */}
-      <div className="mt-8 flex items-center justify-center gap-3" aria-hidden>
-        <DrawnLine width="clamp(120px, 20vw, 200px)" thickness={1.5} opacity={0.55} origin="right" delay={0.25} />
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-dorado" />
-        <DrawnLine width="clamp(120px, 20vw, 200px)" thickness={1.5} opacity={0.55} origin="left" delay={0.25} />
-      </div>
-
-      {numbers.length > 0 && (
-        <motion.span {...item(0.15)} className="mt-7 font-mono uppercase text-bordo/50" style={{ fontSize: 14, letterSpacing: "0.3em" }}>
-          {numbers.join(" · ")}
-        </motion.span>
-      )}
-
-      {heading && (
-        <motion.p {...item(0.22)} className="mt-10 font-playfair italic text-negro-bordo" style={{ fontSize: "clamp(28px, 3vw, 40px)", lineHeight: 1.15 }}>
-          {heading}
-        </motion.p>
-      )}
+/* Sección-bloque con fondo alterno y reveal al entrar en viewport. */
+function Block({ bg, children }: { bg: string; children: ReactNode }) {
+  return (
+    <section className={`${bg} py-16 md:py-24`} style={{ paddingInline: "clamp(24px, 6vw, 96px)" }}>
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={mvp}
+        transition={{ duration: 0.6, ease: EASE }}
+        className="mx-auto w-full"
+        style={{ maxWidth: 1180 }}
+      >
+        {children}
+      </motion.div>
     </section>
   )
 }
 
+function BlockHeader({ c }: { c: Record<string, string> }) {
+  return (
+    <div style={{ maxWidth: 760 }}>
+      <Eyebrow>{c.eyebrow}</Eyebrow>
+      <GoldLine />
+      <BlockTitle>{c.title}</BlockTitle>
+      <Intro text={c.intro} />
+    </div>
+  )
+}
+
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN — CTA FINAL (full-bleed --bordo, centrado)
+   BLOQUE 01 — Estrategia y consultoría general (4 sub-puntos título + desc)
    ════════════════════════════════════════════════════════════════════════ */
-function FinalCTA({ cta }: { cta: Record<string, string> }) {
-  const reduced = !!useReducedMotion()
-  const eyebrow = (cta.eyebrow ?? "").trim()
-  const titlePre = (cta.title_pre ?? "").trim()
-  const titleAccent = (cta.title_accent ?? "").trim()
-  const desc = (cta.description ?? "").trim()
-  const button = (cta.button_text ?? "").trim() || "Conversemos"
-
-  const item = (delay: number) => ({
-    initial: { opacity: 0, y: reduced ? 0 : 18 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: mvp,
-    transition: { duration: reduced ? 0 : 0.65, ease: EASE, delay: reduced ? 0 : delay },
-  })
-
-  const accentMask = maskRevealVariants(1, !!reduced)
+function Bloque01({ c }: { c: Record<string, string> }) {
+  const points = [1, 2, 3, 4]
+    .map((n) => ({ title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
+    .filter((p) => p.title.trim())
 
   return (
-    <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-bordo text-center" style={{ padding: "120px clamp(24px, 6vw, 96px)" }}>
-      <TextureOverlay texture="paperGrain" opacity={0.1} />
-      <div className="relative mx-auto flex flex-col items-center" style={{ maxWidth: 820 }}>
-        <motion.div {...item(0)} className="mb-7" style={{ color: "var(--color-hueso)" }}>
-          <IsotipoInfinito size="small" color="var(--color-hueso)" />
-        </motion.div>
-
-        {eyebrow && (
-          <motion.p {...item(0.05)} className="mb-8 font-mono uppercase text-dorado" style={{ fontSize: 12, letterSpacing: "0.22em" }}>{eyebrow}</motion.p>
-        )}
-        {(titlePre || titleAccent) && (
-          <h2 className="font-playfair font-bold text-hueso" style={{ fontSize: "clamp(40px, 6.5vw, 96px)", lineHeight: 1.04, letterSpacing: "-0.03em" }}>
-            {titlePre && <SplitWords as="span" text={titlePre} delay={0.1} className="block" />}
-            {titleAccent && (
-              <motion.em
-                variants={accentMask}
-                initial="hidden"
-                whileInView="visible"
-                viewport={mvp}
-                className="mt-1 block not-italic font-playfair italic text-dorado"
-              >
-                {titleAccent}
-              </motion.em>
-            )}
-          </h2>
-        )}
-        {desc && (
-          <motion.div {...item(0.18)} className="mt-8 font-sans text-hueso/80" style={{ fontSize: "clamp(16px, 1.5vw, 20px)", lineHeight: 1.6, maxWidth: 560, marginInline: "auto" }}>
-            <RichText html={desc} className="rich-inline" />
-          </motion.div>
-        )}
-        <motion.div {...item(0.24)} className="mt-12">
-          <MotionLink href="/#contacto" whileTap={{ scale: tapScale }} transition={springSnappy} className="cta-invert cta-arrow group inline-flex items-center gap-3 rounded-xl border-2 border-hueso bg-hueso px-10 font-sans font-semibold text-bordo transition-colors duration-300" style={{ fontSize: "clamp(16px, 1.4vw, 19px)", paddingBlock: "clamp(16px,2vw,22px)" }}>
-            {button}
-            <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
-          </MotionLink>
-        </motion.div>
+    <Block bg="bg-hueso">
+      <BlockHeader c={c} />
+      <div className="mt-12">
+        <Label>{c.includes_label}</Label>
+        <div className="mt-7 grid gap-x-10 gap-y-8 md:grid-cols-2">
+          {points.map((p) => (
+            <div key={p.title}>
+              <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: 15 }}>{p.title}</p>
+              <p className="mt-2 font-sans text-gris-bordo" style={{ fontSize: 15, lineHeight: 1.6 }}>{p.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
+    </Block>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   BLOQUE 02 — Prensa (2 sub-bloques + lista común)
+   ════════════════════════════════════════════════════════════════════════ */
+function SubBloquePrensa({ name, desc, items }: { name: string; desc: string; items: string }) {
+  return (
+    <div className="rounded-2xl border border-dorado/25 p-6 md:p-7">
+      <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: 20, lineHeight: 1.2 }}>{name}</p>
+      <p className="mt-3 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{desc}</p>
+      <div className="mt-5">
+        <Bullets items={items} />
+      </div>
+    </div>
+  )
+}
+function Bloque02({ c }: { c: Record<string, string> }) {
+  return (
+    <Block bg="bg-hueso-oscuro">
+      <BlockHeader c={c} />
+      <div className="mt-10 grid gap-6 md:grid-cols-2">
+        <SubBloquePrensa name={c.organica_label} desc={c.organica_desc} items={c.organica_items} />
+        <SubBloquePrensa name={c.pautada_label} desc={c.pautada_desc} items={c.pautada_items} />
+      </div>
+      <div className="mt-12">
+        <Label>{c.includes_label}</Label>
+        <div className="mt-5">
+          <Bullets items={c.includes_items} />
+        </div>
+      </div>
+    </Block>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   BLOQUE 03 — Relaciones públicas y eventos (lista + sub-servicio destacado)
+   ════════════════════════════════════════════════════════════════════════ */
+function Bloque03({ c }: { c: Record<string, string> }) {
+  return (
+    <Block bg="bg-hueso">
+      <BlockHeader c={c} />
+      <div className="mt-10">
+        <Label>{c.includes_label}</Label>
+        <div className="mt-5" style={{ maxWidth: 820 }}>
+          <Bullets items={c.includes_items} />
+        </div>
+      </div>
+      <div className="mt-12 rounded-2xl border border-dorado/30 bg-hueso-oscuro p-6 md:p-8" style={{ maxWidth: 820 }}>
+        <Label>{c.sub_label}</Label>
+        <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: 22, lineHeight: 1.2 }}>{c.sub_title}</p>
+        <p className="mt-3 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{c.sub_desc}</p>
+      </div>
+    </Block>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   BLOQUE 04 — Oratoria y asesoría de imagen (2 listas)
+   ════════════════════════════════════════════════════════════════════════ */
+function Bloque04({ c }: { c: Record<string, string> }) {
+  return (
+    <Block bg="bg-hueso-oscuro">
+      <BlockHeader c={c} />
+      <div className="mt-10 grid gap-10 md:grid-cols-2">
+        <div>
+          <Label>{c.oratoria_label}</Label>
+          <div className="mt-5">
+            <Bullets items={c.oratoria_items} />
+          </div>
+        </div>
+        <div>
+          <Label>{c.imagen_label}</Label>
+          <div className="mt-5">
+            <Bullets items={c.imagen_items} />
+          </div>
+        </div>
+      </div>
+    </Block>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   CTA FINAL — centrada, minimalista (sin fondo --bordo)
+   ════════════════════════════════════════════════════════════════════════ */
+function FinalCTA({ c }: { c: Record<string, string> }) {
+  return (
+    <section className="bg-hueso text-center" style={{ paddingInline: "clamp(24px, 6vw, 96px)", paddingBlock: "96px" }}>
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={mvp}
+        transition={{ duration: 0.6, ease: EASE }}
+        className="mx-auto flex flex-col items-center"
+        style={{ maxWidth: 720 }}
+      >
+        <Eyebrow centered>{c.eyebrow}</Eyebrow>
+        <GoldLine centered />
+        <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(32px, 5vw, 52px)", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+          {c.title}
+        </h2>
+        <p className="mt-6 font-sans text-gris-bordo" style={{ fontSize: 18, lineHeight: 1.7, maxWidth: 520 }}>
+          {c.description}
+        </p>
+        <Link
+          href="/contacto"
+          className="group mt-10 inline-flex items-center gap-2 rounded-full bg-bordo px-8 py-4 font-sans text-[15px] font-semibold text-hueso transition-all hover:bg-bordo/90 active:scale-[0.98]"
+        >
+          {c.button_text}
+          <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+        </Link>
+      </motion.div>
     </section>
   )
 }
@@ -227,45 +322,29 @@ export function ServiciosPageSections({
   content,
 }: {
   content?: {
-    config?: Record<string, string>
     hero?: Record<string, string>
     servicio_01?: Record<string, string>
     servicio_02?: Record<string, string>
     servicio_03?: Record<string, string>
-    transition?: Record<string, string>
-    alianzas?: Record<string, string>
+    servicio_04?: Record<string, string>
     cta?: Record<string, string>
   }
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
+  const s1 = { ...fallbacksFor("servicio_01"), ...content?.servicio_01 }
+  const s2 = { ...fallbacksFor("servicio_02"), ...content?.servicio_02 }
+  const s3 = { ...fallbacksFor("servicio_03"), ...content?.servicio_03 }
+  const s4 = { ...fallbacksFor("servicio_04"), ...content?.servicio_04 }
   const cta = { ...fallbacksFor("cta"), ...content?.cta }
-  const transitionPhrase = ({ ...fallbacksFor("transition"), ...content?.transition }.phrase ?? "").trim()
-  const alianzas = { ...fallbacksFor("alianzas"), ...content?.alianzas }
-
-  const featuredKey =
-    (content?.config?.featured && SERVICE_KEYS.includes(content.config.featured as (typeof SERVICE_KEYS)[number])
-      ? content.config.featured
-      : fallbacksFor("config").featured) || "servicio_02"
-
-  const byKey = Object.fromEntries(
-    SERVICE_KEYS.map((k) => [k, buildServicio(k, { ...fallbacksFor(k), ...content?.[k] })]),
-  ) as Record<string, Servicio>
-
-  const featured = byKey[featuredKey]
-  const secondaries = SERVICE_KEYS.filter((k) => k !== featuredKey).map((k) => byKey[k])
 
   return (
     <>
-      <HeroSection hero={hero} serviceCount={SERVICE_KEYS.length} />
-      <ServicioPrincipal s={featured} id="svc-principal" />
-      <TransitionSection
-        phrase={transitionPhrase}
-        numbers={secondaries.map((s) => s.numero).filter(Boolean)}
-        heading="También ofrezco"
-      />
-      <ServiciosSecundarios servicios={secondaries} id="svc-secundarios" />
-      <AlianzasSection eyebrow={alianzas.eyebrow} title={alianzas.title} items={alianzas.items} id="svc-alianzas" />
-      <FinalCTA cta={cta} />
+      <HeroSection hero={hero} serviceCount={SERVICE_COUNT} />
+      <Bloque01 c={s1} />
+      <Bloque02 c={s2} />
+      <Bloque03 c={s3} />
+      <Bloque04 c={s4} />
+      <FinalCTA c={cta} />
     </>
   )
 }
