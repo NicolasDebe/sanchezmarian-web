@@ -112,12 +112,11 @@ function BioSection({ c }: { c: Record<string, string> }) {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           >
-            {c.paragraph_1_pre}{" "}
-            <em className="italic text-bordo">{c.paragraph_1_accent}</em>
+            {c.paragraph_1_pre}{" "}{c.paragraph_1_accent}
           </motion.p>
 
           <motion.div
-            className="font-sans text-[15px] text-gris-bordo leading-[1.8]"
+            className="font-sans text-[16px] text-gris-bordo leading-[1.7]"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -127,7 +126,7 @@ function BioSection({ c }: { c: Record<string, string> }) {
           </motion.div>
 
           <motion.div
-            className="font-sans text-[15px] text-gris-bordo leading-[1.8]"
+            className="font-sans text-[16px] text-gris-bordo leading-[1.7]"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -202,12 +201,12 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
               <span className="block font-mono text-[10px] text-bordo opacity-60 group-hover:opacity-100 transition-opacity duration-300 mb-3">
                 {pilar.num}
               </span>
-              <p className="font-playfair font-bold text-negro-bordo text-[20px] leading-[1.15] mb-3 transition-transform duration-300 ease-out group-hover:-translate-y-1">
+              <p className="font-playfair font-bold text-negro-bordo text-[22px] leading-[1.15] mb-3 transition-transform duration-300 ease-out group-hover:-translate-y-1">
                 {pilar.titulo}
               </p>
               <RichText
                 html={pilar.descripcion}
-                className="rich-inline font-sans text-[14px] text-gris-bordo leading-relaxed"
+                className="rich-inline font-sans text-[15px] text-gris-bordo leading-[1.7]"
               />
             </motion.div>
           ))}

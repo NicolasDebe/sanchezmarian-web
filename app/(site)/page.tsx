@@ -8,7 +8,6 @@ import { EnMedias } from "@/components/en-medios"
 import { CtaFinal } from "@/components/cta-final"
 import { getContentBatch } from "@/lib/content"
 import { fallbacksFor } from "@/lib/home-schema"
-import { fallbacksFor as serviciosFallbacks } from "@/lib/servicios-schema"
 import { globalFallbacksFor } from "@/lib/global-schema"
 import { buildMetadata, SITE_URL } from "@/lib/seo"
 import type { Metadata } from "next"
@@ -24,8 +23,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   // Lectura resiliente: getContentBatch nunca tira excepción y ya trae fallbacks,
   // así que el build de Vercel jamás rompe por una falla de Supabase.
-  // La vidriera de servicios del home LEE su contenido de page='servicios'
-  // (no duplica texto): Mentoría=servicio_02, Prensa=servicio_01, RRPP=servicio_03.
+  // La vidriera de servicios del home (jerarquía 1+3) lee su contenido de
+  // home/servicios; los textos completos por servicio viven en /servicios.
   const [
     hero,
     stats,
@@ -35,9 +34,6 @@ export default async function Home() {
     serviciosHeader,
     contact,
     footer,
-    svcMentoria,
-    svcPrensa,
-    svcRrpp,
   ] = await Promise.all([
     getContentBatch("home", "hero", fallbacksFor("hero")),
     getContentBatch("home", "stats", fallbacksFor("stats")),
@@ -48,9 +44,6 @@ export default async function Home() {
     getContentBatch("home", "contact", fallbacksFor("contact")),
     // Redes sociales editables desde el CMS (global/footer); única fuente de URLs.
     getContentBatch("global", "footer", globalFallbacksFor("footer")),
-    getContentBatch("servicios", "servicio_02", serviciosFallbacks("servicio_02")),
-    getContentBatch("servicios", "servicio_01", serviciosFallbacks("servicio_01")),
-    getContentBatch("servicios", "servicio_03", serviciosFallbacks("servicio_03")),
   ])
 
   const social = {
@@ -64,12 +57,7 @@ export default async function Home() {
       <Stats content={stats} />
       <Ideas content={metodo} />
       <Clientes />
-      <HomeServicios
-        section={serviciosHeader}
-        mentoria={svcMentoria}
-        prensa={svcPrensa}
-        rrpp={svcRrpp}
-      />
+      <HomeServicios section={serviciosHeader} />
       <Bio content={bio} social={social} />
       <EnMedias />
       <CtaFinal content={ctaFinal} contact={contact} social={social} />

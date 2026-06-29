@@ -45,14 +45,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
         quality={90}
         placeholder="blur"
         sizes="100vw"
-        className="w-full block"
-        style={{
-          height: "auto",
-          maxHeight: "100vh",
-          minHeight: "680px",
-          objectFit: "cover",
-          objectPosition: "center top",
-        }}
+        className="block w-full object-cover object-top absolute inset-0 h-full md:static md:h-auto md:max-h-screen md:min-h-[680px]"
       />
 
       {/* CAPA 2: OVERLAY DESKTOP — horizontal */}
@@ -73,8 +66,15 @@ export function Hero({ content }: { content?: Record<string, string> }) {
         }}
       />
 
-      {/* CAPA 3: TEXTO */}
-      <div className="absolute inset-0 flex items-end md:items-center py-16 md:py-20">
+      {/* CAPA 3: TEXTO
+          MOBILE: el bloque va EN FLUJO (relative) y define el alto de la sección
+          (la imagen pasa a ser fondo absoluto), con min-h-[680px] de piso. Así la
+          sección crece con el texto y nunca recorta el primer renglón. El
+          padding-top blinda contra el nav fixed (~72px): 90px en <640px, 100px en
+          >=640px; con items-end el texto sigue anclado abajo-izquierda cuando
+          sobra espacio (texto corto). DESKTOP (md): vuelve a ser absolute inset-0
+          centrado con py-20 — idéntico al original. */}
+      <div className="relative md:absolute md:inset-0 min-h-[680px] md:min-h-0 flex items-end md:items-center pt-[90px] sm:pt-[100px] md:py-20 pb-16">
         <div className="w-full max-w-7xl mx-auto px-6 lg:px-12 pb-10 md:pb-0">
 
           <motion.div
