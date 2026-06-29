@@ -107,7 +107,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         plain: true,
         label: "Servicio destacado — Descripción",
         fallback:
-          "Diseñamos y coordinamos toda tu estrategia de comunicación desde una visión 360°. Sin micromanagement: vos te enfocás en hacer crecer tu negocio mientras nosotros nos encargamos de que cada canal hable bajo el mismo propósito.",
+          "Diseñado exclusivamente para empresas y marcas personales que buscan delegar su comunicación con absoluta confianza, liberando tiempo clave de su agenda para enfocarlo en el crecimiento del negocio.",
         maxChars: 400,
         help: "~3 líneas. Texto plano, sin negritas ni cursivas.",
       },
@@ -124,7 +124,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         plain: true,
         label: "Servicio 2 — Descripción",
         fallback:
-          "Coberturas orgánicas y pautadas en medios relevantes para tu rubro. Definimos ángulo, redactamos gacetillas y gestionamos publicación, vocería y seguimiento.",
+          "Lograr que la empresa y su vocero aparezca en medios de comunicación relevantes para su rubro y audiencia.",
         maxChars: 320,
         help: "Texto plano, sin negritas ni cursivas.",
       },
@@ -141,7 +141,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         plain: true,
         label: "Servicio 3 — Descripción",
         fallback:
-          "Vinculamos tu marca con sus públicos de interés a través de eventos, alianzas y oportunidades de agenda. Cada acción con objetivo medible, no como gesto aislado.",
+          "El vínculo estratégico entre la empresa o marca personal y sus públicos de interés: clientes, aliados, medios, comunidad y referentes del sector.",
         maxChars: 320,
         help: "Texto plano, sin negritas ni cursivas.",
       },
@@ -158,7 +158,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         plain: true,
         label: "Servicio 4 — Descripción",
         fallback:
-          "Trabajamos con vos o tu vocero para comunicar con seguridad, claridad y coherencia en medios, redes y presentaciones. Imagen alineada al mensaje y al contexto.",
+          "Una estrategia de comunicación es tan fuerte como la persona que la transmite. Trabajamos con el vocero o referente para que pueda comunicarse con seguridad, claridad y coherencia en cualquier plataforma o instancia pública.",
         maxChars: 320,
         help: "Texto plano, sin negritas ni cursivas.",
       },
@@ -166,7 +166,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         field: "cta_label",
         type: "text",
         label: "Botón del pie — texto",
-        fallback: "Ver todos los servicios",
+        fallback: "Ver servicios en detalle",
         maxChars: 50,
       },
     ],
