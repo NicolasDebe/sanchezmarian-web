@@ -64,6 +64,13 @@ export const SCOPE_LABELS: Record<ClippingScope, string> = {
 export const SCOPES: ClippingScope[] = ["local", "nacional", "regional", "internacional"]
 export const FORMATS: ClippingFormat[] = ["Digital", "Gráfico", "TV", "Radio", "Streaming"]
 
+/**
+ * Topes de largo de los campos editables de un clipping, alineados al render
+ * público (/casos-de-exito): el título se recorta a 2 líneas y el medio es un
+ * nombre corto en mono. Validados en el form (cliente) y en el server action.
+ */
+export const CLIPPING_LIMITS = { medium: 80, title: 220, url: 500 } as const
+
 /** Año de un published_at sin pasar por Date (evita el corrimiento de timezone). */
 export function clippingYear(publishedAt: string): string {
   return publishedAt.slice(0, 4)

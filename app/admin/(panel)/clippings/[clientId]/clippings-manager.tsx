@@ -7,12 +7,14 @@ import {
   SCOPES,
   FORMATS,
   SCOPE_LABELS,
+  CLIPPING_LIMITS,
   type DbClipping,
   type ClippingScope,
   type ClippingFormat,
 } from "@/lib/clippings"
 import { audioFileError, AUDIO_ACCEPT_ATTR, audioFileLabel } from "@/lib/audio"
 import { AudioPlayer } from "@/components/audio-player"
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 import {
   createClipping,
   updateClipping,
@@ -115,6 +117,7 @@ function AudioField({
   const [dragOver, setDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [removing, setRemoving] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function handleFile(file: File) {
@@ -159,8 +162,6 @@ function AudioField({
 
   async function handleRemove() {
     if (!audioUrl) return
-    const ok = window.confirm("¿Eliminar el audio de este clipping?")
-    if (!ok) return
     setRemoving(true)
     setError(null)
     try {
@@ -174,6 +175,7 @@ function AudioField({
       setError("No se pudo eliminar el audio. Probá de nuevo.")
     } finally {
       setRemoving(false)
+      setConfirmRemove(false)
     }
   }
 
@@ -193,7 +195,7 @@ function AudioField({
           </span>
           <button
             type="button"
-            onClick={handleRemove}
+            onClick={() => setConfirmRemove(true)}
             disabled={removing}
             className="flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 font-sans text-xs font-semibold transition-opacity hover:opacity-85 disabled:opacity-60"
             style={{ borderColor: "var(--color-bordo)", color: "var(--color-bordo)" }}
@@ -208,6 +210,13 @@ function AudioField({
             {error}
           </p>
         )}
+        <ConfirmDialog
+          open={confirmRemove}
+          title="¿Eliminar el audio de este clipping? No se puede deshacer."
+          busy={removing}
+          onConfirm={handleRemove}
+          onCancel={() => setConfirmRemove(false)}
+        />
       </div>
     )
   }
@@ -301,6 +310,7 @@ export function ClippingsManager({
   const [extractMsg, setExtractMsg] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<DbClipping | null>(null)
 
   useEffect(() => {
     if (!toast) return
@@ -387,7 +397,11 @@ export function ClippingsManager({
     }
     if (!hasUrl && !hasAudio) next._content = "Agregá una URL o un audio (al menos uno)."
     if (!form.medium.trim()) next.medium = "El medio es obligatorio."
+    else if (form.medium.trim().length > CLIPPING_LIMITS.medium)
+      next.medium = `El medio supera el máximo (${form.medium.trim().length}/${CLIPPING_LIMITS.medium}).`
     if (!form.title.trim()) next.title = "El título es obligatorio."
+    else if (form.title.trim().length > CLIPPING_LIMITS.title)
+      next.title = `El título supera el máximo (${form.title.trim().length}/${CLIPPING_LIMITS.title}).`
     if (!/^\d{4}-\d{2}-\d{2}$/.test(form.published_at)) next.published_at = "La fecha es obligatoria."
     if (!form.scope) next.scope = "Elegí el alcance."
     setErrors(next)
@@ -449,12 +463,13 @@ export function ClippingsManager({
   }
 
   // ── Eliminar ──
-  async function handleDelete(c: DbClipping) {
-    const ok = window.confirm("¿Eliminar este clipping? Esta acción no se puede deshacer.")
-    if (!ok) return
+  async function handleDelete() {
+    const c = confirmDelete
+    if (!c) return
     setDeletingId(c.id)
     const result = await deleteClipping(c.id)
     setDeletingId(null)
+    setConfirmDelete(null)
     if (!result.success) {
       setToast(result.error)
       return
@@ -581,7 +596,7 @@ export function ClippingsManager({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDelete(c)}
+                        onClick={() => setConfirmDelete(c)}
                         disabled={deletingId === c.id}
                         aria-label="Eliminar"
                         className="rounded-lg p-2 transition-colors hover:bg-[rgba(102,0,31,0.08)] disabled:opacity-50"
@@ -869,6 +884,15 @@ export function ClippingsManager({
           {toast}
         </div>
       )}
+
+      {/* Confirmación de borrado */}
+      <ConfirmDialog
+        open={!!confirmDelete}
+        title={`¿Eliminar «${confirmDelete?.title ?? ""}»? No se puede deshacer.`}
+        busy={deletingId !== null}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </>
   )
 }

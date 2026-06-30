@@ -55,6 +55,7 @@ import {
   uploadCampaignImage,
   type StagedImage,
 } from "@/app/admin/(panel)/campanas/actions"
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -369,6 +370,11 @@ export function PhotoManager({
     percent: number
   }>(null)
   const [toast, setToast] = useState<string | null>(null)
+  const [confirmRemove, setConfirmRemove] = useState<{
+    photo: ManagedPhoto
+    index: number
+  } | null>(null)
+  const [removingPhoto, setRemovingPhoto] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Espejo para acceso imperativo (flushPending) sin closures viejas.
@@ -525,6 +531,14 @@ export function PhotoManager({
   }
 
   // ── Eliminar ──
+  async function confirmRemovePhoto() {
+    if (!confirmRemove) return
+    setRemovingPhoto(true)
+    await removePhoto(confirmRemove.photo, confirmRemove.index)
+    setRemovingPhoto(false)
+    setConfirmRemove(null)
+  }
+
   async function removePhoto(photo: ManagedPhoto, index: number) {
     setPhotos((prev) => prev.filter((_, i) => i !== index))
     if (!photo.id) {
@@ -696,7 +710,7 @@ export function PhotoManager({
                   onStartEdit={() => setEditingKey(photo.key)}
                   onCancelEdit={() => setEditingKey(null)}
                   onSaveAlt={(alt) => saveAlt(photo, i, alt)}
-                  onRemove={() => removePhoto(photo, i)}
+                  onRemove={() => setConfirmRemove({ photo, index: i })}
                   onMove={(dir) => movePhoto(i, dir)}
                 />
               ))}
@@ -714,6 +728,15 @@ export function PhotoManager({
           {toast}
         </div>
       )}
+
+      {/* Confirmación de borrado de foto */}
+      <ConfirmDialog
+        open={!!confirmRemove}
+        title="¿Eliminar esta foto? No se puede deshacer."
+        busy={removingPhoto}
+        onConfirm={confirmRemovePhoto}
+        onCancel={() => setConfirmRemove(null)}
+      />
     </div>
   )
 }

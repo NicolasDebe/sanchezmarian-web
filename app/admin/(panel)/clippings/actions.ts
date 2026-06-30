@@ -3,7 +3,13 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase"
-import { SCOPES, FORMATS, type ClippingScope, type ClippingFormat } from "@/lib/clippings"
+import {
+  SCOPES,
+  FORMATS,
+  CLIPPING_LIMITS,
+  type ClippingScope,
+  type ClippingFormat,
+} from "@/lib/clippings"
 import {
   audioFileError,
   safeAudioName,
@@ -55,6 +61,12 @@ function validateInput(data: ClippingInput): string | null {
   if (!data.client_id) return "Falta el cliente."
   if (!data.medium?.trim()) return "Completá el medio."
   if (!data.title?.trim()) return "Completá el título."
+  if (data.medium.trim().length > CLIPPING_LIMITS.medium)
+    return `El medio supera el máximo (${data.medium.trim().length}/${CLIPPING_LIMITS.medium}).`
+  if (data.title.trim().length > CLIPPING_LIMITS.title)
+    return `El título supera el máximo (${data.title.trim().length}/${CLIPPING_LIMITS.title}).`
+  if (data.url && data.url.trim().length > CLIPPING_LIMITS.url)
+    return `La URL supera el máximo (${data.url.trim().length}/${CLIPPING_LIMITS.url}).`
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data.published_at ?? "")) return "La fecha no es válida."
   if (!SCOPES.includes(data.scope)) return "Elegí un alcance válido."
   if (!FORMATS.includes(data.format)) return "Elegí un formato válido."

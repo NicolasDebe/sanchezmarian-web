@@ -1,8 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { saveContentSection } from "@/app/admin/actions"
+import { Undo2 } from "lucide-react"
+import {
+  saveContentSection,
+  getLastVersionDate,
+  restoreLastVersion,
+} from "@/app/admin/actions"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 import { hasHtmlTags, htmlToPlainText, plainToHtml } from "@/lib/rich-text"
 import type { FieldType, SelectOption } from "@/lib/content-schema"
 
@@ -69,6 +75,10 @@ export function ContentEditor({
   )
   const [status, setStatus] = useState<Record<string, Status>>({})
   const [messages, setMessages] = useState<Record<string, string>>({})
+  // Undo: sección con el modal abierto, fecha del backup y estado de carga.
+  const [undoFor, setUndoFor] = useState<string | null>(null)
+  const [undoDate, setUndoDate] = useState<string>("")
+  const [undoBusy, setUndoBusy] = useState(false)
 
   function setField(section: string, field: string, value: string) {
     setValues((prev) => ({
@@ -139,6 +149,55 @@ export function ContentEditor({
     }
   }
 
+  // ── Deshacer último cambio ──
+  async function openUndo(sec: EditorSection) {
+    setMessages((m) => ({ ...m, [sec.section]: "" }))
+    const info = await getLastVersionDate(page, sec.section)
+    if (!info.exists) {
+      setStatus((s) => ({ ...s, [sec.section]: "error" }))
+      setMessages((m) => ({
+        ...m,
+        [sec.section]: "No hay un cambio anterior para deshacer en esta sección.",
+      }))
+      return
+    }
+    setUndoDate(info.date)
+    setUndoFor(sec.section)
+  }
+
+  async function confirmUndo() {
+    if (!undoFor) return
+    const sec = sections.find((s) => s.section === undoFor)
+    if (!sec) return
+    setUndoBusy(true)
+    const result = await restoreLastVersion(page, undoFor)
+    setUndoBusy(false)
+    setUndoFor(null)
+    if ("error" in result) {
+      setStatus((s) => ({ ...s, [sec.section]: "error" }))
+      setMessages((m) => ({ ...m, [sec.section]: result.error }))
+      return
+    }
+    // Refrescar los campos del editor con lo restaurado (rich → HTML).
+    setValues((prev) => {
+      const next = { ...prev[sec.section] }
+      for (const f of sec.fields) {
+        if (f.field in result.values) {
+          const raw = result.values[f.field]
+          next[f.field] =
+            isRich(f) && raw && !hasHtmlTags(raw) ? plainToHtml(raw) : raw
+        }
+      }
+      return { ...prev, [sec.section]: next }
+    })
+    setStatus((s) => ({ ...s, [sec.section]: "success" }))
+    setMessages((m) => ({
+      ...m,
+      [sec.section]: "Listo: volvimos al estado anterior. Se verá en el sitio en ~1 minuto.",
+    }))
+    setTimeout(() => setStatus((s) => ({ ...s, [sec.section]: "idle" })), 4000)
+  }
+
   return (
     <div className="flex flex-col">
       {sections.map((sec) => {
@@ -150,28 +209,45 @@ export function ContentEditor({
             className="border-b"
             style={{ borderColor: "rgba(201,168,130,0.2)" }}
           >
-            <button
-              type="button"
-              onClick={() => setOpen(isOpen ? "" : sec.section)}
-              className="flex w-full items-center justify-between py-5 text-left"
-            >
-              <span
-                className="font-playfair text-xl font-bold"
-                style={{ color: "var(--color-negro-bordo)" }}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setOpen(isOpen ? "" : sec.section)}
+                className="flex flex-1 items-center justify-between py-5 text-left"
               >
-                {sec.title}
-              </span>
-              <span
-                className="font-mono transition-transform"
-                style={{
-                  fontSize: 13,
-                  color: "var(--color-dorado)",
-                  transform: isOpen ? "rotate(90deg)" : "none",
-                }}
-              >
-                ▶
-              </span>
-            </button>
+                <span
+                  className="font-playfair text-xl font-bold"
+                  style={{ color: "var(--color-negro-bordo)" }}
+                >
+                  {sec.title}
+                </span>
+                <span
+                  className="font-mono transition-transform"
+                  style={{
+                    fontSize: 13,
+                    color: "var(--color-dorado)",
+                    transform: isOpen ? "rotate(90deg)" : "none",
+                  }}
+                >
+                  ▶
+                </span>
+              </button>
+              {isOpen && (
+                <button
+                  type="button"
+                  onClick={() => openUndo(sec)}
+                  className="flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 font-sans transition-colors hover:bg-[rgba(102,0,31,0.06)]"
+                  style={{
+                    fontSize: 12,
+                    borderColor: "rgba(201,168,130,0.5)",
+                    color: "var(--color-bordo)",
+                  }}
+                >
+                  <Undo2 size={13} />
+                  Deshacer último cambio
+                </button>
+              )}
+            </div>
 
             {isOpen && (
               <div className="pb-8">
@@ -320,6 +396,18 @@ export function ContentEditor({
           </section>
         )
       })}
+
+      <ConfirmDialog
+        open={undoFor !== null}
+        title="¿Deshacer el último cambio en esta sección?"
+        body={`Vas a volver al estado del ${undoDate}.`}
+        confirmLabel="Sí, deshacer"
+        busyLabel="Deshaciendo…"
+        tone="primary"
+        busy={undoBusy}
+        onConfirm={confirmUndo}
+        onCancel={() => setUndoFor(null)}
+      />
     </div>
   )
 }

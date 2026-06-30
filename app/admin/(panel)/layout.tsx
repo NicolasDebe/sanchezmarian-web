@@ -10,6 +10,7 @@ const SECTIONS = [
   { label: "Servicios", href: "/admin/edit/servicios", enabled: true },
   { label: "Mis valores", href: "/admin/edit/mis-valores", enabled: true },
   { label: "Casos de éxito", href: "/admin/edit/casos-de-exito", enabled: true },
+  { label: "Tipografía", href: "/admin/tipografia", enabled: true },
   { label: "Clippings", href: "/admin/clippings", enabled: true },
   { label: "Campañas", href: "/admin/campanas", enabled: true },
   { label: "Suscriptores", href: "/admin/suscriptores", enabled: true, icon: Mail },

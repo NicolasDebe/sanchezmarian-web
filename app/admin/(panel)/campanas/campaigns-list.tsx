@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Plus, Search, Pencil, Trash2, Eye, ImageOff } from "lucide-react"
 import { STATUS_LABELS, type Campaign, type CampaignStatus } from "@/lib/types/campaign"
 import { hasHtmlTags, htmlToPlainText } from "@/lib/rich-text"
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 import { deleteCampaign } from "./actions"
 
 export type CampaignFilter = "todas" | "draft" | "active" | "finished"
@@ -340,58 +341,20 @@ export function CampaignsList({
       )}
 
       {/* Modal de confirmación */}
-      {confirm && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(26,9,16,0.5)" }}
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget && !deleting) setConfirm(null)
-          }}
-        >
-          <div
-            className="w-full rounded-2xl border p-6 shadow-xl sm:p-8"
-            style={{
-              maxWidth: 440,
-              backgroundColor: "var(--color-hueso)",
-              borderColor: "rgba(201,168,130,0.4)",
-            }}
-          >
-            <h2
-              className="font-playfair text-xl font-bold"
-              style={{ color: "var(--color-negro-bordo)" }}
-            >
-              ¿Eliminar la campaña &ldquo;{confirm.title}&rdquo;?
-            </h2>
-            <p
-              className="mt-3 font-sans text-sm leading-relaxed"
-              style={{ color: "var(--color-gris-bordo)" }}
-            >
-              Esta acción borra también las {confirm.images?.length ?? 0} fotos
-              cargadas. No se puede deshacer.
-            </p>
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setConfirm(null)}
-                disabled={deleting}
-                className="rounded-lg border px-4 py-2 font-sans text-sm transition-colors hover:bg-[rgba(102,0,31,0.04)] disabled:opacity-50"
-                style={{ borderColor: "rgba(201,168,130,0.5)", color: "var(--color-gris-bordo)" }}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={deleting}
-                className="rounded-lg px-4 py-2 font-sans text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-60"
-                style={{ backgroundColor: "#B3261E", color: "#fff" }}
-              >
-                {deleting ? "Eliminando…" : "Eliminar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={!!confirm}
+        title={`¿Eliminar «${confirm?.title ?? ""}»? No se puede deshacer.`}
+        body={
+          (confirm?.images?.length ?? 0) > 0
+            ? `Esta acción borra también las ${confirm?.images?.length} foto${
+                confirm?.images?.length === 1 ? "" : "s"
+              } cargadas.`
+            : undefined
+        }
+        busy={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirm(null)}
+      />
 
       {/* Toast */}
       {toast && (
