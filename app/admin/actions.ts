@@ -464,10 +464,51 @@ export async function saveDesignSettings(
       .eq("singleton_lock", true)
 
     if (error) return { error: "No se pudo guardar. Intentá de nuevo." }
+
+    // Trim del historial a las últimas 100 entradas.
+    const { data: oldRows } = await admin
+      .from("design_settings_history")
+      .select("id")
+      .order("changed_at", { ascending: false })
+      .range(100, 999)
+    if (oldRows && oldRows.length > 0) {
+      await admin
+        .from("design_settings_history")
+        .delete()
+        .in("id", oldRows.map((r) => r.id))
+    }
   } catch {
     return { error: "Ocurrió un error al guardar. Intentá de nuevo." }
   }
 
   revalidatePath("/", "layout")
   return { ok: true }
+}
+
+export type DesignHistoryRow = {
+  id: string
+  text_scale_mobile: string
+  text_scale_desktop: string
+  changed_at: string
+  changed_by: string | null
+}
+
+/** Últimas N entradas del historial de cambios de tipografía (más recientes primero). */
+export async function getDesignHistory(limit = 20): Promise<DesignHistoryRow[]> {
+  try {
+    const admin = createAdminClient()
+    const { data } = await admin
+      .from("design_settings_history")
+      .select("*")
+      .order("changed_at", { ascending: false })
+      .limit(limit)
+    return (data ?? []) as DesignHistoryRow[]
+  } catch {
+    return []
+  }
+}
+
+/** Restablece la escala a "equilibrado/equilibrado" (factor 1.00, diseño base). */
+export async function resetDesignToDefault(): Promise<SaveDesignResult> {
+  return saveDesignSettings("equilibrado", "equilibrado")
 }
