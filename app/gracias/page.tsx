@@ -43,10 +43,10 @@ export default function GraciasPage() {
 
         {/* Mensaje */}
         <div className="flex flex-col gap-3">
-          <h1 className="font-playfair font-bold text-negro-bordo text-[2rem] leading-[1.15]">
+          <h1 className="font-playfair font-bold text-negro-bordo text-[calc(2rem*var(--text-scale))] leading-[1.15]">
             Gracias por escribirme.
           </h1>
-          <p className="font-sans text-gris-bordo text-base leading-[1.7]">
+          <p className="font-sans text-gris-bordo text-[var(--fs-body-lg)] leading-[1.7]">
             Te contacto pronto.
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function GraciasPage() {
         {/* CTA */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 bg-bordo text-hueso px-8 py-3.5 rounded-full font-sans text-sm font-semibold hover:bg-bordo/90 active:scale-[0.98] transition-all"
+          className="inline-flex items-center gap-2 bg-bordo text-hueso px-8 py-3.5 rounded-full font-sans text-[var(--fs-caption)] font-semibold hover:bg-bordo/90 active:scale-[0.98] transition-all"
         >
           Volver al inicio
           <ArrowRight size={14} strokeWidth={2} />

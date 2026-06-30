@@ -414,7 +414,7 @@ function CampanaCard({
               </p>
               <p
                 className="font-mono"
-                style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.45, marginTop: 8 }}
+                style={{ fontSize: "var(--fs-eyebrow)", color: "var(--color-gris-bordo)", opacity: 0.45, marginTop: 8 }}
               >
                 {fecha}
               </p>
