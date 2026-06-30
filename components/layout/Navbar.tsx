@@ -65,7 +65,7 @@ export function Navbar({
               <Link
                 href={link.href}
                 className={cn(
-                  "font-sans text-sm font-medium transition-colors tracking-wide",
+                  "font-sans text-[var(--fs-caption)] font-medium transition-colors tracking-wide",
                   pathname === link.href
                     ? "text-hueso"
                     : "text-hueso/60 hover:text-hueso"
@@ -105,7 +105,7 @@ export function Navbar({
             </div>
             <Link
               href="/#contacto"
-              className="rounded-md bg-hueso px-5 py-2.5 font-sans text-[13px] font-medium text-bordo transition-colors hover:bg-arena"
+              className="rounded-md bg-hueso px-5 py-2.5 font-sans text-[var(--fs-caption)] font-medium text-bordo transition-colors hover:bg-arena"
             >
               Conversemos
             </Link>
@@ -165,7 +165,7 @@ export function Navbar({
                       href={link.href}
                       onClick={() => setIsMenuOpen(false)}
                       className={cn(
-                        "flex min-h-12 items-center font-sans text-base font-medium transition-colors",
+                        "flex min-h-12 items-center font-sans text-[var(--fs-body-lg)] font-medium transition-colors",
                         pathname === link.href ? "text-hueso" : "text-hueso/60"
                       )}
                     >
@@ -182,7 +182,7 @@ export function Navbar({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex w-full items-center justify-center gap-2.5 rounded-lg py-3.5 font-sans text-base font-semibold text-white"
+                  className="flex w-full items-center justify-center gap-2.5 rounded-lg py-3.5 font-sans text-[var(--fs-body-lg)] font-semibold text-white"
                   style={{ background: "#25D366" }}
                 >
                   <IconWhatsApp size={20} />
@@ -191,12 +191,12 @@ export function Navbar({
                 <a
                   href={`mailto:${SITE_EMAIL}`}
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-hueso/40 py-3.5 font-sans text-base font-medium text-hueso"
+                  className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-hueso/40 py-3.5 font-sans text-[var(--fs-body-lg)] font-medium text-hueso"
                 >
                   <Mail size={18} strokeWidth={1.5} />
                   Escribime por email
                 </a>
-                <p className="flex items-center justify-center gap-1.5 pt-1 font-sans text-xs text-hueso/50">
+                <p className="flex items-center justify-center gap-1.5 pt-1 font-sans text-[var(--fs-eyebrow)] text-hueso/50">
                   <MapPin size={13} strokeWidth={1.5} />
                   Mendoza, Argentina
                 </p>
@@ -210,7 +210,7 @@ export function Navbar({
                   rel="noopener noreferrer"
                   aria-label="Instagram de Marian Sánchez"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex min-h-11 items-center gap-3 font-sans text-sm text-hueso/80 transition-colors hover:text-hueso"
+                  className="flex min-h-11 items-center gap-3 font-sans text-[var(--fs-caption)] text-hueso/80 transition-colors hover:text-hueso"
                 >
                   <Instagram size={18} strokeWidth={1.5} className="shrink-0" />
                   Instagram @marian15s
@@ -221,7 +221,7 @@ export function Navbar({
                   rel="noopener noreferrer"
                   aria-label="LinkedIn de Marian Sánchez"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex min-h-11 items-center gap-3 font-sans text-sm text-hueso/80 transition-colors hover:text-hueso"
+                  className="flex min-h-11 items-center gap-3 font-sans text-[var(--fs-caption)] text-hueso/80 transition-colors hover:text-hueso"
                 >
                   <Linkedin size={18} strokeWidth={1.5} className="shrink-0" />
                   LinkedIn Marian Sánchez

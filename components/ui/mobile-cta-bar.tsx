@@ -53,7 +53,7 @@ export function MobileCtaBar({
             href={href}
             whileTap={{ scale: tapScale }}
             transition={{ type: "spring", stiffness: 420, damping: 30, mass: 0.6 }}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-bordo py-4 font-sans text-sm font-semibold text-hueso shadow-[0_8px_30px_rgba(102,0,31,0.35)]"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-bordo py-4 font-sans text-[var(--fs-caption)] font-semibold text-hueso shadow-[0_8px_30px_rgba(102,0,31,0.35)]"
           >
             {label}
             <span aria-hidden>→</span>

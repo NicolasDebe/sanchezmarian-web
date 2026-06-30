@@ -103,7 +103,7 @@ export function WhatsAppFloat() {
                 className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-md bg-hueso px-3 py-1.5 text-bordo shadow-md md:block"
                 style={{
                   fontFamily: "var(--font-dm-mono), monospace",
-                  fontSize: "11px",
+                  fontSize: "var(--fs-eyebrow)",
                 }}
               >
                 Hablar por WhatsApp

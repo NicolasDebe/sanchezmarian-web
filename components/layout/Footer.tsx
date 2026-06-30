@@ -59,8 +59,8 @@ export function Footer({
             <p
               className="font-sans text-hueso/55"
               style={{
-                fontSize: 12,
-                lineHeight: 1.65,
+                fontSize: "var(--fs-eyebrow)",
+                lineHeight: "var(--lh-relaxed)",
                 maxWidth: 340,
                 marginTop: 4,
               }}
@@ -69,7 +69,7 @@ export function Footer({
             </p>
             <a
               href={`mailto:${email}`}
-              className="font-mono text-[11px] text-hueso/55 hover:text-hueso/80 transition-colors tracking-wide"
+              className="font-mono text-[var(--fs-eyebrow)] text-hueso/55 hover:text-hueso/80 transition-colors tracking-wide"
             >
               {email}
             </a>
@@ -78,13 +78,13 @@ export function Footer({
               href={WHATSAPP_HREF}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-1 inline-flex items-center gap-2 font-sans text-[13px] text-hueso/60 hover:text-hueso transition-colors"
+              className="mt-1 inline-flex items-center gap-2 font-sans text-[var(--fs-caption)] text-hueso/60 hover:text-hueso transition-colors"
             >
               <MessageCircle size={14} strokeWidth={1.5} className="shrink-0" />
               {phone}
             </a>
 
-            <p className="inline-flex items-center gap-2 font-sans text-[13px] text-hueso/45">
+            <p className="inline-flex items-center gap-2 font-sans text-[var(--fs-caption)] text-hueso/45">
               <MapPin size={14} strokeWidth={1.5} className="shrink-0" />
               {locationTag}
             </p>
@@ -97,7 +97,7 @@ export function Footer({
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="font-sans text-sm text-hueso/60 hover:text-hueso/90 transition-colors"
+                    className="font-sans text-[var(--fs-caption)] text-hueso/60 hover:text-hueso/90 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -119,7 +119,7 @@ export function Footer({
                   className="group flex min-h-11 items-center gap-3 transition-colors"
                 >
                   <Icon size={22} strokeWidth={1.5} className="shrink-0 text-hueso/75 transition-colors group-hover:text-hueso" />
-                  <span className="font-sans text-xs text-hueso/60 transition-colors group-hover:text-hueso">
+                  <span className="font-sans text-[var(--fs-eyebrow)] text-hueso/60 transition-colors group-hover:text-hueso">
                     {label}
                   </span>
                 </a>
@@ -127,7 +127,7 @@ export function Footer({
             </div>
             <Link
               href="/#contacto"
-              className="inline-flex items-center gap-2 bg-hueso/6 border border-hueso/12 text-hueso/50 px-5 py-2.5 rounded-full font-sans text-xs font-medium hover:bg-hueso hover:text-bordo hover:border-hueso transition-all"
+              className="inline-flex items-center gap-2 bg-hueso/6 border border-hueso/12 text-hueso/50 px-5 py-2.5 rounded-full font-sans text-[var(--fs-eyebrow)] font-medium hover:bg-hueso hover:text-bordo hover:border-hueso transition-all"
             >
               {c.cta_text}
             </Link>
@@ -137,7 +137,7 @@ export function Footer({
 
         {/* Bottom row */}
         <div className="pt-7 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="font-mono text-[11px] text-hueso/40 tracking-wide flex items-center gap-2 flex-wrap">
+          <p className="font-mono text-[var(--fs-eyebrow)] text-hueso/40 tracking-wide flex items-center gap-2 flex-wrap">
             © {new Date().getFullYear()} {c.copyright_name}
             <span className="text-hueso/20">·</span>
             <Link href="/privacidad" className="hover:text-hueso/70 transition-colors">
@@ -148,7 +148,7 @@ export function Footer({
               Términos
             </Link>
           </p>
-          <p className="font-mono text-[11px] text-hueso/30 tracking-wide">
+          <p className="font-mono text-[var(--fs-eyebrow)] text-hueso/30 tracking-wide">
             {c.signature}
           </p>
         </div>
