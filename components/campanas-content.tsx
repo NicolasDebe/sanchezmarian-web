@@ -37,7 +37,7 @@ function CampanaHero() {
           <motion.p
             variants={fadeUp}
             className="font-mono uppercase"
-            style={{ fontSize: 11, letterSpacing: "0.15em", color: "var(--color-bordo)", marginBottom: 14 }}
+            style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.15em", color: "var(--color-bordo)", marginBottom: 14 }}
           >
             Campañas activas
           </motion.p>
@@ -52,10 +52,10 @@ function CampanaHero() {
               style={{
                 display:    "block",
                 fontFamily: "var(--font-playfair-display), serif",
-                fontSize:   "clamp(1.6rem, 3.5vw, 2.8rem)",
+                fontSize:   "var(--fs-h2)",
                 fontWeight: 600,
                 color:      "var(--color-negro-bordo)",
-                lineHeight: 1.15,
+                lineHeight: "var(--lh-snug)",
                 opacity:    0.9,
               }}
             >
@@ -66,7 +66,7 @@ function CampanaHero() {
           <motion.p
             variants={fadeUp}
             className="font-sans"
-            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.7, maxWidth: 520, marginTop: 24 }}
+            style={{ fontSize: "var(--fs-body)", color: "var(--color-gris-bordo)", lineHeight: "var(--lh-relaxed)", maxWidth: 520, marginTop: 24 }}
           >
             Campañas activas para marcas personales y empresas
             que confían en mi trabajo.
@@ -119,7 +119,7 @@ function CampanaStats({ campaigns }: { campaigns: Campaign[] }) {
               <p
                 className="font-playfair leading-none"
                 style={{
-                  fontSize: isText ? "clamp(22px, 3vw, 34px)" : "clamp(34px, 4vw, 48px)",
+                  fontSize: isText ? "calc(clamp(22px, 3vw, 34px) * var(--text-scale))" : "calc(clamp(34px, 4vw, 48px) * var(--text-scale))",
                   color: "var(--color-hueso)",
                   fontWeight: 700,
                 }}
@@ -128,7 +128,7 @@ function CampanaStats({ campaigns }: { campaigns: Campaign[] }) {
               </p>
               <p
                 className="font-mono uppercase"
-                style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-hueso)", opacity: 0.55, marginTop: 12 }}
+                style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", color: "var(--color-hueso)", opacity: 0.55, marginTop: 12 }}
               >
                 {s.label}
               </p>
@@ -269,13 +269,13 @@ function CampanaCard({
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p
                   className="font-mono uppercase"
-                  style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+                  style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", color: "var(--color-bordo)" }}
                 >
                   {marca}
                 </p>
                 <p
                   className="font-playfair"
-                  style={{ fontSize: 22, fontWeight: 600, color: "var(--color-negro-bordo)", lineHeight: 1.3, marginTop: 8 }}
+                  style={{ fontSize: "var(--fs-lead)", fontWeight: 600, color: "var(--color-negro-bordo)", lineHeight: 1.3, marginTop: 8 }}
                 >
                   {titulo}
                 </p>
@@ -285,7 +285,7 @@ function CampanaCard({
                 <span
                   className="font-mono uppercase"
                   style={{
-                    fontSize:      10,
+                    fontSize:      "var(--fs-micro)",
                     letterSpacing: "0.1em",
                     borderRadius:  100,
                     padding:       "5px 16px",
@@ -297,7 +297,7 @@ function CampanaCard({
                 </span>
                 <p
                   className="font-mono"
-                  style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.45, marginTop: 8 }}
+                  style={{ fontSize: "var(--fs-eyebrow)", color: "var(--color-gris-bordo)", opacity: 0.45, marginTop: 8 }}
                 >
                   {fecha}
                 </p>
@@ -314,9 +314,9 @@ function CampanaCard({
               <p
                 className="font-sans"
                 style={{
-                  fontSize:        14,
+                  fontSize:        "var(--fs-caption)",
                   color:           "var(--color-gris-bordo)",
-                  lineHeight:      1.7,
+                  lineHeight:      "var(--lh-relaxed)",
                   overflow:        "hidden",
                   display:         "-webkit-box",
                   WebkitLineClamp: 3,
@@ -329,7 +329,7 @@ function CampanaCard({
               <span
                 className="font-sans"
                 style={{
-                  fontSize:   14,
+                  fontSize:   "var(--fs-caption)",
                   color:      "var(--color-bordo)",
                   fontWeight: 500,
                   display:    "inline-flex",
@@ -387,14 +387,14 @@ function CampanaCard({
               >
                 <p
                   className="font-mono uppercase"
-                  style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+                  style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", color: "var(--color-bordo)" }}
                 >
                   {marca}
                 </p>
                 <span
                   className="font-mono uppercase"
                   style={{
-                    fontSize:      9,
+                    fontSize:      "var(--fs-micro)",
                     letterSpacing: "0.1em",
                     borderRadius:  100,
                     padding:       "4px 12px",
@@ -408,7 +408,7 @@ function CampanaCard({
               </div>
               <p
                 className="font-playfair"
-                style={{ fontSize: 18, fontWeight: 600, color: "var(--color-negro-bordo)", lineHeight: 1.3, marginTop: 6 }}
+                style={{ fontSize: "var(--fs-lead)", fontWeight: 600, color: "var(--color-negro-bordo)", lineHeight: 1.3, marginTop: 6 }}
               >
                 {titulo}
               </p>
@@ -431,9 +431,9 @@ function CampanaCard({
             <p
               className="font-sans"
               style={{
-                fontSize:        14,
+                fontSize:        "var(--fs-caption)",
                 color:           "var(--color-gris-bordo)",
-                lineHeight:      1.7,
+                lineHeight:      "var(--lh-relaxed)",
                 overflow:        "hidden",
                 display:         "-webkit-box",
                 WebkitLineClamp: 3,
@@ -446,7 +446,7 @@ function CampanaCard({
             <span
               className="font-sans"
               style={{
-                fontSize:   14,
+                fontSize:   "var(--fs-caption)",
                 color:      "var(--color-bordo)",
                 fontWeight: 500,
                 display:    "inline-flex",
@@ -482,7 +482,7 @@ function CampanaGrid({ campaigns }: { campaigns: Campaign[] }) {
           <motion.p
             variants={fadeUp}
             className="font-mono uppercase"
-            style={{ fontSize: 11, letterSpacing: "0.2em", color: "var(--color-bordo)" }}
+            style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", color: "var(--color-bordo)" }}
           >
             En curso
           </motion.p>
@@ -493,7 +493,7 @@ function CampanaGrid({ campaigns }: { campaigns: Campaign[] }) {
           <motion.h2
             variants={fadeUp}
             className="font-playfair font-bold"
-            style={{ fontSize: "clamp(28px, 3vw, 36px)", color: "var(--color-negro-bordo)" }}
+            style={{ fontSize: "var(--fs-h2)", color: "var(--color-negro-bordo)" }}
           >
             Campañas en curso
           </motion.h2>
@@ -562,7 +562,7 @@ function CampanaEmpty() {
             variants={fadeUp}
             className="font-playfair"
             style={{
-              fontSize:   "clamp(1.4rem, 3vw, 2rem)",
+              fontSize:   "var(--fs-h3)",
               fontWeight: 600,
               color:      "var(--color-negro-bordo)",
               lineHeight: 1.3,
@@ -575,7 +575,7 @@ function CampanaEmpty() {
           <motion.p
             variants={fadeUp}
             className="font-sans"
-            style={{ fontSize: 15, color: "var(--color-gris-bordo)", lineHeight: 1.7, maxWidth: 420, marginBottom: 40 }}
+            style={{ fontSize: "var(--fs-body)", color: "var(--color-gris-bordo)", lineHeight: "var(--lh-relaxed)", maxWidth: 420, marginBottom: 40 }}
           >
             Estamos preparando las próximas estrategias. Si tenés una historia para contar, empezá hoy.
           </motion.p>
@@ -590,7 +590,7 @@ function CampanaEmpty() {
                 border:         "1.5px solid rgba(102,0,31,0.25)",
                 borderRadius:   100,
                 padding:        "12px 28px",
-                fontSize:       14,
+                fontSize:       "var(--fs-caption)",
                 color:          "var(--color-bordo)",
                 fontWeight:     500,
                 textDecoration: "none",
@@ -632,7 +632,7 @@ function CampanaCta() {
         <motion.h2
           variants={fadeUp}
           className="font-playfair"
-          style={{ fontSize: "clamp(24px, 4vw, 32px)", color: "var(--color-hueso)", fontStyle: "italic", lineHeight: 1.2, margin: 0 }}
+          style={{ fontSize: "var(--fs-h3)", color: "var(--color-hueso)", fontStyle: "italic", lineHeight: "var(--lh-snug)", margin: 0 }}
         >
           ¿Tenés una historia para contar?
         </motion.h2>
@@ -640,7 +640,7 @@ function CampanaCta() {
         <motion.p
           variants={fadeUp}
           className="font-sans"
-          style={{ fontSize: 15, color: "var(--color-hueso)", opacity: 0.6, marginTop: 12 }}
+          style={{ fontSize: "var(--fs-body)", color: "var(--color-hueso)", opacity: 0.6, marginTop: 12 }}
         >
           Hablemos de cómo llevarla a los medios.
         </motion.p>
@@ -660,7 +660,7 @@ function CampanaCta() {
               color:          "var(--color-bordo)",
               borderRadius:   100,
               padding:        "14px 36px",
-              fontSize:       14,
+              fontSize:       "var(--fs-caption)",
               fontWeight:     600,
               textDecoration: "none",
               transform:      hov ? "translateY(-1px)" : "translateY(0)",

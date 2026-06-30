@@ -130,7 +130,7 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
         {/* Label */}
         <p
           className="font-mono uppercase"
-          style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)", marginBottom: 16 }}
+          style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", color: "var(--color-bordo)", marginBottom: 16 }}
         >
           Galería — {campaignName}
         </p>
@@ -209,7 +209,7 @@ export function CampaignSlideshow({ images, campaignName }: CampaignSlideshowPro
               position:       "absolute",
               top:            16,
               right:          16,
-              fontSize:       11,
+              fontSize:       "var(--fs-eyebrow)",
               color:          "rgba(255,255,255,0.6)",
               background:     "rgba(0,0,0,0.25)",
               backdropFilter: "blur(6px)",

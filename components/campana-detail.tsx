@@ -19,7 +19,7 @@ function StatusBadge({ status }: { status: Campaign["status"] }) {
     <span
       className="font-mono uppercase"
       style={{
-        fontSize: 10,
+        fontSize: "var(--fs-micro)",
         letterSpacing: "0.1em",
         borderRadius: 100,
         padding: "3px 12px",
@@ -54,7 +54,7 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
             <Link
               href="/campanas"
               className="font-sans inline-flex items-center gap-2 transition-opacity hover:opacity-70"
-              style={{ fontSize: 13, color: "var(--color-gris-bordo)", textDecoration: "none", marginBottom: 40 }}
+              style={{ fontSize: "var(--fs-caption)", color: "var(--color-gris-bordo)", textDecoration: "none", marginBottom: 40 }}
             >
               <ArrowLeft size={13} strokeWidth={2} />
               Todas las campañas
@@ -77,7 +77,7 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
                 color: "var(--color-hueso)",
                 display: "grid",
                 placeItems: "center",
-                fontSize: 24,
+                fontSize: "calc(24px * var(--text-scale))",
                 fontWeight: 700,
                 flexShrink: 0,
               }}
@@ -88,17 +88,17 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
             <div>
               <p
                 className="font-mono uppercase"
-                style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+                style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", color: "var(--color-bordo)" }}
               >
                 {campaign.brand}
               </p>
               <h1
                 className="font-playfair"
                 style={{
-                  fontSize: "clamp(1.4rem, 3vw, 2rem)",
+                  fontSize: "var(--fs-h3)",
                   fontWeight: 600,
                   color: "var(--color-negro-bordo)",
-                  lineHeight: 1.25,
+                  lineHeight: "var(--lh-snug)",
                   marginTop: 8,
                   maxWidth: 700,
                 }}
@@ -108,7 +108,7 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10, flexWrap: "wrap" }}>
                 <span
                   className="font-mono"
-                  style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.5 }}
+                  style={{ fontSize: "var(--fs-eyebrow)", color: "var(--color-gris-bordo)", opacity: 0.5 }}
                 >
                   {campaign.date}
                 </span>
@@ -154,10 +154,10 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
             variants={fadeUp}
             className="font-playfair"
             style={{
-              fontSize: "clamp(24px, 4vw, 32px)",
+              fontSize: "var(--fs-h3)",
               color: "var(--color-hueso)",
               fontStyle: "italic",
-              lineHeight: 1.2,
+              lineHeight: "var(--lh-snug)",
               margin: 0,
             }}
           >
@@ -166,7 +166,7 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
           <motion.p
             variants={fadeUp}
             className="font-sans"
-            style={{ fontSize: 15, color: "var(--color-hueso)", opacity: 0.6, marginTop: 12 }}
+            style={{ fontSize: "var(--fs-body)", color: "var(--color-hueso)", opacity: 0.6, marginTop: 12 }}
           >
             Hablemos de cómo llevarla a los medios.
           </motion.p>
@@ -183,7 +183,7 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
                 color: "var(--color-bordo)",
                 borderRadius: 100,
                 padding: "14px 36px",
-                fontSize: 14,
+                fontSize: "var(--fs-caption)",
                 fontWeight: 600,
                 textDecoration: "none",
               }}

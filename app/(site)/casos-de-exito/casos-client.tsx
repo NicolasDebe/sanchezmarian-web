@@ -64,14 +64,14 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
     <div className="flex items-start justify-between gap-2" style={{ marginBottom: 6 }}>
       <span
         className="font-mono uppercase"
-        style={{ fontSize: 10, letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+        style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.12em", color: "var(--color-bordo)" }}
       >
         {ap.medium}
       </span>
       <span
         className="font-mono shrink-0"
         style={{
-          fontSize: 8,
+          fontSize: "calc(8px * var(--text-scale))",
           padding: "2px 6px",
           borderRadius: 4,
           background: "var(--color-arena)",
@@ -88,9 +88,9 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
     <p
       className="font-sans"
       style={{
-        fontSize: 13,
+        fontSize: "var(--fs-caption)",
         color: "var(--color-negro-bordo)",
-        lineHeight: 1.4,
+        lineHeight: "var(--lh-base)",
         overflow: "hidden",
         display: "-webkit-box",
         WebkitLineClamp: 2,
@@ -104,7 +104,7 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
   const yearEl = (
     <span
       className="font-mono"
-      style={{ display: "block", marginTop: 6, fontSize: 10, color: "var(--color-gris-bordo)", opacity: 0.5 }}
+      style={{ display: "block", marginTop: 6, fontSize: "var(--fs-micro)", color: "var(--color-gris-bordo)", opacity: 0.5 }}
     >
       {clippingYear(ap.published_at)}
     </span>
@@ -124,7 +124,7 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
         {/* Badge de tipo */}
         <div
           className="flex items-center gap-1 font-mono uppercase"
-          style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-bordo)", marginBottom: 8 }}
+          style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.1em", color: "var(--color-bordo)", marginBottom: 8 }}
         >
           <Headphones size={11} />
           {hasUrl ? "Audio + Nota" : "Audio"}
@@ -141,7 +141,7 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono inline-flex items-center gap-1 transition-opacity hover:opacity-70"
-            style={{ marginTop: 10, fontSize: 11, color: "var(--color-bordo)" }}
+            style={{ marginTop: 10, fontSize: "var(--fs-eyebrow)", color: "var(--color-bordo)" }}
           >
             Ver nota original →
           </a>
@@ -463,7 +463,7 @@ function TimelineClientBlock({
                 height: 72,
                 background: "var(--color-arena)",
                 color: "var(--color-bordo)",
-                fontSize: 24,
+                fontSize: "calc(24px * var(--text-scale))",
               }}
             >
               {client.name.charAt(0).toUpperCase()}
@@ -472,7 +472,7 @@ function TimelineClientBlock({
 
           <span
             className="font-sans flex-1"
-            style={{ fontWeight: 600, fontSize: 16, color: "var(--color-negro-bordo)" }}
+            style={{ fontWeight: 600, fontSize: "var(--fs-body-lg)", color: "var(--color-negro-bordo)" }}
           >
             {client.name}
           </span>
@@ -521,7 +521,7 @@ function TimelineClientBlock({
               {apariciones.length === 0 && (
                 <p
                   className="font-mono"
-                  style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.5, paddingBottom: 24 }}
+                  style={{ fontSize: "var(--fs-eyebrow)", color: "var(--color-gris-bordo)", opacity: 0.5, paddingBottom: 24 }}
                 >
                   Próximamente — sin clippings cargados todavía
                 </p>
@@ -551,7 +551,7 @@ function IndexButton({
       onClick={onClick}
       className="font-sans cursor-pointer"
       style={{
-        fontSize: 12,
+        fontSize: "var(--fs-eyebrow)",
         color: hov ? "var(--color-bordo)" : "var(--color-gris-bordo)",
         background: "transparent",
         border: `1px solid ${hov ? "rgba(201,168,130,0.8)" : "rgba(201,168,130,0.3)"}`,
@@ -587,7 +587,7 @@ function ToggleAllButton({
       onClick={onToggle}
       className="font-sans shrink-0 cursor-pointer self-end"
       style={{
-        fontSize: 12,
+        fontSize: "var(--fs-eyebrow)",
         color: "var(--color-bordo)",
         background: "transparent",
         border: `1px solid ${hov ? "var(--color-dorado)" : "rgba(201,168,130,0.5)"}`,
@@ -682,8 +682,8 @@ export function CasosClient({
           >
             <motion.p
               variants={fadeUp}
-              className="font-mono text-[11px] uppercase tracking-[0.22em]"
-              style={{ color: "var(--color-bordo)" }}
+              className="font-mono uppercase tracking-[0.22em]"
+              style={{ color: "var(--color-bordo)", fontSize: "var(--fs-eyebrow)" }}
             >
               {hero.eyebrow}
             </motion.p>
@@ -697,7 +697,7 @@ export function CasosClient({
               className="font-playfair font-bold leading-[1.1]"
               style={{
                 color: "var(--color-negro-bordo)",
-                fontSize: "clamp(2.25rem, 5vw, 3.5rem)",
+                fontSize: "var(--fs-h1)",
                 maxWidth: 700,
               }}
             >
@@ -710,7 +710,7 @@ export function CasosClient({
             <motion.div
               variants={fadeUp}
               className="font-sans mt-6"
-              style={{ fontSize: 16, color: "var(--color-gris-bordo)", maxWidth: 560, lineHeight: 1.7 }}
+              style={{ fontSize: "var(--fs-body-lg)", color: "var(--color-gris-bordo)", maxWidth: 560, lineHeight: "var(--lh-relaxed)" }}
             >
               <RichText html={hero.description} className="rich-inline" />
             </motion.div>
@@ -732,12 +732,12 @@ export function CasosClient({
                   />
                 )}
                 <div>
-                  <p className="font-playfair leading-none" style={{ fontSize: 48, color: "var(--color-bordo)" }}>
+                  <p className="font-playfair leading-none" style={{ fontSize: "calc(48px * var(--text-scale))", color: "var(--color-bordo)" }}>
                     {s.n}
                   </p>
                   <p
-                    className="font-mono text-[11px] uppercase mt-2"
-                    style={{ color: "var(--color-gris-bordo)", letterSpacing: "0.12em" }}
+                    className="font-mono uppercase mt-2"
+                    style={{ color: "var(--color-gris-bordo)", letterSpacing: "0.12em", fontSize: "var(--fs-eyebrow)" }}
                   >
                     {s.label}
                   </p>
@@ -755,12 +755,12 @@ export function CasosClient({
           >
             {STATS.map((s) => (
               <motion.div key={s.label} variants={revealCard}>
-                <p className="font-playfair leading-none" style={{ fontSize: 36, color: "var(--color-bordo)" }}>
+                <p className="font-playfair leading-none" style={{ fontSize: "calc(36px * var(--text-scale))", color: "var(--color-bordo)" }}>
                   {s.n}
                 </p>
                 <p
-                  className="font-mono text-[11px] uppercase mt-2"
-                  style={{ color: "var(--color-gris-bordo)", letterSpacing: "0.12em", lineHeight: 1.4 }}
+                  className="font-mono uppercase mt-2"
+                  style={{ color: "var(--color-gris-bordo)", letterSpacing: "0.12em", lineHeight: 1.4, fontSize: "var(--fs-eyebrow)" }}
                 >
                   {s.label}
                 </p>
@@ -779,7 +779,7 @@ export function CasosClient({
             whileInView="visible"
             viewport={viewportOnce}
             className="font-mono uppercase mb-10"
-            style={{ fontSize: 10, letterSpacing: "0.2em", color: "rgba(254,252,239,0.5)" }}
+            style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.2em", color: "rgba(254,252,239,0.5)" }}
           >
             Coberturas destacadas
           </motion.p>
@@ -802,7 +802,7 @@ export function CasosClient({
               <motion.p
                 variants={fadeUp}
                 className="font-mono uppercase"
-                style={{ fontSize: 10, letterSpacing: "0.2em", color: "var(--color-bordo)" }}
+                style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.2em", color: "var(--color-bordo)" }}
               >
                 Historial de cobertura
               </motion.p>
@@ -813,7 +813,7 @@ export function CasosClient({
               <motion.h2
                 variants={fadeUp}
                 className="font-playfair font-bold"
-                style={{ fontSize: "clamp(28px, 3vw, 36px)", color: "var(--color-negro-bordo)" }}
+                style={{ fontSize: "var(--fs-h2)", color: "var(--color-negro-bordo)" }}
               >
                 Coberturas por marca
               </motion.h2>
@@ -868,9 +868,9 @@ export function CasosClient({
             variants={fadeUp}
             className="font-playfair"
             style={{
-              fontSize: "clamp(32px, 4vw, 44px)",
+              fontSize: "var(--fs-h2)",
               color: "var(--color-hueso)",
-              lineHeight: 1.2,
+              lineHeight: "var(--lh-snug)",
               fontWeight: 400,
             }}
           >
@@ -889,7 +889,7 @@ export function CasosClient({
               style={{
                 background: "var(--color-hueso)",
                 color: "var(--color-bordo)",
-                fontSize: 15,
+                fontSize: "var(--fs-body)",
                 padding: "14px 36px",
                 borderRadius: 999,
               }}

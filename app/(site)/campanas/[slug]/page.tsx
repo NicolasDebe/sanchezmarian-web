@@ -72,7 +72,7 @@ function DraftBanner() {
     >
       <p
         className="font-mono uppercase"
-        style={{ fontSize: 11, letterSpacing: "0.14em", color: "var(--color-hueso)" }}
+        style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.14em", color: "var(--color-hueso)" }}
       >
         Borrador — Vista previa, no es pública todavía
       </p>

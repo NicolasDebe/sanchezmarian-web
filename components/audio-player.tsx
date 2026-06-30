@@ -151,7 +151,7 @@ export function AudioPlayer({ src, title, duration, variant = "full" }: AudioPla
   // ── Sizing por variante ──
   const btnSize = compact ? 36 : 44
   const barH = compact ? 6 : 8
-  const timeFs = compact ? 11 : 12
+  const timeFs = compact ? 11 : "var(--fs-eyebrow)"
   const padding = compact ? "12px 16px" : "16px 20px"
 
   // ── Error ──
@@ -228,7 +228,7 @@ export function AudioPlayer({ src, title, duration, variant = "full" }: AudioPla
           <span
             className="font-mono uppercase"
             style={{
-              fontSize: 11,
+              fontSize: "var(--fs-eyebrow)",
               letterSpacing: "0.1em",
               color: "var(--color-bordo)",
               opacity: 0.6,
