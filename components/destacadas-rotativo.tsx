@@ -71,7 +71,7 @@ function DestacadaCard({ c }: { c: Clipping }) {
       <span
         className="font-mono uppercase w-fit"
         style={{
-          fontSize: 9,
+          fontSize: "var(--fs-micro)",
           padding: "3px 10px",
           borderRadius: 999,
           background: "rgba(201,168,130,0.15)",
@@ -84,25 +84,25 @@ function DestacadaCard({ c }: { c: Clipping }) {
 
       <span
         className="font-mono uppercase"
-        style={{ fontSize: 12, letterSpacing: "0.15em", color: "rgba(254,252,239,0.6)" }}
+        style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.15em", color: "rgba(254,252,239,0.6)" }}
       >
         {c.medio}
       </span>
 
       <p
         className="font-playfair flex-1"
-        style={{ fontSize: 20, color: "var(--color-hueso)", lineHeight: 1.3 }}
+        style={{ fontSize: "var(--fs-lead)", color: "var(--color-hueso)", lineHeight: 1.3 }}
       >
         {c.titular}
       </p>
 
-      <span className="font-sans" style={{ fontSize: 12, color: "rgba(254,252,239,0.4)" }}>
+      <span className="font-sans" style={{ fontSize: "var(--fs-eyebrow)", color: "rgba(254,252,239,0.4)" }}>
         {c.cliente}
       </span>
 
       <span
         className="font-mono absolute"
-        style={{ bottom: 32, right: 32, fontSize: 11, color: "var(--color-dorado)" }}
+        style={{ bottom: 32, right: 32, fontSize: "var(--fs-eyebrow)", color: "var(--color-dorado)" }}
       >
         {c.año}
       </span>

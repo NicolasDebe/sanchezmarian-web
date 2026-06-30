@@ -30,8 +30,8 @@ const itemVariants: Variants = {
 
 /** Estilo único de descripción — mismo para destacada y no destacadas. */
 const DESC_STYLE = {
-  fontSize: 15,
-  lineHeight: 1.6,
+  fontSize: "var(--fs-body)",
+  lineHeight: "var(--lh-base)",
   fontWeight: 400,
   marginTop: 16,
 } as const
@@ -64,13 +64,13 @@ export function HomeServicios({ section }: { section?: Record<string, string> })
           >
             <p
               className="font-mono text-bordo/50"
-              style={{ fontSize: 11, letterSpacing: "0.12em", marginBottom: 16 }}
+              style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", marginBottom: 16 }}
             >
               01
             </p>
             <h3
               className="font-playfair font-bold text-negro-bordo"
-              style={{ fontSize: "clamp(28px, 3vw, 32px)", lineHeight: 1.15, maxWidth: "22ch" }}
+              style={{ fontSize: "var(--fs-h3)", lineHeight: "var(--lh-snug)", maxWidth: "22ch" }}
             >
               {c.featured_title}
             </h3>
@@ -89,13 +89,13 @@ export function HomeServicios({ section }: { section?: Record<string, string> })
               >
                 <p
                   className="font-mono text-bordo/50"
-                  style={{ fontSize: 11, letterSpacing: "0.12em", marginBottom: 14 }}
+                  style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", marginBottom: 14 }}
                 >
                   {s.num}
                 </p>
                 <h3
                   className="font-playfair font-bold text-negro-bordo"
-                  style={{ fontSize: 22, lineHeight: 1.2 }}
+                  style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-snug)" }}
                 >
                   {s.title}
                 </h3>
@@ -110,7 +110,8 @@ export function HomeServicios({ section }: { section?: Record<string, string> })
           <motion.div variants={itemVariants} className="flex justify-center pt-2">
             <Link
               href="/servicios"
-              className="group inline-flex items-center gap-2 rounded-full bg-bordo px-8 py-4 font-sans text-[15px] font-semibold text-hueso transition-all hover:bg-bordo/90 active:scale-[0.98]"
+              className="group inline-flex items-center gap-2 rounded-full bg-bordo px-8 py-4 font-sans font-semibold text-hueso transition-all hover:bg-bordo/90 active:scale-[0.98]"
+              style={{ fontSize: "var(--fs-body)" }}
             >
               {c.cta_label}
               <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">→</span>

@@ -140,7 +140,7 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
               variants={item}
               className="font-mono uppercase"
               style={{
-                fontSize: 11,
+                fontSize: "var(--fs-eyebrow)",
                 letterSpacing: "0.16em",
                 color: "var(--color-bordo)",
                 opacity: 0.7,
@@ -173,8 +173,8 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
               variants={item}
               className="font-playfair"
               style={{
-                fontSize: "clamp(28px, 3.8vw, 44px)",
-                lineHeight: 1.1,
+                fontSize: "var(--fs-h2)",
+                lineHeight: "var(--lh-tight)",
                 color: "var(--color-negro-bordo)",
                 fontWeight: 700,
                 marginBottom: 16,
@@ -191,8 +191,8 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
               variants={item}
               className="font-sans"
               style={{
-                fontSize: 15,
-                lineHeight: 1.65,
+                fontSize: "var(--fs-body)",
+                lineHeight: "var(--lh-relaxed)",
                 color: "var(--color-gris-bordo)",
                 maxWidth: 480,
                 marginBottom: 36,
@@ -286,7 +286,7 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
                   color: "var(--color-hueso)",
                   borderRadius: 999,
                   padding: "16px 32px",
-                  fontSize: 15,
+                  fontSize: "var(--fs-body)",
                   fontWeight: 600,
                   border: "none",
                   cursor: loading ? "wait" : "pointer",
@@ -319,7 +319,7 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
-                  fontSize: 10,
+                  fontSize: "var(--fs-micro)",
                   color: "var(--color-gris-bordo)",
                   opacity: 0.7,
                   marginTop: 14,
@@ -343,7 +343,7 @@ const inputStyle: React.CSSProperties = {
   border: "1.5px solid rgba(102,0,31,0.2)",
   borderRadius: 12,
   padding: "14px 18px",
-  fontSize: 15,
+  fontSize: "var(--fs-body)",
   color: "var(--color-negro-bordo)",
   outline: "none",
   transition: "border-color 0.2s ease, box-shadow 0.2s ease",
@@ -374,7 +374,7 @@ function SuccessState({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: EASE, delay: reduced ? 0 : 0.4 }}
         style={{
-          fontSize: 32,
+          fontSize: "calc(32px * var(--text-scale))",
           fontWeight: 700,
           color: "var(--color-negro-bordo)",
           marginTop: 24,
@@ -389,11 +389,11 @@ function SuccessState({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: EASE, delay: reduced ? 0 : 0.6 }}
         style={{
-          fontSize: 15,
+          fontSize: "var(--fs-body)",
           color: "var(--color-gris-bordo)",
           marginTop: 12,
           maxWidth: 360,
-          lineHeight: 1.6,
+          lineHeight: "var(--lh-base)",
         }}
       >
         {message}

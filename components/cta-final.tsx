@@ -125,7 +125,8 @@ export function CtaFinal({
         >
           <motion.p
             variants={fadeUp}
-            className="font-mono text-[11px] uppercase tracking-[0.25em] text-hueso/60 mb-7"
+            className="font-mono uppercase tracking-[0.25em] text-hueso/60 mb-7"
+            style={{ fontSize: "var(--fs-eyebrow)" }}
           >
             {ct.eyebrow}
           </motion.p>
@@ -147,14 +148,14 @@ export function CtaFinal({
                 <card.Icon size={32} strokeWidth={1.5} className="text-bordo" />
                 <span
                   className="font-mono uppercase text-bordo/60"
-                  style={{ fontSize: 11, letterSpacing: "0.12em" }}
+                  style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em" }}
                 >
                   {card.label}
                 </span>
-                <span className="font-playfair text-[20px] text-negro-bordo">
+                <span className="font-playfair text-negro-bordo" style={{ fontSize: "var(--fs-lead)" }}>
                   {card.value}
                 </span>
-                <span className="mt-1 inline-flex items-center gap-1 font-sans text-[12px] font-semibold text-bordo">
+                <span className="mt-1 inline-flex items-center gap-1 font-sans font-semibold text-bordo" style={{ fontSize: "var(--fs-eyebrow)" }}>
                   {card.cta}
                   <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
                     →
@@ -182,7 +183,7 @@ export function CtaFinal({
             viewport={viewportOnce}
             className="flex flex-col gap-7"
           >
-            <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.25em] text-hueso/60">
+            <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.25em] text-hueso/60" style={{ fontSize: "var(--fs-eyebrow)" }}>
               {c.eyebrow}
             </motion.p>
 
@@ -193,30 +194,30 @@ export function CtaFinal({
 
             <motion.h2
               variants={fadeUp}
-              className="font-playfair font-bold text-hueso text-[2.5rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.0]"
+              className="font-playfair font-bold text-hueso text-[calc(2.5rem*var(--text-scale))] sm:text-[calc(3rem*var(--text-scale))] lg:text-[calc(3.25rem*var(--text-scale))] leading-[1.0]"
             >
               <span className="block">{c.title_pre}</span>
               <em className="block italic text-dorado">{c.title_accent}</em>
             </motion.h2>
 
-            <motion.div variants={fadeUp} className="font-sans text-[0.9375rem] text-hueso/65 leading-[1.7] max-w-[420px]">
+            <motion.div variants={fadeUp} className="font-sans text-hueso/65 leading-[1.7] max-w-[420px]" style={{ fontSize: "var(--fs-body)" }}>
               <RichText html={c.description} className="rich-inline" />
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">
               <div className="flex items-center gap-3">
                 <Mail size={16} strokeWidth={1.5} className="text-dorado shrink-0" />
-                <span className="font-sans text-[14px] text-hueso/90">{c.email}</span>
+                <span className="font-sans text-hueso/90" style={{ fontSize: "var(--fs-caption)" }}>{c.email}</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin size={16} strokeWidth={1.5} className="text-dorado shrink-0" />
-                <span className="font-sans text-[14px] text-hueso/75">{c.location}</span>
+                <span className="font-sans text-hueso/75" style={{ fontSize: "var(--fs-caption)" }}>{c.location}</span>
               </div>
             </motion.div>
 
             {/* También en redes — presencia social con la identidad del CTA. */}
             <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3">
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-hueso/50">
+              <p className="font-mono uppercase tracking-[0.18em] text-hueso/50" style={{ fontSize: "var(--fs-eyebrow)" }}>
                 También en redes
               </p>
               <div className="flex flex-col gap-3">
@@ -228,7 +229,7 @@ export function CtaFinal({
                   className="group inline-flex min-h-11 w-fit items-center gap-2.5"
                 >
                   <Instagram size={16} strokeWidth={1.5} className="shrink-0 text-hueso/75 transition-opacity duration-200 group-hover:opacity-100" />
-                  <span className="relative font-sans text-[14px] text-hueso/85 transition-colors duration-200 group-hover:text-hueso">
+                  <span className="relative font-sans text-hueso/85 transition-colors duration-200 group-hover:text-hueso" style={{ fontSize: "var(--fs-caption)" }}>
                     @marian15s
                     <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-hueso/70 transition-transform duration-300 group-hover:scale-x-100" />
                   </span>
@@ -244,7 +245,7 @@ export function CtaFinal({
                   className="group inline-flex min-h-11 w-fit items-center gap-2.5"
                 >
                   <Linkedin size={16} strokeWidth={1.5} className="shrink-0 text-hueso/75 transition-opacity duration-200 group-hover:opacity-100" />
-                  <span className="relative font-sans text-[14px] text-hueso/85 transition-colors duration-200 group-hover:text-hueso">
+                  <span className="relative font-sans text-hueso/85 transition-colors duration-200 group-hover:text-hueso" style={{ fontSize: "var(--fs-caption)" }}>
                     Marian Sánchez
                     <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-hueso/70 transition-transform duration-300 group-hover:scale-x-100" />
                   </span>
@@ -280,7 +281,7 @@ export function CtaFinal({
                 transition={{ duration: 0.4 }}
                 className="flex items-center justify-center min-h-[260px]"
               >
-                <p className="font-playfair text-hueso text-xl text-center">
+                <p className="font-playfair text-hueso text-center" style={{ fontSize: "var(--fs-lead)" }}>
                   ¡Gracias! Te respondo pronto.
                 </p>
               </motion.div>
@@ -289,7 +290,8 @@ export function CtaFinal({
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="cf-nombre"
-                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-hueso/85"
+                  className="font-mono uppercase tracking-[0.18em] text-hueso/85"
+                  style={{ fontSize: "var(--fs-eyebrow)" }}
                 >
                   Nombre
                 </label>
@@ -312,7 +314,8 @@ export function CtaFinal({
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="cf-email"
-                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-hueso/85"
+                  className="font-mono uppercase tracking-[0.18em] text-hueso/85"
+                  style={{ fontSize: "var(--fs-eyebrow)" }}
                 >
                   Email
                 </label>
@@ -336,7 +339,8 @@ export function CtaFinal({
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="cf-mensaje"
-                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-hueso/85"
+                  className="font-mono uppercase tracking-[0.18em] text-hueso/85"
+                  style={{ fontSize: "var(--fs-eyebrow)" }}
                 >
                   Mensaje
                 </label>
@@ -361,7 +365,8 @@ export function CtaFinal({
                 aria-busy={submitting}
                 whileTap={submitting ? undefined : { scale: tapScale }}
                 transition={springSnappy}
-                className="mt-1 w-full flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-4 rounded-lg font-sans text-sm font-semibold hover:bg-arena transition-colors disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                className="mt-1 w-full flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-4 rounded-lg font-sans font-semibold hover:bg-arena transition-colors disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                style={{ fontSize: "var(--fs-caption)" }}
               >
                 <AnimatePresence mode="popLayout" initial={false}>
                   {submitting ? (

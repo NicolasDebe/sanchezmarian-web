@@ -26,14 +26,15 @@ export function Ideas({ content }: { content?: Record<string, string> }) {
         >
           <motion.p
             variants={fadeUp}
-            className="font-mono text-[11px] uppercase tracking-[0.28em] text-bordo-claro/70 mb-5"
+            className="font-mono uppercase tracking-[0.28em] text-bordo-claro/70 mb-5"
+            style={{ fontSize: "var(--fs-eyebrow)" }}
           >
             {c.eyebrow}
           </motion.p>
 
           <motion.h2
             variants={fadeUp}
-            className="font-playfair font-bold text-negro-bordo text-[2.25rem] sm:text-[3rem] lg:text-[3.25rem] leading-[1.1] max-w-[640px]"
+            className="font-playfair font-bold text-negro-bordo text-[calc(2.25rem*var(--text-scale))] sm:text-[calc(3rem*var(--text-scale))] lg:text-[calc(3.25rem*var(--text-scale))] leading-[1.1] max-w-[640px]"
           >
             {c.title_pre}{" "}
             <em className="italic text-bordo-claro">{c.title_accent}</em>
@@ -58,7 +59,7 @@ export function Ideas({ content }: { content?: Record<string, string> }) {
               >
                 {/* Columna izquierda — número + línea conectora */}
                 <div className="flex flex-col items-center shrink-0 w-12">
-                  <span className="font-playfair italic font-bold text-bordo text-[2rem] leading-none">
+                  <span className="font-playfair italic font-bold text-bordo text-[calc(2rem*var(--text-scale))] leading-none">
                     {paso.num}
                   </span>
                   {!isLast && (
@@ -68,10 +69,10 @@ export function Ideas({ content }: { content?: Record<string, string> }) {
 
                 {/* Columna derecha — contenido */}
                 <div className={`flex flex-col gap-1 ${isLast ? "" : "pb-10"}`}>
-                  <p className="font-sans font-semibold text-negro-bordo text-base">
+                  <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: "var(--fs-body)" }}>
                     {paso.title}
                   </p>
-                  <p className="font-sans text-gris-bordo text-sm leading-relaxed">
+                  <p className="font-sans text-gris-bordo leading-relaxed" style={{ fontSize: "var(--fs-caption)" }}>
                     {paso.body}
                   </p>
                 </div>

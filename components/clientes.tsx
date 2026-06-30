@@ -107,7 +107,7 @@ export function Clientes() {
       >
         <p
           className="font-mono uppercase mb-3"
-          style={{ fontSize: 11, letterSpacing: "0.15em", color: "var(--color-bordo, #66001F)" }}
+          style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.15em", color: "var(--color-bordo, #66001F)" }}
         >
           Marcas
         </p>
@@ -125,14 +125,14 @@ export function Clientes() {
         />
         <h2
           className="font-playfair font-bold leading-[1.15] mb-3"
-          style={{ fontSize: "clamp(28px, 4vw, 36px)", color: "var(--color-negro-bordo)" }}
+          style={{ fontSize: "var(--fs-h2)", color: "var(--color-negro-bordo)" }}
         >
           Marcas que{" "}
           <em style={{ fontStyle: "italic", color: "var(--color-bordo, #66001F)" }}>
             confían en mi
           </em>
         </h2>
-        <p className="font-sans" style={{ fontSize: 14, color: "var(--color-gris-bordo)" }}>
+        <p className="font-sans" style={{ fontSize: "var(--fs-caption)", color: "var(--color-gris-bordo)" }}>
           100+ coberturas en medios nacionales y provinciales.
         </p>
       </motion.div>

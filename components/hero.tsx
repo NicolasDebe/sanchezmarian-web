@@ -101,7 +101,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
               <span
                 style={{
                   fontFamily: "var(--font-dm-mono), monospace",
-                  fontSize: "11px",
+                  fontSize: "var(--fs-eyebrow)",
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   color: "#FEFCEF",
@@ -116,7 +116,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
               variants={itemVariants}
               style={{
                 fontFamily: "var(--font-dm-mono), monospace",
-                fontSize: "11px",
+                fontSize: "var(--fs-eyebrow)",
                 letterSpacing: "0.15em",
                 textTransform: "uppercase",
                 color: "rgba(254,252,239,0.65)",
@@ -138,7 +138,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
                 color: "#FEFCEF",
                 fontWeight: 700,
                 margin: "0 0 20px",
-                fontSize: "clamp(2rem, 5vw, 4rem)",
+                fontSize: "calc(clamp(2rem, 5vw, 4rem) * var(--text-scale))",
                 letterSpacing: "-0.02em",
               }}
             >
@@ -150,7 +150,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
               variants={itemVariants}
               style={{
                 fontFamily: "var(--font-dm-sans), sans-serif",
-                fontSize: "clamp(0.85rem, 1.35vw, 0.98rem)",
+                fontSize: "calc(clamp(0.85rem, 1.35vw, 0.98rem) * var(--text-scale))",
                 color: "rgba(254,252,239,0.8)",
                 lineHeight: 1.7,
                 maxWidth: "520px",
@@ -178,7 +178,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
                   padding: "16px 28px",
                   borderRadius: "999px",
                   fontFamily: "var(--font-dm-sans), sans-serif",
-                  fontSize: "14px",
+                  fontSize: "calc(14px * var(--text-scale))",
                   fontWeight: 600,
                   textDecoration: "none",
                   display: "inline-flex",
@@ -213,7 +213,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
                   borderRadius: "999px",
                   border: "1px solid rgba(254,252,239,0.4)",
                   fontFamily: "var(--font-dm-sans), sans-serif",
-                  fontSize: "14px",
+                  fontSize: "calc(14px * var(--text-scale))",
                   fontWeight: 500,
                   textDecoration: "none",
                   display: "inline-flex",

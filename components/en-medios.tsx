@@ -7,10 +7,10 @@ import { fadeUp, fadeLeft, fadeUpStagger, viewportOnce } from "@/lib/animations"
 
 type MedioItem = { name: string; href: string; dim?: boolean }
 
-const FILAS: { label: string; size: number; medios: MedioItem[] }[] = [
+const FILAS: { label: string; size: string; medios: MedioItem[] }[] = [
   {
     label: "Internacional",
-    size: 15,
+    size: "var(--fs-body)",
     medios: [
       { name: "Vatican News",         href: "/casos-de-exito" },
       { name: "L'Osservatore Romano", href: "/casos-de-exito" },
@@ -21,7 +21,7 @@ const FILAS: { label: string; size: number; medios: MedioItem[] }[] = [
   },
   {
     label: "Nacional",
-    size: 17,
+    size: "calc(17px * var(--text-scale))",
     medios: [
       { name: "La Nación", href: "/casos-de-exito" },
       { name: "Clarín",    href: "/casos-de-exito" },
@@ -31,7 +31,7 @@ const FILAS: { label: string; size: number; medios: MedioItem[] }[] = [
   },
   {
     label: "Regional",
-    size: 15,
+    size: "var(--fs-body)",
     medios: [
       { name: "La Gaceta",          href: "/casos-de-exito" },
       { name: "La Voz del Interior", href: "/casos-de-exito" },
@@ -40,7 +40,7 @@ const FILAS: { label: string; size: number; medios: MedioItem[] }[] = [
   },
   {
     label: "Local",
-    size: 13,
+    size: "var(--fs-caption)",
     medios: [
       { name: "Los Andes",    href: "/casos-de-exito" },
       { name: "MDZ Online",   href: "/casos-de-exito" },
@@ -77,7 +77,7 @@ export function EnMedias() {
           whileInView="visible"
           viewport={viewportOnce}
           className="font-mono uppercase text-bordo"
-          style={{ fontSize: 10, letterSpacing: "0.2em" }}
+          style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.2em" }}
         >
           Apariciones verificadas
         </motion.p>
@@ -93,7 +93,7 @@ export function EnMedias() {
           <span
             className="font-playfair text-negro-bordo"
             style={{
-              fontSize: "clamp(120px, 18vw, 200px)",
+              fontSize: "var(--fs-display)",
               fontWeight: 400,
               lineHeight: 1,
               letterSpacing: "-0.05em",
@@ -104,7 +104,7 @@ export function EnMedias() {
           <em
             className="font-playfair italic text-bordo"
             style={{
-              fontSize: "clamp(120px, 18vw, 200px)",
+              fontSize: "var(--fs-display)",
               fontWeight: 400,
               lineHeight: 1,
               letterSpacing: "-0.05em",
@@ -120,7 +120,7 @@ export function EnMedias() {
           whileInView="visible"
           viewport={viewportOnce}
           className="font-sans text-gris-bordo mt-8"
-          style={{ fontSize: 14, maxWidth: 480, lineHeight: 1.65 }}
+          style={{ fontSize: "var(--fs-caption)", maxWidth: 480, lineHeight: "var(--lh-relaxed)" }}
         >
           En medios locales, provinciales, nacionales e internacionales.
           Desde Mendoza al Vaticano.
@@ -153,7 +153,7 @@ export function EnMedias() {
               {/* Fila label */}
               <span
                 className="font-mono uppercase text-bordo sm:w-[110px] sm:shrink-0"
-                style={{ fontSize: 9, letterSpacing: "0.18em", opacity: 0.5 }}
+                style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.18em", opacity: 0.5 }}
               >
                 {fila.label}
               </span>
@@ -196,7 +196,7 @@ export function EnMedias() {
           <Link
             href="/casos-de-exito"
             className="inline-flex items-center gap-2 font-sans text-bordo hover:opacity-70 transition-opacity group"
-            style={{ fontSize: 13 }}
+            style={{ fontSize: "var(--fs-caption)" }}
           >
             Ver los +100 casos
             <ArrowRight size={13} strokeWidth={2} className="group-hover:translate-x-1 transition-transform" />

@@ -68,8 +68,8 @@ export function Bio({
                   style={{ backgroundColor: "#66001F" }}
                 >
                   <p
-                    className="font-mono text-[11px] uppercase tracking-widest leading-none"
-                    style={{ color: "#FEFCEF" }}
+                    className="font-mono uppercase tracking-widest leading-none"
+                    style={{ color: "#FEFCEF", fontSize: "var(--fs-eyebrow)" }}
                   >
                     {c.badge}
                   </p>
@@ -94,7 +94,7 @@ export function Bio({
             viewport={viewportOnce}
             className="flex flex-col gap-6"
           >
-            <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.25em] text-bordo">
+            <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.25em] text-bordo" style={{ fontSize: "var(--fs-eyebrow)" }}>
               {c.eyebrow}
             </motion.p>
 
@@ -105,13 +105,13 @@ export function Bio({
 
             <motion.h2
               variants={fadeUp}
-              className="font-playfair font-bold text-negro-bordo text-[2rem] sm:text-[2.5rem] lg:text-[2.75rem] leading-[1.15]"
+              className="font-playfair font-bold text-negro-bordo text-[calc(2rem*var(--text-scale))] sm:text-[calc(2.5rem*var(--text-scale))] lg:text-[calc(2.75rem*var(--text-scale))] leading-[1.15]"
             >
               <span className="block">{c.title_pre}</span>
               <em className="block italic text-bordo">{c.title_accent}</em>
             </motion.h2>
 
-            <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo text-base leading-[1.8] max-w-[480px]">
+            <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo leading-[1.8] max-w-[480px]" style={{ fontSize: "var(--fs-body)" }}>
               <RichText html={c.paragraph_1} className="rich-inline" />
               <RichText html={c.paragraph_2} className="rich-inline" />
               <RichText html={c.paragraph_3} className="rich-inline" />
@@ -121,7 +121,8 @@ export function Bio({
               {TAGS.map((tag) => (
                 <li
                   key={tag}
-                  className="font-sans text-xs px-3 py-1.5 rounded-full border border-bordo/40 text-bordo cursor-default transition-colors duration-200 hover:bg-bordo hover:text-hueso hover:border-bordo"
+                  className="font-sans px-3 py-1.5 rounded-full border border-bordo/40 text-bordo cursor-default transition-colors duration-200 hover:bg-bordo hover:text-hueso hover:border-bordo"
+                  style={{ fontSize: "var(--fs-eyebrow)" }}
                 >
                   {tag}
                 </li>
@@ -131,7 +132,7 @@ export function Bio({
             {/* Seguime también — bloque social más prominente del sitio. Jerarquía
                 deliberadamente menor que el título y el link "Leer más". */}
             <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3">
-              <p className="font-mono text-[11px] uppercase tracking-wider text-bordo/70">
+              <p className="font-mono uppercase tracking-wider text-bordo/70" style={{ fontSize: "var(--fs-eyebrow)" }}>
                 Encontrame en
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -140,7 +141,8 @@ export function Bio({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram de Marian Sánchez"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-bordo/30 px-5 py-3 font-sans text-[13px] text-negro-bordo transition-all duration-[250ms] ease-out hover:bg-bordo hover:text-hueso"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-bordo/30 px-5 py-3 font-sans text-negro-bordo transition-all duration-[250ms] ease-out hover:bg-bordo hover:text-hueso"
+                  style={{ fontSize: "var(--fs-caption)" }}
                 >
                   <Instagram size={16} strokeWidth={1.75} className="shrink-0" />
                   @marian15s
@@ -150,7 +152,8 @@ export function Bio({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="LinkedIn de Marian Sánchez"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-bordo/30 px-5 py-3 font-sans text-[13px] text-negro-bordo transition-all duration-[250ms] ease-out hover:bg-bordo hover:text-hueso"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-bordo/30 px-5 py-3 font-sans text-negro-bordo transition-all duration-[250ms] ease-out hover:bg-bordo hover:text-hueso"
+                  style={{ fontSize: "var(--fs-caption)" }}
                 >
                   <Linkedin size={16} strokeWidth={1.75} className="shrink-0" />
                   Marian Sánchez
@@ -161,7 +164,8 @@ export function Bio({
             <motion.div variants={fadeUp}>
               <Link
                 href="/mis-valores"
-                className="group inline-flex items-center gap-2.5 font-sans text-sm font-semibold text-bordo border border-bordo/40 px-5 py-2.5 rounded-full w-fit hover:bg-bordo hover:text-hueso hover:border-bordo transition-all duration-300"
+                className="group inline-flex items-center gap-2.5 font-sans font-semibold text-bordo border border-bordo/40 px-5 py-2.5 rounded-full w-fit hover:bg-bordo hover:text-hueso hover:border-bordo transition-all duration-300"
+                style={{ fontSize: "var(--fs-caption)" }}
               >
                 {c.link_text}
                 <ArrowRight
