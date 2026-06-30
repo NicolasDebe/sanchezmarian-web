@@ -61,7 +61,7 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
       <div className="relative mx-auto grid w-full items-center gap-x-12 gap-y-14 lg:grid-cols-[1fr_auto]" style={{ maxWidth: 1180 }}>
         <div>
           <motion.div {...satellite(0)} className="mb-7">
-            <span className="inline-flex items-center gap-2 rounded-full border border-dorado/60 bg-arena/40 font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em", padding: "8px 16px" }}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-dorado/60 bg-arena/40 font-mono uppercase text-bordo" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", padding: "8px 16px" }}>
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-dorado" />
               {eyebrow}
             </span>
@@ -69,14 +69,14 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
 
           <motion.div aria-hidden initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: reduced ? 0 : 0.7, ease: EASE, delay: reduced ? 0 : satelliteDelay + 0.05 }} className="mb-8 h-px origin-left bg-dorado" style={{ width: "clamp(60px, 10vw, 120px)" }} />
 
-          <motion.h1 aria-label={hero.h1} variants={heroContainer(!!reduced)} initial="hidden" animate="visible" className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(36px, 5.4vw, 88px)", lineHeight: 1.05, letterSpacing: "-0.03em", maxWidth: "18ch" }}>
+          <motion.h1 aria-label={hero.h1} variants={heroContainer(!!reduced)} initial="hidden" animate="visible" className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "calc(clamp(36px, 5.4vw, 88px) * var(--text-scale))", lineHeight: "var(--lh-tight)", letterSpacing: "-0.03em", maxWidth: "18ch" }}>
             {words.map((w, i) => (
               <motion.span key={i} aria-hidden variants={heroWord(!!reduced)} className="inline-block" style={{ marginRight: "0.25em", willChange: "transform, filter" }}>{w}</motion.span>
             ))}
           </motion.h1>
 
           {description && (
-            <motion.div {...satellite(0.15)} className="mt-8 font-sans text-gris-bordo" style={{ fontSize: "clamp(16px, 1.4vw, 20px)", lineHeight: 1.6, maxWidth: 560 }}>
+            <motion.div {...satellite(0.15)} className="mt-8 font-sans text-gris-bordo" style={{ fontSize: "calc(clamp(16px, 1.4vw, 20px) * var(--text-scale))", lineHeight: "var(--lh-base)", maxWidth: 560 }}>
               <RichText html={description} className="rich-inline" />
             </motion.div>
           )}
@@ -89,13 +89,13 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
         >
           <IsotipoInfinito size="hero" color="var(--color-bordo)" />
           <DrawnLine vertical width={80} thickness={1} color="var(--color-dorado)" origin="left" delay={satelliteDelay + 0.2} />
-          <span className="font-mono uppercase text-bordo/70" style={{ fontSize: 11, letterSpacing: "0.22em" }}>
+          <span className="font-mono uppercase text-bordo/70" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.22em" }}>
             Mendoza — AR
           </span>
         </motion.div>
       </div>
 
-      <motion.span aria-hidden {...satellite(0.25)} className="absolute font-mono uppercase text-bordo/55" style={{ bottom: 36, right: "clamp(28px, 6vw, 96px)", fontSize: 11, letterSpacing: "0.22em" }}>
+      <motion.span aria-hidden {...satellite(0.25)} className="absolute font-mono uppercase text-bordo/55" style={{ bottom: 36, right: "clamp(28px, 6vw, 96px)", fontSize: "var(--fs-eyebrow)", letterSpacing: "0.22em" }}>
         {two(serviceCount)} — {eyebrow}
       </motion.span>
     </section>
@@ -107,7 +107,7 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
    ════════════════════════════════════════════════════════════════════════ */
 function Eyebrow({ children, centered }: { children: ReactNode; centered?: boolean }) {
   return (
-    <p className="font-mono uppercase text-bordo" style={{ fontSize: 11, letterSpacing: "0.2em", textAlign: centered ? "center" : "left" }}>
+    <p className="font-mono uppercase text-bordo" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", textAlign: centered ? "center" : "left" }}>
       {children}
     </p>
   )
@@ -117,7 +117,7 @@ function GoldLine({ centered }: { centered?: boolean }) {
 }
 function BlockTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(28px, 4vw, 36px)", lineHeight: 1.12, letterSpacing: "-0.02em", maxWidth: "20ch" }}>
+    <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-h2)", lineHeight: 1.12, letterSpacing: "-0.02em", maxWidth: "20ch" }}>
       {children}
     </h2>
   )
@@ -125,7 +125,7 @@ function BlockTitle({ children }: { children: ReactNode }) {
 /* Label: DM Mono 10px uppercase --bordo opacity 0.7. */
 function Label({ children }: { children: ReactNode }) {
   return (
-    <p className="font-mono uppercase text-bordo/70" style={{ fontSize: 10, letterSpacing: "0.18em" }}>
+    <p className="font-mono uppercase text-bordo/70" style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.18em" }}>
       {children}
     </p>
   )
@@ -133,7 +133,7 @@ function Label({ children }: { children: ReactNode }) {
 /* Subtítulo de sub-bloque (PRENSA ORGÁNICA, etc.): DM Mono 12px uppercase --bordo. */
 function SubHeading({ children }: { children: ReactNode }) {
   return (
-    <p className="font-mono uppercase text-bordo" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
+    <p className="font-mono uppercase text-bordo" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.16em" }}>
       {children}
     </p>
   )
@@ -143,7 +143,7 @@ function Body({ text }: { text?: string }) {
   return (
     <div className="mt-6 flex flex-col gap-4" style={{ maxWidth: 760 }}>
       {paragraphs(text).map((p, i) => (
-        <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{p}</p>
+        <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{p}</p>
       ))}
     </div>
   )
@@ -153,7 +153,7 @@ function Bullets({ items }: { items?: string }) {
   return (
     <ul className="flex flex-col gap-2.5">
       {lines(items).map((it, i) => (
-        <li key={i} className="flex gap-2.5 font-sans text-gris-bordo" style={{ fontSize: 15, lineHeight: 1.6 }}>
+        <li key={i} className="flex gap-2.5 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body)", lineHeight: "var(--lh-base)" }}>
           <span aria-hidden className="text-bordo" style={{ flex: "none" }}>•</span>
           <span>{it}</span>
         </li>
@@ -219,8 +219,8 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
         <div className="grid gap-10 md:grid-cols-3">
           {pilares.map((p) => (
             <div key={p.num}>
-              <p className="font-mono text-bordo/50" style={{ fontSize: 12, letterSpacing: "0.12em", marginBottom: 12 }}>{p.num}</p>
-              <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: 22, lineHeight: 1.2, marginBottom: 16 }}>{p.title}</p>
+              <p className="font-mono text-bordo/50" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", marginBottom: 12 }}>{p.num}</p>
+              <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-snug)", marginBottom: 16 }}>{p.title}</p>
               <Bullets items={p.items} />
             </div>
           ))}
@@ -228,7 +228,7 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
 
         <p
           className="mx-auto mt-14 text-center font-sans text-gris-bordo"
-          style={{ fontSize: 16, lineHeight: 1.7, maxWidth: 720, fontStyle: "italic" }}
+          style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)", maxWidth: 720, fontStyle: "italic" }}
         >
           {c.intro_note}
         </p>
@@ -255,8 +255,8 @@ function Bloque01({ c }: { c: Record<string, string> }) {
         <div className="mt-7 grid gap-x-10 gap-y-8 md:grid-cols-2">
           {points.map((p) => (
             <div key={p.title}>
-              <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: 16 }}>{p.title}</p>
-              <p className="mt-2 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{p.desc}</p>
+              <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: "var(--fs-body-lg)" }}>{p.title}</p>
+              <p className="mt-2 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{p.desc}</p>
             </div>
           ))}
         </div>
@@ -307,16 +307,16 @@ function Bloque03({ c }: { c: Record<string, string> }) {
           <Bullets items={c.includes_items} />
         </div>
         {c.closing?.trim() && (
-          <p className="mt-7 font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{c.closing}</p>
+          <p className="mt-7 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{c.closing}</p>
         )}
       </div>
 
       <div className="mt-12 rounded-2xl" style={{ border: CARD_BORDER_40, padding: 24, maxWidth: 820 }}>
         <Label>{c.sub_label}</Label>
-        <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: 22, lineHeight: 1.2 }}>{c.sub_title}</p>
+        <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-snug)" }}>{c.sub_title}</p>
         <div className="mt-3 flex flex-col gap-4">
           {paragraphs(c.sub_desc).map((p, i) => (
-            <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: 16, lineHeight: 1.7 }}>{p}</p>
+            <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{p}</p>
           ))}
         </div>
       </div>
@@ -363,15 +363,16 @@ function FinalCTA({ c }: { c: Record<string, string> }) {
       >
         <Eyebrow centered>{c.eyebrow}</Eyebrow>
         <GoldLine centered />
-        <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "clamp(32px, 5vw, 52px)", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+        <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-h1)", lineHeight: "var(--lh-tight)", letterSpacing: "-0.02em" }}>
           {c.title}
         </h2>
-        <p className="mt-6 font-sans text-gris-bordo" style={{ fontSize: 18, lineHeight: 1.7, maxWidth: 520 }}>
+        <p className="mt-6 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-relaxed)", maxWidth: 520 }}>
           {c.description}
         </p>
         <Link
           href="/contacto"
-          className="group mt-10 inline-flex items-center gap-2 rounded-full bg-bordo px-8 py-4 font-sans text-[15px] font-semibold text-hueso transition-all hover:bg-bordo/90 active:scale-[0.98]"
+          className="group mt-10 inline-flex items-center gap-2 rounded-full bg-bordo px-8 py-4 font-sans font-semibold text-hueso transition-all hover:bg-bordo/90 active:scale-[0.98]"
+          style={{ fontSize: "var(--fs-body)" }}
         >
           {c.button_text}
           <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>

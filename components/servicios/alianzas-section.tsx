@@ -49,7 +49,7 @@ export function AlianzasSection({
     >
       <div className="mx-auto text-center" style={{ maxWidth: 920 }}>
         {eyebrow && (
-          <motion.p {...item(0)} className="font-mono uppercase text-bordo/70" style={{ fontSize: 12, letterSpacing: "0.24em" }}>
+          <motion.p {...item(0)} className="font-mono uppercase text-bordo/70" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.24em" }}>
             {eyebrow}
           </motion.p>
         )}
@@ -58,7 +58,7 @@ export function AlianzasSection({
           <motion.p
             {...item(0.06)}
             className="mt-6 font-playfair text-negro-bordo"
-            style={{ fontSize: "clamp(26px, 3.4vw, 46px)", lineHeight: 1.15, letterSpacing: "-0.02em" }}
+            style={{ fontSize: "var(--fs-h2)", lineHeight: "var(--lh-snug)", letterSpacing: "-0.02em" }}
           >
             {title}
           </motion.p>
@@ -70,7 +70,7 @@ export function AlianzasSection({
               key={chip}
               {...item(0.1 + i * 0.05)}
               className="inline-flex items-center gap-2 rounded-full border border-dorado/60 bg-arena/40 font-sans text-negro-bordo"
-              style={{ fontSize: "clamp(15px, 1.4vw, 18px)", padding: "11px 22px" }}
+              style={{ fontSize: "calc(clamp(15px, 1.4vw, 18px) * var(--text-scale))", padding: "11px 22px" }}
             >
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-dorado" />
               {chip}

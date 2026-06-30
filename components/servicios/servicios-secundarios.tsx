@@ -62,7 +62,7 @@ function SecondaryService({ s, dark, mirror }: { s: Servicio; dark: boolean; mir
       <motion.p
         {...item(0)}
         className={`font-mono uppercase ${txEyebrow}`}
-        style={{ fontSize: 12, letterSpacing: "0.24em" }}
+        style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.24em" }}
       >
         ● Servicio {s.numero}
       </motion.p>
@@ -72,11 +72,11 @@ function SecondaryService({ s, dark, mirror }: { s: Servicio; dark: boolean; mir
         text={s.nombre}
         delay={0.05}
         className={`mt-6 font-playfair font-bold ${txTitle}`}
-        style={{ fontSize: "clamp(30px, 4.2vw, 56px)", lineHeight: 1.08, letterSpacing: "-0.025em" }}
+        style={{ fontSize: "var(--fs-h1)", lineHeight: "var(--lh-tight)", letterSpacing: "-0.025em" }}
       />
 
       {s.descripcion && (
-        <motion.div {...item(0.15)} className={`mt-6 font-sans ${txBody}`} style={{ fontSize: "clamp(16px, 1.3vw, 18px)", lineHeight: 1.65, maxWidth: 580 }}>
+        <motion.div {...item(0.15)} className={`mt-6 font-sans ${txBody}`} style={{ fontSize: "calc(clamp(16px, 1.3vw, 18px) * var(--text-scale))", lineHeight: "var(--lh-relaxed)", maxWidth: 580 }}>
           <RichText html={s.descripcion} className="rich-inline" />
         </motion.div>
       )}
@@ -90,16 +90,16 @@ function SecondaryService({ s, dark, mirror }: { s: Servicio; dark: boolean; mir
               )}
               <motion.div {...item(0.1 + i * 0.06)} className="group" style={{ paddingBlock: 22 }}>
                 <div className="flex items-baseline gap-3">
-                  <span className={`font-mono ${dark ? "text-dorado" : "text-bordo"}`} style={{ fontSize: 12 }}>{two(i + 1)}</span>
+                  <span className={`font-mono ${dark ? "text-dorado" : "text-bordo"}`} style={{ fontSize: "var(--fs-eyebrow)" }}>{two(i + 1)}</span>
                   <h4 className="relative inline-block w-fit">
-                    <span className={`font-playfair font-bold ${txTitle}`} style={{ fontSize: "clamp(18px, 1.9vw, 24px)", lineHeight: 1.2 }}>
+                    <span className={`font-playfair font-bold ${txTitle}`} style={{ fontSize: "var(--fs-h4)", lineHeight: "var(--lh-snug)" }}>
                       {sub.titulo}
                     </span>
                     <span aria-hidden className={`absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100 ${dark ? "bg-dorado" : "bg-bordo"}`} />
                   </h4>
                 </div>
                 {sub.desc && (
-                  <RichText html={sub.desc} className={`rich-inline mt-2 font-sans ${txBody}`} style={{ fontSize: 15, lineHeight: 1.6, marginLeft: 27 }} />
+                  <RichText html={sub.desc} className={`rich-inline mt-2 font-sans ${txBody}`} style={{ fontSize: "var(--fs-body)", lineHeight: "var(--lh-base)", marginLeft: 27 }} />
                 )}
               </motion.div>
             </div>
@@ -115,7 +115,7 @@ function SecondaryService({ s, dark, mirror }: { s: Servicio; dark: boolean; mir
               ? "cta-invert cta-arrow group inline-flex items-center gap-2 rounded-xl border-2 border-hueso bg-hueso px-9 font-sans font-semibold text-bordo transition-all duration-300 active:scale-[0.98]"
               : "cta-arrow group inline-flex items-center gap-2 rounded-xl bg-bordo px-9 font-sans font-semibold text-hueso transition-all duration-300 hover:bg-bordo-oscuro active:scale-[0.98]"
           }
-          style={{ fontSize: 16, paddingBlock: "clamp(14px, 1.6vw, 18px)" }}
+          style={{ fontSize: "var(--fs-body-lg)", paddingBlock: "clamp(14px, 1.6vw, 18px)" }}
         >
           {s.cta}
           <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
@@ -129,7 +129,7 @@ function SecondaryService({ s, dark, mirror }: { s: Servicio; dark: boolean; mir
       <span
         aria-hidden
         className={`block font-playfair italic select-none ${dark ? "text-dorado/40" : "text-dorado/30"}`}
-        style={{ fontSize: "clamp(56px, 7vw, 92px)", lineHeight: 0.6, height: "0.55em" }}
+        style={{ fontSize: "calc(clamp(56px, 7vw, 92px) * var(--text-scale))", lineHeight: 0.6, height: "0.55em" }}
       >
         &ldquo;
       </span>
@@ -139,7 +139,7 @@ function SecondaryService({ s, dark, mirror }: { s: Servicio; dark: boolean; mir
         whileInView="visible"
         viewport={mvp}
         className={`mt-4 font-playfair italic ${txAnchor}`}
-        style={{ fontSize: "clamp(24px, 2.6vw, 38px)", lineHeight: 1.25 }}
+        style={{ fontSize: "var(--fs-h2)", lineHeight: "var(--lh-snug)" }}
       >
         {s.tagline}
       </motion.p>
