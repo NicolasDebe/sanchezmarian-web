@@ -68,7 +68,7 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
           variants={itemVariants}
           style={{
             fontFamily: "DM Mono, monospace",
-            fontSize: "11px",
+            fontSize: "var(--fs-eyebrow)",
             letterSpacing: ".15em",
             textTransform: "uppercase",
             color: "#66001F",
@@ -88,10 +88,10 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
             margin: 0,
           }}
         >
-          <span style={{ display: "block", fontSize: "clamp(1.3rem, 2.5vw, 2rem)", fontWeight: 600, opacity: 0.82 }}>
+          <span style={{ display: "block", fontSize: "calc(clamp(1.3rem, 2.5vw, 2rem) * var(--text-scale))", fontWeight: 600, opacity: 0.82 }}>
             {c.h1_pre}
           </span>
-          <em style={{ display: "block", fontSize: "clamp(1.9rem, 4vw, 3.2rem)", fontStyle: "italic", color: "#66001F", lineHeight: 1.0 }}>
+          <em style={{ display: "block", fontSize: "calc(clamp(1.9rem, 4vw, 3.2rem) * var(--text-scale))", fontStyle: "italic", color: "#66001F", lineHeight: "var(--lh-tight)" }}>
             {c.h1_accent}
           </em>
         </motion.h1>
@@ -143,10 +143,10 @@ export function ContactoContent({
               viewport={viewportOnce}
               className="flex flex-col gap-3"
             >
-              <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.22em] text-terracota">
+              <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.22em] text-terracota" style={{ fontSize: "var(--fs-eyebrow)" }}>
                 {info.eyebrow}
               </motion.p>
-              <motion.h2 variants={fadeUp} className="font-playfair font-bold text-marino text-[2rem] leading-[1.1]">
+              <motion.h2 variants={fadeUp} className="font-playfair font-bold text-marino text-[calc(2rem*var(--text-scale))] leading-[1.1]">
                 {info.title_pre}<br />
                 <em className="italic text-terracota">{info.title_accent}</em>
               </motion.h2>
@@ -165,15 +165,15 @@ export function ContactoContent({
                     <Icon size={16} className="text-terracota" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-gris-tx/50 mb-0.5">
+                    <p className="font-mono uppercase tracking-[0.12em] text-gris-tx/50 mb-0.5" style={{ fontSize: "var(--fs-micro)" }}>
                       {label}
                     </p>
                     {href ? (
-                      <a href={href} className="font-sans text-sm text-marino hover:text-terracota transition-colors">
+                      <a href={href} className="font-sans text-marino hover:text-terracota transition-colors" style={{ fontSize: "var(--fs-caption)" }}>
                         {value}
                       </a>
                     ) : (
-                      <p className="font-sans text-sm text-marino">{value}</p>
+                      <p className="font-sans text-marino" style={{ fontSize: "var(--fs-caption)" }}>{value}</p>
                     )}
                   </div>
                 </motion.div>
@@ -187,7 +187,7 @@ export function ContactoContent({
               viewport={viewportOnce}
               className="pt-6 border-t border-marino/10"
             >
-              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-gris-tx/50 mb-4">
+              <p className="font-mono uppercase tracking-[0.15em] text-gris-tx/50 mb-4" style={{ fontSize: "var(--fs-micro)" }}>
                 También en redes
               </p>
               <div className="flex gap-3">
@@ -200,7 +200,8 @@ export function ContactoContent({
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-sans text-sm font-medium text-marino/60 hover:text-terracota border border-marino/15 hover:border-terracota/40 px-4 py-2 rounded-full transition-all"
+                    className="font-sans font-medium text-marino/60 hover:text-terracota border border-marino/15 hover:border-terracota/40 px-4 py-2 rounded-full transition-all"
+                    style={{ fontSize: "var(--fs-caption)" }}
                   >
                     {label}
                   </a>
@@ -217,10 +218,10 @@ export function ContactoContent({
             viewport={viewportOnce}
             className="bg-arena rounded-2xl p-8 lg:p-10"
           >
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-terracota mb-2">
+            <p className="font-mono uppercase tracking-[0.2em] text-terracota mb-2" style={{ fontSize: "var(--fs-eyebrow)" }}>
               {info.form_eyebrow}
             </p>
-            <p className="font-playfair font-bold text-marino text-xl mb-8">
+            <p className="font-playfair font-bold text-marino mb-8" style={{ fontSize: "var(--fs-lead)" }}>
               {info.form_title}
             </p>
             <ContactForm />
@@ -244,10 +245,10 @@ export function ContactoContent({
             viewport={viewportOnce}
             className="mb-12"
           >
-            <motion.p variants={fadeUp} className="font-mono text-[11px] uppercase tracking-[0.22em] text-terracota mb-5">
+            <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.22em] text-terracota mb-5" style={{ fontSize: "var(--fs-eyebrow)" }}>
               {faq.eyebrow}
             </motion.p>
-            <motion.h2 variants={fadeUp} className="font-playfair font-bold text-white text-[2rem] sm:text-[2.5rem] leading-[1.1]">
+            <motion.h2 variants={fadeUp} className="font-playfair font-bold text-white text-[calc(2rem*var(--text-scale))] sm:text-[calc(2.5rem*var(--text-scale))] leading-[1.1]">
               {faq.title_pre}<br />
               <em className="italic text-terracota">{faq.title_accent}</em>
             </motion.h2>
@@ -266,10 +267,10 @@ export function ContactoContent({
                 variants={revealCard}
                 className="bg-white/5 border border-white/10 rounded-2xl p-7 flex flex-col gap-3"
               >
-                <h3 className="font-playfair font-bold text-white text-base leading-snug">
+                <h3 className="font-playfair font-bold text-white leading-snug" style={{ fontSize: "var(--fs-body-lg)" }}>
                   {item.q}
                 </h3>
-                <RichText html={item.a} className="rich-inline font-sans text-white/55 text-sm leading-relaxed" />
+                <RichText html={item.a} className="rich-inline font-sans text-white/55 leading-relaxed" style={{ fontSize: "var(--fs-caption)" }} />
               </motion.div>
             ))}
           </motion.div>

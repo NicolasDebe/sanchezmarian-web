@@ -18,7 +18,7 @@ function IconWA() {
   )
 }
 
-const LABEL = "font-mono text-[10px] uppercase tracking-[0.15em] text-gris-tx"
+const LABEL = "font-mono text-[var(--fs-micro)] uppercase tracking-[0.15em] text-gris-tx"
 // text-base (16px) evita el zoom automático de iOS al enfocar inputs.
 const INPUT_BASE = "bg-white border rounded-xl px-4 py-3 font-sans text-base text-marino placeholder:text-gris-tx/40 focus:outline-none transition-colors w-full"
 const INPUT_OK = "border-marino/15 focus:border-terracota/60"
@@ -101,7 +101,7 @@ export function ContactForm() {
         transition={{ duration: 0.4 }}
         className="flex items-center justify-center py-16"
       >
-        <p className="font-playfair text-marino text-xl text-center">
+        <p className="font-playfair text-marino text-center" style={{ fontSize: "var(--fs-lead)" }}>
           ¡Gracias! Te respondo pronto.
         </p>
       </motion.div>
@@ -150,7 +150,7 @@ export function ContactForm() {
       <div className="flex flex-col gap-1.5">
         <label htmlFor="cf-empresa" className={LABEL}>
           Empresa u organización{" "}
-          <span className="normal-case tracking-normal opacity-50 font-sans text-[10px]">(opcional)</span>
+          <span className="normal-case tracking-normal opacity-50 font-sans text-[var(--fs-micro)]">(opcional)</span>
         </label>
         <input
           id="cf-empresa"
@@ -213,7 +213,8 @@ export function ContactForm() {
         aria-busy={submitting}
         whileTap={submitting ? undefined : { scale: tapScale }}
         transition={springSnappy}
-        className="mt-1 inline-flex items-center justify-center gap-2 bg-terracota text-white px-6 py-3.5 rounded-full font-sans text-sm font-semibold hover:bg-terracota/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className="mt-1 inline-flex items-center justify-center gap-2 bg-terracota text-white px-6 py-3.5 rounded-full font-sans font-semibold hover:bg-terracota/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        style={{ fontSize: "var(--fs-caption)" }}
       >
         {submitting ? "Enviando…" : "Enviar consulta"}
         {!submitting && <ArrowRight size={15} strokeWidth={2.5} />}
@@ -221,12 +222,13 @@ export function ContactForm() {
 
       {/* WhatsApp — alternativa secundaria */}
       <div className="flex items-center justify-center gap-2">
-        <span className="font-sans text-xs text-gris-tx/45">¿Preferís WhatsApp?</span>
+        <span className="font-sans text-gris-tx/45" style={{ fontSize: "var(--fs-eyebrow)" }}>¿Preferís WhatsApp?</span>
         <a
           href={WA_HREF}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 font-sans text-xs font-medium text-gris-tx/60 hover:text-marino transition-colors"
+          className="inline-flex items-center gap-1.5 font-sans font-medium text-gris-tx/60 hover:text-marino transition-colors"
+          style={{ fontSize: "var(--fs-eyebrow)" }}
         >
           <IconWA />
           Escribime por acá
