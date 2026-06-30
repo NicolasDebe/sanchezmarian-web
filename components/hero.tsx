@@ -37,7 +37,11 @@ export function Hero({ content }: { content?: Record<string, string> }) {
       {/* CAPA 1: IMAGEN — define la altura del hero.
           next/Image con import estático: width/height intrínsecos (reserva
           espacio → sin CLS), srcset responsivo (payload menor en mobile) y
-          blur placeholder. El style replica el comportamiento cover/min/max. */}
+          blur placeholder. En desktop la altura es h-auto (la imagen 1200×800
+          a pleno ancho da ~850–960px), con un piso clamp(640px,80vh,720px) y
+          SIN techo de vh: así el hero crece con su contenido y no recorta el
+          texto largo a 100% de zoom (un max-h-screen anclaba el alto al
+          viewport y bajo zoom-in dejaba el texto afuera). */}
       <Image
         src={heroMarian}
         alt="Marian Sánchez — Comunicación estratégica en Mendoza"
@@ -45,7 +49,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
         quality={90}
         placeholder="blur"
         sizes="100vw"
-        className="block w-full object-cover object-top absolute inset-0 h-full md:static md:h-auto md:max-h-screen md:min-h-[680px]"
+        className="block w-full object-cover object-top absolute inset-0 h-full md:static md:h-auto md:min-h-[clamp(640px,80vh,720px)]"
       />
 
       {/* CAPA 2: OVERLAY DESKTOP — horizontal */}
