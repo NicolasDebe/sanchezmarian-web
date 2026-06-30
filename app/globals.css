@@ -28,6 +28,38 @@
 :root {
   --background: #FEFCEF;
   --foreground: #1A0008;
+
+  /* Sistema de escala tipográfica — controlado desde /admin/tipografia */
+  --text-scale-mobile: 1;
+  --text-scale-desktop: 1;
+  --text-scale: 1;
+
+  /* Tokens fontSize. Todos multiplican por --text-scale. */
+  --fs-micro:    calc(10px * var(--text-scale));
+  --fs-eyebrow:  calc(11px * var(--text-scale));
+  --fs-caption:  calc(13px * var(--text-scale));
+  --fs-body:     calc(15px * var(--text-scale));
+  --fs-body-lg:  calc(16px * var(--text-scale));
+  --fs-lead:     calc(20px * var(--text-scale));
+  --fs-h4:       calc(clamp(18px, 2vw, 24px) * var(--text-scale));
+  --fs-h3:       calc(clamp(20px, 2.5vw, 28px) * var(--text-scale));
+  --fs-h2:       calc(clamp(28px, 4vw, 44px) * var(--text-scale));
+  --fs-h1:       calc(clamp(32px, 5vw, 56px) * var(--text-scale));
+  --fs-h1-hero:  calc(clamp(2.2rem, 5.5vw, 4.5rem) * var(--text-scale));
+  --fs-display:  calc(clamp(72px, 18vw, 200px) * var(--text-scale));
+
+  /* Tokens lineHeight */
+  --lh-tight:    1.05;
+  --lh-snug:     1.2;
+  --lh-base:     1.55;
+  --lh-relaxed:  1.75;
+}
+
+@media (max-width: 767px) {
+  :root { --text-scale: var(--text-scale-mobile); }
+}
+@media (min-width: 768px) {
+  :root { --text-scale: var(--text-scale-desktop); }
 }
 
 html {

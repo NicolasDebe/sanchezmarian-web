@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import { Playfair_Display, DM_Sans, DM_Mono } from "next/font/google"
 import { Toaster } from "react-hot-toast"
 import { getOgDefaults, absoluteUrl, SITE_URL } from "@/lib/seo"
+import { createAdminClient } from "@/lib/supabase"
+import { getScaleValue, type ScalePresetKey } from "@/lib/design"
 import "./globals.css"
 
 // Solo los pesos realmente usados en el sitio: 400 (texto/H1 plano), 600
@@ -114,15 +116,39 @@ const jsonLd = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Escala tipográfica controlada desde /admin/tipografia (singleton en DB).
+  // Si la tabla todavía no existe o falla la lectura, caemos a 1 (idéntico al
+  // diseño actual).
+  let mobileScale = 1
+  let desktopScale = 1
+  try {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from("design_settings")
+      .select("text_scale_mobile, text_scale_desktop")
+      .eq("singleton_lock", true)
+      .single()
+    if (data) {
+      mobileScale = getScaleValue(data.text_scale_mobile as ScalePresetKey)
+      desktopScale = getScaleValue(data.text_scale_desktop as ScalePresetKey)
+    }
+  } catch {
+    /* defaults a 1 si la tabla todavía no existe o falla la lectura */
+  }
+
   return (
     <html
       lang="es"
       className={`${playfairDisplay.variable} ${playfairVariable.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
+      style={{
+        ["--text-scale-mobile" as string]: String(mobileScale),
+        ["--text-scale-desktop" as string]: String(desktopScale),
+      }}
     >
       <body className="min-h-full flex flex-col">
         <script
