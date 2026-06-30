@@ -111,7 +111,7 @@ export function Bio({
               <em className="block italic text-bordo">{c.title_accent}</em>
             </motion.h2>
 
-            <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo leading-[1.8] max-w-[480px]" style={{ fontSize: "var(--fs-body)" }}>
+            <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo leading-[1.8] max-w-[480px]" style={{ fontSize: "var(--fs-body-lg)" }}>
               <RichText html={c.paragraph_1} className="rich-inline" />
               <RichText html={c.paragraph_2} className="rich-inline" />
               <RichText html={c.paragraph_3} className="rich-inline" />

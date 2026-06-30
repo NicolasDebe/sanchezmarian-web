@@ -69,7 +69,7 @@ export function Ideas({ content }: { content?: Record<string, string> }) {
 
                 {/* Columna derecha — contenido */}
                 <div className={`flex flex-col gap-1 ${isLast ? "" : "pb-10"}`}>
-                  <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: "var(--fs-body)" }}>
+                  <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: "var(--fs-body-lg)" }}>
                     {paso.title}
                   </p>
                   <p className="font-sans text-gris-bordo leading-relaxed" style={{ fontSize: "var(--fs-caption)" }}>
