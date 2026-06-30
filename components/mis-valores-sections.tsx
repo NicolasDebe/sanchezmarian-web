@@ -63,7 +63,7 @@ function HeroEditorial({ c }: { c: Record<string, string> }) {
             variants={itemVariants}
             style={{
               fontFamily: "DM Mono, monospace",
-              fontSize: "11px",
+              fontSize: "var(--fs-eyebrow)",
               letterSpacing: ".15em",
               textTransform: "uppercase",
               color: "rgba(254,252,239,0.65)",
@@ -82,10 +82,10 @@ function HeroEditorial({ c }: { c: Record<string, string> }) {
               margin: 0,
             }}
           >
-            <span style={{ display: "block", fontSize: "clamp(1.3rem, 3vw, 2.2rem)", fontWeight: 600, opacity: 0.88 }}>
+            <span style={{ display: "block", fontSize: "calc(clamp(1.3rem, 3vw, 2.2rem) * var(--text-scale))", fontWeight: 600, opacity: 0.88 }}>
               {c.h1_pre}
             </span>
-            <em style={{ display: "block", fontSize: "clamp(2rem, 5vw, 4rem)", fontStyle: "italic", lineHeight: 1.0 }}>
+            <em style={{ display: "block", fontSize: "calc(clamp(2rem, 5vw, 4rem) * var(--text-scale))", fontStyle: "italic", lineHeight: "var(--lh-tight)" }}>
               {c.h1_accent}
             </em>
           </motion.h1>
@@ -106,7 +106,7 @@ function BioSection({ c }: { c: Record<string, string> }) {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="max-w-[760px] flex flex-col gap-8">
           <motion.p
-            className="font-playfair font-bold text-negro-bordo text-[28px] sm:text-[32px] lg:text-[36px] leading-[1.3]"
+            className="font-playfair font-bold text-negro-bordo text-[calc(28px*var(--text-scale))] sm:text-[calc(32px*var(--text-scale))] lg:text-[calc(36px*var(--text-scale))] leading-[1.3]"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -116,7 +116,8 @@ function BioSection({ c }: { c: Record<string, string> }) {
           </motion.p>
 
           <motion.div
-            className="font-sans text-[16px] text-gris-bordo leading-[1.7]"
+            className="font-sans text-gris-bordo leading-[1.7]"
+            style={{ fontSize: "var(--fs-body-lg)" }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -126,7 +127,8 @@ function BioSection({ c }: { c: Record<string, string> }) {
           </motion.div>
 
           <motion.div
-            className="font-sans text-[16px] text-gris-bordo leading-[1.7]"
+            className="font-sans text-gris-bordo leading-[1.7]"
+            style={{ fontSize: "var(--fs-body-lg)" }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -136,7 +138,8 @@ function BioSection({ c }: { c: Record<string, string> }) {
           </motion.div>
 
           <motion.p
-            className="font-mono text-[11px] text-gris-bordo/60 mt-2 text-right"
+            className="font-mono text-gris-bordo/60 mt-2 text-right"
+            style={{ fontSize: "var(--fs-eyebrow)" }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -171,15 +174,15 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
           viewport={viewportOnce}
           className="mb-16"
         >
-          <motion.p variants={fadeUp} className="font-mono text-[10px] uppercase tracking-[0.25em] text-bordo mb-4">
+          <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.25em] text-bordo mb-4" style={{ fontSize: "var(--fs-micro)" }}>
             {c.eyebrow}
           </motion.p>
           <motion.div variants={fadeUp} className="w-10 h-px bg-dorado mb-6" />
-          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[clamp(28px,7vw,40px)] leading-[1.1] mb-4">
+          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[calc(clamp(28px,7vw,40px)*var(--text-scale))] leading-[1.1] mb-4">
             {c.title_pre}{" "}
             <em className="italic text-bordo">{c.title_accent}</em>
           </motion.h2>
-          <motion.div variants={fadeUp} className="font-sans text-[14px] text-gris-bordo max-w-[480px] leading-relaxed">
+          <motion.div variants={fadeUp} className="font-sans text-gris-bordo max-w-[480px] leading-relaxed" style={{ fontSize: "var(--fs-caption)" }}>
             <RichText html={c.intro} className="rich-inline" />
           </motion.div>
         </motion.div>
@@ -198,15 +201,16 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
               className="group pt-8 cursor-default"
             >
               <div className="w-full h-px bg-dorado/20 mb-8" />
-              <span className="block font-mono text-[10px] text-bordo opacity-60 group-hover:opacity-100 transition-opacity duration-300 mb-3">
+              <span className="block font-mono text-bordo opacity-60 group-hover:opacity-100 transition-opacity duration-300 mb-3" style={{ fontSize: "var(--fs-micro)" }}>
                 {pilar.num}
               </span>
-              <p className="font-playfair font-bold text-negro-bordo text-[22px] leading-[1.15] mb-3 transition-transform duration-300 ease-out group-hover:-translate-y-1">
+              <p className="font-playfair font-bold text-negro-bordo leading-[1.15] mb-3 transition-transform duration-300 ease-out group-hover:-translate-y-1" style={{ fontSize: "var(--fs-lead)" }}>
                 {pilar.titulo}
               </p>
               <RichText
                 html={pilar.descripcion}
-                className="rich-inline font-sans text-[15px] text-gris-bordo leading-[1.7]"
+                className="rich-inline font-sans text-gris-bordo leading-[1.7]"
+                style={{ fontSize: "var(--fs-body)" }}
               />
             </motion.div>
           ))}
@@ -233,11 +237,12 @@ function CierreSection({ c }: { c: Record<string, string> }) {
         >
           <RichText
             html={c.paragraph}
-            className="rich-inline font-playfair text-negro-bordo text-[22px] sm:text-[26px] leading-[1.5] mb-10"
+            className="rich-inline font-playfair text-negro-bordo text-[calc(22px*var(--text-scale))] sm:text-[calc(26px*var(--text-scale))] leading-[1.5] mb-10"
           />
           <Link
             href="/#contacto"
-            className="inline-flex items-center gap-2 bg-bordo text-hueso font-sans text-[15px] font-semibold px-8 py-4 rounded-full hover:bg-bordo/90 active:scale-[0.98] transition-all"
+            className="inline-flex items-center gap-2 bg-bordo text-hueso font-sans font-semibold px-8 py-4 rounded-full hover:bg-bordo/90 active:scale-[0.98] transition-all"
+            style={{ fontSize: "var(--fs-body)" }}
           >
             {c.button_text}
           </Link>
