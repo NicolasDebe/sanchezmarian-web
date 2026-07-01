@@ -358,7 +358,7 @@ function FinalCTA({ c }: { c: Record<string, string> }) {
           {c.description}
         </p>
         <Link
-          href="/contacto"
+          href="/#contacto"
           className="group mt-10 inline-flex min-h-[44px] items-center gap-2 rounded-full bg-hueso px-8 py-4 font-sans font-semibold text-bordo transition-all hover:bg-hueso-oscuro active:scale-[0.98]"
           style={{ fontSize: "var(--fs-body)" }}
         >
