@@ -11,7 +11,7 @@ import {
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 import { hasHtmlTags, htmlToPlainText, plainToHtml } from "@/lib/rich-text"
-import { TEXT_SIZE_PRESETS } from "@/lib/text-size"
+import { TEXT_SIZE_PRESETS, sizeFactor } from "@/lib/text-size"
 import type { FieldType, SelectOption } from "@/lib/content-schema"
 
 const MAX = { text: 250, longtext: 2000, number: 20 } as const
@@ -405,41 +405,94 @@ export function ContentEditor({
                           {len}/{max}
                         </span>
 
-                        {f.resizable && (
-                          <div
-                            className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg px-3 py-2.5"
-                            style={{
-                              backgroundColor: "rgba(201,168,130,0.10)",
-                              border: "1px solid rgba(201,168,130,0.25)",
-                            }}
-                          >
-                            <span
-                              className="font-mono uppercase"
-                              style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-bordo)" }}
+                        {f.resizable && (() => {
+                          const raw = values[sec.section][f.field] ?? ""
+                          const plain = (isRich(f) ? htmlToPlainText(raw) : raw).trim()
+                          const previewText = plain.slice(0, 160) || "Escribí el texto arriba para verlo acá…"
+                          // Aproximación de estilo: títulos en Playfair, párrafos en DM Sans.
+                          const isTitle = f.type === "text"
+                          const previewFont = isTitle
+                            ? "var(--font-playfair-display), serif"
+                            : "var(--font-dm-sans), sans-serif"
+                          const previewWeight = isTitle ? 700 : 400
+                          const base = isTitle ? 22 : 15
+                          const cur = sizes[sec.section]?.[f.field] ?? { m: "normal", d: "normal" }
+                          const previews: [string, number][] = [
+                            ["💻 Compu", sizeFactor(cur.d)],
+                            ["📱 Celular", sizeFactor(cur.m)],
+                          ]
+                          return (
+                            <div
+                              className="mt-1 rounded-lg px-3 py-3"
+                              style={{
+                                backgroundColor: "rgba(201,168,130,0.10)",
+                                border: "1px solid rgba(201,168,130,0.25)",
+                              }}
                             >
-                              Tamaño del texto
-                            </span>
-                            {(["m", "d"] as const).map((dim) => (
-                              <label key={dim} className="flex items-center gap-1.5">
-                                <span style={{ fontSize: 12, color: "var(--color-gris-bordo)" }}>
-                                  {dim === "m" ? "📱 Celular" : "💻 Compu"}
-                                </span>
-                                <select
-                                  value={sizes[sec.section]?.[f.field]?.[dim] ?? "normal"}
-                                  onChange={(e) => setSize(sec.section, f.field, dim, e.target.value)}
-                                  className="admin-input"
-                                  style={{ width: "auto", padding: "4px 8px", fontSize: 13 }}
+                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                <span
+                                  className="font-mono uppercase"
+                                  style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-bordo)" }}
                                 >
-                                  {TEXT_SIZE_PRESETS.map((p) => (
-                                    <option key={p.key} value={p.key}>
-                                      {p.label}
-                                    </option>
+                                  Tamaño del texto
+                                </span>
+                                {(["m", "d"] as const).map((dim) => (
+                                  <label key={dim} className="flex items-center gap-1.5">
+                                    <span style={{ fontSize: 12, color: "var(--color-gris-bordo)" }}>
+                                      {dim === "m" ? "📱 Celular" : "💻 Compu"}
+                                    </span>
+                                    <select
+                                      value={cur[dim] ?? "normal"}
+                                      onChange={(e) => setSize(sec.section, f.field, dim, e.target.value)}
+                                      className="admin-input"
+                                      style={{ width: "auto", padding: "4px 8px", fontSize: 13 }}
+                                    >
+                                      {TEXT_SIZE_PRESETS.map((p) => (
+                                        <option key={p.key} value={p.key}>
+                                          {p.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </label>
+                                ))}
+                              </div>
+
+                              {/* Vista previa en vivo: el texto crece según lo elegido. */}
+                              <div className="mt-3 border-t pt-3" style={{ borderColor: "rgba(201,168,130,0.3)" }}>
+                                <span
+                                  className="font-mono uppercase"
+                                  style={{ fontSize: 9, letterSpacing: "0.1em", color: "rgba(74,48,64,0.55)" }}
+                                >
+                                  Vista previa — así se va a ver de grande
+                                </span>
+                                <div className="mt-2 flex flex-col gap-2">
+                                  {previews.map(([label, factor]) => (
+                                    <div key={label} className="flex items-baseline gap-2">
+                                      <span
+                                        className="shrink-0 font-mono"
+                                        style={{ fontSize: 10, color: "var(--color-bordo)", width: 64 }}
+                                      >
+                                        {label}
+                                      </span>
+                                      <span
+                                        className="line-clamp-2"
+                                        style={{
+                                          fontFamily: previewFont,
+                                          fontWeight: previewWeight,
+                                          fontSize: base * factor,
+                                          lineHeight: 1.25,
+                                          color: "var(--color-negro-bordo)",
+                                        }}
+                                      >
+                                        {previewText}
+                                      </span>
+                                    </div>
                                   ))}
-                                </select>
-                              </label>
-                            ))}
-                          </div>
-                        )}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })()}
                       </div>
                     )
                   })}
