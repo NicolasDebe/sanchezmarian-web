@@ -9,6 +9,8 @@ import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { IsotipoInfinito } from "@/components/ui/isotipo-infinito"
 import { DrawnLine } from "@/components/ui/drawn-line"
 import { ServiceFeatureCard } from "@/components/servicios/service-feature-card"
+import { Conexiones } from "@/components/conexiones"
+import type { Connection } from "@/lib/connections"
 import { EASE } from "@/components/servicios/types"
 
 const mvp = { once: true, margin: "-80px" } as const
@@ -374,6 +376,7 @@ function FinalCTA({ c }: { c: Record<string, string> }) {
    ════════════════════════════════════════════════════════════════════════ */
 export function ServiciosPageSections({
   content,
+  connections = [],
 }: {
   content?: {
     hero?: Record<string, string>
@@ -384,6 +387,7 @@ export function ServiciosPageSections({
     servicio_04?: Record<string, string>
     cta?: Record<string, string>
   }
+  connections?: Pick<Connection, "id" | "label">[]
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
   const pilares = { ...fallbacksFor("pilares"), ...content?.pilares }
@@ -401,6 +405,8 @@ export function ServiciosPageSections({
       <Bloque02 c={s2} />
       <Bloque03 c={s3} />
       <Bloque04 c={s4} />
+      {/* Conexiones al fondo (fondo hueso: Bloque04 arena → hueso → CTA bordó). */}
+      <Conexiones connections={connections} bg="bg-hueso" />
       <FinalCTA c={cta} />
     </>
   )

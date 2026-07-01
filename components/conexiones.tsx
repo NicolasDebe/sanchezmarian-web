@@ -1,22 +1,26 @@
 import type { Connection } from "@/lib/connections"
 
 /**
- * Sección CONEXIONES del home — alianzas/disciplinas con las que se ejecuta cada
- * proyecto, como pills. Fondo --arena para mantener el ritmo alternado con la
- * vidriera de Servicios (--hueso). Contenido dinámico desde la tabla
- * `connections` (editable en /admin/conexiones); ver getActiveConnections().
+ * Sección CONEXIONES — alianzas/disciplinas con las que se ejecuta cada
+ * proyecto, como pills. Aparece en el home (fondo --arena) y al fondo de
+ * /servicios (fondo --hueso, para respetar el ritmo alternado de esa página).
+ * Contenido dinámico desde la tabla `connections` (editable en
+ * /admin/conexiones); ver getActiveConnections().
  *
+ * `bg` permite ajustar el fondo según dónde se inserte (default --arena).
  * Server component puro: los hovers de las pills son CSS (Tailwind), sin JS.
  */
 export function Conexiones({
   connections,
+  bg = "bg-arena",
 }: {
   connections: Pick<Connection, "id" | "label">[]
+  bg?: string
 }) {
   if (connections.length === 0) return null
 
   return (
-    <section className="bg-arena py-20 lg:py-28">
+    <section className={`${bg} py-20 lg:py-28`}>
       <div className="mx-auto flex max-w-7xl flex-col items-center px-6 text-center lg:px-12">
 
         {/* Eyebrow */}

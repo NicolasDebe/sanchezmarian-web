@@ -5,7 +5,6 @@ import { Clientes } from "@/components/clientes"
 import { HomeServicios } from "@/components/home-servicios"
 import { Conexiones } from "@/components/conexiones"
 import { Bio } from "@/components/bio"
-import { EnMedias } from "@/components/en-medios"
 import { CtaFinal } from "@/components/cta-final"
 import { getContentBatch } from "@/lib/content"
 import { getActiveConnections } from "@/lib/connections"
@@ -83,7 +82,6 @@ export default async function Home() {
       />
       <Conexiones connections={connections} />
       <Bio content={bio} social={social} />
-      <EnMedias />
       <CtaFinal content={ctaFinal} contact={contact} social={social} />
     </>
   )
