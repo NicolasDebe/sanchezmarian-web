@@ -7,7 +7,7 @@ import { createAdminClient } from "@/lib/supabase"
 import { htmlToPlainText } from "@/lib/rich-text"
 import { PAGE_PATHS } from "@/lib/admin-paths"
 import { isValidPreset, type DesignSettings, type ScalePresetKey } from "@/lib/design"
-import { isValidTextSize } from "@/lib/text-size"
+import { isValidTextSize, isValidFieldFont } from "@/lib/text-size"
 import type { FieldDef, SectionDef } from "@/lib/content-schema"
 import { HOME_SECTIONS } from "@/lib/home-schema"
 import { SERVICIOS_SECTIONS } from "@/lib/servicios-schema"
@@ -262,6 +262,72 @@ export async function saveTextSizes(
     }
   } catch {
     return { error: "Ocurrió un error al guardar los tamaños." }
+  }
+
+  const path = PAGE_PATHS[page || PAGE_DEFAULT]
+  if (path) revalidatePath(path)
+  if ((page || PAGE_DEFAULT) === "servicios") revalidatePath("/")
+  return { success: true }
+}
+
+// ─── Fuentes por campo (tabla field_fonts) ────────────────────────────────────
+
+export type FieldFontEntry = {
+  section: string
+  field: string
+  font: string
+}
+
+/**
+ * Persiste la fuente elegida para campos "resizable" (SOLO las 3 del sitio, ver
+ * FIELD_FONTS). Independiente de text_sizes y content_blocks: si la tabla
+ * field_fonts no existe todavía, error suave (nada más se ve afectado). Upsert
+ * por (page, section, field). Revalida la ruta pública de la página.
+ */
+export async function saveFieldFonts(
+  page: string,
+  entries: FieldFontEntry[],
+): Promise<SaveResult> {
+  let userEmail: string | null = null
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return { error: "Tu sesión expiró. Volvé a iniciar sesión." }
+    userEmail = user.email ?? null
+  } catch {
+    return { error: "No pudimos verificar tu sesión. Intentá de nuevo." }
+  }
+
+  if (!Array.isArray(entries) || entries.length === 0) return { success: true }
+
+  // Validación: solo fuentes conocidas del sitio (defensa final).
+  for (const e of entries) {
+    if (!isValidFieldFont(e.font)) return { error: "Fuente inválida." }
+  }
+
+  try {
+    const admin = createAdminClient()
+    const pageKey = page || PAGE_DEFAULT
+    const rows = entries.map((e) => ({
+      page: pageKey,
+      section: e.section,
+      field: e.field,
+      font: e.font,
+      updated_at: new Date().toISOString(),
+      updated_by: userEmail,
+    }))
+
+    const { error } = await admin
+      .from("field_fonts")
+      .upsert(rows, { onConflict: "page,section,field" })
+
+    if (error) {
+      return { error: "No se pudieron guardar las fuentes (¿falta correr la migración field_fonts?)." }
+    }
+  } catch {
+    return { error: "Ocurrió un error al guardar las fuentes." }
   }
 
   const path = PAGE_PATHS[page || PAGE_DEFAULT]

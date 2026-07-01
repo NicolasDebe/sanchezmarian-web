@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { sizeFactor } from "@/lib/text-size"
+import { sizeFactor, fontCss } from "@/lib/text-size"
 
 /**
  * Puente de preview del tamaño de texto POR CAMPO para /admin/edit/*. Solo
@@ -11,20 +11,22 @@ import { sizeFactor } from "@/lib/text-size"
  * sitio público real).
  *
  * Mensajes que entiende (desde ContentEditor):
- *  - { type: "fieldSize", fkey, m, d }  → aplica factores mobile/desktop.
- *  - { type: "scrollToField", fkey }    → centra ese texto en la vista.
+ *  - { type: "fieldSize", fkey, m, d, font }  → tamaño mobile/desktop + fuente.
+ *  - { type: "scrollToField", fkey }          → centra ese texto en la vista.
  *
  * `m`/`d` pueden venir como clave de preset ("l", "xl", …) o como número ya
- * resuelto; sizeFactor tolera ambos (número desconocido → 1).
+ * resuelto; sizeFactor tolera ambos (número desconocido → 1). `font` es una
+ * clave de FIELD_FONTS ("default" | "playfair" | "sans" | "mono").
  */
 export function TextSizePreviewBridge() {
   useEffect(() => {
     const url = new URL(window.location.href)
     if (url.searchParams.get("preview") !== "text-sizes") return
 
-    const applyFieldSize = (fkey: string, m: unknown, d: unknown) => {
+    const applyFieldSize = (fkey: string, m: unknown, d: unknown, font: unknown) => {
       const mf = typeof m === "number" ? m : sizeFactor(m as string)
       const df = typeof d === "number" ? d : sizeFactor(d as string)
+      const family = typeof font === "string" ? fontCss(font) : undefined
       const els = document.querySelectorAll<HTMLElement>(
         `[data-fkey="${cssEscape(fkey)}"]`,
       )
@@ -38,6 +40,10 @@ export function TextSizePreviewBridge() {
           el.style.setProperty("--fs-local-m", String(mf))
           el.style.setProperty("--fs-local-d", String(df))
         }
+        // Guardamos UNA vez la fuente inline original (puede ser la del diseño):
+        // al volver a "default" la restauramos en vez de borrarla a ciegas.
+        if (!("fkeyFontOrig" in el.dataset)) el.dataset.fkeyFontOrig = el.style.fontFamily
+        el.style.fontFamily = family ?? el.dataset.fkeyFontOrig ?? ""
       })
     }
 
@@ -52,7 +58,7 @@ export function TextSizePreviewBridge() {
       const data = e.data
       if (!data || typeof data !== "object") return
       if (data.type === "fieldSize" && typeof data.fkey === "string") {
-        applyFieldSize(data.fkey, data.m, data.d)
+        applyFieldSize(data.fkey, data.m, data.d, data.font)
       } else if (data.type === "scrollToField" && typeof data.fkey === "string") {
         scrollToField(data.fkey)
       }

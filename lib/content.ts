@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase"
 import type { SectionDef } from "@/lib/content-schema"
 import { fallbacksForIn } from "@/lib/content-schema"
-import { normalizeTextSize, type FieldScaleMap } from "@/lib/text-size"
+import { normalizeTextSize, normalizeFieldFont, type FieldScaleMap } from "@/lib/text-size"
 
 /**
  * Helpers de lectura pública de contenido editable.
@@ -99,25 +99,55 @@ export async function getPageContent(
 }
 
 /**
- * Lee los tamaños de texto por campo de una página (tabla text_sizes) y los
- * devuelve como mapa "section.field" → { m, d } (claves de preset).
- * Resiliente: si la tabla no existe o falla, devuelve {} → sin cambios de
- * tamaño, el sitio se ve idéntico. NUNCA tira excepción.
+ * Lee el ESTILO por campo de una página: tamaño (tabla text_sizes) + fuente
+ * (tabla field_fonts), y lo devuelve como un solo mapa "section.field" →
+ * { m, d, font }. Cada tabla es independiente y resiliente: si una no existe o
+ * falla, ese aspecto simplemente no se aplica (el sitio se ve idéntico). NUNCA
+ * tira excepción. Ambas lecturas van en paralelo.
  */
 export async function getTextScales(page: string): Promise<FieldScaleMap> {
+  const [sizes, fonts] = await Promise.all([
+    readTextSizes(page),
+    readFieldFonts(page),
+  ])
+  const map: FieldScaleMap = {}
+  for (const key of new Set([...Object.keys(sizes), ...Object.keys(fonts)])) {
+    map[key] = { ...sizes[key], font: fonts[key] }
+  }
+  return map
+}
+
+async function readTextSizes(page: string): Promise<Record<string, FieldScaleMap[string]>> {
   try {
     const { data, error } = await supabase
       .from("text_sizes")
       .select("section, field, scale_mobile, scale_desktop")
       .eq("page", page)
-
     if (error || !data) return {}
-    const map: FieldScaleMap = {}
+    const map: Record<string, FieldScaleMap[string]> = {}
     for (const row of data) {
       map[`${row.section}.${row.field}`] = {
         m: normalizeTextSize(row.scale_mobile),
         d: normalizeTextSize(row.scale_desktop),
       }
+    }
+    return map
+  } catch {
+    return {}
+  }
+}
+
+async function readFieldFonts(page: string): Promise<Record<string, string>> {
+  try {
+    const { data, error } = await supabase
+      .from("field_fonts")
+      .select("section, field, font")
+      .eq("page", page)
+    if (error || !data) return {}
+    const map: Record<string, string> = {}
+    for (const row of data) {
+      const font = normalizeFieldFont(row.font)
+      if (font !== "default") map[`${row.section}.${row.field}`] = font
     }
     return map
   } catch {

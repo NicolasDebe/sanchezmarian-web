@@ -5,13 +5,14 @@ import { Undo2, Eye } from "lucide-react"
 import {
   saveContentSection,
   saveTextSizes,
+  saveFieldFonts,
   getLastVersionDate,
   restoreLastVersion,
 } from "@/app/admin/actions"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 import { hasHtmlTags, htmlToPlainText, plainToHtml } from "@/lib/rich-text"
-import { TEXT_SIZE_KEYS, sizeIndex, sizeLabel } from "@/lib/text-size"
+import { TEXT_SIZE_KEYS, sizeIndex, sizeLabel, FIELD_FONTS } from "@/lib/text-size"
 import type { FieldType, SelectOption } from "@/lib/content-schema"
 
 const MAX = { text: 250, longtext: 2000, number: 20 } as const
@@ -34,6 +35,8 @@ export interface EditorField {
   /** Tamaño actual mobile/desktop (clave de preset; "normal" por defecto). */
   scaleMobile?: string
   scaleDesktop?: string
+  /** Fuente actual (clave de FIELD_FONTS; "default" = original). */
+  font?: string
 }
 
 /** ¿Este campo usa el editor enriquecido? */
@@ -100,6 +103,20 @@ export function ContentEditor({
         ]),
       ),
   )
+  // Fuentes por campo: fonts[section][field] = clave de FIELD_FONTS.
+  const [fonts, setFonts] = useState<Record<string, Record<string, string>>>(
+    () =>
+      Object.fromEntries(
+        sections.map((s) => [
+          s.section,
+          Object.fromEntries(
+            s.fields
+              .filter((f) => f.resizable)
+              .map((f) => [f.field, f.font ?? "default"]),
+          ),
+        ]),
+      ),
+  )
   const [status, setStatus] = useState<Record<string, Status>>({})
   const [messages, setMessages] = useState<Record<string, string>>({})
   // Undo: sección con el modal abierto, fecha del backup y estado de carga.
@@ -121,6 +138,13 @@ export function ContentEditor({
         ...prev[section],
         [field]: { ...prev[section]?.[field], [dim]: key },
       },
+    }))
+  }
+
+  function setFont(section: string, field: string, key: string) {
+    setFonts((prev) => ({
+      ...prev,
+      [section]: { ...prev[section], [field]: key },
     }))
   }
 
@@ -161,12 +185,18 @@ export function ContentEditor({
         const cur = sizes[sec.section]?.[f.field]
         if (!cur) continue
         w.postMessage(
-          { type: "fieldSize", fkey: `${sec.section}.${f.field}`, m: cur.m, d: cur.d },
+          {
+            type: "fieldSize",
+            fkey: `${sec.section}.${f.field}`,
+            m: cur.m,
+            d: cur.d,
+            font: fonts[sec.section]?.[f.field] ?? "default",
+          },
           "*",
         )
       }
     }
-  }, [showPreview, sections, sizes, loadTick])
+  }, [showPreview, sections, sizes, fonts, loadTick])
 
   useEffect(() => {
     if (!scrollReq) return
@@ -240,20 +270,38 @@ export function ContentEditor({
         scale_desktop: sizes[sec.section]?.[f.field]?.d ?? "normal",
       }))
 
-    let sizeWarn = ""
+    let styleWarn = ""
     if (sizeEntries.length > 0) {
       const sizeRes = await saveTextSizes(page, sizeEntries)
-      if (!("success" in sizeRes)) sizeWarn = ` (Texto guardado, pero los tamaños no: ${sizeRes.error})`
+      if (!("success" in sizeRes)) styleWarn = ` (Texto guardado, pero los tamaños no: ${sizeRes.error})`
     }
 
-    setStatus((s) => ({ ...s, [sec.section]: sizeWarn ? "error" : "success" }))
+    // Guardado de fuentes (mismos campos resizable). También aislado.
+    const fontEntries = sec.fields
+      .filter((f) => f.resizable)
+      .map((f) => ({
+        section: sec.section,
+        field: f.field,
+        font: fonts[sec.section]?.[f.field] ?? "default",
+      }))
+
+    if (fontEntries.length > 0) {
+      const fontRes = await saveFieldFonts(page, fontEntries)
+      if (!("success" in fontRes)) {
+        styleWarn = styleWarn
+          ? styleWarn
+          : ` (Texto guardado, pero las fuentes no: ${fontRes.error})`
+      }
+    }
+
+    setStatus((s) => ({ ...s, [sec.section]: styleWarn ? "error" : "success" }))
     setMessages((m) => ({
       ...m,
-      [sec.section]: sizeWarn
-        ? sizeWarn.trim()
+      [sec.section]: styleWarn
+        ? styleWarn.trim()
         : "Los cambios se verán en el sitio en ~1 minuto.",
     }))
-    if (!sizeWarn) {
+    if (!styleWarn) {
       setTimeout(() => setStatus((s) => ({ ...s, [sec.section]: "idle" })), 3000)
     }
   }
@@ -487,7 +535,7 @@ export function ContentEditor({
                                   className="font-mono uppercase"
                                   style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-bordo)" }}
                                 >
-                                  Tamaño del texto
+                                  Apariencia del texto
                                 </span>
                                 {showPreview && (
                                   <button
@@ -530,6 +578,32 @@ export function ContentEditor({
                                     </span>
                                   </div>
                                 ))}
+                              </div>
+
+                              {/* Fuente: solo entre las que ya usa el sitio. */}
+                              <div
+                                className="mt-3 flex items-center gap-3 border-t pt-3"
+                                style={{ borderColor: "rgba(201,168,130,0.3)" }}
+                              >
+                                <span
+                                  className="shrink-0"
+                                  style={{ fontSize: 12, color: "var(--color-gris-bordo)", width: 70 }}
+                                >
+                                  🔤 Fuente
+                                </span>
+                                <select
+                                  value={fonts[sec.section]?.[f.field] ?? "default"}
+                                  onChange={(e) => setFont(sec.section, f.field, e.target.value)}
+                                  className="admin-input flex-1"
+                                  style={{ padding: "4px 8px", fontSize: 13 }}
+                                  aria-label={`Fuente de ${f.label}`}
+                                >
+                                  {FIELD_FONTS.map((ft) => (
+                                    <option key={ft.key} value={ft.key}>
+                                      {ft.label}
+                                    </option>
+                                  ))}
+                                </select>
                               </div>
                             </div>
                           )

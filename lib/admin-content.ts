@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase"
-import { normalizeTextSize } from "@/lib/text-size"
+import { normalizeTextSize, normalizeFieldFont } from "@/lib/text-size"
 import type { SectionDef } from "@/lib/content-schema"
 import type { EditorSection } from "@/components/admin/content-editor"
 
@@ -46,6 +46,21 @@ export async function loadEditorSections(
     // Tabla inexistente: ignorar.
   }
 
+  // Fuentes por campo (tabla field_fonts). Independiente y resiliente igual que
+  // los tamaños: si no existe todavía, todos quedan en "default" (original).
+  const fontMap = new Map<string, string>()
+  try {
+    const { data: fonts } = await admin
+      .from("field_fonts")
+      .select("section, field, font")
+      .eq("page", page)
+    for (const row of fonts ?? []) {
+      fontMap.set(`${row.section}.${row.field}`, normalizeFieldFont(row.font as string))
+    }
+  } catch {
+    // Tabla inexistente: ignorar.
+  }
+
   const sections: EditorSection[] = schema.map((s) => ({
     section: s.section,
     title: s.title,
@@ -63,6 +78,7 @@ export async function loadEditorSections(
         resizable: f.resizable,
         scaleMobile: size?.m ?? "normal",
         scaleDesktop: size?.d ?? "normal",
+        font: fontMap.get(`${s.section}.${f.field}`) ?? "default",
         value: dbMap.get(`${s.section}.${f.field}`) ?? f.fallback,
       }
     }),

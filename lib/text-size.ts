@@ -79,8 +79,50 @@ export function sizeIndex(key: string | null | undefined): number {
   return TEXT_SIZE_KEYS.indexOf(normalizeTextSize(key))
 }
 
-/** Tamaño elegido para un campo: claves de preset mobile/desktop. */
-export type FieldScale = { m?: string | null; d?: string | null }
+/**
+ * Fuentes por campo. SOLO las 3 familias que ya usa el sitio (no se agregan
+ * nuevas): Marian puede cambiar la tipografía de un título/párrafo puntual
+ * entre ellas, o dejar la ORIGINAL del diseño. `css` = valor font-family con la
+ * variable de next/font correspondiente; `null` = no tocar (usa la del diseño).
+ */
+export const FIELD_FONTS = [
+  { key: "default", label: "Original (según el diseño)", css: null },
+  { key: "playfair", label: "Playfair — títulos elegantes", css: "var(--font-playfair-display), serif" },
+  { key: "sans", label: "DM Sans — cuerpo", css: "var(--font-dm-sans), sans-serif" },
+  { key: "mono", label: "DM Mono — técnica", css: "var(--font-dm-mono), monospace" },
+] as const
+
+export type FieldFontKey = (typeof FIELD_FONTS)[number]["key"]
+
+export const DEFAULT_FIELD_FONT: FieldFontKey = "default"
+
+const FONT_CSS: Record<string, string | null> = Object.fromEntries(
+  FIELD_FONTS.map((f) => [f.key, f.css]),
+)
+const FONT_LABELS: Record<string, string> = Object.fromEntries(
+  FIELD_FONTS.map((f) => [f.key, f.label]),
+)
+
+export function isValidFieldFont(key: string): key is FieldFontKey {
+  return FIELD_FONTS.some((f) => f.key === key)
+}
+
+/** Lleva cualquier clave a una válida: desconocida/None → "default". */
+export function normalizeFieldFont(key: string | null | undefined): FieldFontKey {
+  return key && isValidFieldFont(key) ? key : DEFAULT_FIELD_FONT
+}
+
+/** Valor CSS font-family de la fuente elegida, o undefined si es la original. */
+export function fontCss(key: string | null | undefined): string | undefined {
+  return FONT_CSS[normalizeFieldFont(key)] ?? undefined
+}
+
+export function fontLabel(key: string | null | undefined): string {
+  return FONT_LABELS[normalizeFieldFont(key)]
+}
+
+/** Estilo elegido para un campo: tamaño (mobile/desktop) + fuente. */
+export type FieldScale = { m?: string | null; d?: string | null; font?: string | null }
 
 /** Mapa "section.field" → FieldScale, para una página. */
 export type FieldScaleMap = Record<string, FieldScale>
@@ -95,17 +137,24 @@ type FsResult = { style?: CSSProperties } & Record<string, unknown>
 function localVars(scale: FieldScale | undefined, baseStyle?: CSSProperties): FsResult {
   const m = sizeFactor(scale?.m)
   const d = sizeFactor(scale?.d)
-  if (m === 1 && d === 1) {
+  const font = fontCss(scale?.font)
+  const sizeChanged = !(m === 1 && d === 1)
+
+  // Sin cambios de tamaño NI de fuente: el elemento queda idéntico al diseño.
+  if (!sizeChanged && !font) {
     return baseStyle ? { style: baseStyle } : {}
   }
-  return {
-    "data-fscale": "",
-    style: {
-      ...baseStyle,
-      ["--fs-local-m" as string]: m,
-      ["--fs-local-d" as string]: d,
-    } as CSSProperties,
+
+  const style: CSSProperties = { ...baseStyle }
+  // La fuente elegida gana sobre className/baseStyle (inline > clase).
+  if (font) style.fontFamily = font
+  if (sizeChanged) {
+    ;(style as Record<string, unknown>)["--fs-local-m"] = m
+    ;(style as Record<string, unknown>)["--fs-local-d"] = d
   }
+  const res: FsResult = { style }
+  if (sizeChanged) res["data-fscale"] = ""
+  return res
 }
 
 /**
