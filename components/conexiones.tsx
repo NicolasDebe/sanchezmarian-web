@@ -34,14 +34,6 @@ export function Conexiones({
         {/* Línea dorada */}
         <span aria-hidden className="my-6 h-px bg-dorado" style={{ width: 40 }} />
 
-        {/* Subtítulo (encima del título) */}
-        <p
-          className="font-sans uppercase text-gris-bordo"
-          style={{ fontSize: "var(--fs-body)", letterSpacing: "0.14em", marginBottom: 14 }}
-        >
-          Alianzas para llevar a cabo tu proyecto.
-        </p>
-
         {/* Título con acento italic --bordo */}
         <h2
           className="font-playfair font-bold text-negro-bordo"
