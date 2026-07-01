@@ -13,8 +13,6 @@ import { two, EASE } from "@/components/servicios/types"
 const SERVICE_COUNT = 4
 const mvp = { once: true, margin: "-80px" } as const
 const PAD_X = "clamp(24px, 6vw, 96px)"
-const CARD_BORDER_30 = "1px solid rgba(201, 168, 130, 0.3)"
-const CARD_BORDER_40 = "1px solid rgba(201, 168, 130, 0.4)"
 
 /* Convierte un longtext multilínea (un ítem por línea) en array no vacío. */
 function lines(raw?: string): string[] {
@@ -26,7 +24,7 @@ function paragraphs(raw?: string): string[] {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 1 — HERO (se mantiene el diseño existente)
+   SECCIÓN 1 — HERO (se mantiene el diseño existente aprobado por el cliente)
    ════════════════════════════════════════════════════════════════════════ */
 const heroContainer = (reduced: boolean): Variants => ({
   hidden: {},
@@ -103,7 +101,23 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   ÁTOMOS TIPOGRÁFICOS (reglas globales de la página)
+   SEPARADOR EDITORIAL — el isotipo del infinito marca la transición entre
+   bloques. Es el ÚNICO elemento decorativo permitido entre secciones.
+   Fondo transparente: respira sobre el lienzo, con padding vertical generoso.
+   ════════════════════════════════════════════════════════════════════════ */
+function Separador() {
+  return (
+    <div
+      className="flex justify-center"
+      style={{ paddingBlock: "clamp(48px, 7vw, 96px)", background: "transparent" }}
+    >
+      <IsotipoInfinito size="transicion" color="var(--color-bordo)" />
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   ÁTOMOS TIPOGRÁFICOS (reglas globales de la página) — fontSize por tokens.
    ════════════════════════════════════════════════════════════════════════ */
 function Eyebrow({ children, centered }: { children: ReactNode; centered?: boolean }) {
   return (
@@ -122,7 +136,7 @@ function BlockTitle({ children }: { children: ReactNode }) {
     </h2>
   )
 }
-/* Label: DM Mono 10px uppercase --bordo opacity 0.7. */
+/* Label: DM Mono uppercase --bordo opacity 0.7. */
 function Label({ children }: { children: ReactNode }) {
   return (
     <p className="font-mono uppercase text-bordo/70" style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.18em" }}>
@@ -130,16 +144,8 @@ function Label({ children }: { children: ReactNode }) {
     </p>
   )
 }
-/* Subtítulo de sub-bloque (PRENSA ORGÁNICA, etc.): DM Mono 12px uppercase --bordo. */
-function SubHeading({ children }: { children: ReactNode }) {
-  return (
-    <p className="font-mono uppercase text-bordo" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.16em" }}>
-      {children}
-    </p>
-  )
-}
-/* Párrafos de descripción / cuerpo: DM Sans 16px / 1.7 --gris-bordo. */
-function Body({ text }: { text?: string }) {
+/* Párrafos de descripción / cuerpo: DM Sans --gris-bordo. */
+function Intro({ text }: { text?: string }) {
   return (
     <div className="mt-6 flex flex-col gap-4" style={{ maxWidth: 760 }}>
       {paragraphs(text).map((p, i) => (
@@ -148,10 +154,10 @@ function Body({ text }: { text?: string }) {
     </div>
   )
 }
-/* Bullets: DM Sans 15px / 1.6 con marcador • en --bordo. */
-function Bullets({ items }: { items?: string }) {
+/* Bullets: DM Sans con marcador • en --bordo. */
+function Bullets({ items, className }: { items?: string; className?: string }) {
   return (
-    <ul className="flex flex-col gap-2.5">
+    <ul className={`flex flex-col gap-2.5${className ? ` ${className}` : ""}`}>
       {lines(items).map((it, i) => (
         <li key={i} className="flex gap-2.5 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body)", lineHeight: "var(--lh-base)" }}>
           <span aria-hidden className="text-bordo" style={{ flex: "none" }}>•</span>
@@ -186,7 +192,7 @@ function BlockHeader({ c }: { c: Record<string, string> }) {
       <Eyebrow>{c.eyebrow}</Eyebrow>
       <GoldLine />
       <BlockTitle>{c.title}</BlockTitle>
-      <Body text={c.intro} />
+      <Intro text={c.intro} />
     </div>
   )
 }
@@ -201,39 +207,35 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
     { num: "03", title: c.pilar_3_title, items: c.pilar_3_items },
   ]
   return (
-    <section className="bg-hueso-oscuro py-16 md:py-24" style={{ paddingInline: PAD_X }}>
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={mvp}
-        transition={{ duration: 0.6, ease: EASE }}
-        className="mx-auto w-full"
-        style={{ maxWidth: 1180 }}
-      >
-        <div className="mb-12 md:mb-16">
-          <Eyebrow>{c.eyebrow}</Eyebrow>
-          <GoldLine />
-          <BlockTitle>{c.title}</BlockTitle>
-        </div>
+    <Block bg="bg-hueso">
+      <div style={{ maxWidth: 760 }}>
+        <Eyebrow>{c.eyebrow}</Eyebrow>
+        <GoldLine />
+        <BlockTitle>{c.title}</BlockTitle>
+      </div>
 
-        <div className="grid gap-10 md:grid-cols-3">
-          {pilares.map((p) => (
-            <div key={p.num}>
-              <p className="font-mono text-bordo/50" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", marginBottom: 12 }}>{p.num}</p>
-              <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-snug)", marginBottom: 16 }}>{p.title}</p>
-              <Bullets items={p.items} />
-            </div>
-          ))}
-        </div>
+      <div className="grid gap-x-10 gap-y-12 md:grid-cols-3" style={{ marginTop: 56 }}>
+        {pilares.map((p) => (
+          <div key={p.num}>
+            <p className="font-mono uppercase text-bordo/55" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.18em", marginBottom: 12 }}>{p.num}</p>
+            <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: 1.2, marginBottom: 16 }}>{p.title}</p>
+            <Bullets items={p.items} />
+          </div>
+        ))}
+      </div>
 
+      {/* La nota final (intro_note) es la bisagra hacia el catálogo de
+          servicios: se muestra como cierre italic centrado bajo los pilares.
+          El schema de pilares no define un campo `closing` aparte. */}
+      {c.intro_note?.trim() && (
         <p
-          className="mx-auto mt-14 text-center font-sans text-gris-bordo"
-          style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)", maxWidth: 720, fontStyle: "italic" }}
+          className="font-sans text-gris-bordo text-center italic"
+          style={{ fontSize: "var(--fs-body)", lineHeight: 1.75, maxWidth: 720, margin: "64px auto 0" }}
         >
           {c.intro_note}
         </p>
-      </motion.div>
-    </section>
+      )}
+    </Block>
   )
 }
 
@@ -241,14 +243,14 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
    SECCIÓN 3 — LOS 4 SERVICIOS
    ════════════════════════════════════════════════════════════════════════ */
 
-/* BLOQUE 01 — 4 sub-puntos (título bold + descripción). */
+/* BLOQUE 01 — Estrategia: 4 sub-puntos (título bold + descripción). */
 function Bloque01({ c }: { c: Record<string, string> }) {
   const points = [1, 2, 3, 4]
     .map((n) => ({ title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
     .filter((p) => p.title.trim())
 
   return (
-    <Block bg="bg-hueso">
+    <Block bg="bg-hueso-oscuro">
       <BlockHeader c={c} />
       <div className="mt-12">
         <Label>{c.includes_label}</Label>
@@ -265,22 +267,20 @@ function Bloque01({ c }: { c: Record<string, string> }) {
   )
 }
 
-/* Mini-card de modalidad de prensa: borde dorado, sin fondo distinto. */
+/* Card de modalidad de prensa: título Playfair + lista, borde dorado. */
 function PrensaCard({ name, items }: { name: string; items: string }) {
   return (
-    <div className="rounded-2xl" style={{ border: CARD_BORDER_30, padding: 24 }}>
-      <SubHeading>{name}</SubHeading>
-      <div className="mt-4">
-        <Bullets items={items} />
-      </div>
+    <div className="rounded-2xl border border-dorado/25 p-6 md:p-7">
+      <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: 1.2 }}>{name}</p>
+      <Bullets items={items} className="mt-5" />
     </div>
   )
 }
 
-/* BLOQUE 02 — Prensa: 2 modalidades + lista común. */
+/* BLOQUE 02 — Prensa: 2 modalidades (cards) + lista común. */
 function Bloque02({ c }: { c: Record<string, string> }) {
   return (
-    <Block bg="bg-hueso-oscuro">
+    <Block bg="bg-hueso">
       <BlockHeader c={c} />
       <div className="mt-10 grid gap-6 md:grid-cols-2">
         <PrensaCard name={c.organica_label} items={c.organica_items} />
@@ -288,9 +288,7 @@ function Bloque02({ c }: { c: Record<string, string> }) {
       </div>
       <div className="mt-12">
         <Label>{c.includes_label}</Label>
-        <div className="mt-5">
-          <Bullets items={c.includes_items} />
-        </div>
+        <Bullets items={c.includes_items} className="mt-5" />
       </div>
     </Block>
   )
@@ -299,21 +297,19 @@ function Bloque02({ c }: { c: Record<string, string> }) {
 /* BLOQUE 03 — RRPP y eventos: lista + cierre + sub-servicio destacado. */
 function Bloque03({ c }: { c: Record<string, string> }) {
   return (
-    <Block bg="bg-hueso">
+    <Block bg="bg-hueso-oscuro">
       <BlockHeader c={c} />
       <div className="mt-10" style={{ maxWidth: 820 }}>
         <Label>{c.includes_label}</Label>
-        <div className="mt-5">
-          <Bullets items={c.includes_items} />
-        </div>
+        <Bullets items={c.includes_items} className="mt-5" />
         {c.closing?.trim() && (
           <p className="mt-7 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{c.closing}</p>
         )}
       </div>
 
-      <div className="mt-12 rounded-2xl" style={{ border: CARD_BORDER_40, padding: 24, maxWidth: 820 }}>
+      <div className="mt-12 rounded-2xl border border-dorado/30 bg-hueso p-6 md:p-8" style={{ maxWidth: 820 }}>
         <Label>{c.sub_label}</Label>
-        <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-snug)" }}>{c.sub_title}</p>
+        <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: 1.2 }}>{c.sub_title}</p>
         <div className="mt-3 flex flex-col gap-4">
           {paragraphs(c.sub_desc).map((p, i) => (
             <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{p}</p>
@@ -324,23 +320,19 @@ function Bloque03({ c }: { c: Record<string, string> }) {
   )
 }
 
-/* BLOQUE 04 — Oratoria y asesoría de imagen: 2 sub-bloques. */
+/* BLOQUE 04 — Oratoria y asesoría de imagen: 2 sub-bloques paralelos. */
 function Bloque04({ c }: { c: Record<string, string> }) {
   return (
-    <Block bg="bg-hueso-oscuro">
+    <Block bg="bg-hueso">
       <BlockHeader c={c} />
-      <div className="mt-10 grid gap-10 md:grid-cols-2">
+      <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
         <div>
           <Label>{c.oratoria_label}</Label>
-          <div className="mt-5">
-            <Bullets items={c.oratoria_items} />
-          </div>
+          <Bullets items={c.oratoria_items} className="mt-4" />
         </div>
         <div>
           <Label>{c.imagen_label}</Label>
-          <div className="mt-5">
-            <Bullets items={c.imagen_items} />
-          </div>
+          <Bullets items={c.imagen_items} className="mt-4" />
         </div>
       </div>
     </Block>
@@ -348,7 +340,7 @@ function Bloque04({ c }: { c: Record<string, string> }) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 4 — CTA FINAL (centrada, sin fondo --bordo)
+   SECCIÓN 4 — CTA FINAL (centrada, sin fondo --bordo) — se conserva tal cual.
    ════════════════════════════════════════════════════════════════════════ */
 function FinalCTA({ c }: { c: Record<string, string> }) {
   return (
@@ -383,7 +375,8 @@ function FinalCTA({ c }: { c: Record<string, string> }) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   ORQUESTADOR
+   ORQUESTADOR — Hero + Pilares + 4 bloques diferenciados, separados por el
+   isotipo del infinito. Fondos alternados hueso / hueso-oscuro.
    ════════════════════════════════════════════════════════════════════════ */
 export function ServiciosPageSections({
   content,
@@ -409,11 +402,17 @@ export function ServiciosPageSections({
   return (
     <>
       <HeroSection hero={hero} serviceCount={SERVICE_COUNT} />
+      <Separador />
       <PilaresSection c={pilares} />
+      <Separador />
       <Bloque01 c={s1} />
+      <Separador />
       <Bloque02 c={s2} />
+      <Separador />
       <Bloque03 c={s3} />
+      <Separador />
       <Bloque04 c={s4} />
+      <Separador />
       <FinalCTA c={cta} />
     </>
   )
