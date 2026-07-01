@@ -62,6 +62,18 @@
   :root { --text-scale: var(--text-scale-desktop); }
 }
 
+/* Tamaño por campo (tabla text_sizes): un título/párrafo con [data-fscale]
+   recalcula SOLO su --text-scale local = escala global de la página × factor
+   del campo. Como todos los --fs-* multiplican por --text-scale, esto agranda
+   el texto SIN tocar la fuente ni el tamaño base. Mobile/desktop independientes
+   vía --fs-local-m / --fs-local-d (default 1 = sin cambio). */
+@media (max-width: 767px) {
+  [data-fscale] { --text-scale: calc(var(--text-scale-mobile) * var(--fs-local-m, 1)); }
+}
+@media (min-width: 768px) {
+  [data-fscale] { --text-scale: calc(var(--text-scale-desktop) * var(--fs-local-d, 1)); }
+}
+
 html {
   scroll-padding-top: 80px;
   /* El contenedor de scroll es <html>: aquí se mide el overflow. `clip` corta

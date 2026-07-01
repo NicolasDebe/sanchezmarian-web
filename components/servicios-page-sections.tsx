@@ -11,6 +11,7 @@ import { DrawnLine } from "@/components/ui/drawn-line"
 import { ServiceFeatureCard } from "@/components/servicios/service-feature-card"
 import { Conexiones } from "@/components/conexiones"
 import type { Connection } from "@/lib/connections"
+import { fsStyle, type FieldScale, type FieldScaleMap } from "@/lib/text-size"
 import { EASE } from "@/components/servicios/types"
 
 const mvp = { once: true, margin: "-80px" } as const
@@ -37,7 +38,7 @@ const heroWord = (reduced: boolean): Variants => ({
   visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: reduced ? 0 : 0.8, ease: EASE } },
 })
 
-function HeroSection({ hero }: { hero: Record<string, string> }) {
+function HeroSection({ hero, scales }: { hero: Record<string, string>; scales?: FieldScaleMap }) {
   const reduced = useReducedMotion()
   const words = (hero.h1 ?? "").split(/\s+/).filter(Boolean)
   const satelliteDelay = reduced ? 0 : words.length * 0.06 + 0.45
@@ -69,14 +70,14 @@ function HeroSection({ hero }: { hero: Record<string, string> }) {
 
           <motion.div aria-hidden initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: reduced ? 0 : 0.7, ease: EASE, delay: reduced ? 0 : satelliteDelay + 0.05 }} className="mb-8 h-px origin-left bg-dorado" style={{ width: "clamp(60px, 10vw, 120px)" }} />
 
-          <motion.h1 aria-label={hero.h1} variants={heroContainer(!!reduced)} initial="hidden" animate="visible" className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "calc(clamp(36px, 5.4vw, 88px) * var(--text-scale))", lineHeight: "var(--lh-tight)", letterSpacing: "-0.03em", maxWidth: "18ch" }}>
+          <motion.h1 aria-label={hero.h1} variants={heroContainer(!!reduced)} initial="hidden" animate="visible" className="font-playfair font-bold text-negro-bordo" {...fsStyle(scales?.["hero.h1"], { fontSize: "calc(clamp(36px, 5.4vw, 88px) * var(--text-scale))", lineHeight: "var(--lh-tight)", letterSpacing: "-0.03em", maxWidth: "18ch" })}>
             {words.map((w, i) => (
               <motion.span key={i} aria-hidden variants={heroWord(!!reduced)} className="inline-block" style={{ marginRight: "0.25em", willChange: "transform, filter" }}>{w}</motion.span>
             ))}
           </motion.h1>
 
           {description && (
-            <motion.div {...satellite(0.15)} className="mt-8 font-sans text-gris-bordo" style={{ fontSize: "calc(clamp(16px, 1.4vw, 20px) * var(--text-scale))", lineHeight: "var(--lh-base)", maxWidth: 560 }}>
+            <motion.div {...satellite(0.15)} className="mt-8 font-sans text-gris-bordo" {...fsStyle(scales?.["hero.description"], { fontSize: "calc(clamp(16px, 1.4vw, 20px) * var(--text-scale))", lineHeight: "var(--lh-base)", maxWidth: 560 })}>
               <RichText html={description} className="rich-inline" />
             </motion.div>
           )}
@@ -115,9 +116,12 @@ function Eyebrow({ children, centered }: { children: ReactNode; centered?: boole
 function GoldLine({ centered, flush }: { centered?: boolean; flush?: boolean }) {
   return <div className="bg-dorado" style={{ width: 40, height: 1, margin: centered ? "16px auto 24px" : `${flush ? 0 : 16}px 0 24px` }} />
 }
-function BlockTitle({ children }: { children: ReactNode }) {
+function BlockTitle({ children, scale }: { children: ReactNode; scale?: FieldScale }) {
   return (
-    <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-h2)", lineHeight: 1.12, letterSpacing: "-0.02em", maxWidth: "20ch" }}>
+    <h2
+      className="font-playfair font-bold text-negro-bordo"
+      {...fsStyle(scale, { fontSize: "var(--fs-h2)", lineHeight: 1.12, letterSpacing: "-0.02em", maxWidth: "20ch" })}
+    >
       {children}
     </h2>
   )
@@ -130,10 +134,11 @@ function Label({ children }: { children: ReactNode }) {
     </p>
   )
 }
-/* Párrafos de introducción de sección: DM Sans 16px --gris-bordo. */
-function Intro({ text }: { text?: string }) {
+/* Párrafos de introducción de sección: DM Sans 16px --gris-bordo. El tamaño
+   (scale) se aplica al contenedor: los <p> heredan el --text-scale local. */
+function Intro({ text, scale }: { text?: string; scale?: FieldScale }) {
   return (
-    <div className="mt-6 flex flex-col gap-4" style={{ maxWidth: 760 }}>
+    <div className="mt-6 flex flex-col gap-4" {...fsStyle(scale, { maxWidth: 760 })}>
       {paragraphs(text).map((p, i) => (
         <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{p}</p>
       ))}
@@ -179,14 +184,14 @@ function Section({ bg, id, children }: { bg: string; id?: string; children: Reac
   )
 }
 
-function BlockHeader({ c }: { c: Record<string, string> }) {
+function BlockHeader({ c, section, scales }: { c: Record<string, string>; section: string; scales?: FieldScaleMap }) {
   const eyebrow = (c.eyebrow ?? "").trim()
   return (
     <div style={{ maxWidth: 760 }}>
       {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
       <GoldLine flush={!eyebrow} />
-      <BlockTitle>{c.title}</BlockTitle>
-      <Intro text={c.intro} />
+      <BlockTitle scale={scales?.[`${section}.title`]}>{c.title}</BlockTitle>
+      <Intro text={c.intro} scale={scales?.[`${section}.intro`]} />
     </div>
   )
 }
@@ -194,7 +199,7 @@ function BlockHeader({ c }: { c: Record<string, string> }) {
 /* ════════════════════════════════════════════════════════════════════════
    SECCIÓN 2 — PILARES (3 cards, jerarquía por línea dorada) — fondo --arena
    ════════════════════════════════════════════════════════════════════════ */
-function PilaresSection({ c }: { c: Record<string, string> }) {
+function PilaresSection({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   const pilares = [
     { title: c.pilar_1_title, items: c.pilar_1_items },
     { title: c.pilar_2_title, items: c.pilar_2_items },
@@ -205,7 +210,7 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
       <div style={{ maxWidth: 760 }}>
         <Eyebrow>{c.eyebrow}</Eyebrow>
         <GoldLine />
-        <BlockTitle>{c.title}</BlockTitle>
+        <BlockTitle scale={scales?.["pilares.title"]}>{c.title}</BlockTitle>
       </div>
 
       <div className="mt-12 grid gap-4 md:mt-14 md:grid-cols-3 md:gap-6">
@@ -234,14 +239,14 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
 /* ════════════════════════════════════════════════════════════════════════
    SECCIÓN 3 — SERVICIO 01 · Estrategia (grid 2x2 de cards) — fondo --hueso
    ════════════════════════════════════════════════════════════════════════ */
-function Bloque01({ c }: { c: Record<string, string> }) {
+function Bloque01({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   const points = [1, 2, 3, 4]
     .map((n) => ({ title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
     .filter((p) => p.title.trim())
 
   return (
     <Section bg="bg-hueso" id="servicio-1">
-      <BlockHeader c={c} />
+      <BlockHeader c={c} section="servicio_01" scales={scales} />
       <div className="mt-12">
         <Label>{c.includes_label}</Label>
         <div className="mt-6 grid gap-4 md:grid-cols-2 md:gap-6">
@@ -271,10 +276,10 @@ function TitledCard({ title, items }: { title: string; items: string }) {
 /* ════════════════════════════════════════════════════════════════════════
    SECCIÓN 4 — SERVICIO 02 · Prensa (2 modalidades + card común) — fondo --arena
    ════════════════════════════════════════════════════════════════════════ */
-function Bloque02({ c }: { c: Record<string, string> }) {
+function Bloque02({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   return (
     <Section bg="bg-arena" id="servicio-2">
-      <BlockHeader c={c} />
+      <BlockHeader c={c} section="servicio_02" scales={scales} />
       <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
         <TitledCard title={c.organica_label} items={c.organica_items} />
         <TitledCard title={c.pautada_label} items={c.pautada_items} />
@@ -292,10 +297,10 @@ function Bloque02({ c }: { c: Record<string, string> }) {
 /* ════════════════════════════════════════════════════════════════════════
    SECCIÓN 5 — SERVICIO 03 · RRPP (card + sub-servicio destacado) — fondo --hueso
    ════════════════════════════════════════════════════════════════════════ */
-function Bloque03({ c }: { c: Record<string, string> }) {
+function Bloque03({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   return (
     <Section bg="bg-hueso" id="servicio-3">
-      <BlockHeader c={c} />
+      <BlockHeader c={c} section="servicio_03" scales={scales} />
       <ServiceFeatureCard className="mt-10">
         <Label>{c.includes_label}</Label>
         <div className="mt-5">
@@ -323,10 +328,10 @@ function Bloque03({ c }: { c: Record<string, string> }) {
 /* ════════════════════════════════════════════════════════════════════════
    SECCIÓN 6 — SERVICIO 04 · Oratoria (2 cards lado a lado) — fondo --arena
    ════════════════════════════════════════════════════════════════════════ */
-function Bloque04({ c }: { c: Record<string, string> }) {
+function Bloque04({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   return (
     <Section bg="bg-arena" id="servicio-4">
-      <BlockHeader c={c} />
+      <BlockHeader c={c} section="servicio_04" scales={scales} />
       <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
         <TitledCard title={c.oratoria_label} items={c.oratoria_items} />
         <TitledCard title={c.imagen_label} items={c.imagen_items} />
@@ -338,7 +343,7 @@ function Bloque04({ c }: { c: Record<string, string> }) {
 /* ════════════════════════════════════════════════════════════════════════
    SECCIÓN 7 — CTA FINAL — fondo --bordo, texto --hueso, botón invertido.
    ════════════════════════════════════════════════════════════════════════ */
-function FinalCTA({ c }: { c: Record<string, string> }) {
+function FinalCTA({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   return (
     <section className="bg-bordo text-center" style={{ paddingInline: PAD_X, paddingBlock: "clamp(56px, 8vw, 96px)" }}>
       <motion.div
@@ -351,10 +356,10 @@ function FinalCTA({ c }: { c: Record<string, string> }) {
       >
         <p className="font-mono uppercase text-hueso/70" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em" }}>{c.eyebrow}</p>
         <div className="bg-dorado" style={{ width: 40, height: 1, margin: "16px auto 24px" }} />
-        <h2 className="font-playfair font-bold text-hueso" style={{ fontSize: "var(--fs-h1)", lineHeight: "var(--lh-tight)", letterSpacing: "-0.02em" }}>
+        <h2 className="font-playfair font-bold text-hueso" {...fsStyle(scales?.["cta.title"], { fontSize: "var(--fs-h1)", lineHeight: "var(--lh-tight)", letterSpacing: "-0.02em" })}>
           {c.title}
         </h2>
-        <p className="mt-6 font-sans text-hueso/80" style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-relaxed)", maxWidth: 520 }}>
+        <p className="mt-6 font-sans text-hueso/80" {...fsStyle(scales?.["cta.description"], { fontSize: "var(--fs-lead)", lineHeight: "var(--lh-relaxed)", maxWidth: 520 })}>
           {c.description}
         </p>
         <Link
@@ -377,6 +382,7 @@ function FinalCTA({ c }: { c: Record<string, string> }) {
 export function ServiciosPageSections({
   content,
   connections = [],
+  scales,
 }: {
   content?: {
     hero?: Record<string, string>
@@ -388,6 +394,7 @@ export function ServiciosPageSections({
     cta?: Record<string, string>
   }
   connections?: Pick<Connection, "id" | "label">[]
+  scales?: FieldScaleMap
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
   const pilares = { ...fallbacksFor("pilares"), ...content?.pilares }
@@ -399,15 +406,15 @@ export function ServiciosPageSections({
 
   return (
     <>
-      <HeroSection hero={hero} />
-      <PilaresSection c={pilares} />
-      <Bloque01 c={s1} />
-      <Bloque02 c={s2} />
-      <Bloque03 c={s3} />
-      <Bloque04 c={s4} />
+      <HeroSection hero={hero} scales={scales} />
+      <PilaresSection c={pilares} scales={scales} />
+      <Bloque01 c={s1} scales={scales} />
+      <Bloque02 c={s2} scales={scales} />
+      <Bloque03 c={s3} scales={scales} />
+      <Bloque04 c={s4} scales={scales} />
       {/* Conexiones al fondo (fondo hueso: Bloque04 arena → hueso → CTA bordó). */}
       <Conexiones connections={connections} bg="bg-hueso" />
-      <FinalCTA c={cta} />
+      <FinalCTA c={cta} scales={scales} />
     </>
   )
 }

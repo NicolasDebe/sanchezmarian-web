@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase"
 import { htmlToPlainText } from "@/lib/rich-text"
 import { PAGE_PATHS } from "@/lib/admin-paths"
 import { isValidPreset, type DesignSettings, type ScalePresetKey } from "@/lib/design"
+import { isValidTextSize } from "@/lib/text-size"
 import type { FieldDef, SectionDef } from "@/lib/content-schema"
 import { HOME_SECTIONS } from "@/lib/home-schema"
 import { SERVICIOS_SECTIONS } from "@/lib/servicios-schema"
@@ -195,6 +196,77 @@ export async function saveContentSection(
 
   // 5. Refrescar el sitio público.
   revalidateForPage(page || PAGE_DEFAULT, section)
+  return { success: true }
+}
+
+// ─── Tamaños de texto por campo (tabla text_sizes) ────────────────────────────
+
+export type TextSizeEntry = {
+  section: string
+  field: string
+  scale_mobile: string
+  scale_desktop: string
+}
+
+/**
+ * Persiste los tamaños de texto elegidos para campos "resizable" de una página.
+ * Aislado de content_blocks: si la tabla text_sizes no existe todavía, devuelve
+ * error suave (el guardado de contenido NO se ve afectado). Upsert por
+ * (page, section, field). Revalida la ruta pública de la página.
+ */
+export async function saveTextSizes(
+  page: string,
+  entries: TextSizeEntry[],
+): Promise<SaveResult> {
+  let userEmail: string | null = null
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return { error: "Tu sesión expiró. Volvé a iniciar sesión." }
+    userEmail = user.email ?? null
+  } catch {
+    return { error: "No pudimos verificar tu sesión. Intentá de nuevo." }
+  }
+
+  if (!Array.isArray(entries) || entries.length === 0) return { success: true }
+
+  // Validación: solo presets conocidos (defensa final).
+  for (const e of entries) {
+    if (!isValidTextSize(e.scale_mobile) || !isValidTextSize(e.scale_desktop)) {
+      return { error: "Tamaño de texto inválido." }
+    }
+  }
+
+  try {
+    const admin = createAdminClient()
+    const pageKey = page || PAGE_DEFAULT
+    const rows = entries.map((e) => ({
+      page: pageKey,
+      section: e.section,
+      field: e.field,
+      scale_mobile: e.scale_mobile,
+      scale_desktop: e.scale_desktop,
+      updated_at: new Date().toISOString(),
+      updated_by: userEmail,
+    }))
+
+    const { error } = await admin
+      .from("text_sizes")
+      .upsert(rows, { onConflict: "page,section,field" })
+
+    if (error) {
+      // Tabla inexistente u otro error: no rompemos, informamos suave.
+      return { error: "No se pudieron guardar los tamaños (¿falta correr la migración text_sizes?)." }
+    }
+  } catch {
+    return { error: "Ocurrió un error al guardar los tamaños." }
+  }
+
+  const path = PAGE_PATHS[page || PAGE_DEFAULT]
+  if (path) revalidatePath(path)
+  if ((page || PAGE_DEFAULT) === "servicios") revalidatePath("/")
   return { success: true }
 }
 

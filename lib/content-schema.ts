@@ -44,6 +44,12 @@ export interface FieldDef {
   maxChars?: number
   /** Ayuda mostrada bajo el label en el admin. */
   help?: string
+  /**
+   * Si true, el campo (un título o párrafo) muestra en el admin un selector de
+   * tamaño (mobile/desktop, tamaños predefinidos) y el sitio público aplica ese
+   * tamaño. Solo cambia el font-size, nunca la fuente. Ver lib/text-size.ts.
+   */
+  resizable?: boolean
 }
 
 export interface SectionDef {

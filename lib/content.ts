@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase"
 import type { SectionDef } from "@/lib/content-schema"
 import { fallbacksForIn } from "@/lib/content-schema"
+import type { FieldScaleMap } from "@/lib/text-size"
 
 /**
  * Helpers de lectura pública de contenido editable.
@@ -95,4 +96,31 @@ export async function getPageContent(
     sections.map((s) => getContentBatch(page, s, fallbacksForIn(schema, s))),
   )
   return Object.fromEntries(sections.map((s, i) => [s, results[i]]))
+}
+
+/**
+ * Lee los tamaños de texto por campo de una página (tabla text_sizes) y los
+ * devuelve como mapa "section.field" → { m, d } (claves de preset).
+ * Resiliente: si la tabla no existe o falla, devuelve {} → sin cambios de
+ * tamaño, el sitio se ve idéntico. NUNCA tira excepción.
+ */
+export async function getTextScales(page: string): Promise<FieldScaleMap> {
+  try {
+    const { data, error } = await supabase
+      .from("text_sizes")
+      .select("section, field, scale_mobile, scale_desktop")
+      .eq("page", page)
+
+    if (error || !data) return {}
+    const map: FieldScaleMap = {}
+    for (const row of data) {
+      map[`${row.section}.${row.field}`] = {
+        m: row.scale_mobile,
+        d: row.scale_desktop,
+      }
+    }
+    return map
+  } catch {
+    return {}
+  }
 }

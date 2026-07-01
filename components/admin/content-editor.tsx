@@ -4,12 +4,14 @@ import { useState } from "react"
 import { Undo2 } from "lucide-react"
 import {
   saveContentSection,
+  saveTextSizes,
   getLastVersionDate,
   restoreLastVersion,
 } from "@/app/admin/actions"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 import { hasHtmlTags, htmlToPlainText, plainToHtml } from "@/lib/rich-text"
+import { TEXT_SIZE_PRESETS } from "@/lib/text-size"
 import type { FieldType, SelectOption } from "@/lib/content-schema"
 
 const MAX = { text: 250, longtext: 2000, number: 20 } as const
@@ -27,6 +29,11 @@ export interface EditorField {
   maxChars?: number
   /** Ayuda mostrada bajo el label. */
   help?: string
+  /** Si true, muestra selector de tamaño (mobile/desktop). */
+  resizable?: boolean
+  /** Tamaño actual mobile/desktop (clave de preset; "normal" por defecto). */
+  scaleMobile?: string
+  scaleDesktop?: string
 }
 
 /** ¿Este campo usa el editor enriquecido? */
@@ -73,6 +80,23 @@ export function ContentEditor({
         ]),
       ),
   )
+  // Tamaños por campo: sizes[section][field] = { m, d } (claves de preset).
+  const [sizes, setSizes] = useState<Record<string, Record<string, { m: string; d: string }>>>(
+    () =>
+      Object.fromEntries(
+        sections.map((s) => [
+          s.section,
+          Object.fromEntries(
+            s.fields
+              .filter((f) => f.resizable)
+              .map((f) => [
+                f.field,
+                { m: f.scaleMobile ?? "normal", d: f.scaleDesktop ?? "normal" },
+              ]),
+          ),
+        ]),
+      ),
+  )
   const [status, setStatus] = useState<Record<string, Status>>({})
   const [messages, setMessages] = useState<Record<string, string>>({})
   // Undo: sección con el modal abierto, fecha del backup y estado de carga.
@@ -84,6 +108,16 @@ export function ContentEditor({
     setValues((prev) => ({
       ...prev,
       [section]: { ...prev[section], [field]: value },
+    }))
+  }
+
+  function setSize(section: string, field: string, dim: "m" | "d", key: string) {
+    setSizes((prev) => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: { ...prev[section]?.[field], [dim]: key },
+      },
     }))
   }
 
@@ -134,18 +168,38 @@ export function ContentEditor({
 
     const result = await saveContentSection(page, sec.section, payload)
 
-    if ("success" in result) {
-      setStatus((s) => ({ ...s, [sec.section]: "success" }))
-      setMessages((m) => ({
-        ...m,
-        [sec.section]: "Los cambios se verán en el sitio en ~1 minuto.",
-      }))
-      setTimeout(() => {
-        setStatus((s) => ({ ...s, [sec.section]: "idle" }))
-      }, 3000)
-    } else {
+    if (!("success" in result)) {
       setStatus((s) => ({ ...s, [sec.section]: "error" }))
       setMessages((m) => ({ ...m, [sec.section]: result.error }))
+      return
+    }
+
+    // Guardado de tamaños (campos resizable). Aislado: si falla (p.ej. falta la
+    // migración text_sizes), el texto YA quedó guardado; solo avisamos.
+    const sizeEntries = sec.fields
+      .filter((f) => f.resizable)
+      .map((f) => ({
+        section: sec.section,
+        field: f.field,
+        scale_mobile: sizes[sec.section]?.[f.field]?.m ?? "normal",
+        scale_desktop: sizes[sec.section]?.[f.field]?.d ?? "normal",
+      }))
+
+    let sizeWarn = ""
+    if (sizeEntries.length > 0) {
+      const sizeRes = await saveTextSizes(page, sizeEntries)
+      if (!("success" in sizeRes)) sizeWarn = ` (Texto guardado, pero los tamaños no: ${sizeRes.error})`
+    }
+
+    setStatus((s) => ({ ...s, [sec.section]: sizeWarn ? "error" : "success" }))
+    setMessages((m) => ({
+      ...m,
+      [sec.section]: sizeWarn
+        ? sizeWarn.trim()
+        : "Los cambios se verán en el sitio en ~1 minuto.",
+    }))
+    if (!sizeWarn) {
+      setTimeout(() => setStatus((s) => ({ ...s, [sec.section]: "idle" })), 3000)
     }
   }
 
@@ -350,6 +404,42 @@ export function ContentEditor({
                         >
                           {len}/{max}
                         </span>
+
+                        {f.resizable && (
+                          <div
+                            className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg px-3 py-2.5"
+                            style={{
+                              backgroundColor: "rgba(201,168,130,0.10)",
+                              border: "1px solid rgba(201,168,130,0.25)",
+                            }}
+                          >
+                            <span
+                              className="font-mono uppercase"
+                              style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-bordo)" }}
+                            >
+                              Tamaño del texto
+                            </span>
+                            {(["m", "d"] as const).map((dim) => (
+                              <label key={dim} className="flex items-center gap-1.5">
+                                <span style={{ fontSize: 12, color: "var(--color-gris-bordo)" }}>
+                                  {dim === "m" ? "📱 Celular" : "💻 Compu"}
+                                </span>
+                                <select
+                                  value={sizes[sec.section]?.[f.field]?.[dim] ?? "normal"}
+                                  onChange={(e) => setSize(sec.section, f.field, dim, e.target.value)}
+                                  className="admin-input"
+                                  style={{ width: "auto", padding: "4px 8px", fontSize: 13 }}
+                                >
+                                  {TEXT_SIZE_PRESETS.map((p) => (
+                                    <option key={p.key} value={p.key}>
+                                      {p.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )
                   })}

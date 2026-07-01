@@ -25,6 +25,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
         label: "Título principal (H1)",
         fallback: "La Estrategia en Comunicación se asienta sobre tres pilares fundamentales.",
         maxChars: 120,
+        resizable: true,
       },
       {
         field: "description",
@@ -32,6 +33,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
         label: "Bajada (opcional — el título solo basta)",
         fallback: "",
         maxChars: 400,
+        resizable: true,
       },
     ],
   },
@@ -43,7 +45,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     legend: "Tres pilares en columnas. Cada pilar: título + ítems (uno por línea). La nota final es la bisagra hacia el catálogo de servicios.",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Pilares", maxChars: 30 },
-      { field: "title", type: "text", label: "Título", fallback: "Pilares del servicio.", maxChars: 80 },
+      { field: "title", type: "text", label: "Título", fallback: "Pilares del servicio.", maxChars: 80, resizable: true },
       { field: "pilar_1_title", type: "text", label: "Pilar 01 — Título", fallback: "Propósito", maxChars: 60 },
       { field: "pilar_1_items", type: "longtext", plain: true, label: "Pilar 01 — Ítems (uno por línea)", fallback: "Se parte siempre del porqué de la empresa.\nLa comunicación refleja los valores, la visión y la identidad de la organización.\nSe evita la comunicación vacía o desconectada de la realidad del negocio.", maxChars: 600 },
       { field: "pilar_2_title", type: "text", label: "Pilar 02 — Título", fallback: "Plataformas adecuadas", maxChars: 60 },
@@ -61,7 +63,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     legend: "Servicio principal. La descripción admite varios párrafos (separalos con una línea en blanco).",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Servicio principal", maxChars: 40 },
-      { field: "title", type: "text", label: "Título", fallback: "Estrategia y consultoría general de comunicación", maxChars: 90 },
+      { field: "title", type: "text", label: "Título", fallback: "Estrategia y consultoría general de comunicación", maxChars: 90, resizable: true },
       {
         field: "intro",
         type: "longtext",
@@ -70,6 +72,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
         fallback:
           "Este servicio está diseñado exclusivamente para empresas y marcas personales que buscan delegar su comunicación con absoluta confianza, liberando tiempo clave de su agenda para enfocarlo en el crecimiento del negocio.\n\nAquí entra un esquema de trabajo flexible, el servicio se adapta con total fluidez a la estructura del cliente. Es posible coordinar y potenciar a los profesionales o proveedores que la empresa ya tenga contratados, o bien encargarse de buscar y acercar al perfil experto adecuado para cubrir cada necesidad específica mediante alianzas estratégicas.",
         maxChars: 900,
+        resizable: true,
       },
       { field: "includes_label", type: "text", label: "Label de la lista", fallback: "Incluye", maxChars: 40 },
       { field: "sub_1_title", type: "text", label: "Punto 1 — Título", fallback: "Planificación y visión 360°", maxChars: 80 },
@@ -90,7 +93,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     legend: "Dos modalidades (orgánica/pautada) como mini-cards + lista común. Cada lista: un ítem por línea.",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow (opcional)", fallback: "", maxChars: 40 },
-      { field: "title", type: "text", label: "Título", fallback: "Prensa", maxChars: 90 },
+      { field: "title", type: "text", label: "Título", fallback: "Prensa", maxChars: 90, resizable: true },
       {
         field: "intro",
         type: "longtext",
@@ -99,6 +102,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
         fallback:
           "El servicio de prensa tiene como objetivo lograr que la empresa y su vocero aparezca en medios de comunicación relevantes para su rubro y audiencia. Se trabaja en dos modalidades.",
         maxChars: 400,
+        resizable: true,
       },
       { field: "organica_label", type: "text", label: "Modalidad A — Nombre", fallback: "Prensa orgánica", maxChars: 40 },
       { field: "organica_items", type: "longtext", plain: true, label: "Modalidad A — Ítems (uno por línea)", fallback: "Se aprovecha la red de contactos del responsable de prensa en medios locales para lograr cobertura de manera espontánea y no pautada.\nLa noticia se instala de forma natural gracias a la relación con periodistas y editores, pero fundamentalmente por la elección de la temática que debe ser de interés genuino, y hasta de servicio al ciudadano.\nMayor credibilidad percibida por el público al no identificarse como publicidad.\nMenor costo, pero requiere una propuesta de valor noticiable y timing adecuado.", maxChars: 900 },
@@ -116,7 +120,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     legend: "Lista + párrafo de cierre + sub-servicio destacado. La descripción del sub-servicio admite varios párrafos.",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow (opcional)", fallback: "", maxChars: 40 },
-      { field: "title", type: "text", label: "Título", fallback: "Relaciones públicas y eventos", maxChars: 90 },
+      { field: "title", type: "text", label: "Título", fallback: "Relaciones públicas y eventos", maxChars: 90, resizable: true },
       {
         field: "intro",
         type: "longtext",
@@ -125,6 +129,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
         fallback:
           "Las relaciones públicas son el vínculo estratégico entre la empresa o marca personal y sus públicos de interés: clientes, aliados, medios, comunidad y referentes del sector. Dentro de este servicio se incluye la diagramación y organización de eventos como herramienta de comunicación tangible y experiencial.",
         maxChars: 500,
+        resizable: true,
       },
       { field: "includes_label", type: "text", label: "Label de la lista", fallback: "El trabajo incluye", maxChars: 40 },
       { field: "includes_items", type: "longtext", plain: true, label: "Lista (uno por línea)", fallback: "Definición del objetivo del evento en función de la estrategia comercial (lanzamiento, networking, fidelización, posicionamiento, entre otros).\nArmado de la lista de invitados según el público objetivo y el propósito del encuentro.\nDiseño del concepto del evento y la experiencia que se quiere generar.\nCoordinación logística y comunicacional antes, durante y después del evento.\nGeneración de contenido y cobertura del evento para amplificar su impacto en medios y redes (en caso de que sea compatible).", maxChars: 900 },
@@ -142,7 +147,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     legend: "Dos sub-bloques (entrenamiento e imagen). Cada uno con un ítem por línea.",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow (opcional)", fallback: "", maxChars: 40 },
-      { field: "title", type: "text", label: "Título", fallback: "Entrenamiento en oratoria y asesoría de imagen", maxChars: 90 },
+      { field: "title", type: "text", label: "Título", fallback: "Entrenamiento en oratoria y asesoría de imagen", maxChars: 90, resizable: true },
       {
         field: "intro",
         type: "longtext",
@@ -151,6 +156,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
         fallback:
           "Una estrategia de comunicación es tan fuerte como la persona que la transmite. Este servicio trabaja con el vocero o referente de la empresa para que pueda comunicarse con seguridad, claridad y coherencia en cualquier plataforma o instancia pública.",
         maxChars: 500,
+        resizable: true,
       },
       { field: "oratoria_label", type: "text", label: "Sub-bloque A — Label", fallback: "El entrenamiento abarca", maxChars: 50 },
       { field: "oratoria_items", type: "longtext", plain: true, label: "Sub-bloque A — Ítems (uno por línea)", fallback: "Técnicas de oratoria y manejo del lenguaje verbal y no verbal.\nPreparación específica para entrevistas en medios (radio, TV, prensa escrita, podcast, etc.).\nComunicación efectiva en redes sociales, videos institucionales y presentaciones en vivo.\nGestión de situaciones de crisis comunicacional o Q&A de crisis para estar preparado ante preguntas incómodas.", maxChars: 700 },
@@ -166,13 +172,14 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     legend: "Cierre de la página, centrado. El botón lleva a /contacto.",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Conversemos", maxChars: 40 },
-      { field: "title", type: "text", label: "Título", fallback: "Diseñemos juntos tu estrategia.", maxChars: 90 },
+      { field: "title", type: "text", label: "Título", fallback: "Diseñemos juntos tu estrategia.", maxChars: 90, resizable: true },
       {
         field: "description",
         type: "longtext",
         label: "Bajada",
         fallback: "Cada empresa requiere su propio mix de comunicación.",
         maxChars: 300,
+        resizable: true,
       },
       { field: "button_text", type: "text", label: "Texto del botón", fallback: "Agendá una conversación", maxChars: 40 },
     ],
