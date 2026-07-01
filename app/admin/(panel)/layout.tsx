@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic"
 
 const SECTIONS = [
   { label: "Home", href: "/admin/edit/home", enabled: true },
+  { label: "Conexiones", href: "/admin/conexiones", enabled: true },
   { label: "Servicios", href: "/admin/edit/servicios", enabled: true },
   { label: "Mis valores", href: "/admin/edit/mis-valores", enabled: true },
   { label: "Casos de éxito", href: "/admin/edit/casos-de-exito", enabled: true },

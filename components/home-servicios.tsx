@@ -3,18 +3,22 @@
 import { motion, type Variants } from "motion/react"
 import Link from "next/link"
 import { EASE_EXPO } from "@/lib/animations"
-import { fallbacksFor } from "@/lib/home-schema"
+import { fallbacksFor } from "@/lib/servicios-schema"
+import { ServiceFeatureCard } from "@/components/servicios/service-feature-card"
 
 /**
- * Sección de servicios del HOME — jerarquía 1+3: un servicio DESTACADO en una
- * card full-width arriba y los otros tres en una grilla de 3 columnas (apilada
- * en mobile). Tipografía aplanada: solo el título resalta (Playfair); todas las
- * descripciones comparten el mismo tamaño, peso y color (DM Sans 15px regular,
- * --gris-bordo), sin cursivas, negritas ni bordó inline.
+ * Vidriera de servicios del HOME — ESPEJO RESUMIDO de /servicios.
  *
- * Contenido editable desde /admin/edit/home → sección «Servicios». Fallback
- * robusto: si Supabase está vacío, se mergea con los fallbacks del esquema y la
- * sección se ve idéntica (los textos son palabra por palabra los del brief).
+ * Consume los MISMOS 4 servicios (servicio_01…04 de la página «servicios»),
+ * mostrando solo eyebrow + título + primer párrafo del intro de cada uno.
+ * Comparte el lenguaje visual de /servicios (ServiceFeatureCard + línea dorada,
+ * sin numerales — la jerarquía es por diseño). Cada card enlaza al bloque
+ * completo en /servicios#servicio-{n}. Si Marian edita un servicio desde
+ * /admin/edit/servicios, el cambio se refleja acá y en /servicios sin tocar
+ * código (misma fuente content_blocks + revalidatePath en ambas rutas).
+ *
+ * Fallback robusto: se mergea con los fallbacks del esquema de servicios, así
+ * que si Supabase está vacío la sección se ve idéntica.
  */
 
 const VIEWPORT = { once: true, amount: 0.2 } as const
@@ -28,22 +32,36 @@ const itemVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE_EXPO } },
 }
 
-/** Estilo único de descripción — mismo para destacada y no destacadas. */
-const DESC_STYLE = {
-  fontSize: "var(--fs-body)",
-  lineHeight: "var(--lh-base)",
-  fontWeight: 400,
-  marginTop: 16,
-} as const
+/** Primer párrafo de un intro multi-párrafo (separados por línea en blanco). */
+function firstParagraph(raw?: string): string {
+  return (
+    (raw ?? "")
+      .split(/\n{2,}/)
+      .map((s) => s.trim())
+      .find(Boolean) ?? ""
+  )
+}
 
-export function HomeServicios({ section }: { section?: Record<string, string> }) {
-  const c = { ...fallbacksFor("servicios"), ...section }
+type ServicioCard = { anchor: string; eyebrow: string; title: string; desc: string }
 
-  const secondary = [
-    { num: "02", title: c.s2_title, desc: c.s2_desc },
-    { num: "03", title: c.s3_title, desc: c.s3_desc },
-    { num: "04", title: c.s4_title, desc: c.s4_desc },
-  ]
+export function HomeServicios({
+  servicios,
+  ctaLabel,
+}: {
+  servicios?: Record<string, Record<string, string>>
+  ctaLabel?: string
+}) {
+  const cards: ServicioCard[] = [1, 2, 3, 4].map((n) => {
+    const key = `servicio_0${n}`
+    const c = { ...fallbacksFor(key), ...servicios?.[key] }
+    return {
+      anchor: `servicio-${n}`,
+      eyebrow: (c.eyebrow ?? "").trim(),
+      title: (c.title ?? "").trim(),
+      desc: firstParagraph(c.intro),
+    }
+  })
+  const cta = (ctaLabel ?? "Ver servicios en detalle").trim()
 
   return (
     <section id="servicios" className="bg-hueso pt-24 lg:pt-[140px] pb-20 lg:pb-[120px]">
@@ -57,52 +75,43 @@ export function HomeServicios({ section }: { section?: Record<string, string> })
           className="flex flex-col gap-8"
         >
 
-          {/* ── CARD DESTACADA (servicio 1, full-width) ── */}
-          <motion.article
-            variants={itemVariants}
-            className="rounded-[20px] border border-dorado/30 bg-hueso-oscuro p-8 sm:p-10"
-          >
-            <p
-              className="font-mono text-bordo/50"
-              style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", marginBottom: 16 }}
-            >
-              01
-            </p>
-            <h3
-              className="font-playfair font-bold text-negro-bordo"
-              style={{ fontSize: "var(--fs-h3)", lineHeight: "var(--lh-snug)", maxWidth: "22ch" }}
-            >
-              {c.featured_title}
-            </h3>
-            <p className="font-sans text-gris-bordo" style={{ ...DESC_STYLE, maxWidth: "62ch" }}>
-              {c.featured_desc}
-            </p>
-          </motion.article>
-
-          {/* ── GRID 3 COLUMNAS (servicios 2, 3, 4) ── */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {secondary.map((s) => (
-              <motion.article
-                key={s.num}
-                variants={itemVariants}
-                className="flex flex-col rounded-[20px] border border-dorado/20 bg-arena p-6 sm:p-7"
-              >
-                <p
-                  className="font-mono text-bordo/50"
-                  style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em", marginBottom: 14 }}
-                >
-                  {s.num}
-                </p>
-                <h3
-                  className="font-playfair font-bold text-negro-bordo"
-                  style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-snug)" }}
-                >
-                  {s.title}
-                </h3>
-                <p className="font-sans text-gris-bordo" style={DESC_STYLE}>
-                  {s.desc}
-                </p>
-              </motion.article>
+          {/* ── GRID 2x2 (mobile: 1 columna) — mismas cards que /servicios ── */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+            {cards.map((s) => (
+              <motion.div key={s.anchor} variants={itemVariants}>
+                <Link href={`/servicios#${s.anchor}`} className="group block h-full">
+                  <ServiceFeatureCard className="flex h-full flex-col">
+                    <span aria-hidden className="mb-5 h-px w-8 bg-dorado" />
+                    {s.eyebrow && (
+                      <p
+                        className="font-mono uppercase text-bordo"
+                        style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", marginBottom: 10 }}
+                      >
+                        {s.eyebrow}
+                      </p>
+                    )}
+                    <h3
+                      className="font-playfair font-bold text-negro-bordo"
+                      style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-snug)" }}
+                    >
+                      {s.title}
+                    </h3>
+                    <p
+                      className="font-sans text-gris-bordo"
+                      style={{ fontSize: "var(--fs-body)", lineHeight: "var(--lh-base)", marginTop: 16 }}
+                    >
+                      {s.desc}
+                    </p>
+                    <span
+                      className="mt-6 inline-flex items-center gap-2 font-mono uppercase text-bordo"
+                      style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.16em" }}
+                    >
+                      Ver más
+                      <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                    </span>
+                  </ServiceFeatureCard>
+                </Link>
+              </motion.div>
             ))}
           </div>
 
@@ -113,7 +122,7 @@ export function HomeServicios({ section }: { section?: Record<string, string> })
               className="group inline-flex items-center gap-2 rounded-full bg-bordo px-8 py-4 font-sans font-semibold text-hueso transition-all hover:bg-bordo/90 active:scale-[0.98]"
               style={{ fontSize: "var(--fs-body)" }}
             >
-              {c.cta_label}
+              {cta}
               <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">→</span>
             </Link>
           </motion.div>

@@ -3,11 +3,14 @@ import { Stats } from "@/components/stats"
 import { Ideas } from "@/components/ideas"
 import { Clientes } from "@/components/clientes"
 import { HomeServicios } from "@/components/home-servicios"
+import { Conexiones } from "@/components/conexiones"
 import { Bio } from "@/components/bio"
 import { EnMedias } from "@/components/en-medios"
 import { CtaFinal } from "@/components/cta-final"
 import { getContentBatch } from "@/lib/content"
+import { getActiveConnections } from "@/lib/connections"
 import { fallbacksFor } from "@/lib/home-schema"
+import { fallbacksFor as serviciosFallbacksFor } from "@/lib/servicios-schema"
 import { globalFallbacksFor } from "@/lib/global-schema"
 import { buildMetadata, SITE_URL } from "@/lib/seo"
 import type { Metadata } from "next"
@@ -23,8 +26,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   // Lectura resiliente: getContentBatch nunca tira excepción y ya trae fallbacks,
   // así que el build de Vercel jamás rompe por una falla de Supabase.
-  // La vidriera de servicios del home (jerarquía 1+3) lee su contenido de
-  // home/servicios; los textos completos por servicio viven en /servicios.
+  // La vidriera de servicios del home ESPEJA /servicios: lee los mismos
+  // servicio_01…04 de page="servicios" (resumidos), no un copy propio. Solo el
+  // texto del botón "ver todos" sigue saliendo de home/servicios (cta_label).
   const [
     hero,
     stats,
@@ -32,8 +36,13 @@ export default async function Home() {
     bio,
     ctaFinal,
     serviciosHeader,
+    servicio1,
+    servicio2,
+    servicio3,
+    servicio4,
     contact,
     footer,
+    connections,
   ] = await Promise.all([
     getContentBatch("home", "hero", fallbacksFor("hero")),
     getContentBatch("home", "stats", fallbacksFor("stats")),
@@ -41,9 +50,15 @@ export default async function Home() {
     getContentBatch("home", "bio", fallbacksFor("bio")),
     getContentBatch("home", "cta_final", fallbacksFor("cta_final")),
     getContentBatch("home", "servicios", fallbacksFor("servicios")),
+    getContentBatch("servicios", "servicio_01", serviciosFallbacksFor("servicio_01")),
+    getContentBatch("servicios", "servicio_02", serviciosFallbacksFor("servicio_02")),
+    getContentBatch("servicios", "servicio_03", serviciosFallbacksFor("servicio_03")),
+    getContentBatch("servicios", "servicio_04", serviciosFallbacksFor("servicio_04")),
     getContentBatch("home", "contact", fallbacksFor("contact")),
     // Redes sociales editables desde el CMS (global/footer); única fuente de URLs.
     getContentBatch("global", "footer", globalFallbacksFor("footer")),
+    // Conexiones (alianzas): CRUD propio, lectura resiliente con fallback.
+    getActiveConnections(),
   ])
 
   const social = {
@@ -57,7 +72,16 @@ export default async function Home() {
       <Stats content={stats} />
       <Ideas content={metodo} />
       <Clientes />
-      <HomeServicios section={serviciosHeader} />
+      <HomeServicios
+        servicios={{
+          servicio_01: servicio1,
+          servicio_02: servicio2,
+          servicio_03: servicio3,
+          servicio_04: servicio4,
+        }}
+        ctaLabel={serviciosHeader.cta_label}
+      />
+      <Conexiones connections={connections} />
       <Bio content={bio} social={social} />
       <EnMedias />
       <CtaFinal content={ctaFinal} contact={contact} social={social} />

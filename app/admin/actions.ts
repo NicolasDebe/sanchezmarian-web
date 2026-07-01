@@ -210,6 +210,9 @@ function revalidateForPage(pageKey: string, section: string) {
   } else {
     const path = PAGE_PATHS[pageKey]
     if (path) revalidatePath(path)
+    // La vidriera del home espeja (resumidos) los servicio_01…04 de /servicios,
+    // así que un cambio en «servicios» debe revalidar también la home.
+    if (pageKey === "servicios") revalidatePath("/")
   }
 }
 

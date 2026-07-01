@@ -8,6 +8,7 @@ import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { IsotipoInfinito } from "@/components/ui/isotipo-infinito"
 import { DrawnLine } from "@/components/ui/drawn-line"
+import { ServiceFeatureCard } from "@/components/servicios/service-feature-card"
 import { EASE } from "@/components/servicios/types"
 
 const mvp = { once: true, margin: "-80px" } as const
@@ -157,20 +158,11 @@ function DashList({ items, twoCol }: { items?: string; twoCol?: boolean }) {
   )
 }
 
-/* Card única de toda la página: borde dorado 25%, radius 16px, fondo hueso,
-   padding 32/20, hover a borde bordó 40% (solo desktop, 0.3s ease-out). */
-function ServiceFeatureCard({ children, className }: { children: ReactNode; className?: string }) {
+/* Sección con fondo configurable (ritmo del scroll) y reveal al entrar.
+   `id` habilita anchors (p.ej. #servicio-1) con offset para el nav fijo. */
+function Section({ bg, id, children }: { bg: string; id?: string; children: ReactNode }) {
   return (
-    <div className={`rounded-2xl border border-dorado/25 bg-hueso p-5 transition-colors duration-300 ease-out md:p-8 md:hover:border-bordo/40${className ? ` ${className}` : ""}`}>
-      {children}
-    </div>
-  )
-}
-
-/* Sección con fondo configurable (ritmo del scroll) y reveal al entrar. */
-function Section({ bg, children }: { bg: string; children: ReactNode }) {
-  return (
-    <section className={`${bg} py-14 md:py-24`} style={{ paddingInline: PAD_X }}>
+    <section id={id} className={`${bg} py-14 md:py-24 scroll-mt-24 md:scroll-mt-28`} style={{ paddingInline: PAD_X }}>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -246,7 +238,7 @@ function Bloque01({ c }: { c: Record<string, string> }) {
     .filter((p) => p.title.trim())
 
   return (
-    <Section bg="bg-hueso">
+    <Section bg="bg-hueso" id="servicio-1">
       <BlockHeader c={c} />
       <div className="mt-12">
         <Label>{c.includes_label}</Label>
@@ -279,7 +271,7 @@ function TitledCard({ title, items }: { title: string; items: string }) {
    ════════════════════════════════════════════════════════════════════════ */
 function Bloque02({ c }: { c: Record<string, string> }) {
   return (
-    <Section bg="bg-arena">
+    <Section bg="bg-arena" id="servicio-2">
       <BlockHeader c={c} />
       <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
         <TitledCard title={c.organica_label} items={c.organica_items} />
@@ -300,7 +292,7 @@ function Bloque02({ c }: { c: Record<string, string> }) {
    ════════════════════════════════════════════════════════════════════════ */
 function Bloque03({ c }: { c: Record<string, string> }) {
   return (
-    <Section bg="bg-hueso">
+    <Section bg="bg-hueso" id="servicio-3">
       <BlockHeader c={c} />
       <ServiceFeatureCard className="mt-10">
         <Label>{c.includes_label}</Label>
@@ -331,7 +323,7 @@ function Bloque03({ c }: { c: Record<string, string> }) {
    ════════════════════════════════════════════════════════════════════════ */
 function Bloque04({ c }: { c: Record<string, string> }) {
   return (
-    <Section bg="bg-arena">
+    <Section bg="bg-arena" id="servicio-4">
       <BlockHeader c={c} />
       <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
         <TitledCard title={c.oratoria_label} items={c.oratoria_items} />
