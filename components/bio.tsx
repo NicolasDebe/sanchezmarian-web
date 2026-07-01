@@ -109,16 +109,16 @@ export function Bio({
             <motion.h2
               variants={fadeUp}
               className="font-playfair font-bold text-negro-bordo text-[calc(2rem*var(--text-scale))] sm:text-[calc(2.5rem*var(--text-scale))] lg:text-[calc(2.75rem*var(--text-scale))] leading-[1.15]"
-              {...fsStyle(scales?.["bio.title_pre"])}
+              {...fsStyle(scales?.["bio.title_pre"], undefined, "bio.title_pre")}
             >
               <span className="block">{c.title_pre}</span>
               <em className="block italic text-bordo">{c.title_accent}</em>
             </motion.h2>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo leading-[1.8] max-w-[480px]" style={{ fontSize: "var(--fs-body-lg)" }}>
-              <RichText html={c.paragraph_1} className="rich-inline" scale={scales?.["bio.paragraph_1"]} />
-              <RichText html={c.paragraph_2} className="rich-inline" scale={scales?.["bio.paragraph_2"]} />
-              <RichText html={c.paragraph_3} className="rich-inline" scale={scales?.["bio.paragraph_3"]} />
+              <RichText html={c.paragraph_1} className="rich-inline" scale={scales?.["bio.paragraph_1"]} fkey="bio.paragraph_1" />
+              <RichText html={c.paragraph_2} className="rich-inline" scale={scales?.["bio.paragraph_2"]} fkey="bio.paragraph_2" />
+              <RichText html={c.paragraph_3} className="rich-inline" scale={scales?.["bio.paragraph_3"]} fkey="bio.paragraph_3" />
             </motion.div>
 
             <motion.ul variants={fadeUp} className="flex flex-wrap gap-2">

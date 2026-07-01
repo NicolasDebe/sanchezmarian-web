@@ -36,7 +36,7 @@ export function Ideas({ content, scales }: { content?: Record<string, string>; s
           <motion.h2
             variants={fadeUp}
             className="font-playfair font-bold text-negro-bordo text-[calc(2.25rem*var(--text-scale))] sm:text-[calc(3rem*var(--text-scale))] lg:text-[calc(3.25rem*var(--text-scale))] leading-[1.1] max-w-[640px]"
-            {...fsStyle(scales?.["metodo.title_pre"])}
+            {...fsStyle(scales?.["metodo.title_pre"], undefined, "metodo.title_pre")}
           >
             {c.title_pre}{" "}
             <em className="italic text-bordo-claro">{c.title_accent}</em>

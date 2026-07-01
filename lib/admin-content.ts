@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase"
+import { normalizeTextSize } from "@/lib/text-size"
 import type { SectionDef } from "@/lib/content-schema"
 import type { EditorSection } from "@/components/admin/content-editor"
 
@@ -37,8 +38,8 @@ export async function loadEditorSections(
       .eq("page", page)
     for (const row of sizes ?? []) {
       sizeMap.set(`${row.section}.${row.field}`, {
-        m: (row.scale_mobile as string) ?? "normal",
-        d: (row.scale_desktop as string) ?? "normal",
+        m: normalizeTextSize(row.scale_mobile as string),
+        d: normalizeTextSize(row.scale_desktop as string),
       })
     }
   } catch {

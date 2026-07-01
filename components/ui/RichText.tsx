@@ -11,6 +11,8 @@ interface RichTextProps {
   as?: ElementType
   /** Tamaño de texto por campo (opcional): solo escala, no cambia la fuente. */
   scale?: FieldScale
+  /** Clave "section.field" para el preview en vivo (emite data-fkey). */
+  fkey?: string
 }
 
 /**
@@ -26,7 +28,7 @@ interface RichTextProps {
  * `.rich-inline` (textos embebidos en componentes diseñados: hereda
  * tipografía/color del wrapper y solo estiliza la estructura).
  */
-export function RichText({ html, className, style, as: Tag = "div", scale }: RichTextProps) {
+export function RichText({ html, className, style, as: Tag = "div", scale, fkey }: RichTextProps) {
   if (!html || !html.trim()) return null
 
   const raw = hasHtmlTags(html) ? html : plainToHtml(html)
@@ -36,7 +38,7 @@ export function RichText({ html, className, style, as: Tag = "div", scale }: Ric
   return (
     <Tag
       className={className}
-      {...fsStyle(scale, style)}
+      {...fsStyle(scale, style, fkey)}
       dangerouslySetInnerHTML={{ __html: safe }}
     />
   )

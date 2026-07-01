@@ -21,6 +21,9 @@ export async function AdminEditPage({
 }) {
   const { sections, error } = await loadEditorSections(page, schema)
   const previewPath = PAGE_PATHS[page]
+  // Solo mostramos (y ensanchamos para) el iframe si hay campos con tamaño editable.
+  const hasResizable = schema.some((s) => s.fields.some((f) => f.resizable))
+  const showPreview = Boolean(previewPath) && hasResizable
 
   if (error || !sections) {
     return (
@@ -37,7 +40,7 @@ export async function AdminEditPage({
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className={showPreview ? "mx-auto max-w-6xl" : "mx-auto max-w-3xl"}>
       <p
         className="font-mono uppercase"
         style={{ fontSize: 11, letterSpacing: "0.18em", color: "var(--color-bordo)" }}
@@ -79,7 +82,7 @@ export async function AdminEditPage({
         </p>
       )}
 
-      <ContentEditor page={page} sections={sections} />
+      <ContentEditor page={page} sections={sections} previewPath={previewPath} />
     </div>
   )
 }

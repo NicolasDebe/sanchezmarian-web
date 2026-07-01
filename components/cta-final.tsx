@@ -198,14 +198,14 @@ export function CtaFinal({
             <motion.h2
               variants={fadeUp}
               className="font-playfair font-bold text-hueso text-[calc(2.5rem*var(--text-scale))] sm:text-[calc(3rem*var(--text-scale))] lg:text-[calc(3.25rem*var(--text-scale))] leading-[1.0]"
-              {...fsStyle(scales?.["cta_final.title_pre"])}
+              {...fsStyle(scales?.["cta_final.title_pre"], undefined, "cta_final.title_pre")}
             >
               <span className="block">{c.title_pre}</span>
               <em className="block italic text-dorado">{c.title_accent}</em>
             </motion.h2>
 
             <motion.div variants={fadeUp} className="font-sans text-hueso/65 leading-[1.7] max-w-[420px]" style={{ fontSize: "var(--fs-body)" }}>
-              <RichText html={c.description} className="rich-inline" scale={scales?.["cta_final.description"]} />
+              <RichText html={c.description} className="rich-inline" scale={scales?.["cta_final.description"]} fkey="cta_final.description" />
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">

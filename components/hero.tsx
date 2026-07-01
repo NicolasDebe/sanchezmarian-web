@@ -96,7 +96,7 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
             lineHeight: 1.05,
             letterSpacing: "-0.02em",
             textShadow: "0 1px 2px rgba(254, 252, 239, 0.6)",
-          })}
+          }, "hero.h1")}
         >
           {c.h1}
         </motion.h1>
@@ -152,7 +152,7 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
             fontSize: "var(--fs-body)",
             lineHeight: 1.7,
             color: "var(--color-gris-bordo)",
-          })}
+          }, "hero.subtitle")}
         >
           <RichText html={c.subtitle} className="rich-inline" />
         </motion.div>
@@ -300,7 +300,7 @@ function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduce
                 margin: "0 0 20px",
                 fontSize: "calc(clamp(2rem, 5vw, 4rem) * var(--text-scale))",
                 letterSpacing: "-0.02em",
-              })}
+              }, "hero.h1")}
             >
               {c.h1}
             </motion.h1>
@@ -315,7 +315,7 @@ function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduce
                 lineHeight: 1.7,
                 maxWidth: "520px",
                 marginBottom: "28px",
-              })}
+              }, "hero.subtitle")}
             >
               <RichText html={c.subtitle} className="rich-inline" />
             </motion.div>

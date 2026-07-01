@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase"
 import type { SectionDef } from "@/lib/content-schema"
 import { fallbacksForIn } from "@/lib/content-schema"
-import type { FieldScaleMap } from "@/lib/text-size"
+import { normalizeTextSize, type FieldScaleMap } from "@/lib/text-size"
 
 /**
  * Helpers de lectura pública de contenido editable.
@@ -115,8 +115,8 @@ export async function getTextScales(page: string): Promise<FieldScaleMap> {
     const map: FieldScaleMap = {}
     for (const row of data) {
       map[`${row.section}.${row.field}`] = {
-        m: row.scale_mobile,
-        d: row.scale_desktop,
+        m: normalizeTextSize(row.scale_mobile),
+        d: normalizeTextSize(row.scale_desktop),
       }
     }
     return map

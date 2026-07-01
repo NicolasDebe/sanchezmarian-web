@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Undo2 } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { Undo2, Eye } from "lucide-react"
 import {
   saveContentSection,
   saveTextSizes,
@@ -11,7 +11,7 @@ import {
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 import { hasHtmlTags, htmlToPlainText, plainToHtml } from "@/lib/rich-text"
-import { TEXT_SIZE_PRESETS, sizeFactor } from "@/lib/text-size"
+import { TEXT_SIZE_KEYS, sizeIndex, sizeLabel } from "@/lib/text-size"
 import type { FieldType, SelectOption } from "@/lib/content-schema"
 
 const MAX = { text: 250, longtext: 2000, number: 20 } as const
@@ -57,9 +57,12 @@ type Status = "idle" | "loading" | "success" | "error"
 export function ContentEditor({
   page,
   sections,
+  previewPath,
 }: {
   page: string
   sections: EditorSection[]
+  /** Ruta pública de la página (p.ej. "/"), para el iframe de vista previa. */
+  previewPath?: string
 }) {
   const [open, setOpen] = useState<string>(sections[0]?.section ?? "")
   const [values, setValues] = useState<Record<string, Record<string, string>>>(
@@ -120,6 +123,58 @@ export function ContentEditor({
       },
     }))
   }
+
+  // ── Vista previa en vivo (iframe del sitio real, ?preview=text-sizes) ──
+  const hasResizable = sections.some((s) => s.fields.some((f) => f.resizable))
+  const showPreview = Boolean(previewPath) && hasResizable
+  const iframeRef = useRef<HTMLIFrameElement | null>(null)
+  const [viewport, setViewport] = useState<"mobile" | "desktop">("desktop")
+  // src estable: se calcula una vez y no cambia (los tamaños viajan por postMessage).
+  const [iframeSrc] = useState(
+    () => `${previewPath ?? "/"}?preview=text-sizes`,
+  )
+  // Ancho disponible para el iframe (se escala para que entre en la columna).
+  const previewWrapRef = useRef<HTMLDivElement | null>(null)
+  const [wrapW, setWrapW] = useState(440)
+  useEffect(() => {
+    const el = previewWrapRef.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setWrapW(el.clientWidth))
+    ro.observe(el)
+    setWrapW(el.clientWidth)
+    return () => ro.disconnect()
+  }, [showPreview])
+
+  // El iframe se sincroniza de forma declarativa: cualquier cambio de `sizes`
+  // (o una recarga del iframe) dispara un efecto que reenvía TODOS los tamaños.
+  // Así el ref del iframe solo se toca dentro de effects (lo exige el linter).
+  const [loadTick, setLoadTick] = useState(0)
+  const [scrollReq, setScrollReq] = useState<{ fkey: string; n: number } | null>(null)
+
+  useEffect(() => {
+    if (!showPreview) return
+    const w = iframeRef.current?.contentWindow
+    if (!w) return
+    for (const sec of sections) {
+      for (const f of sec.fields) {
+        if (!f.resizable) continue
+        const cur = sizes[sec.section]?.[f.field]
+        if (!cur) continue
+        w.postMessage(
+          { type: "fieldSize", fkey: `${sec.section}.${f.field}`, m: cur.m, d: cur.d },
+          "*",
+        )
+      }
+    }
+  }, [showPreview, sections, sizes, loadTick])
+
+  useEffect(() => {
+    if (!scrollReq) return
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "scrollToField", fkey: scrollReq.fkey },
+      "*",
+    )
+  }, [scrollReq])
 
   // El límite del campo prioriza f.maxChars; si no hay, cae al MAX por tipo.
   function maxFor(f: EditorField) {
@@ -252,8 +307,18 @@ export function ContentEditor({
     setTimeout(() => setStatus((s) => ({ ...s, [sec.section]: "idle" })), 4000)
   }
 
+  const previewBase = viewport === "mobile" ? { w: 390, h: 720 } : { w: 1280, h: 820 }
+  const previewScale = Math.min(1, wrapW / previewBase.w)
+
   return (
-    <div className="flex flex-col">
+    <div
+      className={
+        showPreview
+          ? "grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:items-start"
+          : ""
+      }
+    >
+      <div className="flex min-w-0 flex-col">
       {sections.map((sec) => {
         const isOpen = open === sec.section
         const st = status[sec.section] ?? "idle"
@@ -406,21 +471,9 @@ export function ContentEditor({
                         </span>
 
                         {f.resizable && (() => {
-                          const raw = values[sec.section][f.field] ?? ""
-                          const plain = (isRich(f) ? htmlToPlainText(raw) : raw).trim()
-                          const previewText = plain.slice(0, 160) || "Escribí el texto arriba para verlo acá…"
-                          // Aproximación de estilo: títulos en Playfair, párrafos en DM Sans.
-                          const isTitle = f.type === "text"
-                          const previewFont = isTitle
-                            ? "var(--font-playfair-display), serif"
-                            : "var(--font-dm-sans), sans-serif"
-                          const previewWeight = isTitle ? 700 : 400
-                          const base = isTitle ? 22 : 15
+                          const fkey = `${sec.section}.${f.field}`
                           const cur = sizes[sec.section]?.[f.field] ?? { m: "normal", d: "normal" }
-                          const previews: [string, number][] = [
-                            ["💻 Compu", sizeFactor(cur.d)],
-                            ["📱 Celular", sizeFactor(cur.m)],
-                          ]
+                          const maxIdx = TEXT_SIZE_KEYS.length - 1
                           return (
                             <div
                               className="mt-1 rounded-lg px-3 py-3"
@@ -429,66 +482,54 @@ export function ContentEditor({
                                 border: "1px solid rgba(201,168,130,0.25)",
                               }}
                             >
-                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                              <div className="mb-2 flex items-center justify-between gap-2">
                                 <span
                                   className="font-mono uppercase"
                                   style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-bordo)" }}
                                 >
                                   Tamaño del texto
                                 </span>
-                                {(["m", "d"] as const).map((dim) => (
-                                  <label key={dim} className="flex items-center gap-1.5">
-                                    <span style={{ fontSize: 12, color: "var(--color-gris-bordo)" }}>
+                                {showPreview && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setScrollReq((r) => ({ fkey, n: (r?.n ?? 0) + 1 }))}
+                                    className="flex items-center gap-1 font-mono uppercase transition-opacity hover:opacity-70"
+                                    style={{ fontSize: 10, letterSpacing: "0.06em", color: "var(--color-bordo)" }}
+                                  >
+                                    <Eye size={12} />
+                                    Ver en la vista previa
+                                  </button>
+                                )}
+                              </div>
+                              <div className="flex flex-col gap-2.5">
+                                {(["d", "m"] as const).map((dim) => (
+                                  <div key={dim} className="flex items-center gap-3">
+                                    <span
+                                      className="shrink-0"
+                                      style={{ fontSize: 12, color: "var(--color-gris-bordo)", width: 70 }}
+                                    >
                                       {dim === "m" ? "📱 Celular" : "💻 Compu"}
                                     </span>
-                                    <select
-                                      value={cur[dim] ?? "normal"}
-                                      onChange={(e) => setSize(sec.section, f.field, dim, e.target.value)}
-                                      className="admin-input"
-                                      style={{ width: "auto", padding: "4px 8px", fontSize: 13 }}
+                                    <input
+                                      type="range"
+                                      min={0}
+                                      max={maxIdx}
+                                      step={1}
+                                      value={sizeIndex(cur[dim])}
+                                      onChange={(e) =>
+                                        setSize(sec.section, f.field, dim, TEXT_SIZE_KEYS[Number(e.target.value)])
+                                      }
+                                      className="flex-1 accent-[var(--color-bordo)]"
+                                      aria-label={`Tamaño ${dim === "m" ? "celular" : "compu"} de ${f.label}`}
+                                    />
+                                    <span
+                                      className="shrink-0 text-right font-sans"
+                                      style={{ fontSize: 11, color: "var(--color-negro-bordo)", width: 82 }}
                                     >
-                                      {TEXT_SIZE_PRESETS.map((p) => (
-                                        <option key={p.key} value={p.key}>
-                                          {p.label}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </label>
+                                      {sizeLabel(cur[dim])}
+                                    </span>
+                                  </div>
                                 ))}
-                              </div>
-
-                              {/* Vista previa en vivo: el texto crece según lo elegido. */}
-                              <div className="mt-3 border-t pt-3" style={{ borderColor: "rgba(201,168,130,0.3)" }}>
-                                <span
-                                  className="font-mono uppercase"
-                                  style={{ fontSize: 9, letterSpacing: "0.1em", color: "rgba(74,48,64,0.55)" }}
-                                >
-                                  Vista previa — así se va a ver de grande
-                                </span>
-                                <div className="mt-2 flex flex-col gap-2">
-                                  {previews.map(([label, factor]) => (
-                                    <div key={label} className="flex items-baseline gap-2">
-                                      <span
-                                        className="shrink-0 font-mono"
-                                        style={{ fontSize: 10, color: "var(--color-bordo)", width: 64 }}
-                                      >
-                                        {label}
-                                      </span>
-                                      <span
-                                        className="line-clamp-2"
-                                        style={{
-                                          fontFamily: previewFont,
-                                          fontWeight: previewWeight,
-                                          fontSize: base * factor,
-                                          lineHeight: 1.25,
-                                          color: "var(--color-negro-bordo)",
-                                        }}
-                                      >
-                                        {previewText}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
                               </div>
                             </div>
                           )
@@ -539,6 +580,77 @@ export function ContentEditor({
           </section>
         )
       })}
+      </div>
+
+      {showPreview && (
+        <aside className="lg:sticky lg:top-6">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <span
+              className="font-mono uppercase"
+              style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--color-bordo)" }}
+            >
+              Vista previa de tamaños
+            </span>
+            <div className="flex gap-1">
+              {(
+                [
+                  { key: "mobile", label: "📱" },
+                  { key: "desktop", label: "💻" },
+                ] as const
+              ).map((t) => {
+                const active = viewport === t.key
+                return (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => setViewport(t.key)}
+                    className="rounded-md px-2.5 py-1 font-mono transition-colors"
+                    style={{
+                      fontSize: 13,
+                      backgroundColor: active ? "var(--color-bordo)" : "transparent",
+                      border: active ? "1px solid transparent" : "1px solid rgba(102,0,31,0.2)",
+                      opacity: active ? 1 : 0.6,
+                    }}
+                    aria-label={t.key === "mobile" ? "Ver como celular" : "Ver como compu"}
+                  >
+                    {t.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+          <div
+            ref={previewWrapRef}
+            className="overflow-hidden rounded-xl border"
+            style={{ borderColor: "rgba(102,0,31,0.15)", backgroundColor: "var(--color-hueso)" }}
+          >
+            <div style={{ height: previewBase.h * previewScale, position: "relative" }}>
+              <iframe
+                ref={iframeRef}
+                src={iframeSrc}
+                onLoad={() => setLoadTick((t) => t + 1)}
+                title="Vista previa del sitio"
+                style={{
+                  width: previewBase.w,
+                  height: previewBase.h,
+                  border: 0,
+                  display: "block",
+                  transform: `scale(${previewScale})`,
+                  transformOrigin: "top left",
+                  marginLeft: (wrapW - previewBase.w * previewScale) / 2,
+                }}
+              />
+            </div>
+          </div>
+          <p
+            className="mt-2 font-sans"
+            style={{ fontSize: 11, lineHeight: 1.5, color: "rgba(74,48,64,0.7)" }}
+          >
+            Movés los controles y el texto cambia acá al instante. El texto que ves es el
+            último guardado (los cambios de contenido se ven al guardar).
+          </p>
+        </aside>
+      )}
 
       <ConfirmDialog
         open={undoFor !== null}

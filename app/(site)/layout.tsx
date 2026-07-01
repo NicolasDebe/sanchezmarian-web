@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { WhatsAppFloat } from "@/components/whatsapp-float"
 import { DesignPreviewBridge } from "@/components/design-preview-bridge"
+import { TextSizePreviewBridge } from "@/components/text-size-preview-bridge"
 import { getGlobalContent } from "@/lib/global-content"
 
 /**
@@ -38,6 +39,7 @@ export default async function SiteLayout({
       <Footer content={global.footer} nav={global.nav} />
       <WhatsAppFloat />
       <DesignPreviewBridge />
+      <TextSizePreviewBridge />
     </>
   )
 }
