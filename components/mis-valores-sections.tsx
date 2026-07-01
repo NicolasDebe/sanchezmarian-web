@@ -9,6 +9,7 @@ import {
 } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/mis-valores-schema"
 import { RichText } from "@/components/ui/RichText"
+import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 import heroValores from "@/public/images/NAC_4208.jpg"
 
 const containerVariants = {
@@ -24,7 +25,7 @@ const itemVariants = {
 /* ═══════════════════════════════════════════════════════════════
    HERO EDITORIAL
 ═══════════════════════════════════════════════════════════════ */
-function HeroEditorial({ c }: { c: Record<string, string> }) {
+function HeroEditorial({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   return (
     <section style={{ position: "relative", width: "100%", overflow: "hidden" }}>
 
@@ -75,12 +76,12 @@ function HeroEditorial({ c }: { c: Record<string, string> }) {
 
           <motion.h1
             variants={itemVariants}
-            style={{
+            {...fsStyle(scales?.["hero.h1_pre"], {
               fontFamily: "Playfair Display, serif",
               color: "#FEFCEF",
               fontWeight: 700,
               margin: 0,
-            }}
+            })}
           >
             <span style={{ display: "block", fontSize: "calc(clamp(1.3rem, 3vw, 2.2rem) * var(--text-scale))", fontWeight: 600, opacity: 0.88 }}>
               {c.h1_pre}
@@ -100,7 +101,7 @@ function HeroEditorial({ c }: { c: Record<string, string> }) {
 /* ═══════════════════════════════════════════════════════════════
    BIO — 3 párrafos
 ═══════════════════════════════════════════════════════════════ */
-function BioSection({ c }: { c: Record<string, string> }) {
+function BioSection({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   return (
     <section className="bg-hueso py-[120px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -111,13 +112,14 @@ function BioSection({ c }: { c: Record<string, string> }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            {...fsStyle(scales?.["bio.paragraph_1_pre"])}
           >
             {c.paragraph_1_pre}{" "}{c.paragraph_1_accent}
           </motion.p>
 
           <motion.div
             className="font-sans text-gris-bordo leading-[1.7]"
-            style={{ fontSize: "var(--fs-body-lg)" }}
+            {...fsStyle(scales?.["bio.paragraph_2"], { fontSize: "var(--fs-body-lg)" })}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -128,7 +130,7 @@ function BioSection({ c }: { c: Record<string, string> }) {
 
           <motion.div
             className="font-sans text-gris-bordo leading-[1.7]"
-            style={{ fontSize: "var(--fs-body-lg)" }}
+            {...fsStyle(scales?.["bio.paragraph_3"], { fontSize: "var(--fs-body-lg)" })}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -156,8 +158,9 @@ function BioSection({ c }: { c: Record<string, string> }) {
 /* ═══════════════════════════════════════════════════════════════
    PILARES
 ═══════════════════════════════════════════════════════════════ */
-function PilaresSection({ c }: { c: Record<string, string> }) {
+function PilaresSection({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   const pilares = [1, 2, 3, 4, 5].map((n) => ({
+    n,
     num: String(n).padStart(2, "0"),
     titulo: c[`pilar_${n}_title`] ?? "",
     descripcion: c[`pilar_${n}_desc`] ?? "",
@@ -178,11 +181,11 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
             {c.eyebrow}
           </motion.p>
           <motion.div variants={fadeUp} className="w-10 h-px bg-dorado mb-6" />
-          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[calc(clamp(28px,7vw,40px)*var(--text-scale))] leading-[1.1] mb-4">
+          <motion.h2 variants={fadeUp} className="font-playfair font-bold text-negro-bordo text-[calc(clamp(28px,7vw,40px)*var(--text-scale))] leading-[1.1] mb-4" {...fsStyle(scales?.["pilares.title_pre"])}>
             {c.title_pre}{" "}
             <em className="italic text-bordo">{c.title_accent}</em>
           </motion.h2>
-          <motion.div variants={fadeUp} className="font-sans text-gris-bordo max-w-[480px] leading-relaxed" style={{ fontSize: "var(--fs-caption)" }}>
+          <motion.div variants={fadeUp} className="font-sans text-gris-bordo max-w-[480px] leading-relaxed" {...fsStyle(scales?.["pilares.intro"], { fontSize: "var(--fs-caption)" })}>
             <RichText html={c.intro} className="rich-inline" />
           </motion.div>
         </motion.div>
@@ -204,13 +207,14 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
               <span className="block font-mono text-bordo opacity-60 group-hover:opacity-100 transition-opacity duration-300 mb-3" style={{ fontSize: "var(--fs-micro)" }}>
                 {pilar.num}
               </span>
-              <p className="font-playfair font-bold text-negro-bordo leading-[1.15] mb-3 transition-transform duration-300 ease-out group-hover:-translate-y-1" style={{ fontSize: "var(--fs-lead)" }}>
+              <p className="font-playfair font-bold text-negro-bordo leading-[1.15] mb-3 transition-transform duration-300 ease-out group-hover:-translate-y-1" {...fsStyle(scales?.[`pilares.pilar_${pilar.n}_title`], { fontSize: "var(--fs-lead)" })}>
                 {pilar.titulo}
               </p>
               <RichText
                 html={pilar.descripcion}
                 className="rich-inline font-sans text-gris-bordo leading-[1.7]"
                 style={{ fontSize: "var(--fs-body)" }}
+                scale={scales?.[`pilares.pilar_${pilar.n}_desc`]}
               />
             </motion.div>
           ))}
@@ -224,7 +228,7 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
 /* ═══════════════════════════════════════════════════════════════
    CIERRE
 ═══════════════════════════════════════════════════════════════ */
-function CierreSection({ c }: { c: Record<string, string> }) {
+function CierreSection({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   return (
     <section className="bg-hueso py-[120px]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -238,6 +242,7 @@ function CierreSection({ c }: { c: Record<string, string> }) {
           <RichText
             html={c.paragraph}
             className="rich-inline font-playfair text-negro-bordo text-[calc(22px*var(--text-scale))] sm:text-[calc(26px*var(--text-scale))] leading-[1.5] mb-10"
+            scale={scales?.["cierre.paragraph"]}
           />
           <Link
             href="/#contacto"
@@ -257,6 +262,7 @@ function CierreSection({ c }: { c: Record<string, string> }) {
 ═══════════════════════════════════════════════════════════════ */
 export function MisValoresSections({
   content,
+  scales,
 }: {
   content?: {
     hero?: Record<string, string>
@@ -264,13 +270,14 @@ export function MisValoresSections({
     pilares?: Record<string, string>
     cierre?: Record<string, string>
   }
+  scales?: FieldScaleMap
 }) {
   return (
     <>
-      <HeroEditorial c={{ ...fallbacksFor("hero"), ...content?.hero }} />
-      <BioSection c={{ ...fallbacksFor("bio"), ...content?.bio }} />
-      <PilaresSection c={{ ...fallbacksFor("pilares"), ...content?.pilares }} />
-      <CierreSection c={{ ...fallbacksFor("cierre"), ...content?.cierre }} />
+      <HeroEditorial c={{ ...fallbacksFor("hero"), ...content?.hero }} scales={scales} />
+      <BioSection c={{ ...fallbacksFor("bio"), ...content?.bio }} scales={scales} />
+      <PilaresSection c={{ ...fallbacksFor("pilares"), ...content?.pilares }} scales={scales} />
+      <CierreSection c={{ ...fallbacksFor("cierre"), ...content?.cierre }} scales={scales} />
     </>
   )
 }

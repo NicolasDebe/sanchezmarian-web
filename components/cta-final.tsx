@@ -8,6 +8,7 @@ import { Instagram, Linkedin } from "@/components/ui/social-icons"
 import { fadeLeft, fadeUp, fadeUpStagger, revealCard, viewportOnce, springSnappy, tapScale } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/home-schema"
 import { RichText } from "@/components/ui/RichText"
+import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 import { SITE_EMAIL, SOCIAL_LINKS } from "@/lib/constants"
 
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "YOUR_FORM_ID"
@@ -31,10 +32,12 @@ export function CtaFinal({
   content,
   contact,
   social,
+  scales,
 }: {
   content?: Record<string, string>
   contact?: Record<string, string>
   social?: { instagram: string; linkedin: string }
+  scales?: FieldScaleMap
 }) {
   const c = { ...fallbacksFor("cta_final"), ...content }
   const ct = { ...fallbacksFor("contact"), ...contact }
@@ -195,13 +198,14 @@ export function CtaFinal({
             <motion.h2
               variants={fadeUp}
               className="font-playfair font-bold text-hueso text-[calc(2.5rem*var(--text-scale))] sm:text-[calc(3rem*var(--text-scale))] lg:text-[calc(3.25rem*var(--text-scale))] leading-[1.0]"
+              {...fsStyle(scales?.["cta_final.title_pre"])}
             >
               <span className="block">{c.title_pre}</span>
               <em className="block italic text-dorado">{c.title_accent}</em>
             </motion.h2>
 
             <motion.div variants={fadeUp} className="font-sans text-hueso/65 leading-[1.7] max-w-[420px]" style={{ fontSize: "var(--fs-body)" }}>
-              <RichText html={c.description} className="rich-inline" />
+              <RichText html={c.description} className="rich-inline" scale={scales?.["cta_final.description"]} />
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">

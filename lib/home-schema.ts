@@ -40,6 +40,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         fallback: "Comunicar es conectar",
         maxChars: 60,
         help: "Título grande del hero. Frase corta y memorable.",
+        resizable: true,
       },
       {
         field: "subtitle",
@@ -49,6 +50,7 @@ export const HOME_SECTIONS: SectionDef[] = [
           "Diseño estrategias de comunicación multiplataforma con visión de futuro que transforman tu valor diferencial en visibilidad real. Te acompaño a construir puentes honestos con los medios y la comunidad para que el mensaje de tu negocio resuene con fuerza, claridad y el impacto que realmente merece.",
         maxChars: 1500,
         help: "Texto editorial al lado de la foto. Podés escribir varios párrafos. Tu texto se ve bien hasta unas 6-8 líneas en escritorio.",
+        resizable: true,
       },
       {
         field: "location_tag",
@@ -211,7 +213,7 @@ export const HOME_SECTIONS: SectionDef[] = [
       "Título del método — la parte destacada se muestra en cursiva bordó automáticamente.",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Mi método de trabajo", maxChars: 40 },
-      { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Saber qué decir,", maxChars: 60 },
+      { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Saber qué decir,", maxChars: 60, resizable: true },
       { field: "title_accent", type: "text", label: "Título — texto destacado (cursiva bordó)", fallback: "a quién y cuándo.", maxChars: 60 },
       { field: "step_1_title", type: "text", label: "Paso 1 — Título", fallback: "Definición del relato", maxChars: 50 },
       { field: "step_1_desc", type: "text", label: "Paso 1 — Descripción", fallback: "Qué historia contar y a quién.", maxChars: 160 },
@@ -233,7 +235,7 @@ export const HOME_SECTIONS: SectionDef[] = [
     fields: [
       { field: "badge", type: "text", label: "Badge sobre la foto", fallback: "Más de una década en comunicación", maxChars: 50 },
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Sobre Marian", maxChars: 30 },
-      { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Mariana Sánchez,", maxChars: 80 },
+      { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Mariana Sánchez,", maxChars: 80, resizable: true },
       { field: "title_accent", type: "text", label: "Título — texto destacado (cursiva bordó)", fallback: "comunicación con propósito.", maxChars: 80 },
       {
         field: "paragraph_1",
@@ -242,6 +244,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         fallback:
           "Mentoreo a personas y empresas para transformar su propósito en un mensaje simple, cercano y real, conectando su propuesta de valor con los canales de comunicación adecuados. Una década de trayectoria construyendo vínculos reales con los protagonistas del ecosistema de la comunicación me respaldan.",
         maxChars: 1000,
+        resizable: true,
       },
       {
         field: "paragraph_2",
@@ -250,6 +253,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         fallback:
           "Entiendo el ADN de cada caso y trabajo en una estrategia personalizada, aterrizada y real dentro de la comunicación del nuevo paradigma. Donde lo simple y genuino triunfa en diversas plataformas, entendiendo el público y el objetivo del mensaje.",
         maxChars: 1000,
+        resizable: true,
       },
       {
         field: "paragraph_3",
@@ -258,6 +262,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         fallback:
           "Mi método de comunicación suma un valor diferencial a cada proyecto con contenido de calidad, chequeado y de interés genuino para los negocios del presente y del futuro.",
         maxChars: 1000,
+        resizable: true,
       },
       { field: "tag_1", type: "text", label: "Tag 1", fallback: "Comunicación estratégica", maxChars: 40 },
       { field: "tag_2", type: "text", label: "Tag 2", fallback: "Prensa y medios", maxChars: 40 },
@@ -279,6 +284,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         label: "Título — parte normal",
         fallback: "Creo en el valor de las buenas historias",
         maxChars: 80,
+        resizable: true,
       },
       {
         field: "title_accent",
@@ -294,6 +300,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         fallback:
           "Si querés comunicar mejor lo que hacés, empezamos por una charla. Hablemos de la historia que tu negocio tiene para contar.",
         maxChars: 400,
+        resizable: true,
       },
       { field: "email", type: "text", label: "Email de contacto", fallback: SITE_EMAIL, maxChars: 300 },
       { field: "location", type: "text", label: "Ubicación", fallback: "Mendoza, Argentina", maxChars: 60 },

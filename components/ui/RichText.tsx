@@ -1,5 +1,6 @@
 import type { CSSProperties, ElementType } from "react"
 import { hasHtmlTags, plainToHtml, sanitizeHtml } from "@/lib/rich-text"
+import { fsStyle, type FieldScale } from "@/lib/text-size"
 
 interface RichTextProps {
   /** Contenido HTML (o texto plano legacy — se envuelve en <p> automáticamente) */
@@ -8,6 +9,8 @@ interface RichTextProps {
   style?: CSSProperties
   /** Tag del wrapper (default: div) */
   as?: ElementType
+  /** Tamaño de texto por campo (opcional): solo escala, no cambia la fuente. */
+  scale?: FieldScale
 }
 
 /**
@@ -23,7 +26,7 @@ interface RichTextProps {
  * `.rich-inline` (textos embebidos en componentes diseñados: hereda
  * tipografía/color del wrapper y solo estiliza la estructura).
  */
-export function RichText({ html, className, style, as: Tag = "div" }: RichTextProps) {
+export function RichText({ html, className, style, as: Tag = "div", scale }: RichTextProps) {
   if (!html || !html.trim()) return null
 
   const raw = hasHtmlTags(html) ? html : plainToHtml(html)
@@ -33,7 +36,7 @@ export function RichText({ html, className, style, as: Tag = "div" }: RichTextPr
   return (
     <Tag
       className={className}
-      style={style}
+      {...fsStyle(scale, style)}
       dangerouslySetInnerHTML={{ __html: safe }}
     />
   )

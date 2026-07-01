@@ -3,8 +3,9 @@
 import { motion } from "motion/react"
 import { fadeUp, fadeUpStagger, fadeLeft, viewportOnce } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/home-schema"
+import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 
-export function Ideas({ content }: { content?: Record<string, string> }) {
+export function Ideas({ content, scales }: { content?: Record<string, string>; scales?: FieldScaleMap }) {
   const c = { ...fallbacksFor("metodo"), ...content }
   const PASOS = [1, 2, 3, 4, 5].map((n) => ({
     num: String(n).padStart(2, "0"),
@@ -35,6 +36,7 @@ export function Ideas({ content }: { content?: Record<string, string> }) {
           <motion.h2
             variants={fadeUp}
             className="font-playfair font-bold text-negro-bordo text-[calc(2.25rem*var(--text-scale))] sm:text-[calc(3rem*var(--text-scale))] lg:text-[calc(3.25rem*var(--text-scale))] leading-[1.1] max-w-[640px]"
+            {...fsStyle(scales?.["metodo.title_pre"])}
           >
             {c.title_pre}{" "}
             <em className="italic text-bordo-claro">{c.title_accent}</em>

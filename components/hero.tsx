@@ -6,6 +6,7 @@ import { MapPin, ArrowRight } from "lucide-react"
 import { fallbacksFor } from "@/lib/home-schema"
 import { springSnappy } from "@/lib/animations"
 import { RichText } from "@/components/ui/RichText"
+import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 import heroMarian from "@/public/images/hero-marian.jpg"
 
 /* Curva expo-out para el momento propio del H1 mobile. */
@@ -32,14 +33,14 @@ const makeItemVariants = (reduced: boolean) => ({
   },
 })
 
-export function Hero({ content }: { content?: Record<string, string> }) {
+export function Hero({ content, scales }: { content?: Record<string, string>; scales?: FieldScaleMap }) {
   const c = { ...fallbacksFor("hero"), ...content }
   const reduced = !!useReducedMotion()
 
   return (
     <>
-      <HeroMobile c={c} reduced={reduced} />
-      <HeroDesktop c={c} reduced={reduced} />
+      <HeroMobile c={c} reduced={reduced} scales={scales} />
+      <HeroDesktop c={c} reduced={reduced} scales={scales} />
     </>
   )
 }
@@ -49,7 +50,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
    crop) con el H1 superpuesto sobre la zona blanca de las cortinas; debajo,
    en flujo normal sobre fondo hueso, la pill + eyebrow + subtitle + CTAs.
    ════════════════════════════════════════════════════════════════════════ */
-function HeroMobile({ c, reduced }: { c: Record<string, string>; reduced: boolean }) {
+function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced: boolean; scales?: FieldScaleMap }) {
   const itemVariants = makeItemVariants(reduced)
 
   return (
@@ -86,16 +87,16 @@ function HeroMobile({ c, reduced }: { c: Record<string, string>; reduced: boolea
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
           className="absolute font-playfair font-bold text-negro-bordo"
-          style={{
+          {...fsStyle(scales?.["hero.h1"], {
             top: "50%",
             left: "24px",
             transform: "translateY(-50%)",
             maxWidth: "55%",
-            fontSize: "clamp(2rem, 8.5vw, 2.8rem)",
+            fontSize: "calc(clamp(2rem, 8.5vw, 2.8rem) * var(--text-scale))",
             lineHeight: 1.05,
             letterSpacing: "-0.02em",
             textShadow: "0 1px 2px rgba(254, 252, 239, 0.6)",
-          }}
+          })}
         >
           {c.h1}
         </motion.h1>
@@ -146,12 +147,12 @@ function HeroMobile({ c, reduced }: { c: Record<string, string>; reduced: boolea
         <motion.div
           variants={itemVariants}
           className="rich-inline hero-subtitle"
-          style={{
+          {...fsStyle(scales?.["hero.subtitle"], {
             fontFamily: "var(--font-dm-sans), sans-serif",
             fontSize: "var(--fs-body)",
             lineHeight: 1.7,
             color: "var(--color-gris-bordo)",
-          }}
+          })}
         >
           <RichText html={c.subtitle} className="rich-inline" />
         </motion.div>
@@ -199,7 +200,7 @@ function HeroMobile({ c, reduced }: { c: Record<string, string>; reduced: boolea
    DESKTOP (hidden md:block) — layout existente aprobado, sin cambios: foto
    full-bleed con overlay y texto a la izquierda centrado vertical.
    ════════════════════════════════════════════════════════════════════════ */
-function HeroDesktop({ c, reduced }: { c: Record<string, string>; reduced: boolean }) {
+function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduced: boolean; scales?: FieldScaleMap }) {
   const itemVariants = makeItemVariants(reduced)
 
   return (
@@ -291,7 +292,7 @@ function HeroDesktop({ c, reduced }: { c: Record<string, string>; reduced: boole
             {/* H1 */}
             <motion.h1
               variants={itemVariants}
-              style={{
+              {...fsStyle(scales?.["hero.h1"], {
                 fontFamily: "var(--font-playfair-display), serif",
                 lineHeight: 1.05,
                 color: "#FEFCEF",
@@ -299,7 +300,7 @@ function HeroDesktop({ c, reduced }: { c: Record<string, string>; reduced: boole
                 margin: "0 0 20px",
                 fontSize: "calc(clamp(2rem, 5vw, 4rem) * var(--text-scale))",
                 letterSpacing: "-0.02em",
-              }}
+              })}
             >
               {c.h1}
             </motion.h1>
@@ -307,14 +308,14 @@ function HeroDesktop({ c, reduced }: { c: Record<string, string>; reduced: boole
             {/* DESCRIPCIÓN */}
             <motion.div
               variants={itemVariants}
-              style={{
+              {...fsStyle(scales?.["hero.subtitle"], {
                 fontFamily: "var(--font-dm-sans), sans-serif",
                 fontSize: "calc(clamp(0.85rem, 1.35vw, 0.98rem) * var(--text-scale))",
                 color: "rgba(254,252,239,0.8)",
                 lineHeight: 1.7,
                 maxWidth: "520px",
                 marginBottom: "28px",
-              }}
+              })}
             >
               <RichText html={c.subtitle} className="rich-inline" />
             </motion.div>

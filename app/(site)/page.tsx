@@ -6,7 +6,7 @@ import { HomeServicios } from "@/components/home-servicios"
 import { Conexiones } from "@/components/conexiones"
 import { Bio } from "@/components/bio"
 import { CtaFinal } from "@/components/cta-final"
-import { getContentBatch } from "@/lib/content"
+import { getContentBatch, getTextScales } from "@/lib/content"
 import { getActiveConnections } from "@/lib/connections"
 import { fallbacksFor } from "@/lib/home-schema"
 import { fallbacksFor as serviciosFallbacksFor } from "@/lib/servicios-schema"
@@ -42,6 +42,7 @@ export default async function Home() {
     contact,
     footer,
     connections,
+    scales,
   ] = await Promise.all([
     getContentBatch("home", "hero", fallbacksFor("hero")),
     getContentBatch("home", "stats", fallbacksFor("stats")),
@@ -58,6 +59,8 @@ export default async function Home() {
     getContentBatch("global", "footer", globalFallbacksFor("footer")),
     // Conexiones (alianzas): CRUD propio, lectura resiliente con fallback.
     getActiveConnections(),
+    // Tamaños de texto por campo (títulos/párrafos resizables).
+    getTextScales("home"),
   ])
 
   const social = {
@@ -67,9 +70,9 @@ export default async function Home() {
 
   return (
     <>
-      <Hero content={hero} />
+      <Hero content={hero} scales={scales} />
       <Stats content={stats} />
-      <Ideas content={metodo} />
+      <Ideas content={metodo} scales={scales} />
       <Clientes />
       <HomeServicios
         servicios={{
@@ -81,8 +84,8 @@ export default async function Home() {
         ctaLabel={serviciosHeader.cta_label}
       />
       <Conexiones connections={connections} />
-      <Bio content={bio} social={social} />
-      <CtaFinal content={ctaFinal} contact={contact} social={social} />
+      <Bio content={bio} social={social} scales={scales} />
+      <CtaFinal content={ctaFinal} contact={contact} social={social} scales={scales} />
     </>
   )
 }

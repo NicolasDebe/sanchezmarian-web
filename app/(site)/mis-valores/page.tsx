@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { MisValoresSections } from "@/components/mis-valores-sections"
-import { getPageContent } from "@/lib/content"
+import { getPageContent, getTextScales } from "@/lib/content"
 import { MIS_VALORES_SECTIONS } from "@/lib/mis-valores-schema"
 import { buildMetadata, SITE_URL } from "@/lib/seo"
 
@@ -11,7 +11,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MisValoresPage() {
-  const content = await getPageContent("mis_valores", MIS_VALORES_SECTIONS)
+  const [content, scales] = await Promise.all([
+    getPageContent("mis_valores", MIS_VALORES_SECTIONS),
+    getTextScales("mis_valores"),
+  ])
 
-  return <MisValoresSections content={content} />
+  return <MisValoresSections content={content} scales={scales} />
 }
