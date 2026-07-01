@@ -101,23 +101,7 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SEPARADOR EDITORIAL — el isotipo del infinito marca la transición entre
-   bloques. Es el ÚNICO elemento decorativo permitido entre secciones.
-   Fondo transparente: respira sobre el lienzo, con padding vertical generoso.
-   ════════════════════════════════════════════════════════════════════════ */
-function Separador() {
-  return (
-    <div
-      className="flex justify-center"
-      style={{ paddingBlock: "clamp(48px, 7vw, 96px)", background: "transparent" }}
-    >
-      <IsotipoInfinito size="transicion" color="var(--color-bordo)" />
-    </div>
-  )
-}
-
-/* ════════════════════════════════════════════════════════════════════════
-   ÁTOMOS TIPOGRÁFICOS (reglas globales de la página) — fontSize por tokens.
+   SISTEMA VISUAL ÚNICO — átomos, card reutilizable y listas con guión.
    ════════════════════════════════════════════════════════════════════════ */
 function Eyebrow({ children, centered }: { children: ReactNode; centered?: boolean }) {
   return (
@@ -144,7 +128,7 @@ function Label({ children }: { children: ReactNode }) {
     </p>
   )
 }
-/* Párrafos de descripción / cuerpo: DM Sans --gris-bordo. */
+/* Párrafos de introducción de sección: DM Sans 16px --gris-bordo. */
 function Intro({ text }: { text?: string }) {
   return (
     <div className="mt-6 flex flex-col gap-4" style={{ maxWidth: 760 }}>
@@ -154,13 +138,19 @@ function Intro({ text }: { text?: string }) {
     </div>
   )
 }
-/* Bullets: DM Sans con marcador • en --bordo. */
-function Bullets({ items, className }: { items?: string; className?: string }) {
+
+/* Listas de la página: guión corto (—) en --bordo, indent y line-height 1.7.
+   `twoCol` divide la lista en 2 columnas dentro de la card (solo desktop). */
+function DashList({ items, twoCol }: { items?: string; twoCol?: boolean }) {
   return (
-    <ul className={`flex flex-col gap-2.5${className ? ` ${className}` : ""}`}>
+    <ul className={twoCol ? "pl-4 sm:columns-2 sm:gap-x-12" : "flex flex-col gap-2 pl-4"}>
       {lines(items).map((it, i) => (
-        <li key={i} className="flex gap-2.5 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body)", lineHeight: "var(--lh-base)" }}>
-          <span aria-hidden className="text-bordo" style={{ flex: "none" }}>•</span>
+        <li
+          key={i}
+          className={`flex gap-2.5 font-sans text-gris-bordo${twoCol ? " mb-2.5 break-inside-avoid" : ""}`}
+          style={{ fontSize: "var(--fs-body)", lineHeight: 1.7 }}
+        >
+          <span aria-hidden className="shrink-0 select-none text-bordo">—</span>
           <span>{it}</span>
         </li>
       ))}
@@ -168,10 +158,20 @@ function Bullets({ items, className }: { items?: string; className?: string }) {
   )
 }
 
-/* Sección-bloque con fondo alterno y reveal al entrar en viewport. */
-function Block({ bg, children }: { bg: string; children: ReactNode }) {
+/* Card única de toda la página: borde dorado 25%, radius 16px, fondo hueso,
+   padding 32/20, hover a borde bordó 40% (solo desktop, 0.3s ease-out). */
+function ServiceFeatureCard({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <section className={`${bg} py-16 md:py-24`} style={{ paddingInline: PAD_X }}>
+    <div className={`rounded-2xl border border-dorado/25 bg-hueso p-5 transition-colors duration-300 ease-out md:p-8 md:hover:border-bordo/40${className ? ` ${className}` : ""}`}>
+      {children}
+    </div>
+  )
+}
+
+/* Sección con fondo configurable (ritmo del scroll) y reveal al entrar. */
+function Section({ bg, children }: { bg: string; children: ReactNode }) {
+  return (
+    <section className={`${bg} py-14 md:py-24`} style={{ paddingInline: PAD_X }}>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -198,7 +198,7 @@ function BlockHeader({ c }: { c: Record<string, string> }) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 2 — PILARES
+   SECCIÓN 2 — PILARES (3 cards con numeral fantasma) — fondo --arena
    ════════════════════════════════════════════════════════════════════════ */
 function PilaresSection({ c }: { c: Record<string, string> }) {
   const pilares = [
@@ -207,107 +207,121 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
     { num: "03", title: c.pilar_3_title, items: c.pilar_3_items },
   ]
   return (
-    <Block bg="bg-hueso">
+    <Section bg="bg-arena">
       <div style={{ maxWidth: 760 }}>
         <Eyebrow>{c.eyebrow}</Eyebrow>
         <GoldLine />
         <BlockTitle>{c.title}</BlockTitle>
       </div>
 
-      <div className="grid gap-x-10 gap-y-12 md:grid-cols-3" style={{ marginTop: 56 }}>
+      <div className="mt-12 grid gap-4 md:mt-14 md:grid-cols-3 md:gap-6">
         {pilares.map((p) => (
-          <div key={p.num}>
-            <p className="font-mono uppercase text-bordo/55" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.18em", marginBottom: 12 }}>{p.num}</p>
-            <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: 1.2, marginBottom: 16 }}>{p.title}</p>
-            <Bullets items={p.items} />
-          </div>
+          <ServiceFeatureCard key={p.num} className="relative overflow-hidden">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute left-4 top-2 select-none font-playfair font-bold leading-none"
+              style={{ fontSize: "calc(clamp(40px, 7vw, 64px) * var(--text-scale))", color: "rgba(102, 0, 31, 0.12)" }}
+            >
+              {p.num}
+            </span>
+            <div className="relative z-10">
+              <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "calc(22px * var(--text-scale))", lineHeight: 1.2, marginBottom: 16 }}>{p.title}</p>
+              <DashList items={p.items} />
+            </div>
+          </ServiceFeatureCard>
         ))}
       </div>
 
-      {/* La nota final (intro_note) es la bisagra hacia el catálogo de
-          servicios: se muestra como cierre italic centrado bajo los pilares.
-          El schema de pilares no define un campo `closing` aparte. */}
+      {/* La nota final (intro_note) es la bisagra hacia el catálogo. */}
       {c.intro_note?.trim() && (
         <p
-          className="font-sans text-gris-bordo text-center italic"
-          style={{ fontSize: "var(--fs-body)", lineHeight: 1.75, maxWidth: 720, margin: "64px auto 0" }}
+          className="font-sans italic text-gris-bordo text-center"
+          style={{ fontSize: "var(--fs-body)", lineHeight: 1.75, maxWidth: 720, margin: "56px auto 0" }}
         >
           {c.intro_note}
         </p>
       )}
-    </Block>
+    </Section>
   )
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 3 — LOS 4 SERVICIOS
+   SECCIÓN 3 — SERVICIO 01 · Estrategia (grid 2x2 de cards) — fondo --hueso
    ════════════════════════════════════════════════════════════════════════ */
-
-/* BLOQUE 01 — Estrategia: 4 sub-puntos (título bold + descripción). */
 function Bloque01({ c }: { c: Record<string, string> }) {
   const points = [1, 2, 3, 4]
-    .map((n) => ({ title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
+    .map((n) => ({ num: two(n), title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
     .filter((p) => p.title.trim())
 
   return (
-    <Block bg="bg-hueso-oscuro">
+    <Section bg="bg-hueso">
       <BlockHeader c={c} />
       <div className="mt-12">
         <Label>{c.includes_label}</Label>
-        <div className="mt-7 grid gap-x-10 gap-y-8 md:grid-cols-2">
+        <div className="mt-6 grid gap-4 md:grid-cols-2 md:gap-6">
           {points.map((p) => (
-            <div key={p.title}>
-              <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: "var(--fs-body-lg)" }}>{p.title}</p>
-              <p className="mt-2 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{p.desc}</p>
-            </div>
+            <ServiceFeatureCard key={p.num}>
+              <p className="font-mono text-bordo/50" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.18em", marginBottom: 10 }}>{p.num}</p>
+              <p className="font-sans font-medium text-negro-bordo" style={{ fontSize: "calc(18px * var(--text-scale))", lineHeight: 1.3 }}>{p.title}</p>
+              <p className="mt-2 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body)", lineHeight: 1.7 }}>{p.desc}</p>
+            </ServiceFeatureCard>
           ))}
         </div>
       </div>
-    </Block>
+    </Section>
   )
 }
 
-/* Card de modalidad de prensa: título Playfair + lista, borde dorado. */
-function PrensaCard({ name, items }: { name: string; items: string }) {
+/* Card de modalidad / sub-bloque: título Playfair + lista con guiones. */
+function TitledCard({ title, items }: { title: string; items: string }) {
   return (
-    <div className="rounded-2xl border border-dorado/25 p-6 md:p-7">
-      <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: 1.2 }}>{name}</p>
-      <Bullets items={items} className="mt-5" />
-    </div>
+    <ServiceFeatureCard>
+      <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: 1.2, marginBottom: 20 }}>{title}</p>
+      <DashList items={items} />
+    </ServiceFeatureCard>
   )
 }
 
-/* BLOQUE 02 — Prensa: 2 modalidades (cards) + lista común. */
+/* ════════════════════════════════════════════════════════════════════════
+   SECCIÓN 4 — SERVICIO 02 · Prensa (2 modalidades + card común) — fondo --arena
+   ════════════════════════════════════════════════════════════════════════ */
 function Bloque02({ c }: { c: Record<string, string> }) {
   return (
-    <Block bg="bg-hueso">
+    <Section bg="bg-arena">
       <BlockHeader c={c} />
-      <div className="mt-10 grid gap-6 md:grid-cols-2">
-        <PrensaCard name={c.organica_label} items={c.organica_items} />
-        <PrensaCard name={c.pautada_label} items={c.pautada_items} />
+      <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
+        <TitledCard title={c.organica_label} items={c.organica_items} />
+        <TitledCard title={c.pautada_label} items={c.pautada_items} />
       </div>
-      <div className="mt-12">
+      <ServiceFeatureCard className="mt-4 md:mt-6">
         <Label>{c.includes_label}</Label>
-        <Bullets items={c.includes_items} className="mt-5" />
-      </div>
-    </Block>
+        <div className="mt-5">
+          <DashList items={c.includes_items} twoCol />
+        </div>
+      </ServiceFeatureCard>
+    </Section>
   )
 }
 
-/* BLOQUE 03 — RRPP y eventos: lista + cierre + sub-servicio destacado. */
+/* ════════════════════════════════════════════════════════════════════════
+   SECCIÓN 5 — SERVICIO 03 · RRPP (card + sub-servicio destacado) — fondo --hueso
+   ════════════════════════════════════════════════════════════════════════ */
 function Bloque03({ c }: { c: Record<string, string> }) {
   return (
-    <Block bg="bg-hueso-oscuro">
+    <Section bg="bg-hueso">
       <BlockHeader c={c} />
-      <div className="mt-10" style={{ maxWidth: 820 }}>
+      <ServiceFeatureCard className="mt-10">
         <Label>{c.includes_label}</Label>
-        <Bullets items={c.includes_items} className="mt-5" />
-        {c.closing?.trim() && (
-          <p className="mt-7 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{c.closing}</p>
-        )}
-      </div>
+        <div className="mt-5">
+          <DashList items={c.includes_items} />
+        </div>
+      </ServiceFeatureCard>
 
-      <div className="mt-12 rounded-2xl border border-dorado/30 bg-hueso p-6 md:p-8" style={{ maxWidth: 820 }}>
+      {c.closing?.trim() && (
+        <p className="mt-7 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)", maxWidth: 820 }}>{c.closing}</p>
+      )}
+
+      <ServiceFeatureCard className="mt-4 md:mt-6">
         <Label>{c.sub_label}</Label>
         <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: 1.2 }}>{c.sub_title}</p>
         <div className="mt-3 flex flex-col gap-4">
@@ -315,36 +329,32 @@ function Bloque03({ c }: { c: Record<string, string> }) {
             <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{p}</p>
           ))}
         </div>
-      </div>
-    </Block>
-  )
-}
-
-/* BLOQUE 04 — Oratoria y asesoría de imagen: 2 sub-bloques paralelos. */
-function Bloque04({ c }: { c: Record<string, string> }) {
-  return (
-    <Block bg="bg-hueso">
-      <BlockHeader c={c} />
-      <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
-        <div>
-          <Label>{c.oratoria_label}</Label>
-          <Bullets items={c.oratoria_items} className="mt-4" />
-        </div>
-        <div>
-          <Label>{c.imagen_label}</Label>
-          <Bullets items={c.imagen_items} className="mt-4" />
-        </div>
-      </div>
-    </Block>
+      </ServiceFeatureCard>
+    </Section>
   )
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 4 — CTA FINAL (centrada, sin fondo --bordo) — se conserva tal cual.
+   SECCIÓN 6 — SERVICIO 04 · Oratoria (2 cards lado a lado) — fondo --arena
+   ════════════════════════════════════════════════════════════════════════ */
+function Bloque04({ c }: { c: Record<string, string> }) {
+  return (
+    <Section bg="bg-arena">
+      <BlockHeader c={c} />
+      <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
+        <TitledCard title={c.oratoria_label} items={c.oratoria_items} />
+        <TitledCard title={c.imagen_label} items={c.imagen_items} />
+      </div>
+    </Section>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SECCIÓN 7 — CTA FINAL — fondo --bordo, texto --hueso, botón invertido.
    ════════════════════════════════════════════════════════════════════════ */
 function FinalCTA({ c }: { c: Record<string, string> }) {
   return (
-    <section className="bg-hueso text-center" style={{ paddingInline: PAD_X, paddingBlock: "96px" }}>
+    <section className="bg-bordo text-center" style={{ paddingInline: PAD_X, paddingBlock: "clamp(56px, 8vw, 96px)" }}>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -353,17 +363,17 @@ function FinalCTA({ c }: { c: Record<string, string> }) {
         className="mx-auto flex flex-col items-center"
         style={{ maxWidth: 640 }}
       >
-        <Eyebrow centered>{c.eyebrow}</Eyebrow>
-        <GoldLine centered />
-        <h2 className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-h1)", lineHeight: "var(--lh-tight)", letterSpacing: "-0.02em" }}>
+        <p className="font-mono uppercase text-hueso/70" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em" }}>{c.eyebrow}</p>
+        <div className="bg-dorado" style={{ width: 40, height: 1, margin: "16px auto 24px" }} />
+        <h2 className="font-playfair font-bold text-hueso" style={{ fontSize: "var(--fs-h1)", lineHeight: "var(--lh-tight)", letterSpacing: "-0.02em" }}>
           {c.title}
         </h2>
-        <p className="mt-6 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-relaxed)", maxWidth: 520 }}>
+        <p className="mt-6 font-sans text-hueso/80" style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-relaxed)", maxWidth: 520 }}>
           {c.description}
         </p>
         <Link
           href="/contacto"
-          className="group mt-10 inline-flex items-center gap-2 rounded-full bg-bordo px-8 py-4 font-sans font-semibold text-hueso transition-all hover:bg-bordo/90 active:scale-[0.98]"
+          className="group mt-10 inline-flex min-h-[44px] items-center gap-2 rounded-full bg-hueso px-8 py-4 font-sans font-semibold text-bordo transition-all hover:bg-hueso-oscuro active:scale-[0.98]"
           style={{ fontSize: "var(--fs-body)" }}
         >
           {c.button_text}
@@ -375,8 +385,8 @@ function FinalCTA({ c }: { c: Record<string, string> }) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   ORQUESTADOR — Hero + Pilares + 4 bloques diferenciados, separados por el
-   isotipo del infinito. Fondos alternados hueso / hueso-oscuro.
+   ORQUESTADOR — Hero + Pilares + 4 servicios + CTA, con ritmo de fondos
+   alternados (arena / hueso) para pausar el scroll largo.
    ════════════════════════════════════════════════════════════════════════ */
 export function ServiciosPageSections({
   content,
@@ -402,17 +412,11 @@ export function ServiciosPageSections({
   return (
     <>
       <HeroSection hero={hero} serviceCount={SERVICE_COUNT} />
-      <Separador />
       <PilaresSection c={pilares} />
-      <Separador />
       <Bloque01 c={s1} />
-      <Separador />
       <Bloque02 c={s2} />
-      <Separador />
       <Bloque03 c={s3} />
-      <Separador />
       <Bloque04 c={s4} />
-      <Separador />
       <FinalCTA c={cta} />
     </>
   )
