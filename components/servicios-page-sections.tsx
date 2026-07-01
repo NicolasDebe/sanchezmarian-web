@@ -8,9 +8,8 @@ import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { IsotipoInfinito } from "@/components/ui/isotipo-infinito"
 import { DrawnLine } from "@/components/ui/drawn-line"
-import { two, EASE } from "@/components/servicios/types"
+import { EASE } from "@/components/servicios/types"
 
-const SERVICE_COUNT = 4
 const mvp = { once: true, margin: "-80px" } as const
 const PAD_X = "clamp(24px, 6vw, 96px)"
 
@@ -35,7 +34,7 @@ const heroWord = (reduced: boolean): Variants => ({
   visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: reduced ? 0 : 0.8, ease: EASE } },
 })
 
-function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; serviceCount: number }) {
+function HeroSection({ hero }: { hero: Record<string, string> }) {
   const reduced = useReducedMotion()
   const words = (hero.h1 ?? "").split(/\s+/).filter(Boolean)
   const satelliteDelay = reduced ? 0 : words.length * 0.06 + 0.45
@@ -94,7 +93,7 @@ function HeroSection({ hero, serviceCount }: { hero: Record<string, string>; ser
       </div>
 
       <motion.span aria-hidden {...satellite(0.25)} className="absolute font-mono uppercase text-bordo/55" style={{ bottom: 36, right: "clamp(28px, 6vw, 96px)", fontSize: "var(--fs-eyebrow)", letterSpacing: "0.22em" }}>
-        {two(serviceCount)} — {eyebrow}
+        Estrategia en Comunicación
       </motion.span>
     </section>
   )
@@ -110,8 +109,8 @@ function Eyebrow({ children, centered }: { children: ReactNode; centered?: boole
     </p>
   )
 }
-function GoldLine({ centered }: { centered?: boolean }) {
-  return <div className="bg-dorado" style={{ width: 40, height: 1, margin: centered ? "16px auto 24px" : "16px 0 24px" }} />
+function GoldLine({ centered, flush }: { centered?: boolean; flush?: boolean }) {
+  return <div className="bg-dorado" style={{ width: 40, height: 1, margin: centered ? "16px auto 24px" : `${flush ? 0 : 16}px 0 24px` }} />
 }
 function BlockTitle({ children }: { children: ReactNode }) {
   return (
@@ -187,10 +186,11 @@ function Section({ bg, children }: { bg: string; children: ReactNode }) {
 }
 
 function BlockHeader({ c }: { c: Record<string, string> }) {
+  const eyebrow = (c.eyebrow ?? "").trim()
   return (
     <div style={{ maxWidth: 760 }}>
-      <Eyebrow>{c.eyebrow}</Eyebrow>
-      <GoldLine />
+      {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
+      <GoldLine flush={!eyebrow} />
       <BlockTitle>{c.title}</BlockTitle>
       <Intro text={c.intro} />
     </div>
@@ -198,13 +198,13 @@ function BlockHeader({ c }: { c: Record<string, string> }) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 2 — PILARES (3 cards con numeral fantasma) — fondo --arena
+   SECCIÓN 2 — PILARES (3 cards, jerarquía por línea dorada) — fondo --arena
    ════════════════════════════════════════════════════════════════════════ */
 function PilaresSection({ c }: { c: Record<string, string> }) {
   const pilares = [
-    { num: "01", title: c.pilar_1_title, items: c.pilar_1_items },
-    { num: "02", title: c.pilar_2_title, items: c.pilar_2_items },
-    { num: "03", title: c.pilar_3_title, items: c.pilar_3_items },
+    { title: c.pilar_1_title, items: c.pilar_1_items },
+    { title: c.pilar_2_title, items: c.pilar_2_items },
+    { title: c.pilar_3_title, items: c.pilar_3_items },
   ]
   return (
     <Section bg="bg-arena">
@@ -216,18 +216,10 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
 
       <div className="mt-12 grid gap-4 md:mt-14 md:grid-cols-3 md:gap-6">
         {pilares.map((p) => (
-          <ServiceFeatureCard key={p.num} className="relative overflow-hidden">
-            <span
-              aria-hidden
-              className="pointer-events-none absolute left-4 top-2 select-none font-playfair font-bold leading-none"
-              style={{ fontSize: "calc(clamp(40px, 7vw, 64px) * var(--text-scale))", color: "rgba(102, 0, 31, 0.12)" }}
-            >
-              {p.num}
-            </span>
-            <div className="relative z-10">
-              <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "calc(22px * var(--text-scale))", lineHeight: 1.2, marginBottom: 16 }}>{p.title}</p>
-              <DashList items={p.items} />
-            </div>
+          <ServiceFeatureCard key={p.title} className="flex flex-col">
+            <span aria-hidden className="mb-5 h-px w-8 bg-dorado" />
+            <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "calc(24px * var(--text-scale))", lineHeight: 1.2, marginBottom: 16 }}>{p.title}</p>
+            <DashList items={p.items} />
           </ServiceFeatureCard>
         ))}
       </div>
@@ -250,7 +242,7 @@ function PilaresSection({ c }: { c: Record<string, string> }) {
    ════════════════════════════════════════════════════════════════════════ */
 function Bloque01({ c }: { c: Record<string, string> }) {
   const points = [1, 2, 3, 4]
-    .map((n) => ({ num: two(n), title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
+    .map((n) => ({ title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
     .filter((p) => p.title.trim())
 
   return (
@@ -260,8 +252,8 @@ function Bloque01({ c }: { c: Record<string, string> }) {
         <Label>{c.includes_label}</Label>
         <div className="mt-6 grid gap-4 md:grid-cols-2 md:gap-6">
           {points.map((p) => (
-            <ServiceFeatureCard key={p.num}>
-              <p className="font-mono text-bordo/50" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.18em", marginBottom: 10 }}>{p.num}</p>
+            <ServiceFeatureCard key={p.title}>
+              <span aria-hidden className="mb-4 block h-1.5 w-1.5 rounded-full bg-dorado" />
               <p className="font-sans font-medium text-negro-bordo" style={{ fontSize: "calc(18px * var(--text-scale))", lineHeight: 1.3 }}>{p.title}</p>
               <p className="mt-2 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body)", lineHeight: 1.7 }}>{p.desc}</p>
             </ServiceFeatureCard>
@@ -411,7 +403,7 @@ export function ServiciosPageSections({
 
   return (
     <>
-      <HeroSection hero={hero} serviceCount={SERVICE_COUNT} />
+      <HeroSection hero={hero} />
       <PilaresSection c={pilares} />
       <Bloque01 c={s1} />
       <Bloque02 c={s2} />

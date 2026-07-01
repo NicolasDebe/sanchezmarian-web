@@ -8,6 +8,9 @@ import { springSnappy } from "@/lib/animations"
 import { RichText } from "@/components/ui/RichText"
 import heroMarian from "@/public/images/hero-marian.jpg"
 
+/* Curva expo-out para el momento propio del H1 mobile. */
+const EASE = [0.16, 1, 0.3, 1] as const
+
 const containerVariants = {
   hidden: {},
   visible: {
@@ -18,21 +21,189 @@ const containerVariants = {
   },
 }
 
+/* itemVariants depende de reduced; se genera una vez y se comparte a ambas
+   variantes responsive para no duplicar la definición de animaciones. */
+const makeItemVariants = (reduced: boolean) => ({
+  hidden: { opacity: 0, y: reduced ? 0 : 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" as const },
+  },
+})
+
 export function Hero({ content }: { content?: Record<string, string> }) {
   const c = { ...fallbacksFor("hero"), ...content }
-  const shouldReduceMotion = useReducedMotion()
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" as const },
-    },
-  }
+  const reduced = !!useReducedMotion()
 
   return (
-    <section className="relative w-full overflow-hidden">
+    <>
+      <HeroMobile c={c} reduced={reduced} />
+      <HeroDesktop c={c} reduced={reduced} />
+    </>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   MOBILE (md:hidden) — layout dedicado: imagen COMPLETA (aspect 3:2, sin
+   crop) con el H1 superpuesto sobre la zona blanca de las cortinas; debajo,
+   en flujo normal sobre fondo hueso, la pill + eyebrow + subtitle + CTAs.
+   ════════════════════════════════════════════════════════════════════════ */
+function HeroMobile({ c, reduced }: { c: Record<string, string>; reduced: boolean }) {
+  const itemVariants = makeItemVariants(reduced)
+
+  return (
+    <section className="md:hidden bg-hueso">
+
+      {/* BLOQUE 1 — IMAGEN CON H1 SUPERPUESTO */}
+      <div className="relative w-full">
+        <div className="relative w-full" style={{ aspectRatio: "3 / 2" }}>
+          <Image
+            src={heroMarian}
+            alt="Marian Sánchez — Comunicación estratégica en Mendoza"
+            fill
+            preload
+            quality={90}
+            placeholder="blur"
+            sizes="100vw"
+            style={{ objectFit: "cover", objectPosition: "center center" }}
+          />
+          {/* Realce sutil hueso→transparent sobre el 60% izquierdo: refuerza el
+              contraste del H1 sin oscurecer la foto (la zona ya es clara). */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(254,252,239,0.35) 0%, rgba(254,252,239,0.12) 35%, transparent 60%)",
+            }}
+          />
+        </div>
+
+        {/* H1 ABSOLUTO sobre la zona blanca de las cortinas (izquierda) */}
+        <motion.h1
+          initial={reduced ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
+          className="absolute font-playfair font-bold text-negro-bordo"
+          style={{
+            top: "50%",
+            left: "24px",
+            transform: "translateY(-50%)",
+            maxWidth: "55%",
+            fontSize: "clamp(2rem, 8.5vw, 2.8rem)",
+            lineHeight: 1.05,
+            letterSpacing: "-0.02em",
+            textShadow: "0 1px 2px rgba(254, 252, 239, 0.6)",
+          }}
+        >
+          {c.h1}
+        </motion.h1>
+      </div>
+
+      {/* BLOQUE 2 — TEXTO DEBAJO DE LA IMAGEN */}
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="flex flex-col"
+        style={{
+          paddingInline: "24px",
+          paddingTop: "32px",
+          paddingBottom: "48px",
+          gap: "20px",
+        }}
+      >
+        {/* Pill ubicación */}
+        <motion.div variants={itemVariants}>
+          <span
+            className="inline-flex items-center gap-2 rounded-full border border-bordo/20 bg-bordo/5 font-mono uppercase text-bordo"
+            style={{
+              fontSize: "var(--fs-eyebrow)",
+              letterSpacing: "0.14em",
+              padding: "8px 14px",
+            }}
+          >
+            <MapPin size={12} aria-hidden />
+            {c.location_tag}
+          </span>
+        </motion.div>
+
+        {/* Eyebrow */}
+        <motion.p
+          variants={itemVariants}
+          className="font-mono uppercase text-gris-bordo"
+          style={{
+            fontSize: "var(--fs-eyebrow)",
+            letterSpacing: "0.16em",
+            margin: 0,
+          }}
+        >
+          {c.eyebrow}
+        </motion.p>
+
+        {/* Subtitle (RichText con los 4 párrafos) — color gris-bordo sobre hueso */}
+        <motion.div
+          variants={itemVariants}
+          className="rich-inline hero-subtitle"
+          style={{
+            fontFamily: "var(--font-dm-sans), sans-serif",
+            fontSize: "var(--fs-body)",
+            lineHeight: 1.7,
+            color: "var(--color-gris-bordo)",
+          }}
+        >
+          <RichText html={c.subtitle} className="rich-inline" />
+        </motion.div>
+
+        {/* CTAs — primario pill bordó + secundario outline */}
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col gap-3"
+          style={{ marginTop: "12px" }}
+        >
+          <motion.a
+            href={c.cta_primary_link}
+            whileTap={{ scale: 0.98 }}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-bordo font-sans font-semibold text-hueso"
+            style={{
+              padding: "14px 28px",
+              fontSize: "var(--fs-body)",
+              letterSpacing: "0.02em",
+            }}
+          >
+            {c.cta_primary_label}
+            <ArrowRight size={16} aria-hidden />
+          </motion.a>
+
+          <motion.a
+            href={c.cta_secondary_link}
+            whileTap={{ scale: 0.98 }}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-bordo bg-transparent font-sans font-semibold text-bordo"
+            style={{
+              padding: "14px 28px",
+              fontSize: "var(--fs-body)",
+              letterSpacing: "0.02em",
+            }}
+          >
+            {c.cta_secondary_label}
+            <ArrowRight size={16} aria-hidden />
+          </motion.a>
+        </motion.div>
+      </motion.div>
+    </section>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   DESKTOP (hidden md:block) — layout existente aprobado, sin cambios: foto
+   full-bleed con overlay y texto a la izquierda centrado vertical.
+   ════════════════════════════════════════════════════════════════════════ */
+function HeroDesktop({ c, reduced }: { c: Record<string, string>; reduced: boolean }) {
+  const itemVariants = makeItemVariants(reduced)
+
+  return (
+    <section className="relative w-full overflow-hidden hidden md:block">
 
       {/* CAPA 1: IMAGEN — define la altura del hero.
           next/Image con import estático: width/height intrínsecos (reserva
@@ -61,25 +232,9 @@ export function Hero({ content }: { content?: Record<string, string> }) {
         }}
       />
 
-      {/* CAPA 2: OVERLAY MOBILE — vertical */}
-      <div
-        className="absolute inset-0 pointer-events-none md:hidden"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 35%, rgba(0,0,0,0.85) 70%, rgba(0,0,0,0.9) 100%)",
-        }}
-      />
-
-      {/* CAPA 3: TEXTO
-          MOBILE: el bloque va EN FLUJO (relative) y define el alto de la sección
-          (la imagen pasa a ser fondo absoluto), con min-h-[680px] de piso. Así la
-          sección crece con el texto y nunca recorta el primer renglón. El
-          padding-top blinda contra el nav fixed (~72px): 90px en <640px, 100px en
-          >=640px; con items-end el texto sigue anclado abajo-izquierda cuando
-          sobra espacio (texto corto). DESKTOP (md): vuelve a ser absolute inset-0
-          centrado con py-20 — idéntico al original. */}
-      <div className="relative md:absolute md:inset-0 min-h-[680px] md:min-h-0 flex items-end md:items-center pt-[90px] sm:pt-[100px] md:py-20 pb-16">
-        <div className="w-full max-w-7xl mx-auto px-6 lg:px-12 pb-10 md:pb-0">
+      {/* CAPA 3: TEXTO — absolute inset-0 centrado vertical, alineado izquierda. */}
+      <div className="absolute inset-0 flex items-center py-20">
+        <div className="w-full max-w-7xl mx-auto px-6 lg:px-12">
 
           <motion.div
             variants={containerVariants}
@@ -90,7 +245,7 @@ export function Hero({ content }: { content?: Record<string, string> }) {
 
             {/* PILL GEOLOCALIZACIÓN — solo en el hero del home */}
             <motion.div
-              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
+              initial={{ opacity: 0, y: reduced ? 0 : 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
               className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6"

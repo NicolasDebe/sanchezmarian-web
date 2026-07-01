@@ -60,7 +60,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     title: "Servicio 01 — Estrategia y consultoría",
     legend: "Servicio principal. La descripción admite varios párrafos (separalos con una línea en blanco).",
     fields: [
-      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "01 · Servicio principal", maxChars: 40 },
+      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Servicio principal", maxChars: 40 },
       { field: "title", type: "text", label: "Título", fallback: "Estrategia y consultoría general de comunicación", maxChars: 90 },
       {
         field: "intro",
@@ -89,7 +89,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     title: "Servicio 02 — Prensa",
     legend: "Dos modalidades (orgánica/pautada) como mini-cards + lista común. Cada lista: un ítem por línea.",
     fields: [
-      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "02 · Servicio", maxChars: 40 },
+      { field: "eyebrow", type: "text", label: "Eyebrow (opcional)", fallback: "", maxChars: 40 },
       { field: "title", type: "text", label: "Título", fallback: "Prensa", maxChars: 90 },
       {
         field: "intro",
@@ -115,7 +115,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     title: "Servicio 03 — Relaciones públicas y eventos",
     legend: "Lista + párrafo de cierre + sub-servicio destacado. La descripción del sub-servicio admite varios párrafos.",
     fields: [
-      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "03 · Servicio", maxChars: 40 },
+      { field: "eyebrow", type: "text", label: "Eyebrow (opcional)", fallback: "", maxChars: 40 },
       { field: "title", type: "text", label: "Título", fallback: "Relaciones públicas y eventos", maxChars: 90 },
       {
         field: "intro",
@@ -141,7 +141,7 @@ export const SERVICIOS_SECTIONS: SectionDef[] = [
     title: "Servicio 04 — Oratoria y asesoría de imagen",
     legend: "Dos sub-bloques (entrenamiento e imagen). Cada uno con un ítem por línea.",
     fields: [
-      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "04 · Servicio", maxChars: 40 },
+      { field: "eyebrow", type: "text", label: "Eyebrow (opcional)", fallback: "", maxChars: 40 },
       { field: "title", type: "text", label: "Título", fallback: "Entrenamiento en oratoria y asesoría de imagen", maxChars: 90 },
       {
         field: "intro",
