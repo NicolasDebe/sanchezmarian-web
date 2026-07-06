@@ -175,8 +175,24 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
     )
   }
 
-  // ── Solo URL (o sin acción): card clickeable como antes ──
-  const inner = (
+  // Filete dorado + año (footer de la variante editorial).
+  const footerEl = (
+    <div className="flex items-center gap-3" style={{ marginTop: 18 }}>
+      <span aria-hidden style={{ width: 28, height: 1, background: "var(--color-dorado)" }} />
+      <span
+        className="font-mono"
+        style={{ fontSize: "var(--fs-micro)", color: "var(--color-gris-bordo)", letterSpacing: "0.08em" }}
+      >
+        {clippingYear(ap.published_at)}
+      </span>
+    </div>
+  )
+
+  // ── Solo URL (o sin acción): card clickeable ──
+  // Con imagen → diseño compacto de siempre. Sin imagen → "cita editorial":
+  // fondo arena, titular Playfair serif grande y comilla dorada, para que la
+  // tarjeta tenga presencia y no se lea como un hueco entre las fotos del muro.
+  const inner = ap.image_url ? (
     <div
       style={{
         background: "var(--color-hueso)",
@@ -189,6 +205,73 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
       {head}
       {titleEl}
       {yearEl}
+    </div>
+  ) : (
+    <div
+      className="flex flex-col"
+      style={{
+        background: "var(--color-arena)",
+        borderRadius: 8,
+        padding: "24px 24px 22px",
+        borderLeft: `2px solid ${borderColor}`,
+      }}
+    >
+      {/* Head editorial: medio + alcance (badge con tinte bordó para contrastar
+          sobre el fondo arena). */}
+      <div className="flex items-start justify-between gap-2" style={{ marginBottom: 4 }}>
+        <span
+          className="font-mono uppercase"
+          style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.12em", color: "var(--color-bordo)" }}
+        >
+          {ap.medium}
+        </span>
+        <span
+          className="font-mono shrink-0"
+          style={{
+            fontSize: "calc(8px * var(--text-scale))",
+            padding: "2px 6px",
+            borderRadius: 4,
+            background: "rgba(102,0,31,0.10)",
+            color: "var(--color-bordo)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {SCOPE_LABELS[ap.scope] ?? ap.scope}
+        </span>
+      </div>
+
+      {/* Comilla decorativa. */}
+      <span
+        aria-hidden
+        className="font-playfair"
+        style={{
+          fontSize: "calc(44px * var(--text-scale))",
+          lineHeight: 0.7,
+          color: "var(--color-dorado)",
+          marginTop: 8,
+        }}
+      >
+        &ldquo;
+      </span>
+
+      {/* Titular serif tipo cita. */}
+      <p
+        className="font-playfair"
+        style={{
+          fontSize: "var(--fs-lead)",
+          color: "var(--color-negro-bordo)",
+          lineHeight: "var(--lh-snug)",
+          marginTop: 6,
+          overflow: "hidden",
+          display: "-webkit-box",
+          WebkitLineClamp: 6,
+          WebkitBoxOrient: "vertical",
+        } as React.CSSProperties}
+      >
+        {ap.title}
+      </p>
+
+      {footerEl}
     </div>
   )
 
