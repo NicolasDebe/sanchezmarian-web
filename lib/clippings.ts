@@ -38,12 +38,20 @@ export interface DbClipping {
   audio_url: string | null
   /** Duración del audio en segundos (persistida al subir). */
   audio_duration_seconds: number | null
+  /**
+   * Imagen de portada de la tarjeta: la del enlace (Open Graph) o una propia
+   * subida desde /admin. NULL = sin imagen (la tarjeta se ve como siempre).
+   */
+  image_url: string | null
   order_position: number
 }
 
-// Columnas leídas de la tabla `clippings`. Las de audio pueden no existir aún
-// (la migración 20260628 se corre a mano en el dashboard): por eso las lecturas
-// reintentan sin ellas. Ver SELECT_WITH_AUDIO / SELECT_LEGACY.
+// Columnas leídas de la tabla `clippings`. Las de audio (migración 20260628) e
+// imagen (20260706) pueden no existir todavía —se corren a mano en el dashboard—,
+// así que la lectura reintenta con menos columnas de forma progresiva:
+// SELECT_FULL → SELECT_WITH_AUDIO → SELECT_LEGACY.
+export const SELECT_FULL =
+  "id, client_id, medium, title, published_at, scope, format, url, order_position, audio_url, audio_duration_seconds, image_url"
 export const SELECT_WITH_AUDIO =
   "id, client_id, medium, title, published_at, scope, format, url, order_position, audio_url, audio_duration_seconds"
 export const SELECT_LEGACY =
@@ -135,6 +143,7 @@ function buildFallback(): ClientWithClippings[] {
         url: c.link,
         audio_url: null,
         audio_duration_seconds: null,
+        image_url: null,
         order_position: i,
       }))
       // Mismo orden que la versión hardcoded: año desc, entradas nuevas primero.
@@ -155,19 +164,26 @@ function buildFallback(): ClientWithClippings[] {
 export async function getClientsWithClippings(): Promise<ClientWithClippings[]> {
   try {
     const clippingsQuery = async () => {
-      // Intento con columnas de audio; si todavía no existen, reintento legacy.
+      // Intento con todas las columnas (audio + imagen); si alguna todavía no
+      // existe, reintento con menos, de forma progresiva. Los SELECT_* van como
+      // literales (no variable) para que Supabase infiera el tipo de fila.
+      const full = await supabase
+        .from("clippings")
+        .select(SELECT_FULL)
+        .order("published_at", { ascending: false })
+        .order("order_position", { ascending: false })
+      if (!full.error) return full
       const withAudio = await supabase
         .from("clippings")
         .select(SELECT_WITH_AUDIO)
         .order("published_at", { ascending: false })
         .order("order_position", { ascending: false })
       if (!withAudio.error) return withAudio
-      const legacy = await supabase
+      return supabase
         .from("clippings")
         .select(SELECT_LEGACY)
         .order("published_at", { ascending: false })
         .order("order_position", { ascending: false })
-      return legacy
     }
 
     const [clientsRes, clippingsRes] = await Promise.all([
@@ -185,10 +201,11 @@ export async function getClientsWithClippings(): Promise<ClientWithClippings[]> 
 
     const byClient = new Map<string, DbClipping[]>()
     for (const raw of clippingsRes.data ?? []) {
-      // El select legacy no trae audio_*: normalizamos a null.
+      // Los selects reducidos no traen audio_*/image_url: normalizamos a null.
       const k = {
         audio_url: null,
         audio_duration_seconds: null,
+        image_url: null,
         ...(raw as Record<string, unknown>),
       } as unknown as DbClipping
       if (!byClient.has(k.client_id)) byClient.set(k.client_id, [])

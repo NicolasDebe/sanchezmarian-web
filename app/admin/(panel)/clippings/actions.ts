@@ -16,6 +16,12 @@ import {
   audioPathFromPublicUrl,
 } from "@/lib/audio"
 import {
+  imageFileError,
+  safeImageName,
+  imagePathFromPublicUrl,
+  IMAGE_BUCKET,
+} from "@/lib/images"
+import {
   fetchUrlMetadata,
   isHttpUrl,
   EMPTY_METADATA,
@@ -40,6 +46,8 @@ export interface ClippingInput {
   audio_url?: string | null
   /** Opcional: duración del audio en segundos. */
   audio_duration_seconds?: number | null
+  /** Opcional: imagen de la tarjeta (OG del enlace o subida propia). */
+  image_url?: string | null
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -94,6 +102,18 @@ function audioFields(data: ClippingInput): Record<string, unknown> {
   return out
 }
 
+/**
+ * Campo de imagen para insert/update. Solo se incluye cuando viene definido:
+ * así, mientras la migración 20260706 no se haya corrido (columna inexistente),
+ * los clippings sin imagen se siguen guardando sin tocar una columna que no
+ * existe. Ver imageFields en el mismo espíritu que audioFields.
+ */
+function imageFields(data: ClippingInput): Record<string, unknown> {
+  const out: Record<string, unknown> = {}
+  if (data.image_url !== undefined) out.image_url = data.image_url || null
+  return out
+}
+
 // ─── CRUD ─────────────────────────────────────────────────────────────────────
 
 export async function createClipping(data: ClippingInput): Promise<ClippingResult> {
@@ -124,6 +144,7 @@ export async function createClipping(data: ClippingInput): Promise<ClippingResul
       format: data.format,
       url: data.url?.trim() || null,
       ...audioFields(data),
+      ...imageFields(data),
       order_position: (maxRow?.order_position ?? -1) + 1,
       created_by: user.email || user.id,
       updated_by: user.email || user.id,
@@ -170,6 +191,7 @@ export async function updateClipping(
         format: data.format,
         url: data.url?.trim() || null,
         ...audioFields(data),
+        ...imageFields(data),
         updated_at: new Date().toISOString(),
         updated_by: user.email || user.id,
       })
@@ -392,6 +414,121 @@ export async function removeClippingAudio(
   } catch (err) {
     console.error("[removeClippingAudio] throw:", err)
     return { success: false, error: "Ocurrió un error al eliminar el audio." }
+  }
+}
+
+// ─── Imagen (Storage) ─────────────────────────────────────────────────────────
+
+export type ImageUploadResult =
+  | { success: true; url: string; path: string }
+  | { success: false; error: string }
+
+/**
+ * Sube una imagen al bucket `clipping-images` (service role) y devuelve la URL
+ * pública. Si viene `clipping_id`, además la asocia al clipping. Para clippings
+ * NUEVOS no hay id todavía: el form guarda la URL devuelta y la manda en
+ * createClipping. La compresión se hace en el cliente antes de subir.
+ */
+export async function uploadClippingImage(
+  formData: FormData,
+): Promise<ImageUploadResult> {
+  const user = await requireUser()
+  if (!user) return { success: false, error: "Tu sesión expiró. Volvé a iniciar sesión." }
+
+  const file = formData.get("image") as File | null
+  const clippingId = (formData.get("clipping_id") as string | null) || null
+  const clientSlug = (formData.get("client_slug") as string | null) || null
+
+  if (!file) return { success: false, error: "No se seleccionó archivo." }
+  if (!clientSlug) return { success: false, error: "Falta el cliente." }
+
+  // Validación de tipo y tamaño (misma lógica que en el cliente).
+  const invalid = imageFileError({ name: file.name, type: file.type, size: file.size })
+  if (invalid) return { success: false, error: invalid }
+
+  const path = `${clientSlug}/${Date.now()}-${safeImageName(file.name)}`
+
+  try {
+    const admin = createAdminClient()
+
+    const { error: uploadErr } = await admin.storage
+      .from(IMAGE_BUCKET)
+      .upload(path, file, {
+        contentType: file.type || "image/webp",
+        cacheControl: "3600",
+        upsert: false,
+      })
+
+    if (uploadErr) {
+      console.error("[uploadClippingImage] upload error:", uploadErr)
+      return { success: false, error: "No se pudo subir la imagen." }
+    }
+
+    const { data: publicData } = admin.storage.from(IMAGE_BUCKET).getPublicUrl(path)
+    const publicUrl = publicData.publicUrl
+
+    if (clippingId) {
+      const { error: updateErr } = await admin
+        .from("clippings")
+        .update({ image_url: publicUrl })
+        .eq("id", clippingId)
+      if (updateErr) {
+        console.error("[uploadClippingImage] update error:", updateErr)
+        return {
+          success: false,
+          error: "Imagen subida, pero no se pudo asociar al clipping.",
+        }
+      }
+      revalidatePath("/casos-de-exito")
+    }
+
+    return { success: true, url: publicUrl, path }
+  } catch (err) {
+    console.error("[uploadClippingImage] throw:", err)
+    return { success: false, error: "Ocurrió un error al subir la imagen." }
+  }
+}
+
+/**
+ * Quita la imagen del clipping. Si es una imagen propia (de nuestro bucket) la
+ * borra también del Storage; si es una imagen OG remota, solo limpia la
+ * referencia. `clippingId` puede ser null (alta todavía sin guardar).
+ */
+export async function removeClippingImage(
+  clippingId: string | null,
+  imageUrl: string,
+): Promise<ClippingResult> {
+  const user = await requireUser()
+  if (!user) return { success: false, error: "Tu sesión expiró. Volvé a iniciar sesión." }
+
+  try {
+    const admin = createAdminClient()
+
+    const path = imagePathFromPublicUrl(imageUrl)
+    if (path) {
+      const { error: removeErr } = await admin.storage.from(IMAGE_BUCKET).remove([path])
+      if (removeErr) {
+        // No bloquea: igual limpiamos la referencia del clipping.
+        console.error("[removeClippingImage] storage remove error:", removeErr)
+      }
+    }
+
+    if (clippingId) {
+      const { error: updateErr } = await admin
+        .from("clippings")
+        .update({ image_url: null })
+        .eq("id", clippingId)
+      if (updateErr) {
+        console.error("[removeClippingImage] update error:", updateErr)
+        return { success: false, error: "No se pudo eliminar la imagen." }
+      }
+      revalidatePath("/casos-de-exito")
+    }
+
+    return { success: true }
+  } catch (err) {
+    console.error("[removeClippingImage] throw:", err)
+    return { success: false, error: "Ocurrió un error al eliminar la imagen." }
   }
 }
 
