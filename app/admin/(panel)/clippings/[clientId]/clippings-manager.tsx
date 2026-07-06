@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Pencil, Trash2, Plus, Sparkles, X, Headphones, UploadCloud, Loader2 } from "lucide-react"
+import { Pencil, Trash2, Plus, Sparkles, X, Headphones, UploadCloud, Loader2, ImageIcon } from "lucide-react"
 import {
   SCOPES,
   FORMATS,
@@ -13,6 +13,7 @@ import {
   type ClippingFormat,
 } from "@/lib/clippings"
 import { audioFileError, AUDIO_ACCEPT_ATTR, audioFileLabel } from "@/lib/audio"
+import { imageFileError, IMAGE_ACCEPT_ATTR, isOwnImage } from "@/lib/images"
 import { AudioPlayer } from "@/components/audio-player"
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 import {
@@ -23,6 +24,8 @@ import {
   uploadClippingAudio,
   removeClippingAudio,
   updateAudioDuration,
+  uploadClippingImage,
+  removeClippingImage,
   type ClippingInput,
 } from "../actions"
 
@@ -42,6 +45,7 @@ interface FormState {
   format: ClippingFormat
   audio_url: string | null
   audio_duration_seconds: number | null
+  image_url: string | null
 }
 
 const EMPTY_FORM: FormState = {
@@ -53,6 +57,7 @@ const EMPTY_FORM: FormState = {
   format: "Digital",
   audio_url: null,
   audio_duration_seconds: null,
+  image_url: null,
 }
 
 function isHttpUrl(value: string): boolean {
@@ -288,6 +293,244 @@ function AudioField({
   )
 }
 
+// ─── Campo de imagen (compresión + upload + preview + quitar) ─────────────────
+
+/** Comprime a WebP antes de subir (misma estrategia que PhotoManager). */
+async function optimizeImage(file: File): Promise<File> {
+  if (file.size < 500 * 1024) return file
+  try {
+    const imageCompression = (await import("browser-image-compression")).default
+    const compressed = await imageCompression(file, {
+      maxSizeMB: 2,
+      maxWidthOrHeight: 2000,
+      useWebWorker: true,
+      fileType: "image/webp",
+    })
+    const name = file.name.replace(/\.[^.]+$/, "") + ".webp"
+    return new File([compressed], name, { type: "image/webp" })
+  } catch {
+    return file
+  }
+}
+
+function ImageField({
+  clientSlug,
+  clippingId,
+  imageUrl,
+  onChange,
+}: {
+  clientSlug: string
+  /** id del clipping si ya existe (modo edición); null en alta. */
+  clippingId: string | null
+  imageUrl: string | null
+  onChange: (nextUrl: string | null) => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [dragOver, setDragOver] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleFile(file: File) {
+    setError(null)
+    const invalid = imageFileError({ name: file.name, type: file.type, size: file.size })
+    if (invalid) {
+      setError(invalid)
+      return
+    }
+    setBusy(true)
+    try {
+      const optimized = await optimizeImage(file)
+      const invalidAfter = imageFileError({
+        name: optimized.name,
+        type: optimized.type,
+        size: optimized.size,
+      })
+      if (invalidAfter) {
+        setError(invalidAfter)
+        return
+      }
+      const fd = new FormData()
+      fd.set("image", optimized)
+      fd.set("client_slug", clientSlug)
+      if (clippingId) fd.set("clipping_id", clippingId)
+      const result = await uploadClippingImage(fd)
+      if (!result.success) {
+        setError(result.error)
+        return
+      }
+      onChange(result.url)
+    } catch {
+      setError("No se pudo subir la imagen. Probá de nuevo.")
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleRemove() {
+    if (!imageUrl) return
+    setBusy(true)
+    setError(null)
+    try {
+      // Si es imagen propia (o hay clipping guardado) limpiamos también en la
+      // base/Storage; para una OG remota en un alta sin guardar, alcanza con
+      // limpiar el estado local.
+      if (clippingId || isOwnImage(imageUrl)) {
+        const result = await removeClippingImage(clippingId, imageUrl)
+        if (!result.success) {
+          setError(result.error)
+          return
+        }
+      }
+      onChange(null)
+    } catch {
+      setError("No se pudo quitar la imagen. Probá de nuevo.")
+    } finally {
+      setBusy(false)
+      setConfirmRemove(false)
+    }
+  }
+
+  // ── Ya hay imagen: preview + reemplazar/quitar ──
+  if (imageUrl) {
+    const own = isOwnImage(imageUrl)
+    return (
+      <div className="flex flex-col gap-2.5">
+        <div
+          className="relative overflow-hidden rounded-xl border"
+          style={{ borderColor: "rgba(201,168,130,0.4)", aspectRatio: "16 / 9", background: "var(--color-arena)" }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageUrl} alt="Imagen del clipping" className="h-full w-full object-cover" />
+          {busy && (
+            <div
+              className="absolute inset-0 grid place-items-center"
+              style={{ background: "rgba(26,9,16,0.45)" }}
+            >
+              <Loader2 size={22} className="animate-spin" style={{ color: "var(--color-hueso)" }} />
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-mono" style={{ fontSize: 11, color: "var(--color-gris-bordo)" }}>
+            {own ? "Imagen propia" : "Imagen del enlace (Open Graph)"}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => !busy && inputRef.current?.click()}
+              disabled={busy}
+              className="rounded-lg border px-3 py-1.5 font-sans text-xs font-semibold transition-opacity hover:opacity-85 disabled:opacity-60"
+              style={{ borderColor: "var(--color-dorado)", color: "var(--color-bordo)" }}
+            >
+              Reemplazar
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmRemove(true)}
+              disabled={busy}
+              className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-sans text-xs font-semibold transition-opacity hover:opacity-85 disabled:opacity-60"
+              style={{ borderColor: "var(--color-bordo)", color: "var(--color-bordo)" }}
+            >
+              <Trash2 size={13} />
+              Quitar
+            </button>
+          </div>
+        </div>
+        {error && (
+          <p className="font-sans text-xs" style={{ color: "var(--color-bordo)" }}>
+            {error}
+          </p>
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept={IMAGE_ACCEPT_ATTR}
+          hidden
+          onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) void handleFile(file)
+            e.target.value = ""
+          }}
+        />
+        <ConfirmDialog
+          open={confirmRemove}
+          title="¿Quitar la imagen de este clipping?"
+          busy={busy}
+          onConfirm={handleRemove}
+          onCancel={() => setConfirmRemove(false)}
+        />
+      </div>
+    )
+  }
+
+  // ── Sin imagen: dropzone ──
+  return (
+    <div className="flex flex-col gap-1.5">
+      <button
+        type="button"
+        onClick={() => !busy && inputRef.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault()
+          if (!busy) setDragOver(true)
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setDragOver(false)
+          if (busy) return
+          const file = e.dataTransfer.files?.[0]
+          if (file) void handleFile(file)
+        }}
+        disabled={busy}
+        className="flex w-full flex-col items-center justify-center gap-2 text-center transition-colors"
+        style={{
+          border: `2px dashed ${dragOver ? "rgba(102,0,31,0.6)" : "rgba(102,0,31,0.3)"}`,
+          borderRadius: 12,
+          padding: 28,
+          background: dragOver ? "rgba(240,232,216,0.5)" : "transparent",
+          cursor: busy ? "default" : "pointer",
+        }}
+      >
+        {busy ? (
+          <>
+            <Loader2 size={22} className="animate-spin" style={{ color: "var(--color-bordo)" }} />
+            <span className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
+              Subiendo…
+            </span>
+          </>
+        ) : (
+          <>
+            <ImageIcon size={22} style={{ color: "var(--color-bordo)" }} />
+            <span className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
+              Arrastrá una imagen acá o hacé click para elegir
+            </span>
+            <span className="font-mono" style={{ fontSize: 11, color: "var(--color-gris-bordo)" }}>
+              JPG, PNG o WebP · se optimiza sola al subirla
+            </span>
+          </>
+        )}
+      </button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={IMAGE_ACCEPT_ATTR}
+        hidden
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) void handleFile(file)
+          e.target.value = ""
+        }}
+      />
+      {error && (
+        <p className="font-sans text-xs" style={{ color: "var(--color-bordo)" }}>
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function ClippingsManager({
@@ -335,6 +578,7 @@ export function ClippingsManager({
       format: c.format,
       audio_url: c.audio_url,
       audio_duration_seconds: c.audio_duration_seconds,
+      image_url: c.image_url,
     })
     setErrors({})
     setExtractMsg(null)
@@ -371,10 +615,14 @@ export function ClippingsManager({
         medium: meta.medium ?? prev.medium,
         title: meta.title ?? prev.title,
         published_at: meta.published_at ?? prev.published_at,
+        // La imagen OG solo se toma si todavía no hay una elegida (no pisa una
+        // imagen propia que Marian ya haya subido).
+        image_url: prev.image_url ?? meta.image ?? null,
       }))
       if (meta.medium) found.push("medio")
       if (meta.title) found.push("título")
       if (meta.published_at) found.push("fecha")
+      if (meta.image && !form.image_url) found.push("imagen")
       setExtractMsg(
         found.length === 0
           ? "No pudimos leer los datos automáticamente — completá manualmente."
@@ -429,6 +677,11 @@ export function ClippingsManager({
     if (form.audio_url) {
       payload.audio_url = form.audio_url
       payload.audio_duration_seconds = form.audio_duration_seconds
+    }
+    // Ídem imagen: solo se adjunta cuando hay una, para no tocar la columna
+    // image_url mientras la migración 20260706 no esté corrida.
+    if (form.image_url) {
+      payload.image_url = form.image_url
     }
     try {
       const result =
@@ -715,6 +968,23 @@ export function ClippingsManager({
                 {errors._content}
               </p>
             )}
+
+            {/* Imagen */}
+            <div className="mt-4 flex flex-col gap-1.5">
+              <label className="font-sans text-sm font-medium" style={{ color: "var(--color-negro-bordo)" }}>
+                Imagen de la tarjeta <span style={{ color: "var(--color-gris-bordo)", fontWeight: 400 }}>(opcional)</span>
+              </label>
+              <p className="font-sans text-xs" style={{ color: "var(--color-gris-bordo)" }}>
+                Con «Auto-completar» se toma la imagen del enlace. Si no hay o querés otra, subí una propia.
+                Si la dejás vacía, la tarjeta se ve sin imagen.
+              </p>
+              <ImageField
+                clientSlug={clientSlug}
+                clippingId={modal.mode === "edit" ? modal.id : null}
+                imageUrl={form.image_url}
+                onChange={(nextUrl) => setForm((prev) => ({ ...prev, image_url: nextUrl }))}
+              />
+            </div>
 
             {/* Medio */}
             <div className="mt-4 flex flex-col gap-1.5">

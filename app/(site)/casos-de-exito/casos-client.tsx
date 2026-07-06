@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useRef, useEffect } from "react"
+import React, { useState, useMemo } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
@@ -46,19 +46,41 @@ const FORMAT_BADGE: Record<string, { bg: string; color: string; label: string }>
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
-// ─── Timeline layout constants ────────────────────────────────────────────────
-
-const COLS = 3
-const ROW_H = 220      // px per grid row
-const LINE_Y = 185     // y of zigzag line within each row (below cards)
-const GAP = 24         // column gap
-
 // ─── Timeline card ────────────────────────────────────────────────────────────
 
 function TimelineCard({ ap }: { ap: DbClipping }) {
   const borderColor = FORMAT_BORDER[ap.format] ?? FORMAT_BORDER.Digital
   const hasAudio = !!ap.audio_url
   const hasUrl = !!ap.url
+
+  // Imagen de la tarjeta: OG del enlace o subida propia. Si no hay ninguna, no
+  // se renderiza NADA (ni placeholder ni hueco): la tarjeta queda como siempre.
+  const imageEl = ap.image_url ? (
+    <div
+      style={{
+        marginBottom: 14,
+        borderRadius: 6,
+        overflow: "hidden",
+        aspectRatio: "16 / 9",
+        background: "var(--color-arena)",
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={ap.image_url}
+        alt=""
+        loading="lazy"
+        style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }}
+        // Si la imagen (típicamente una OG remota) no carga o dejó de existir,
+        // ocultamos el contenedor: la tarjeta colapsa a su diseño de solo texto,
+        // sin caja vacía. Respeta la regla "sin imagen = diseño de siempre".
+        onError={(e) => {
+          const box = e.currentTarget.parentElement
+          if (box) box.style.display = "none"
+        }}
+      />
+    </div>
+  ) : null
 
   const head = (
     <div className="flex items-start justify-between gap-2" style={{ marginBottom: 6 }}>
@@ -121,6 +143,7 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
           borderLeft: `2px solid ${borderColor}`,
         }}
       >
+        {imageEl}
         {/* Badge de tipo */}
         <div
           className="flex items-center gap-1 font-mono uppercase"
@@ -162,6 +185,7 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
         borderLeft: `2px solid ${borderColor}`,
       }}
     >
+      {imageEl}
       {head}
       {titleEl}
       {yearEl}
@@ -183,219 +207,28 @@ function TimelineCard({ ap }: { ap: DbClipping }) {
   )
 }
 
-// ─── Zigzag timeline ──────────────────────────────────────────────────────────
+// ─── Client timeline (masonry) ────────────────────────────────────────────────
+// Muro de tarjetas tipo masonry: tolera alturas variables (tarjetas con imagen
+// y sin imagen conviven) sin dejar huecos, y respira más que el zigzag anterior.
+// Responsive por column-count: 1 (mobile) · 2 (sm) · 3 (lg). Cada tarjeta entra
+// con un fade-up escalonado cuando el bloque del cliente se despliega.
 
-function ZigzagTimeline({
-  apariciones,
-  clientId,
-}: {
-  apariciones: DbClipping[]
-  clientId: string
-}) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [containerW, setContainerW] = useState(0)
+function ClientTimeline({ apariciones }: { apariciones: DbClipping[] }) {
+  if (apariciones.length === 0) return null
 
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    setContainerW(el.getBoundingClientRect().width)
-    const ro = new ResizeObserver((entries) => {
-      setContainerW(entries[0].contentRect.width)
-    })
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
-  // Ya vienen ordenadas por published_at DESC desde el servidor.
-  const sorted = apariciones
-
-  // Si algún clipping de este cliente tiene audio, las filas crecen para
-  // acomodar el player inline (la geometría del zigzag es uniforme por cliente).
-  const hasAnyAudio = sorted.some((a) => !!a.audio_url)
-  const rowH = hasAnyAudio ? 360 : ROW_H
-  const lineY = hasAnyAudio ? 320 : LINE_Y
-
-  const isMobile = containerW > 0 && containerW < 640
-  const rows = Math.ceil(sorted.length / COLS)
-  const colW = containerW > 0 ? (containerW - GAP * (COLS - 1)) / COLS : 0
-  const colCenter = (c: number) => c * (colW + GAP) + colW / 2
-
-  // Build zigzag SVG path
-  const svgPath = useMemo(() => {
-    if (containerW <= 0 || sorted.length === 0) return ""
-    const W = containerW
-    let d = ""
-    for (let r = 0; r < rows; r++) {
-      const y = r * rowH + lineY
-      const ltr = r % 2 === 0
-      if (r === 0) d = `M ${ltr ? 0 : W},${y}`
-      d += ` L ${ltr ? W : 0},${y}`
-      if (r < rows - 1) {
-        d += ` L ${ltr ? W : 0},${(r + 1) * rowH + lineY}`
-      }
-    }
-    return d
-  }, [containerW, rows, sorted.length, rowH, lineY])
-
-  const svgH = rows * rowH + 20
-
-  if (sorted.length === 0) return null
-
-  // ── Mobile: simple vertical list ──
-  if (isMobile) {
-    return (
-      <div ref={containerRef} style={{ position: "relative", paddingLeft: 28, paddingBottom: 24, width: "100%" }}>
-        <div
-          style={{
-            position: "absolute",
-            left: 10,
-            top: 0,
-            bottom: 0,
-            width: 1,
-            background: "rgba(201,168,130,0.4)",
-          }}
-        />
-        {sorted.map((ap, i) => (
-          <motion.div
-            key={ap.id}
-            initial={{ opacity: 0, x: -16 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 + i * 0.08, duration: 0.35, ease: EASE }}
-            style={{ position: "relative", marginBottom: 10 }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                left: -22,
-                top: 14,
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background: "var(--color-bordo)",
-              }}
-            />
-            <TimelineCard ap={ap} />
-          </motion.div>
-        ))}
-      </div>
-    )
-  }
-
-  // ── Desktop: zigzag grid ──
   return (
-    <div ref={containerRef} style={{ position: "relative", width: "100%", paddingBottom: 24 }}>
-      {/* SVG zigzag overlay */}
-      {containerW > 0 && svgPath && (
-        <svg
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: containerW,
-            height: svgH,
-            pointerEvents: "none",
-            overflow: "visible",
-            zIndex: 0,
-          }}
+    <div className="columns-1 sm:columns-2 lg:columns-3 [column-gap:24px]">
+      {apariciones.map((ap, i) => (
+        <motion.div
+          key={ap.id}
+          className="mb-6 break-inside-avoid"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 + Math.min(i, 10) * 0.06, duration: 0.4, ease: EASE }}
         >
-          {/* Path draw animation */}
-          <motion.path
-            key={`p-${clientId}-${containerW}`}
-            d={svgPath}
-            fill="none"
-            stroke="rgba(201,168,130,0.4)"
-            strokeWidth={1.5}
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-          />
-
-          {/* Static dots at card positions */}
-          {sorted.map((ap, i) => {
-            const row = Math.floor(i / COLS)
-            const col = i % COLS
-            const ltr = row % 2 === 0
-            const actualCol = ltr ? col : COLS - 1 - col
-            return (
-              <motion.circle
-                key={`dot-${ap.id}`}
-                cx={colCenter(actualCol)}
-                cy={row * rowH + lineY}
-                r={4}
-                fill="var(--color-bordo)"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.45 + i * 0.08, duration: 0.2 }}
-              />
-            )
-          })}
-
-          {/* Traveling dot — infinite loop along the path */}
-          {svgPath && (
-            <circle
-              key={`traveler-${clientId}-${containerW}`}
-              r={3}
-              fill="var(--color-bordo)"
-              opacity={0.65}
-            >
-              <animateMotion dur="8s" repeatCount="indefinite" path={svgPath} />
-            </circle>
-          )}
-        </svg>
-      )}
-
-      {/* Cards grid arranged by row */}
-      <div style={{ position: "relative", zIndex: 1 }}>
-        {Array.from({ length: rows }).map((_, rowIdx) => {
-          const rowItems = sorted.slice(rowIdx * COLS, (rowIdx + 1) * COLS)
-          const ltr = rowIdx % 2 === 0
-          const emptyCount = COLS - rowItems.length
-
-          // L→R rows: items left-aligned, empty slots at end
-          // R→L rows: items right-aligned, empty slots at start, items reversed
-          const displayItems: (DbClipping | null)[] = ltr
-            ? [...rowItems, ...Array<null>(emptyCount).fill(null)]
-            : [
-                ...Array<null>(emptyCount).fill(null),
-                ...[...rowItems].reverse(),
-              ]
-
-          return (
-            <div
-              key={rowIdx}
-              style={{
-                display: "grid",
-                gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-                gap: GAP,
-                height: rowH,
-                alignItems: "flex-start",
-                paddingTop: 18,
-              }}
-            >
-              {displayItems.map((ap, gridCol) => {
-                if (!ap)
-                  return <div key={`empty-${rowIdx}-${gridCol}`} />
-                const sortedIdx = sorted.findIndex((item) => item.id === ap.id)
-                return (
-                  <motion.div
-                    key={ap.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: 0.3 + sortedIdx * 0.1,
-                      duration: 0.35,
-                      ease: EASE,
-                    }}
-                  >
-                    <TimelineCard ap={ap} />
-                  </motion.div>
-                )
-              })}
-            </div>
-          )
-        })}
-      </div>
+          <TimelineCard ap={ap} />
+        </motion.div>
+      ))}
     </div>
   )
 }
@@ -513,10 +346,7 @@ function TimelineClientBlock({
           >
             <div style={{ paddingTop: 20 }}>
               {apariciones.length > 0 && (
-                <ZigzagTimeline
-                  apariciones={apariciones}
-                  clientId={client.slug}
-                />
+                <ClientTimeline apariciones={apariciones} />
               )}
               {apariciones.length === 0 && (
                 <p

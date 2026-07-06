@@ -13,9 +13,16 @@ export interface UrlMetadata {
   title: string | null
   /** yyyy-mm-dd */
   published_at: string | null
+  /** URL absoluta de la imagen de portada (og:image / twitter:image / JSON-LD). */
+  image: string | null
 }
 
-export const EMPTY_METADATA: UrlMetadata = { medium: null, title: null, published_at: null }
+export const EMPTY_METADATA: UrlMetadata = {
+  medium: null,
+  title: null,
+  published_at: null,
+  image: null,
+}
 
 export function isHttpUrl(value: string): boolean {
   try {
@@ -23,6 +30,20 @@ export function isHttpUrl(value: string): boolean {
     return u.protocol === "http:" || u.protocol === "https:"
   } catch {
     return false
+  }
+}
+
+/**
+ * Resuelve una URL de imagen (posiblemente relativa o protocol-relative) a
+ * absoluta, contra la URL de la página. Devuelve null si no es http(s).
+ */
+function toAbsoluteUrl(raw: string | undefined | null, base: string): string | null {
+  if (!raw) return null
+  try {
+    const abs = new URL(raw.trim(), base)
+    return abs.protocol === "http:" || abs.protocol === "https:" ? abs.href : null
+  } catch {
+    return null
   }
 }
 
@@ -73,11 +94,16 @@ export async function fetchUrlMetadata(url: string): Promise<UrlMetadata> {
       toIsoDate(meta('meta[property="article:published_time"]')) ??
       toIsoDate(meta('meta[property="og:updated_time"]')) ??
       toIsoDate(meta('meta[name="date"]'))
+    let image =
+      toAbsoluteUrl(meta('meta[property="og:image:secure_url"]'), url) ??
+      toAbsoluteUrl(meta('meta[property="og:image"]'), url) ??
+      toAbsoluteUrl(meta('meta[name="twitter:image"]'), url) ??
+      toAbsoluteUrl(meta('meta[name="twitter:image:src"]'), url)
 
-    // JSON-LD (NewsArticle): suele tener datePublished y publisher.name.
-    if (!published || !medium) {
+    // JSON-LD (NewsArticle): suele tener datePublished, publisher.name e image.
+    if (!published || !medium || !image) {
       $('script[type="application/ld+json"]').each((_, el) => {
-        if (published && medium) return
+        if (published && medium && image) return
         try {
           const parsed = JSON.parse($(el).text())
           const nodes = Array.isArray(parsed) ? parsed : (parsed["@graph"] ?? [parsed])
@@ -88,6 +114,12 @@ export async function fetchUrlMetadata(url: string): Promise<UrlMetadata> {
               medium = String(node.publisher.name).trim() || null
             }
             if (!title && node.headline) title = String(node.headline).trim() || null
+            if (!image && node.image) {
+              // image puede ser string, {url}, o un array de cualquiera de los dos.
+              const first = Array.isArray(node.image) ? node.image[0] : node.image
+              const raw = typeof first === "object" ? first?.url : first
+              image = toAbsoluteUrl(typeof raw === "string" ? raw : null, url)
+            }
           }
         } catch {
           // JSON-LD malformado: se ignora.
@@ -95,7 +127,7 @@ export async function fetchUrlMetadata(url: string): Promise<UrlMetadata> {
       })
     }
 
-    return { medium, title, published_at: published }
+    return { medium, title, published_at: published, image }
   } catch {
     return EMPTY_METADATA
   }
