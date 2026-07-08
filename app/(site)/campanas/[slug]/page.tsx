@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { CampanaDetail } from "@/components/campana-detail"
+import { NewsletterSection } from "@/components/newsletter-section"
 import { getCampaignBySlug } from "@/lib/campaigns"
 import { createClient } from "@/lib/supabase/server"
 import { ogImageUrl, getOgDefaults, SITE_URL } from "@/lib/seo"
@@ -95,7 +96,7 @@ export default async function CampanaPage({ params, searchParams }: Props) {
   return (
     <>
       {isDraft && <DraftBanner />}
-      <CampanaDetail campaign={campaign} />
+      <CampanaDetail campaign={campaign} newsletter={<NewsletterSection />} />
     </>
   )
 }

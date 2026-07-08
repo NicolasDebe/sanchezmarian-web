@@ -32,7 +32,14 @@ function StatusBadge({ status }: { status: Campaign["status"] }) {
 }
 
 /** Página detalle de una campaña: header editorial + contenido HTML + slideshow. */
-export function CampanaDetail({ campaign }: { campaign: Campaign }) {
+export function CampanaDetail({
+  campaign,
+  newsletter,
+}: {
+  campaign: Campaign
+  /** Slot server-side (NewsletterSection) que se inserta antes del CTA final. */
+  newsletter?: React.ReactNode
+}) {
   const images = (campaign.images ?? [])
     .slice()
     .sort((a, b) => a.position - b.position)
@@ -132,6 +139,9 @@ export function CampanaDetail({ campaign }: { campaign: Campaign }) {
           <CampaignSlideshow campaignName={campaign.brand} images={images} />
         )}
       </div>
+
+      {/* CTA newsletter (MANTENETE AL DÍA) — se inserta antes del CTA final */}
+      {newsletter}
 
       {/* CTA final */}
       <div
