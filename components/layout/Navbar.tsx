@@ -109,15 +109,6 @@ export function Navbar({
             >
               Conversemos
             </Link>
-            <a
-              href={WHATSAPP_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Contactar por WhatsApp"
-              className="flex items-center justify-center text-hueso transition-colors hover:text-hueso/70"
-            >
-              <IconWhatsApp size={20} />
-            </a>
           </div>
 
           <button
