@@ -25,7 +25,7 @@ const SECTIONS = [
   },
   {
     title: "Contacto",
-    body: "Para cualquier consulta sobre estos términos, escribinos a contacto@sanchezmarian.com.",
+    body: "Para cualquier consulta sobre estos términos, escribinos a info@sanchezmarian.com.",
   },
 ]
 

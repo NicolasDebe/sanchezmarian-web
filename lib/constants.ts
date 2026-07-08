@@ -5,7 +5,7 @@
  * sobrescribirlos desde el admin sin que dejen de existir defaults consistentes.
  */
 
-export const SITE_EMAIL = "contacto@sanchezmarian.com"
+export const SITE_EMAIL = "info@sanchezmarian.com"
 
 export const WHATSAPP_NUMBER = "542615433882"
 export const WHATSAPP_MESSAGE =
