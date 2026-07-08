@@ -186,20 +186,22 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
               </em>
             </motion.h2>
 
-            {/* Subtítulo */}
-            <motion.p
-              variants={item}
-              className="font-sans"
-              style={{
-                fontSize: "var(--fs-body)",
-                lineHeight: "var(--lh-relaxed)",
-                color: "var(--color-gris-bordo)",
-                maxWidth: 480,
-                marginBottom: 36,
-              }}
-            >
-              {copy.subtitle}
-            </motion.p>
+            {/* Subtítulo (solo si tiene contenido) */}
+            {copy.subtitle?.trim() ? (
+              <motion.p
+                variants={item}
+                className="font-sans"
+                style={{
+                  fontSize: "var(--fs-body)",
+                  lineHeight: "var(--lh-relaxed)",
+                  color: "var(--color-gris-bordo)",
+                  maxWidth: 480,
+                  marginBottom: 36,
+                }}
+              >
+                {copy.subtitle}
+              </motion.p>
+            ) : null}
 
             {/* Form (sin <form>, submit por botón / Enter) */}
             <motion.div variants={item} style={{ position: "relative" }}>

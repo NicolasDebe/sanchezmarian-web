@@ -42,7 +42,7 @@ export const GLOBAL_SECTIONS: SectionDef[] = [
       { field: "eyebrow", type: "text", label: "Eyebrow (línea superior)", fallback: "MANTENETE AL DÍA", maxChars: 40 },
       { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Recibí cada nueva campaña", maxChars: 80 },
       { field: "title_accent", type: "text", label: "Título — parte con acento (itálica/bordó)", fallback: "en tu casilla.", maxChars: 60 },
-      { field: "subtitle", type: "text", label: "Subtítulo", fallback: "Una vez por mes. Sin spam. Solo trabajo real.", maxChars: 120 },
+      { field: "subtitle", type: "text", label: "Subtítulo", fallback: "", maxChars: 120 },
       { field: "name_label", type: "text", label: "Etiqueta del campo Nombre", fallback: "Tu nombre", maxChars: 40 },
       { field: "email_label", type: "text", label: "Etiqueta del campo Email", fallback: "Tu email", maxChars: 40 },
       { field: "button_label", type: "text", label: "Texto del botón", fallback: "Quiero recibirla", maxChars: 40 },
