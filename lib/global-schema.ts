@@ -70,7 +70,6 @@ export const GLOBAL_SECTIONS: SectionDef[] = [
       { field: "instagram_url", type: "text", label: "URL de Instagram", fallback: SOCIAL_LINKS.instagram, maxChars: 200 },
       { field: "linkedin_url", type: "text", label: "URL de LinkedIn", fallback: SOCIAL_LINKS.linkedin, maxChars: 200 },
       { field: "copyright_name", type: "text", label: "Nombre en el copyright", fallback: "Mariana Sánchez", maxChars: 60 },
-      { field: "signature", type: "text", label: "Firma final", fallback: "Diseñado con intención.", maxChars: 60 },
     ],
   },
 ]

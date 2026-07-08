@@ -139,17 +139,6 @@ export function Footer({
         <div className="pt-7 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="font-mono text-[var(--fs-eyebrow)] text-hueso/40 tracking-wide flex items-center gap-2 flex-wrap">
             © {new Date().getFullYear()} {c.copyright_name}
-            <span className="text-hueso/20">·</span>
-            <Link href="/privacidad" className="hover:text-hueso/70 transition-colors">
-              Privacidad
-            </Link>
-            <span className="text-hueso/20">·</span>
-            <Link href="/terminos" className="hover:text-hueso/70 transition-colors">
-              Términos
-            </Link>
-          </p>
-          <p className="font-mono text-[var(--fs-eyebrow)] text-hueso/30 tracking-wide">
-            {c.signature}
           </p>
         </div>
 
