@@ -10,22 +10,16 @@ import {
 import { fallbacksFor } from "@/lib/mis-valores-schema"
 import { RichText } from "@/components/ui/RichText"
 import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
+import { HeroWords, heroNextLineDelay, heroSatelliteDelay, useHeroSatellite } from "@/components/ui/hero-reveal"
 import heroValores from "@/public/images/NAC_4208.jpg"
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.12 } },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } },
-}
-
 /* ═══════════════════════════════════════════════════════════════
-   HERO EDITORIAL
+   HERO EDITORIAL — título palabra por palabra + satélites
+   (coreografía compartida en components/ui/hero-reveal.tsx)
 ═══════════════════════════════════════════════════════════════ */
 function HeroEditorial({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
+  const satellite = useHeroSatellite(heroSatelliteDelay(c.h1_pre, c.h1_accent))
+
   return (
     <section style={{ position: "relative", width: "100%", overflow: "hidden" }}>
 
@@ -58,10 +52,10 @@ function HeroEditorial({ c, scales }: { c: Record<string, string>; scales?: Fiel
         className="pt-5 sm:pt-0 px-5 sm:px-[clamp(20px,5vw,64px)] pb-8 sm:pb-[clamp(32px,6vh,64px)]"
         style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
       >
-        <motion.div variants={containerVariants} initial="hidden" animate="visible">
+        <div>
 
           <motion.p
-            variants={itemVariants}
+            {...satellite(0)}
             style={{
               fontFamily: "DM Mono, monospace",
               fontSize: "var(--fs-eyebrow)",
@@ -74,8 +68,8 @@ function HeroEditorial({ c, scales }: { c: Record<string, string>; scales?: Fiel
             {c.eyebrow}
           </motion.p>
 
-          <motion.h1
-            variants={itemVariants}
+          <h1
+            aria-label={`${c.h1_pre} ${c.h1_accent}`}
             {...fsStyle(scales?.["hero.h1_pre"], {
               fontFamily: "Playfair Display, serif",
               color: "#FEFCEF",
@@ -83,15 +77,22 @@ function HeroEditorial({ c, scales }: { c: Record<string, string>; scales?: Fiel
               margin: 0,
             }, "hero.h1_pre")}
           >
-            <span style={{ display: "block", fontSize: "calc(clamp(1.3rem, 3vw, 2.2rem) * var(--text-scale))", fontWeight: 600, opacity: 0.88 }}>
-              {c.h1_pre}
-            </span>
-            <em style={{ display: "block", fontSize: "calc(clamp(2rem, 5vw, 4rem) * var(--text-scale))", fontStyle: "italic", lineHeight: "var(--lh-tight)" }}>
-              {c.h1_accent}
-            </em>
-          </motion.h1>
+            <HeroWords
+              text={c.h1_pre}
+              as="span"
+              ariaHidden
+              style={{ display: "block", fontSize: "calc(clamp(1.3rem, 3vw, 2.2rem) * var(--text-scale))", fontWeight: 600, opacity: 0.88 }}
+            />
+            <HeroWords
+              text={c.h1_accent}
+              as="em"
+              ariaHidden
+              delay={heroNextLineDelay(c.h1_pre)}
+              style={{ display: "block", fontSize: "calc(clamp(2rem, 5vw, 4rem) * var(--text-scale))", fontStyle: "italic", lineHeight: "var(--lh-tight)" }}
+            />
+          </h1>
 
-        </motion.div>
+        </div>
       </div>
 
     </section>

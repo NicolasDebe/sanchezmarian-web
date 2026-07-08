@@ -8,13 +8,18 @@ import { ArrowRight } from "lucide-react"
 import {
   fadeUp, fadeUpStagger, revealCard, viewportOnce,
 } from "@/lib/animations"
+import { HeroWords, heroSatelliteDelay, useHeroSatellite } from "@/components/ui/hero-reveal"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { STATUS_LABELS, type Campaign, type CampaignStatus } from "@/lib/types/campaign"
 import { hasHtmlTags, htmlToPlainText } from "@/lib/rich-text"
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
+const CAMPANA_H1 = "Estrategias en acción."
+
 function CampanaHero() {
+  const satellite = useHeroSatellite(heroSatelliteDelay(CAMPANA_H1))
+
   return (
     <section
       className="relative bg-hueso overflow-hidden"
@@ -28,14 +33,9 @@ function CampanaHero() {
         className="relative max-w-7xl mx-auto"
         style={{ padding: "0 clamp(20px, 5vw, 64px)" }}
       >
-        <motion.div
-          variants={fadeUpStagger}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col"
-        >
+        <div className="flex flex-col">
           <motion.p
-            variants={fadeUp}
+            {...satellite(0)}
             className="font-mono uppercase"
             style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.15em", color: "var(--color-bordo)", marginBottom: 14 }}
           >
@@ -43,35 +43,33 @@ function CampanaHero() {
           </motion.p>
 
           <motion.div
-            variants={fadeUp}
+            {...satellite(0.05)}
             style={{ width: 40, height: 1, background: "var(--color-dorado)", marginBottom: 32 }}
           />
 
-          <motion.h1 variants={fadeUp} style={{ margin: 0 }}>
-            <span
-              style={{
-                display:    "block",
-                fontFamily: "var(--font-playfair-display), serif",
-                fontSize:   "var(--fs-h2)",
-                fontWeight: 600,
-                color:      "var(--color-negro-bordo)",
-                lineHeight: "var(--lh-snug)",
-                opacity:    0.9,
-              }}
-            >
-              Estrategias en acción.
-            </span>
-          </motion.h1>
+          <HeroWords
+            text={CAMPANA_H1}
+            as="h1"
+            style={{
+              margin:     0,
+              fontFamily: "var(--font-playfair-display), serif",
+              fontSize:   "var(--fs-h2)",
+              fontWeight: 600,
+              color:      "var(--color-negro-bordo)",
+              lineHeight: "var(--lh-snug)",
+              opacity:    0.9,
+            }}
+          />
 
           <motion.p
-            variants={fadeUp}
+            {...satellite(0.15)}
             className="font-sans"
             style={{ fontSize: "var(--fs-body)", color: "var(--color-gris-bordo)", lineHeight: "var(--lh-relaxed)", maxWidth: 520, marginTop: 24 }}
           >
             Campañas activas para marcas personales y empresas
             que confían en mi trabajo.
           </motion.p>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

@@ -1,46 +1,26 @@
 "use client"
 
 import Image from "next/image"
-import { motion, useReducedMotion } from "motion/react"
+import { motion } from "motion/react"
 import { MapPin, ArrowRight } from "lucide-react"
 import { fallbacksFor } from "@/lib/home-schema"
 import { springSnappy } from "@/lib/animations"
 import { RichText } from "@/components/ui/RichText"
 import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
+import { HeroWords, heroSatelliteDelay, useHeroSatellite } from "@/components/ui/hero-reveal"
 import heroMarian from "@/public/images/hero-marian.jpg"
 
-/* Curva expo-out para el momento propio del H1 mobile. */
-const EASE = [0.16, 1, 0.3, 1] as const
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.14,
-      delayChildren: 0.2,
-    },
-  },
-}
-
-/* itemVariants depende de reduced; se genera una vez y se comparte a ambas
-   variantes responsive para no duplicar la definición de animaciones. */
-const makeItemVariants = (reduced: boolean) => ({
-  hidden: { opacity: 0, y: reduced ? 0 : 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as const },
-  },
-})
+/* Coreografía compartida de heros (components/ui/hero-reveal.tsx): el H1
+   entra palabra por palabra (blur + subida escalonada) y los satélites
+   (pill, eyebrow, subtitle, CTAs) aparecen cuando el título terminó. */
 
 export function Hero({ content, scales }: { content?: Record<string, string>; scales?: FieldScaleMap }) {
   const c = { ...fallbacksFor("hero"), ...content }
-  const reduced = !!useReducedMotion()
 
   return (
     <>
-      <HeroMobile c={c} reduced={reduced} scales={scales} />
-      <HeroDesktop c={c} reduced={reduced} scales={scales} />
+      <HeroMobile c={c} scales={scales} />
+      <HeroDesktop c={c} scales={scales} />
     </>
   )
 }
@@ -50,8 +30,8 @@ export function Hero({ content, scales }: { content?: Record<string, string>; sc
    crop) con el H1 superpuesto sobre la zona blanca de las cortinas; debajo,
    en flujo normal sobre fondo hueso, la pill + eyebrow + subtitle + CTAs.
    ════════════════════════════════════════════════════════════════════════ */
-function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced: boolean; scales?: FieldScaleMap }) {
-  const itemVariants = makeItemVariants(reduced)
+function HeroMobile({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
+  const satellite = useHeroSatellite(heroSatelliteDelay(c.h1))
 
   return (
     <section className="md:hidden bg-hueso">
@@ -82,10 +62,9 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
         </div>
 
         {/* H1 ABSOLUTO sobre la zona blanca de las cortinas (izquierda) */}
-        <motion.h1
-          initial={reduced ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
+        <HeroWords
+          text={c.h1}
+          as="h1"
           className="absolute font-playfair font-bold text-negro-bordo"
           {...fsStyle(scales?.["hero.h1"], {
             top: "50%",
@@ -97,16 +76,11 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
             letterSpacing: "-0.02em",
             textShadow: "0 1px 2px rgba(254, 252, 239, 0.6)",
           }, "hero.h1")}
-        >
-          {c.h1}
-        </motion.h1>
+        />
       </div>
 
-      {/* BLOQUE 2 — TEXTO DEBAJO DE LA IMAGEN */}
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
+      {/* BLOQUE 2 — TEXTO DEBAJO DE LA IMAGEN (satélites del H1) */}
+      <div
         className="flex flex-col"
         style={{
           paddingInline: "24px",
@@ -116,7 +90,7 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
         }}
       >
         {/* Pill ubicación */}
-        <motion.div variants={itemVariants}>
+        <motion.div {...satellite(0)}>
           <span
             className="inline-flex items-center gap-2 rounded-full border border-bordo/20 bg-bordo/5 font-mono uppercase text-bordo"
             style={{
@@ -132,7 +106,7 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
 
         {/* Eyebrow */}
         <motion.p
-          variants={itemVariants}
+          {...satellite(0.08)}
           className="font-mono uppercase text-gris-bordo"
           style={{
             fontSize: "var(--fs-eyebrow)",
@@ -145,7 +119,7 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
 
         {/* Subtitle (RichText con los 4 párrafos) — color gris-bordo sobre hueso */}
         <motion.div
-          variants={itemVariants}
+          {...satellite(0.15)}
           className="rich-inline hero-subtitle"
           {...fsStyle(scales?.["hero.subtitle"], {
             fontFamily: "var(--font-dm-sans), sans-serif",
@@ -159,7 +133,7 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
 
         {/* CTAs — primario pill bordó + secundario outline */}
         <motion.div
-          variants={itemVariants}
+          {...satellite(0.3)}
           className="flex flex-col gap-3"
           style={{ marginTop: "12px" }}
         >
@@ -191,7 +165,7 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
             <ArrowRight size={16} aria-hidden />
           </motion.a>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   )
 }
@@ -200,8 +174,8 @@ function HeroMobile({ c, reduced, scales }: { c: Record<string, string>; reduced
    DESKTOP (hidden md:block) — layout existente aprobado, sin cambios: foto
    full-bleed con overlay y texto a la izquierda centrado vertical.
    ════════════════════════════════════════════════════════════════════════ */
-function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduced: boolean; scales?: FieldScaleMap }) {
-  const itemVariants = makeItemVariants(reduced)
+function HeroDesktop({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
+  const satellite = useHeroSatellite(heroSatelliteDelay(c.h1))
 
   return (
     <section className="relative w-full overflow-hidden hidden md:block">
@@ -237,18 +211,11 @@ function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduce
       <div className="absolute inset-0 flex items-center py-20">
         <div className="w-full max-w-7xl mx-auto px-6 lg:px-12">
 
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="max-w-xl"
-          >
+          <div className="max-w-xl">
 
             {/* PILL GEOLOCALIZACIÓN — solo en el hero del home */}
             <motion.div
-              initial={{ opacity: 0, y: reduced ? 0 : 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+              {...satellite(0)}
               className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6"
               style={{
                 background: "rgba(254,252,239,0.10)",
@@ -273,7 +240,7 @@ function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduce
 
             {/* EYEBROW */}
             <motion.p
-              variants={itemVariants}
+              {...satellite(0.08)}
               style={{
                 fontFamily: "var(--font-dm-mono), monospace",
                 fontSize: "var(--fs-eyebrow)",
@@ -290,8 +257,9 @@ function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduce
             </motion.p>
 
             {/* H1 */}
-            <motion.h1
-              variants={itemVariants}
+            <HeroWords
+              text={c.h1}
+              as="h1"
               {...fsStyle(scales?.["hero.h1"], {
                 fontFamily: "var(--font-playfair-display), serif",
                 lineHeight: 1.05,
@@ -301,13 +269,11 @@ function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduce
                 fontSize: "calc(clamp(2rem, 5vw, 4rem) * var(--text-scale))",
                 letterSpacing: "-0.02em",
               }, "hero.h1")}
-            >
-              {c.h1}
-            </motion.h1>
+            />
 
             {/* DESCRIPCIÓN */}
             <motion.div
-              variants={itemVariants}
+              {...satellite(0.15)}
               {...fsStyle(scales?.["hero.subtitle"], {
                 fontFamily: "var(--font-dm-sans), sans-serif",
                 fontSize: "calc(clamp(0.85rem, 1.35vw, 0.98rem) * var(--text-scale))",
@@ -323,7 +289,7 @@ function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduce
             {/* BOTONES — primario (fill --hueso) + secundario (outline).
                 Misma altura y curva; la diferencia es solo fill vs outline. */}
             <motion.div
-              variants={itemVariants}
+              {...satellite(0.3)}
               className="flex flex-col sm:flex-row gap-3"
             >
               <motion.a
@@ -387,7 +353,7 @@ function HeroDesktop({ c, reduced, scales }: { c: Record<string, string>; reduce
               </motion.a>
             </motion.div>
 
-          </motion.div>
+          </div>
         </div>
       </div>
 

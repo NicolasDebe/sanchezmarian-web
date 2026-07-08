@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 import Link from "next/link"
-import { motion, useReducedMotion, type Variants } from "motion/react"
+import { motion, useReducedMotion } from "motion/react"
 import { fallbacksFor } from "@/lib/servicios-schema"
 import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
@@ -13,6 +13,7 @@ import { Conexiones } from "@/components/conexiones"
 import type { Connection } from "@/lib/connections"
 import { fsStyle, type FieldScale, type FieldScaleMap } from "@/lib/text-size"
 import { EASE } from "@/components/servicios/types"
+import { HeroWords, heroSatelliteDelay, useHeroSatellite } from "@/components/ui/hero-reveal"
 
 const mvp = { once: true, margin: "-80px" } as const
 const PAD_X = "clamp(24px, 6vw, 96px)"
@@ -27,29 +28,17 @@ function paragraphs(raw?: string): string[] {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   SECCIÓN 1 — HERO (se mantiene el diseño existente aprobado por el cliente)
+   SECCIÓN 1 — HERO (se mantiene el diseño existente aprobado por el cliente).
+   La animación (HeroWords + satélites) vive en components/ui/hero-reveal.tsx
+   y es la misma que usan todos los heros del sitio.
    ════════════════════════════════════════════════════════════════════════ */
-const heroContainer = (reduced: boolean): Variants => ({
-  hidden: {},
-  visible: { transition: { staggerChildren: reduced ? 0 : 0.06, delayChildren: reduced ? 0 : 0.08 } },
-})
-const heroWord = (reduced: boolean): Variants => ({
-  hidden: reduced ? { opacity: 0 } : { opacity: 0, y: 20, filter: "blur(12px)" },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: reduced ? 0 : 0.8, ease: EASE } },
-})
-
 function HeroSection({ hero, scales }: { hero: Record<string, string>; scales?: FieldScaleMap }) {
   const reduced = useReducedMotion()
-  const words = (hero.h1 ?? "").split(/\s+/).filter(Boolean)
-  const satelliteDelay = reduced ? 0 : words.length * 0.06 + 0.45
+  const satelliteDelay = reduced ? 0 : heroSatelliteDelay(hero.h1)
   const eyebrow = (hero.eyebrow ?? "Servicios").trim()
   const description = (hero.description ?? "").trim()
 
-  const satellite = (delay: number) => ({
-    initial: { opacity: 0, y: reduced ? 0 : 10 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: reduced ? 0 : 0.7, ease: EASE, delay: reduced ? 0 : satelliteDelay + delay },
-  })
+  const satellite = useHeroSatellite(satelliteDelay)
 
   return (
     <section
@@ -70,11 +59,7 @@ function HeroSection({ hero, scales }: { hero: Record<string, string>; scales?: 
 
           <motion.div aria-hidden initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: reduced ? 0 : 0.7, ease: EASE, delay: reduced ? 0 : satelliteDelay + 0.05 }} className="mb-8 h-px origin-left bg-dorado" style={{ width: "clamp(60px, 10vw, 120px)" }} />
 
-          <motion.h1 aria-label={hero.h1} variants={heroContainer(!!reduced)} initial="hidden" animate="visible" className="font-playfair font-bold text-negro-bordo" {...fsStyle(scales?.["hero.h1"], { fontSize: "calc(clamp(36px, 5.4vw, 88px) * var(--text-scale))", lineHeight: "var(--lh-tight)", letterSpacing: "-0.03em", maxWidth: "18ch" }, "hero.h1")}>
-            {words.map((w, i) => (
-              <motion.span key={i} aria-hidden variants={heroWord(!!reduced)} className="inline-block" style={{ marginRight: "0.25em", willChange: "transform, filter" }}>{w}</motion.span>
-            ))}
-          </motion.h1>
+          <HeroWords text={hero.h1} as="h1" className="font-playfair font-bold text-negro-bordo" {...fsStyle(scales?.["hero.h1"], { fontSize: "calc(clamp(36px, 5.4vw, 88px) * var(--text-scale))", lineHeight: "var(--lh-tight)", letterSpacing: "-0.03em", maxWidth: "18ch" }, "hero.h1")} />
 
           {description && (
             <motion.div {...satellite(0.15)} className="mt-8 font-sans text-gris-bordo" {...fsStyle(scales?.["hero.description"], { fontSize: "calc(clamp(16px, 1.4vw, 20px) * var(--text-scale))", lineHeight: "var(--lh-base)", maxWidth: 560 }, "hero.description")}>

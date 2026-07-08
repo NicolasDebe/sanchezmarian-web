@@ -15,6 +15,7 @@ import {
   type DbClipping,
 } from "@/lib/clippings"
 import { fadeUp, fadeUpStagger, revealCard, viewportOnce, springSnappy, tapScale } from "@/lib/animations"
+import { HeroWords, heroNextLineDelay, heroSatelliteDelay, useHeroSatellite } from "@/components/ui/hero-reveal"
 import { MotionLink } from "@/components/ui/motion-link"
 import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
@@ -533,6 +534,17 @@ export function CasosClient({
   clientsData: ClientWithClippings[]
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
+  const satellite = useHeroSatellite(heroSatelliteDelay(hero.h1_pre, hero.h1_accent))
+  // Las stats forman parte del hero: entran en cascada después del título.
+  const statsStagger = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.045,
+        delayChildren: heroSatelliteDelay(hero.h1_pre, hero.h1_accent) + 0.3,
+      },
+    },
+  }
   const statsContent = { ...fallbacksFor("stats"), ...content?.stats }
   const STATS = [1, 2, 3, 4].map((n) => ({
     n: statsContent[`stat_${n}_number`] ?? "",
@@ -587,26 +599,21 @@ export function CasosClient({
       >
         <TextureOverlay texture="paperGrain" opacity={0.25} />
         <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
-          <motion.div
-            variants={fadeUpStagger}
-            initial="hidden"
-            animate="visible"
-            className="flex flex-col"
-          >
+          <div className="flex flex-col">
             <motion.p
-              variants={fadeUp}
+              {...satellite(0)}
               className="font-mono uppercase tracking-[0.22em]"
               style={{ color: "var(--color-bordo)", fontSize: "var(--fs-eyebrow)" }}
             >
               {hero.eyebrow}
             </motion.p>
             <motion.div
-              variants={fadeUp}
+              {...satellite(0.05)}
               className="mt-4 mb-4"
               style={{ width: 40, height: 1, background: "var(--color-dorado)" }}
             />
-            <motion.h1
-              variants={fadeUp}
+            <h1
+              aria-label={`${hero.h1_pre} ${hero.h1_accent}`}
               className="font-playfair font-bold leading-[1.1]"
               style={{
                 color: "var(--color-negro-bordo)",
@@ -614,24 +621,28 @@ export function CasosClient({
                 maxWidth: 700,
               }}
             >
-              {hero.h1_pre}
-              <br />
-              <em className="italic" style={{ color: "var(--color-bordo)" }}>
-                {hero.h1_accent}
-              </em>
-            </motion.h1>
+              <HeroWords text={hero.h1_pre} as="span" ariaHidden style={{ display: "block" }} />
+              <HeroWords
+                text={hero.h1_accent}
+                as="em"
+                ariaHidden
+                delay={heroNextLineDelay(hero.h1_pre)}
+                className="italic"
+                style={{ display: "block", color: "var(--color-bordo)" }}
+              />
+            </h1>
             <motion.div
-              variants={fadeUp}
+              {...satellite(0.15)}
               className="font-sans mt-6"
               style={{ fontSize: "var(--fs-body-lg)", color: "var(--color-gris-bordo)", maxWidth: 560, lineHeight: "var(--lh-relaxed)" }}
             >
               <RichText html={hero.description} className="rich-inline" />
             </motion.div>
-          </motion.div>
+          </div>
 
           {/* Stats — desktop */}
           <motion.div
-            variants={fadeUpStagger}
+            variants={statsStagger}
             initial="hidden"
             animate="visible"
             className="hidden sm:flex items-center gap-0 mt-[60px]"
@@ -661,7 +672,7 @@ export function CasosClient({
 
           {/* Stats — mobile */}
           <motion.div
-            variants={fadeUpStagger}
+            variants={statsStagger}
             initial="hidden"
             animate="visible"
             className="grid grid-cols-2 gap-8 mt-[60px] sm:hidden"

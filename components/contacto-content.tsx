@@ -11,18 +11,12 @@ import {
 } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/contacto-schema"
 import { RichText } from "@/components/ui/RichText"
-
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.12 } },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 14 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const } },
-}
+import { HeroWords, heroNextLineDelay, heroSatelliteDelay, useHeroSatellite } from "@/components/ui/hero-reveal"
 
 function ContactoHero({ c }: { c: Record<string, string> }) {
+  const satDelay = heroSatelliteDelay(c.h1_pre, c.h1_accent)
+  const satellite = useHeroSatellite(satDelay)
+
   return (
     <section
       className="flex flex-col sm:flex-row items-center flex-wrap mx-auto"
@@ -32,11 +26,11 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
         gap: "clamp(32px, 6vw, 80px)",
       }}
     >
-      {/* FOTO CIRCULAR */}
+      {/* FOTO CIRCULAR — satélite con scale-in, entra tras el título */}
       <motion.div
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.55, ease: "easeOut" }}
+        transition={{ duration: 0.55, ease: "easeOut", delay: satDelay + 0.1 }}
         style={{ flexShrink: 0 }}
       >
         <Image
@@ -57,15 +51,9 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
       </motion.div>
 
       {/* TEXTO */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="text-center sm:text-left"
-        style={{ flex: 1, minWidth: "260px" }}
-      >
+      <div className="text-center sm:text-left" style={{ flex: 1, minWidth: "260px" }}>
         <motion.p
-          variants={itemVariants}
+          {...satellite(0)}
           style={{
             fontFamily: "DM Mono, monospace",
             fontSize: "var(--fs-eyebrow)",
@@ -79,8 +67,8 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
           {c.eyebrow}
         </motion.p>
 
-        <motion.h1
-          variants={itemVariants}
+        <h1
+          aria-label={`${c.h1_pre} ${c.h1_accent}`}
           style={{
             fontFamily: "Playfair Display, serif",
             color: "#1A0008",
@@ -88,14 +76,21 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
             margin: 0,
           }}
         >
-          <span style={{ display: "block", fontSize: "calc(clamp(1.3rem, 2.5vw, 2rem) * var(--text-scale))", fontWeight: 600, opacity: 0.82 }}>
-            {c.h1_pre}
-          </span>
-          <em style={{ display: "block", fontSize: "calc(clamp(1.9rem, 4vw, 3.2rem) * var(--text-scale))", fontStyle: "italic", color: "#66001F", lineHeight: "var(--lh-tight)" }}>
-            {c.h1_accent}
-          </em>
-        </motion.h1>
-      </motion.div>
+          <HeroWords
+            text={c.h1_pre}
+            as="span"
+            ariaHidden
+            style={{ display: "block", fontSize: "calc(clamp(1.3rem, 2.5vw, 2rem) * var(--text-scale))", fontWeight: 600, opacity: 0.82 }}
+          />
+          <HeroWords
+            text={c.h1_accent}
+            as="em"
+            ariaHidden
+            delay={heroNextLineDelay(c.h1_pre)}
+            style={{ display: "block", fontSize: "calc(clamp(1.9rem, 4vw, 3.2rem) * var(--text-scale))", fontStyle: "italic", color: "#66001F", lineHeight: "var(--lh-tight)" }}
+          />
+        </h1>
+      </div>
     </section>
   )
 }
