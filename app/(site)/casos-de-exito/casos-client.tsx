@@ -732,15 +732,8 @@ export function CasosClient({
               </motion.p>
               <motion.div
                 variants={fadeUp}
-                style={{ width: 40, height: 1, background: "var(--color-dorado)", margin: "16px 0 20px" }}
+                style={{ width: 40, height: 1, background: "var(--color-dorado)", margin: "16px 0 0" }}
               />
-              <motion.h2
-                variants={fadeUp}
-                className="font-playfair font-bold"
-                style={{ fontSize: "var(--fs-h2)", color: "var(--color-negro-bordo)" }}
-              >
-                Coberturas por marca
-              </motion.h2>
             </motion.div>
 
             <ToggleAllButton allExpanded={allExpanded} onToggle={handleToggleAll} />
