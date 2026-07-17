@@ -16,6 +16,16 @@ export const WHATSAPP_HREF = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIC
   WHATSAPP_MESSAGE,
 )}`
 
+/**
+ * Canal de difusión de WhatsApp de Marian (distinto del chat 1:1 de WHATSAPP_HREF).
+ * Es el fallback del campo editable global/newsletter.whatsapp_channel_url.
+ */
+export const WHATSAPP_CHANNEL_URL =
+  "https://whatsapp.com/channel/0029Vb8FH5e2kNFqiBaeSZ2k"
+
+/** Prefijo válido para un link de canal de WhatsApp (usado para sanitizar). */
+export const WHATSAPP_CHANNEL_PREFIX = "https://whatsapp.com/"
+
 export const SOCIAL_LINKS = {
   linkedin: "https://www.linkedin.com/in/marians%C3%A1nchez/",
   instagram: "https://www.instagram.com/marian15s/",

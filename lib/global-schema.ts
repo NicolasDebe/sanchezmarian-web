@@ -4,7 +4,7 @@
  */
 import type { SectionDef } from "@/lib/content-schema"
 import { fallbacksForIn } from "@/lib/content-schema"
-import { SITE_EMAIL, SITE_TAGLINE, SOCIAL_LINKS } from "@/lib/constants"
+import { SITE_EMAIL, SITE_TAGLINE, SOCIAL_LINKS, WHATSAPP_CHANNEL_URL } from "@/lib/constants"
 
 export const GLOBAL_PAGE = "global"
 
@@ -49,6 +49,14 @@ export const GLOBAL_SECTIONS: SectionDef[] = [
       { field: "success_title", type: "text", label: "Título del estado de éxito", fallback: "¡Listo!", maxChars: 40 },
       { field: "success_message", type: "text", label: "Mensaje del estado de éxito", fallback: "Te aviso apenas haya algo nuevo.", maxChars: 120 },
       { field: "privacy_note", type: "text", label: "Nota de privacidad", fallback: "Tu email es privado. No lo compartimos.", maxChars: 120 },
+      {
+        field: "whatsapp_channel_url",
+        type: "text",
+        label: "URL del canal de WhatsApp",
+        fallback: WHATSAPP_CHANNEL_URL,
+        maxChars: 200,
+        help: "Enlace al canal de WhatsApp de Marian (botón secundario del recuadro). Tiene que empezar con https://whatsapp.com/  ·  Ejemplo: https://whatsapp.com/channel/0029Vb8FH5e2kNFqiBaeSZ2k  ·  Si lo dejás vacío o mal, el sitio usa el enlace por defecto.",
+      },
     ],
   },
   {

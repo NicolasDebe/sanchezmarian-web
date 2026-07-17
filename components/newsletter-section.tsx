@@ -1,5 +1,6 @@
 import { getNewsletterContent } from "@/lib/global-content"
 import { globalFallbacksFor } from "@/lib/global-schema"
+import { WHATSAPP_CHANNEL_URL, WHATSAPP_CHANNEL_PREFIX } from "@/lib/constants"
 import { NewsletterCard, type NewsletterCopy } from "@/components/newsletter-card"
 
 /**
@@ -11,6 +12,15 @@ export async function NewsletterSection() {
   const fb = globalFallbacksFor("newsletter")
   // Merge defensivo: si faltara algún campo, cae al fallback del esquema.
   const copy = { ...fb, ...c } as NewsletterCopy
+
+  // Blindaje del link de WhatsApp: si lo guardado no es un canal válido
+  // (vacío o mal tipeado desde el admin), caemos al enlace por defecto. Así el
+  // botón público nunca apunta a una URL rota.
+  copy.whatsapp_channel_url = copy.whatsapp_channel_url?.startsWith(
+    WHATSAPP_CHANNEL_PREFIX,
+  )
+    ? copy.whatsapp_channel_url
+    : WHATSAPP_CHANNEL_URL
 
   return (
     <section

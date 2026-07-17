@@ -301,6 +301,59 @@ body::after {
   }
 }
 
+/* Divisor «o» del CTA secundario de WhatsApp */
+.nl-or-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 24px 0;
+}
+.nl-or-line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-dorado);
+  opacity: 0.2;
+}
+.nl-or-word {
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 11px;
+  color: rgba(102, 0, 31, 0.6); /* bordó al 60% */
+}
+
+/* Botón outlined «Sumate al canal de WhatsApp» (secundario) */
+.newsletter-wa-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px 32px;
+  border: 1.5px solid var(--color-bordo);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-bordo);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.newsletter-wa-btn:hover {
+  background: var(--color-bordo);
+  color: var(--color-hueso);
+}
+.newsletter-wa-btn:focus-visible {
+  outline: 2px solid var(--color-dorado);
+  outline-offset: 2px;
+}
+/* En mobile el divisor respira un poco menos (16px arriba/abajo). */
+@media (max-width: 767px) {
+  .nl-or-divider {
+    margin: 16px 0;
+  }
+}
+
 /* ── Admin — tabla de suscriptores ── */
 .suscriptor-row {
   transition: background 0.15s ease;
