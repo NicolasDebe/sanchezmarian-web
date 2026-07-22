@@ -24,7 +24,11 @@ export async function NewsletterSection() {
 
   return (
     <section
+      id="newsletter"
+      // scroll-margin para que el ancla (#newsletter, usada desde los mails de
+      // Brevo) no quede tapada por el nav fijo al aterrizar.
       style={{
+        scrollMarginTop: 96,
         background: "var(--color-hueso)",
         padding: "clamp(80px, 12vw, 120px) 24px",
       }}

@@ -1,0 +1,98 @@
+<!-- ============================================================
+     CTA Newsletter + Canal de WhatsApp — versión EMAIL (Brevo)
+     Réplica email-safe del bloque de la web (components/newsletter-card.tsx).
+     · Todo en tablas + estilos inline (compatible Gmail/Outlook/Apple Mail).
+     · El form no puede vivir en un mail: el botón principal lleva al sitio,
+       el secundario abre el canal de WhatsApp. Ambos son links funcionales.
+     · Paleta: hueso #FEFCEF · arena #F0E8D8 · bordó #66001F ·
+       dorado #C9A882 · negro-bordó #1A0008 · gris-bordó #4A3040
+     Cómo usarlo en Brevo: en el editor drag & drop, arrastrá un bloque
+     "HTML" y pegá TODO este contenido adentro. También sirve como
+     plantilla completa vía "Importar HTML".
+     ============================================================ -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FEFCEF;">
+  <tr>
+    <td align="center" style="padding:60px 24px;">
+
+      <!-- Tarjeta arena -->
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:100%; background-color:#F0E8D8; border-radius:24px;">
+        <tr>
+          <td style="padding:48px 40px;">
+
+            <!-- Asterisco decorativo (esquina sup. derecha) -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="right" style="font-family:Georgia,serif; font-size:26px; line-height:26px; color:#C9A882; padding-bottom:4px;" aria-hidden="true">&#10035;</td>
+              </tr>
+            </table>
+
+            <!-- Eyebrow -->
+            <p style="margin:0 0 16px 0; font-family:'Courier New',Courier,monospace; font-size:12px; letter-spacing:3px; text-transform:uppercase; color:#66001F;">
+              MANTENETE AL D&Iacute;A
+            </p>
+
+            <!-- Línea dorada -->
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
+              <tr>
+                <td width="40" height="2" style="background-color:#C9A882; font-size:0; line-height:0;">&nbsp;</td>
+              </tr>
+            </table>
+
+            <!-- Título -->
+            <h2 style="margin:0 0 14px 0; font-family:'Playfair Display',Georgia,'Times New Roman',serif; font-size:30px; line-height:1.2; font-weight:700; color:#1A0008;">
+              Recib&iacute; cada nueva campa&ntilde;a <em style="font-style:italic; color:#66001F;">en tu casilla.</em>
+            </h2>
+
+            <!-- Subtítulo -->
+            <p style="margin:0 0 32px 0; font-family:Arial,Helvetica,sans-serif; font-size:16px; line-height:1.6; color:#4A3040;">
+              Historias reales de comunicaci&oacute;n con prop&oacute;sito, directo desde Mendoza.
+            </p>
+
+            <!-- Botón principal (bordó) → lleva al sitio, donde el form sí funciona -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" bgcolor="#66001F" style="border-radius:999px;">
+                  <a href="https://www.sanchezmarian.com/#newsletter"
+                     target="_blank"
+                     style="display:block; padding:16px 32px; font-family:Arial,Helvetica,sans-serif; font-size:16px; font-weight:bold; color:#FEFCEF; text-decoration:none; border-radius:999px;">
+                    Quiero recibirla &nbsp;&#8594;
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Divisor «o» -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0;">
+              <tr>
+                <td width="42%" style="border-top:1px solid #D9CBB4; font-size:0; line-height:0;">&nbsp;</td>
+                <td align="center" style="font-family:'Courier New',Courier,monospace; font-size:13px; color:#4A3040; padding:0 12px;">o</td>
+                <td width="42%" style="border-top:1px solid #D9CBB4; font-size:0; line-height:0;">&nbsp;</td>
+              </tr>
+            </table>
+
+            <!-- Botón secundario (outlined) → canal de WhatsApp -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="border:1.5px solid #66001F; border-radius:999px;">
+                  <a href="https://whatsapp.com/channel/0029Vb8FH5e2kNFqiBaeSZ2k"
+                     target="_blank"
+                     style="display:block; padding:14px 32px; font-family:Arial,Helvetica,sans-serif; font-size:16px; font-weight:bold; color:#66001F; text-decoration:none; border-radius:999px;">
+                    &#128172;&nbsp; Sumate al canal de WhatsApp
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Nota de privacidad -->
+            <p style="margin:18px 0 0 0; font-family:'Courier New',Courier,monospace; font-size:12px; line-height:1.5; color:#4A3040;">
+              &#128274;&nbsp; Tu email es privado. No lo compartimos.
+            </p>
+
+          </td>
+        </tr>
+      </table>
+      <!-- /Tarjeta arena -->
+
+    </td>
+  </tr>
+</table>
