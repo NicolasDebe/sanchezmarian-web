@@ -3,6 +3,7 @@ import { Stats } from "@/components/stats"
 import { Ideas } from "@/components/ideas"
 import { Clientes } from "@/components/clientes"
 import { HomeServicios } from "@/components/home-servicios"
+import { NewsletterSection } from "@/components/newsletter-section"
 import { Conexiones } from "@/components/conexiones"
 import { Bio } from "@/components/bio"
 import { CtaFinal } from "@/components/cta-final"
@@ -74,6 +75,10 @@ export default async function Home() {
       <Stats content={stats} />
       <Ideas content={metodo} scales={scales} />
       <Clientes />
+      {/* Newsletter + canal de WhatsApp: montado tras el social proof (logos de
+          clientes) para máxima motivación y visibilidad a media página. Reutiliza
+          el bloque compartido (mismo copy editable en global/newsletter). */}
+      <NewsletterSection />
       <HomeServicios
         servicios={{
           servicio_01: servicio1,

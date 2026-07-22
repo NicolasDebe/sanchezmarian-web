@@ -37,7 +37,7 @@ export const GLOBAL_SECTIONS: SectionDef[] = [
     section: "newsletter",
     title: "Newsletter (captura de mails)",
     legend:
-      "Textos del recuadro de suscripción que aparece en Campañas y Casos de éxito. El acento del título va en itálica + bordó (editás solo el texto).",
+      "Textos del recuadro de suscripción que aparece en el Home, Campañas y Casos de éxito. El acento del título va en itálica + bordó (editás solo el texto).",
     fields: [
       { field: "eyebrow", type: "text", label: "Eyebrow (línea superior)", fallback: "MANTENETE AL DÍA", maxChars: 40 },
       { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Recibí cada nueva campaña", maxChars: 80 },
