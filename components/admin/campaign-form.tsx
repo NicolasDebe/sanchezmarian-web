@@ -8,6 +8,7 @@ import { Check, Eye, Pencil, Trash2, X } from "lucide-react"
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { PhotoManager, type PhotoManagerHandle } from "@/components/admin/PhotoManager"
 import { STATUS_LABELS, type Campaign, type CampaignStatus } from "@/lib/types/campaign"
+import { CLIENT_LOGOS, findClient } from "@/lib/client-logos"
 import {
   checkSlugAvailability,
   createCampaign,
@@ -131,6 +132,11 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
 
   const [title, setTitle] = useState(initial?.title ?? "")
   const [brand, setBrand] = useState(initial?.brand ?? "")
+  // "Otro": marca personalizada que no está en el catálogo de clientes (sin
+  // logo). Se activa al editar una campaña cuya marca no matchea ningún cliente.
+  const [customBrand, setCustomBrand] = useState(
+    () => !!initial?.brand?.trim() && !findClient(initial.brand),
+  )
   const [slug, setSlug] = useState(initial?.slug ?? "")
   const [slugManual, setSlugManual] = useState(isEdit)
   const [slugEditing, setSlugEditing] = useState(false)
@@ -320,16 +326,80 @@ export function CampaignForm({ initial }: { initial?: Campaign }) {
             />
           </Field>
 
-          <Field label="Marca / Cliente" error={errors.brand}>
-            <input
-              className="admin-input"
-              value={brand}
-              onChange={(e) => {
-                setBrand(e.target.value)
-                clearError("brand")
-              }}
-              placeholder="Ej.: Grupo Presidente"
-            />
+          <Field label="Cliente" error={errors.brand}>
+            {(() => {
+              const selected = customBrand ? null : findClient(brand)
+              return (
+                <div className="flex items-center gap-3">
+                  <div
+                    className="grid place-items-center overflow-hidden rounded-full"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      flexShrink: 0,
+                      background: selected ? "#FFFFFF" : "var(--color-arena)",
+                      border: "1px solid rgba(201,168,130,0.5)",
+                    }}
+                  >
+                    {selected ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={selected.logo}
+                        alt={selected.name}
+                        style={{ maxWidth: 32, maxHeight: 32, width: "auto", height: "auto", objectFit: "contain" }}
+                      />
+                    ) : (
+                      <span
+                        className="font-playfair font-bold"
+                        style={{ fontSize: 18, color: "var(--color-bordo)" }}
+                      >
+                        {(brand.trim()[0] ?? "?").toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <select
+                    className="admin-input"
+                    style={{ flex: 1 }}
+                    value={customBrand ? "__custom__" : selected?.name ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      if (v === "__custom__") {
+                        setCustomBrand(true)
+                        setBrand("")
+                      } else {
+                        setCustomBrand(false)
+                        setBrand(v)
+                      }
+                      clearError("brand")
+                    }}
+                  >
+                    <option value="" disabled>
+                      Elegí un cliente…
+                    </option>
+                    {CLIENT_LOGOS.map((c) => (
+                      <option key={c.name} value={c.name}>
+                        {c.name}
+                      </option>
+                    ))}
+                    <option value="__custom__">Otro (escribir a mano)</option>
+                  </select>
+                </div>
+              )
+            })()}
+            {customBrand && (
+              <input
+                className="admin-input mt-2"
+                value={brand}
+                onChange={(e) => {
+                  setBrand(e.target.value)
+                  clearError("brand")
+                }}
+                placeholder="Nombre de la marca (sin logo)"
+              />
+            )}
+            <p className="mt-1.5 font-sans text-xs" style={{ color: "rgba(74,48,64,0.55)" }}>
+              El logo del cliente se muestra como foto de perfil en la campaña.
+            </p>
           </Field>
 
           <Field label="Slug" error={errors.slug}>

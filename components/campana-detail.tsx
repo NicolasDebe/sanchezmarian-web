@@ -8,6 +8,7 @@ import { MotionLink } from "@/components/ui/motion-link"
 import { CampaignSlideshow } from "@/components/campaign-slideshow"
 import { RichText } from "@/components/ui/RichText"
 import { STATUS_LABELS, type Campaign } from "@/lib/types/campaign"
+import { findClientLogo } from "@/lib/client-logos"
 
 function StatusBadge({ status }: { status: Campaign["status"] }) {
   const styles: Record<Campaign["status"], React.CSSProperties> = {
@@ -46,6 +47,9 @@ export function CampanaDetail({
     .map((img) => ({ src: img.url, alt: img.alt || campaign.title }))
 
   const initial = campaign.brand.trim()[0]?.toUpperCase() ?? "?"
+  // Logo del cliente al que pertenece la campaña (derivado de la marca). Si se
+  // reconoce, se usa como "foto de perfil"; si no, cae a la inicial en círculo.
+  const clientLogo = findClientLogo(campaign.brand)
 
   return (
     <section
@@ -74,23 +78,53 @@ export function CampanaDetail({
             className="flex flex-col sm:flex-row items-start sm:items-center"
             style={{ gap: "clamp(16px, 3vw, 40px)", marginBottom: 40 }}
           >
-            <div
-              className="font-playfair"
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: "50%",
-                background: "var(--color-bordo)",
-                color: "var(--color-hueso)",
-                display: "grid",
-                placeItems: "center",
-                fontSize: "calc(24px * var(--text-scale))",
-                fontWeight: 700,
-                flexShrink: 0,
-              }}
-            >
-              {initial}
-            </div>
+            {clientLogo ? (
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  background: "#FFFFFF",
+                  border: "1px solid rgba(102,0,31,0.12)",
+                  display: "grid",
+                  placeItems: "center",
+                  overflow: "hidden",
+                  flexShrink: 0,
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={clientLogo}
+                  alt={`Logo de ${campaign.brand}`}
+                  style={{
+                    maxWidth: 42,
+                    maxHeight: 42,
+                    width: "auto",
+                    height: "auto",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
+            ) : (
+              <div
+                className="font-playfair"
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  background: "var(--color-bordo)",
+                  color: "var(--color-hueso)",
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: "calc(24px * var(--text-scale))",
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}
+              >
+                {initial}
+              </div>
+            )}
 
             <div>
               <p
