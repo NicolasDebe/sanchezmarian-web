@@ -18,7 +18,7 @@ function IconWA() {
   )
 }
 
-const LABEL = "font-mono text-[var(--fs-micro)] uppercase tracking-[0.15em] text-gris-tx"
+const LABEL = "font-mono text-[length:var(--fs-micro)] uppercase tracking-[0.15em] text-gris-tx"
 // text-base (16px) evita el zoom automático de iOS al enfocar inputs.
 const INPUT_BASE = "bg-white border rounded-xl px-4 py-3 font-sans text-base text-marino placeholder:text-gris-tx/40 focus:outline-none transition-colors w-full"
 const INPUT_OK = "border-marino/15 focus:border-terracota/60"
@@ -150,7 +150,7 @@ export function ContactForm() {
       <div className="flex flex-col gap-1.5">
         <label htmlFor="cf-empresa" className={LABEL}>
           Empresa u organización{" "}
-          <span className="normal-case tracking-normal opacity-50 font-sans text-[var(--fs-micro)]">(opcional)</span>
+          <span className="normal-case tracking-normal opacity-50 font-sans text-[length:var(--fs-micro)]">(opcional)</span>
         </label>
         <input
           id="cf-empresa"

@@ -34,13 +34,13 @@ export default function PrivacidadPage() {
     <>
       <section className="bg-arena pt-32 pb-16">
         <div className="max-w-[800px] mx-auto px-6 lg:px-8">
-          <p className="font-mono text-[var(--fs-micro)] uppercase tracking-[0.22em] text-terracota mb-4">
+          <p className="font-mono text-[length:var(--fs-micro)] uppercase tracking-[0.22em] text-terracota mb-4">
             Legal
           </p>
           <h1 className="font-playfair font-bold text-marino text-[calc(2.25rem*var(--text-scale))] sm:text-[calc(2.75rem*var(--text-scale))] leading-[1.1]">
             Política de Privacidad
           </h1>
-          <p className="font-mono text-[var(--fs-micro)] text-gris-tx/50 mt-4">
+          <p className="font-mono text-[length:var(--fs-micro)] text-gris-tx/50 mt-4">
             Última actualización: mayo 2026
           </p>
         </div>
@@ -50,15 +50,15 @@ export default function PrivacidadPage() {
         <div className="max-w-[800px] mx-auto px-6 lg:px-8 flex flex-col gap-10">
           {SECTIONS.map((s) => (
             <div key={s.title} className="flex flex-col gap-3">
-              <h2 className="font-playfair font-bold text-marino text-[var(--fs-lead)]">{s.title}</h2>
-              <p className="font-sans text-[var(--fs-body-lg)] text-gris-tx leading-[1.7]">{s.body}</p>
+              <h2 className="font-playfair font-bold text-marino text-[length:var(--fs-lead)]">{s.title}</h2>
+              <p className="font-sans text-[length:var(--fs-body-lg)] text-gris-tx leading-[1.7]">{s.body}</p>
             </div>
           ))}
 
           <div className="pt-4 border-t border-marino/10">
             <Link
               href="/"
-              className="font-sans text-[var(--fs-caption)] font-medium text-terracota hover:text-marino transition-colors"
+              className="font-sans text-[length:var(--fs-caption)] font-medium text-terracota hover:text-marino transition-colors"
             >
               ← Volver al inicio
             </Link>
