@@ -31,6 +31,8 @@ export function TextSizePreviewBridge() {
         `[data-fkey="${cssEscape(fkey)}"]`,
       )
       els.forEach((el) => {
+        const sizeBefore = getComputedStyle(el).fontSize
+
         if (mf === 1 && df === 1) {
           el.removeAttribute("data-fscale")
           el.style.removeProperty("--fs-local-m")
@@ -44,6 +46,20 @@ export function TextSizePreviewBridge() {
         // al volver a "default" la restauramos en vez de borrarla a ciegas.
         if (!("fkeyFontOrig" in el.dataset)) el.dataset.fkeyFontOrig = el.style.fontFamily
         el.style.fontFamily = family ?? el.dataset.fkeyFontOrig ?? ""
+
+        // En algunos elementos el navegador no recomputa el font-size al recibir
+        // [data-fscale] por JS: los tokens --fs-* locales quedan bien, pero el
+        // tamaño usado no se actualiza (ni forzando un font-size absoluto). Un
+        // toggle de display lo obliga a recalcular. Solo pasa acá, aplicando en
+        // caliente: el sitio público trae el atributo en el HTML del servidor y
+        // computa de cero. Se hace únicamente si el tamaño no reaccionó, para
+        // no forzar reflows de más mientras se mueve el slider.
+        if (getComputedStyle(el).fontSize === sizeBefore) {
+          const prev = el.style.display
+          el.style.display = "none"
+          void el.offsetHeight
+          el.style.display = prev
+        }
       })
     }
 
