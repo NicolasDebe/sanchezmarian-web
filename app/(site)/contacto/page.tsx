@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { ContactoContent } from "@/components/contacto-content"
-import { getPageContent } from "@/lib/content"
+import { getPageContent, getTextScales } from "@/lib/content"
 import { CONTACTO_SECTIONS } from "@/lib/contacto-schema"
 import { buildMetadata, SITE_URL } from "@/lib/seo"
 
@@ -11,7 +11,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactoPage() {
-  const content = await getPageContent("contacto", CONTACTO_SECTIONS)
+  const [content, scales] = await Promise.all([
+    getPageContent("contacto", CONTACTO_SECTIONS),
+    // Tamaños/fuentes por campo (títulos, datos y preguntas frecuentes).
+    getTextScales("contacto"),
+  ])
 
-  return <ContactoContent content={content} />
+  return <ContactoContent content={content} scales={scales} />
 }

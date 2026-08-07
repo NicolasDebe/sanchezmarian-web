@@ -51,7 +51,10 @@ function HeroSection({ hero, scales }: { hero: Record<string, string>; scales?: 
       <div className="relative mx-auto grid w-full items-center gap-x-12 gap-y-14 lg:grid-cols-[1fr_auto]" style={{ maxWidth: 1180 }}>
         <div>
           <motion.div {...satellite(0)} className="mb-7">
-            <span className="inline-flex items-center gap-2 rounded-full border border-dorado/60 bg-arena/40 font-mono uppercase text-bordo" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", padding: "8px 16px" }}>
+            <span
+              className="inline-flex items-center gap-2 rounded-full border border-dorado/60 bg-arena/40 font-mono uppercase text-bordo"
+              {...fsStyle(scales?.["hero.eyebrow"], { fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", padding: "8px 16px" }, "hero.eyebrow")}
+            >
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-dorado" />
               {eyebrow}
             </span>
@@ -91,9 +94,14 @@ function HeroSection({ hero, scales }: { hero: Record<string, string>; scales?: 
 /* ════════════════════════════════════════════════════════════════════════
    SISTEMA VISUAL ÚNICO — átomos, card reutilizable y listas con guión.
    ════════════════════════════════════════════════════════════════════════ */
-function Eyebrow({ children, centered }: { children: ReactNode; centered?: boolean }) {
+/* Los átomos aceptan `scale`/`fkey` para que CUALQUIER texto editable pueda
+   ajustarse desde /admin sin duplicar markup: el fkey viaja al elemento real. */
+function Eyebrow({ children, centered, scale, fkey }: { children: ReactNode; centered?: boolean; scale?: FieldScale; fkey?: string }) {
   return (
-    <p className="font-mono uppercase text-bordo" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", textAlign: centered ? "center" : "left" }}>
+    <p
+      className="font-mono uppercase text-bordo"
+      {...fsStyle(scale, { fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", textAlign: centered ? "center" : "left" }, fkey)}
+    >
       {children}
     </p>
   )
@@ -112,9 +120,12 @@ function BlockTitle({ children, scale, fkey }: { children: ReactNode; scale?: Fi
   )
 }
 /* Label: DM Mono uppercase --bordo opacity 0.7. */
-function Label({ children }: { children: ReactNode }) {
+function Label({ children, scale, fkey }: { children: ReactNode; scale?: FieldScale; fkey?: string }) {
   return (
-    <p className="font-mono uppercase text-bordo/70" style={{ fontSize: "var(--fs-micro)", letterSpacing: "0.18em" }}>
+    <p
+      className="font-mono uppercase text-bordo/70"
+      {...fsStyle(scale, { fontSize: "var(--fs-micro)", letterSpacing: "0.18em" }, fkey)}
+    >
       {children}
     </p>
   )
@@ -133,9 +144,12 @@ function Intro({ text, scale, fkey }: { text?: string; scale?: FieldScale; fkey?
 
 /* Listas de la página: guión corto (—) en --bordo, indent y line-height 1.7.
    `twoCol` divide la lista en 2 columnas dentro de la card (solo desktop). */
-function DashList({ items, twoCol }: { items?: string; twoCol?: boolean }) {
+function DashList({ items, twoCol, scale, fkey }: { items?: string; twoCol?: boolean; scale?: FieldScale; fkey?: string }) {
   return (
-    <ul className={twoCol ? "pl-4 sm:columns-2 sm:gap-x-12" : "flex flex-col gap-2 pl-4"}>
+    <ul
+      className={twoCol ? "pl-4 sm:columns-2 sm:gap-x-12" : "flex flex-col gap-2 pl-4"}
+      {...fsStyle(scale, undefined, fkey)}
+    >
       {lines(items).map((it, i) => (
         <li
           key={i}
@@ -173,7 +187,9 @@ function BlockHeader({ c, section, scales }: { c: Record<string, string>; sectio
   const eyebrow = (c.eyebrow ?? "").trim()
   return (
     <div style={{ maxWidth: 760 }}>
-      {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
+      {eyebrow ? (
+        <Eyebrow scale={scales?.[`${section}.eyebrow`]} fkey={`${section}.eyebrow`}>{eyebrow}</Eyebrow>
+      ) : null}
       <GoldLine flush={!eyebrow} />
       <BlockTitle scale={scales?.[`${section}.title`]} fkey={`${section}.title`}>{c.title}</BlockTitle>
       <Intro text={c.intro} scale={scales?.[`${section}.intro`]} fkey={`${section}.intro`} />
@@ -185,25 +201,30 @@ function BlockHeader({ c, section, scales }: { c: Record<string, string>; sectio
    SECCIÓN 2 — PILARES (3 cards, jerarquía por línea dorada) — fondo --arena
    ════════════════════════════════════════════════════════════════════════ */
 function PilaresSection({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
-  const pilares = [
-    { title: c.pilar_1_title, items: c.pilar_1_items },
-    { title: c.pilar_2_title, items: c.pilar_2_items },
-    { title: c.pilar_3_title, items: c.pilar_3_items },
-  ]
+  const pilares = [1, 2, 3].map((n) => ({
+    n,
+    title: c[`pilar_${n}_title`],
+    items: c[`pilar_${n}_items`],
+  }))
   return (
     <Section bg="bg-arena">
       <div style={{ maxWidth: 760 }}>
-        <Eyebrow>{c.eyebrow}</Eyebrow>
+        <Eyebrow scale={scales?.["pilares.eyebrow"]} fkey="pilares.eyebrow">{c.eyebrow}</Eyebrow>
         <GoldLine />
         <BlockTitle scale={scales?.["pilares.title"]} fkey="pilares.title">{c.title}</BlockTitle>
       </div>
 
       <div className="mt-12 grid gap-4 md:mt-14 md:grid-cols-3 md:gap-6">
         {pilares.map((p) => (
-          <ServiceFeatureCard key={p.title} className="flex flex-col">
+          <ServiceFeatureCard key={p.n} className="flex flex-col">
             <span aria-hidden className="mb-5 h-px w-8 bg-dorado" />
-            <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "calc(24px * var(--text-scale))", lineHeight: 1.2, marginBottom: 16 }}>{p.title}</p>
-            <DashList items={p.items} />
+            <p
+              className="font-playfair font-bold text-negro-bordo"
+              {...fsStyle(scales?.[`pilares.pilar_${p.n}_title`], { fontSize: "calc(24px * var(--text-scale))", lineHeight: 1.2, marginBottom: 16 }, `pilares.pilar_${p.n}_title`)}
+            >
+              {p.title}
+            </p>
+            <DashList items={p.items} scale={scales?.[`pilares.pilar_${p.n}_items`]} fkey={`pilares.pilar_${p.n}_items`} />
           </ServiceFeatureCard>
         ))}
       </div>
@@ -212,7 +233,7 @@ function PilaresSection({ c, scales }: { c: Record<string, string>; scales?: Fie
       {c.intro_note?.trim() && (
         <p
           className="font-sans italic text-gris-bordo text-center"
-          style={{ fontSize: "var(--fs-body)", lineHeight: 1.75, maxWidth: 720, margin: "56px auto 0" }}
+          {...fsStyle(scales?.["pilares.intro_note"], { fontSize: "var(--fs-body)", lineHeight: 1.75, maxWidth: 720, margin: "56px auto 0" }, "pilares.intro_note")}
         >
           {c.intro_note}
         </p>
@@ -226,20 +247,30 @@ function PilaresSection({ c, scales }: { c: Record<string, string>; scales?: Fie
    ════════════════════════════════════════════════════════════════════════ */
 function Bloque01({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   const points = [1, 2, 3, 4]
-    .map((n) => ({ title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
+    .map((n) => ({ n, title: c[`sub_${n}_title`] ?? "", desc: c[`sub_${n}_desc`] ?? "" }))
     .filter((p) => p.title.trim())
 
   return (
     <Section bg="bg-hueso" id="servicio-1">
       <BlockHeader c={c} section="servicio_01" scales={scales} />
       <div className="mt-12">
-        <Label>{c.includes_label}</Label>
+        <Label scale={scales?.["servicio_01.includes_label"]} fkey="servicio_01.includes_label">{c.includes_label}</Label>
         <div className="mt-6 grid gap-4 md:grid-cols-2 md:gap-6">
           {points.map((p) => (
-            <ServiceFeatureCard key={p.title}>
+            <ServiceFeatureCard key={p.n}>
               <span aria-hidden className="mb-4 block h-1.5 w-1.5 rounded-full bg-dorado" />
-              <p className="font-sans font-medium text-negro-bordo" style={{ fontSize: "calc(18px * var(--text-scale))", lineHeight: 1.3 }}>{p.title}</p>
-              <p className="mt-2 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body)", lineHeight: 1.7 }}>{p.desc}</p>
+              <p
+                className="font-sans font-medium text-negro-bordo"
+                {...fsStyle(scales?.[`servicio_01.sub_${p.n}_title`], { fontSize: "calc(18px * var(--text-scale))", lineHeight: 1.3 }, `servicio_01.sub_${p.n}_title`)}
+              >
+                {p.title}
+              </p>
+              <p
+                className="mt-2 font-sans text-gris-bordo"
+                {...fsStyle(scales?.[`servicio_01.sub_${p.n}_desc`], { fontSize: "var(--fs-body)", lineHeight: 1.7 }, `servicio_01.sub_${p.n}_desc`)}
+              >
+                {p.desc}
+              </p>
             </ServiceFeatureCard>
           ))}
         </div>
@@ -249,11 +280,30 @@ function Bloque01({ c, scales }: { c: Record<string, string>; scales?: FieldScal
 }
 
 /* Card de modalidad / sub-bloque: título Playfair + lista con guiones. */
-function TitledCard({ title, items }: { title: string; items: string }) {
+function TitledCard({
+  title,
+  items,
+  scales,
+  section,
+  titleField,
+  itemsField,
+}: {
+  title: string
+  items: string
+  scales?: FieldScaleMap
+  section: string
+  titleField: string
+  itemsField: string
+}) {
   return (
     <ServiceFeatureCard>
-      <p className="font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: 1.2, marginBottom: 20 }}>{title}</p>
-      <DashList items={items} />
+      <p
+        className="font-playfair font-bold text-negro-bordo"
+        {...fsStyle(scales?.[`${section}.${titleField}`], { fontSize: "var(--fs-lead)", lineHeight: 1.2, marginBottom: 20 }, `${section}.${titleField}`)}
+      >
+        {title}
+      </p>
+      <DashList items={items} scale={scales?.[`${section}.${itemsField}`]} fkey={`${section}.${itemsField}`} />
     </ServiceFeatureCard>
   )
 }
@@ -266,13 +316,13 @@ function Bloque02({ c, scales }: { c: Record<string, string>; scales?: FieldScal
     <Section bg="bg-arena" id="servicio-2">
       <BlockHeader c={c} section="servicio_02" scales={scales} />
       <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
-        <TitledCard title={c.organica_label} items={c.organica_items} />
-        <TitledCard title={c.pautada_label} items={c.pautada_items} />
+        <TitledCard title={c.organica_label} items={c.organica_items} scales={scales} section="servicio_02" titleField="organica_label" itemsField="organica_items" />
+        <TitledCard title={c.pautada_label} items={c.pautada_items} scales={scales} section="servicio_02" titleField="pautada_label" itemsField="pautada_items" />
       </div>
       <ServiceFeatureCard className="mt-4 md:mt-6">
-        <Label>{c.includes_label}</Label>
+        <Label scale={scales?.["servicio_02.includes_label"]} fkey="servicio_02.includes_label">{c.includes_label}</Label>
         <div className="mt-5">
-          <DashList items={c.includes_items} twoCol />
+          <DashList items={c.includes_items} twoCol scale={scales?.["servicio_02.includes_items"]} fkey="servicio_02.includes_items" />
         </div>
       </ServiceFeatureCard>
     </Section>
@@ -287,20 +337,31 @@ function Bloque03({ c, scales }: { c: Record<string, string>; scales?: FieldScal
     <Section bg="bg-hueso" id="servicio-3">
       <BlockHeader c={c} section="servicio_03" scales={scales} />
       <ServiceFeatureCard className="mt-10">
-        <Label>{c.includes_label}</Label>
+        <Label scale={scales?.["servicio_03.includes_label"]} fkey="servicio_03.includes_label">{c.includes_label}</Label>
         <div className="mt-5">
-          <DashList items={c.includes_items} />
+          <DashList items={c.includes_items} scale={scales?.["servicio_03.includes_items"]} fkey="servicio_03.includes_items" />
         </div>
       </ServiceFeatureCard>
 
       {c.closing?.trim() && (
-        <p className="mt-7 font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)", maxWidth: 820 }}>{c.closing}</p>
+        <p
+          className="mt-7 font-sans text-gris-bordo"
+          {...fsStyle(scales?.["servicio_03.closing"], { fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)", maxWidth: 820 }, "servicio_03.closing")}
+        >
+          {c.closing}
+        </p>
       )}
 
       <ServiceFeatureCard className="mt-4 md:mt-6">
-        <Label>{c.sub_label}</Label>
-        <p className="mt-3 font-playfair font-bold text-negro-bordo" style={{ fontSize: "var(--fs-lead)", lineHeight: 1.2 }}>{c.sub_title}</p>
-        <div className="mt-3 flex flex-col gap-4">
+        <Label scale={scales?.["servicio_03.sub_label"]} fkey="servicio_03.sub_label">{c.sub_label}</Label>
+        <p
+          className="mt-3 font-playfair font-bold text-negro-bordo"
+          {...fsStyle(scales?.["servicio_03.sub_title"], { fontSize: "var(--fs-lead)", lineHeight: 1.2 }, "servicio_03.sub_title")}
+        >
+          {c.sub_title}
+        </p>
+        {/* El fkey va en el contenedor: los párrafos heredan el --text-scale local. */}
+        <div className="mt-3 flex flex-col gap-4" {...fsStyle(scales?.["servicio_03.sub_desc"], undefined, "servicio_03.sub_desc")}>
           {paragraphs(c.sub_desc).map((p, i) => (
             <p key={i} className="font-sans text-gris-bordo" style={{ fontSize: "var(--fs-body-lg)", lineHeight: "var(--lh-relaxed)" }}>{p}</p>
           ))}
@@ -318,8 +379,8 @@ function Bloque04({ c, scales }: { c: Record<string, string>; scales?: FieldScal
     <Section bg="bg-arena" id="servicio-4">
       <BlockHeader c={c} section="servicio_04" scales={scales} />
       <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
-        <TitledCard title={c.oratoria_label} items={c.oratoria_items} />
-        <TitledCard title={c.imagen_label} items={c.imagen_items} />
+        <TitledCard title={c.oratoria_label} items={c.oratoria_items} scales={scales} section="servicio_04" titleField="oratoria_label" itemsField="oratoria_items" />
+        <TitledCard title={c.imagen_label} items={c.imagen_items} scales={scales} section="servicio_04" titleField="imagen_label" itemsField="imagen_items" />
       </div>
     </Section>
   )
@@ -339,7 +400,12 @@ function FinalCTA({ c, scales }: { c: Record<string, string>; scales?: FieldScal
         className="mx-auto flex flex-col items-center"
         style={{ maxWidth: 640 }}
       >
-        <p className="font-mono uppercase text-hueso/70" style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em" }}>{c.eyebrow}</p>
+        <p
+          className="font-mono uppercase text-hueso/70"
+          {...fsStyle(scales?.["cta.eyebrow"], { fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em" }, "cta.eyebrow")}
+        >
+          {c.eyebrow}
+        </p>
         <div className="bg-dorado" style={{ width: 40, height: 1, margin: "16px auto 24px" }} />
         <h2 className="font-playfair font-bold text-hueso" {...fsStyle(scales?.["cta.title"], { fontSize: "var(--fs-h1)", lineHeight: "var(--lh-tight)", letterSpacing: "-0.02em" }, "cta.title")}>
           {c.title}

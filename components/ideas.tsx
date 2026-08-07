@@ -8,6 +8,7 @@ import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 export function Ideas({ content, scales }: { content?: Record<string, string>; scales?: FieldScaleMap }) {
   const c = { ...fallbacksFor("metodo"), ...content }
   const PASOS = [1, 2, 3, 4, 5].map((n) => ({
+    n,
     num: String(n).padStart(2, "0"),
     title: c[`step_${n}_title`] ?? "",
     body: c[`step_${n}_desc`] ?? "",
@@ -28,7 +29,7 @@ export function Ideas({ content, scales }: { content?: Record<string, string>; s
           <motion.p
             variants={fadeUp}
             className="font-mono uppercase tracking-[0.28em] text-bordo-claro/70 mb-5"
-            style={{ fontSize: "var(--fs-eyebrow)" }}
+            {...fsStyle(scales?.["metodo.eyebrow"], { fontSize: "var(--fs-eyebrow)" }, "metodo.eyebrow")}
           >
             {c.eyebrow}
           </motion.p>
@@ -71,10 +72,16 @@ export function Ideas({ content, scales }: { content?: Record<string, string>; s
 
                 {/* Columna derecha — contenido */}
                 <div className={`flex flex-col gap-1 ${isLast ? "" : "pb-10"}`}>
-                  <p className="font-sans font-semibold text-negro-bordo" style={{ fontSize: "var(--fs-body-lg)" }}>
+                  <p
+                    className="font-sans font-semibold text-negro-bordo"
+                    {...fsStyle(scales?.[`metodo.step_${paso.n}_title`], { fontSize: "var(--fs-body-lg)" }, `metodo.step_${paso.n}_title`)}
+                  >
                     {paso.title}
                   </p>
-                  <p className="font-sans text-gris-bordo leading-relaxed" style={{ fontSize: "var(--fs-caption)" }}>
+                  <p
+                    className="font-sans text-gris-bordo leading-relaxed"
+                    {...fsStyle(scales?.[`metodo.step_${paso.n}_desc`], { fontSize: "var(--fs-caption)" }, `metodo.step_${paso.n}_desc`)}
+                  >
                     {paso.body}
                   </p>
                 </div>

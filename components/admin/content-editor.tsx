@@ -12,7 +12,7 @@ import {
 import { RichTextEditor } from "@/components/admin/RichTextEditor"
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog"
 import { hasHtmlTags, htmlToPlainText, plainToHtml } from "@/lib/rich-text"
-import { TEXT_SIZE_KEYS, sizeIndex, sizeLabel, FIELD_FONTS } from "@/lib/text-size"
+import { TEXT_SIZE_KEYS, sizeIndex, sizeLabel, fontLabel, FIELD_FONTS } from "@/lib/text-size"
 import type { FieldType, SelectOption } from "@/lib/content-schema"
 
 const MAX = { text: 250, longtext: 2000, number: 20 } as const
@@ -117,6 +117,10 @@ export function ContentEditor({
         ]),
       ),
   )
+  // Qué paneles "Apariencia del texto" están abiertos (clave: "section.field").
+  // Arrancan cerrados: casi todos los campos son ajustables, y con el panel
+  // siempre abierto el formulario se volvía inmanejable de scrollear.
+  const [openStyle, setOpenStyle] = useState<Record<string, boolean>>({})
   const [status, setStatus] = useState<Record<string, Status>>({})
   const [messages, setMessages] = useState<Record<string, string>>({})
   // Undo: sección con el modal abierto, fecha del backup y estado de carga.
@@ -521,27 +525,63 @@ export function ContentEditor({
                         {f.resizable && (() => {
                           const fkey = `${sec.section}.${f.field}`
                           const cur = sizes[sec.section]?.[f.field] ?? { m: "normal", d: "normal" }
+                          const curFont = fonts[sec.section]?.[f.field] ?? "default"
                           const maxIdx = TEXT_SIZE_KEYS.length - 1
+                          const isOpen = openStyle[fkey] ?? false
+                          // ¿Este campo tiene algún ajuste, o está tal cual el diseño?
+                          const touched =
+                            cur.m !== "normal" || cur.d !== "normal" || curFont !== "default"
+                          const summary = touched
+                            ? `Compu: ${sizeLabel(cur.d)} · Celular: ${sizeLabel(cur.m)}${curFont === "default" ? "" : ` · ${fontLabel(curFont)}`}`
+                            : "Sin cambios"
                           return (
                             <div
-                              className="mt-1 rounded-lg px-3 py-3"
+                              className="mt-1 rounded-lg px-3 py-2.5"
                               style={{
-                                backgroundColor: "rgba(201,168,130,0.10)",
-                                border: "1px solid rgba(201,168,130,0.25)",
+                                backgroundColor: touched
+                                  ? "rgba(201,168,130,0.18)"
+                                  : "rgba(201,168,130,0.08)",
+                                border: `1px solid rgba(201,168,130,${touched ? 0.5 : 0.22})`,
                               }}
                             >
-                              <div className="mb-2 flex items-center justify-between gap-2">
-                                <span
-                                  className="font-mono uppercase"
-                                  style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-bordo)" }}
+                              <div className="flex items-center justify-between gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setOpenStyle((o) => ({ ...o, [fkey]: !isOpen }))
+                                  }
+                                  className="flex min-w-0 flex-1 items-center gap-2 text-left transition-opacity hover:opacity-70"
+                                  aria-expanded={isOpen}
                                 >
-                                  Apariencia del texto
-                                </span>
-                                {showPreview && (
+                                  <span
+                                    className="font-mono"
+                                    style={{ fontSize: 10, color: "var(--color-dorado)" }}
+                                  >
+                                    {isOpen ? "▾" : "▸"}
+                                  </span>
+                                  <span
+                                    className="shrink-0 font-mono uppercase"
+                                    style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--color-bordo)" }}
+                                  >
+                                    Apariencia del texto
+                                  </span>
+                                  <span
+                                    className="truncate font-sans"
+                                    style={{
+                                      fontSize: 11,
+                                      color: touched
+                                        ? "var(--color-negro-bordo)"
+                                        : "rgba(74,48,64,0.5)",
+                                    }}
+                                  >
+                                    {summary}
+                                  </span>
+                                </button>
+                                {isOpen && showPreview && (
                                   <button
                                     type="button"
                                     onClick={() => setScrollReq((r) => ({ fkey, n: (r?.n ?? 0) + 1 }))}
-                                    className="flex items-center gap-1 font-mono uppercase transition-opacity hover:opacity-70"
+                                    className="flex shrink-0 items-center gap-1 font-mono uppercase transition-opacity hover:opacity-70"
                                     style={{ fontSize: 10, letterSpacing: "0.06em", color: "var(--color-bordo)" }}
                                   >
                                     <Eye size={12} />
@@ -549,7 +589,9 @@ export function ContentEditor({
                                   </button>
                                 )}
                               </div>
-                              <div className="flex flex-col gap-2.5">
+                              {isOpen && (
+                              <>
+                              <div className="mt-3 flex flex-col gap-2.5">
                                 {(["d", "m"] as const).map((dim) => (
                                   <div key={dim} className="flex items-center gap-3">
                                     <span
@@ -592,7 +634,7 @@ export function ContentEditor({
                                   🔤 Fuente
                                 </span>
                                 <select
-                                  value={fonts[sec.section]?.[f.field] ?? "default"}
+                                  value={curFont}
                                   onChange={(e) => setFont(sec.section, f.field, e.target.value)}
                                   className="admin-input flex-1"
                                   style={{ padding: "4px 8px", fontSize: 13 }}
@@ -605,6 +647,23 @@ export function ContentEditor({
                                   ))}
                                 </select>
                               </div>
+
+                              {touched && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSize(sec.section, f.field, "m", "normal")
+                                    setSize(sec.section, f.field, "d", "normal")
+                                    setFont(sec.section, f.field, "default")
+                                  }}
+                                  className="mt-3 font-mono uppercase underline-offset-4 transition-opacity hover:underline"
+                                  style={{ fontSize: 10, letterSpacing: "0.08em", color: "var(--color-bordo)" }}
+                                >
+                                  Volver al tamaño y fuente del diseño
+                                </button>
+                              )}
+                              </>
+                              )}
                             </div>
                           )
                         })()}

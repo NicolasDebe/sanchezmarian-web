@@ -12,8 +12,9 @@ import {
 import { fallbacksFor } from "@/lib/contacto-schema"
 import { RichText } from "@/components/ui/RichText"
 import { HeroWords, heroNextLineDelay, heroSatelliteDelay, useHeroSatellite } from "@/components/ui/hero-reveal"
+import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 
-function ContactoHero({ c }: { c: Record<string, string> }) {
+function ContactoHero({ c, scales }: { c: Record<string, string>; scales?: FieldScaleMap }) {
   const satDelay = heroSatelliteDelay(c.h1_pre, c.h1_accent)
   const satellite = useHeroSatellite(satDelay)
 
@@ -54,7 +55,7 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
       <div className="text-center sm:text-left" style={{ flex: 1, minWidth: "260px" }}>
         <motion.p
           {...satellite(0)}
-          style={{
+          {...fsStyle(scales?.["hero.eyebrow"], {
             fontFamily: "DM Mono, monospace",
             fontSize: "var(--fs-eyebrow)",
             letterSpacing: ".15em",
@@ -62,19 +63,19 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
             color: "#66001F",
             opacity: 0.65,
             marginBottom: "16px",
-          }}
+          }, "hero.eyebrow")}
         >
           {c.eyebrow}
         </motion.p>
 
         <h1
           aria-label={`${c.h1_pre} ${c.h1_accent}`}
-          style={{
+          {...fsStyle(scales?.["hero.h1_pre"], {
             fontFamily: "Playfair Display, serif",
             color: "#1A0008",
             fontWeight: 700,
             margin: 0,
-          }}
+          }, "hero.h1_pre")}
         >
           <HeroWords
             text={c.h1_pre}
@@ -97,27 +98,31 @@ function ContactoHero({ c }: { c: Record<string, string> }) {
 
 export function ContactoContent({
   content,
+  scales,
 }: {
   content?: {
     hero?: Record<string, string>
     info?: Record<string, string>
     faq?: Record<string, string>
   }
+  scales?: FieldScaleMap
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
   const info = { ...fallbacksFor("info"), ...content?.info }
   const faq = { ...fallbacksFor("faq"), ...content?.faq }
 
+  // `field` es la clave editable del dato (el `label` del ícono es fijo por
+  // diseño): con ella armamos el data-fkey de tamaño/fuente de cada valor.
   const INFO_ITEMS = [
-    { icon: Mail, label: "Email", value: info.email, href: `mailto:${info.email}` },
-    { icon: MapPin, label: "Ubicación", value: info.location, href: null as string | null },
-    { icon: MessageCircle, label: "Disponibilidad", value: info.availability, href: null as string | null },
+    { icon: Mail, field: "email", label: "Email", value: info.email, href: `mailto:${info.email}` },
+    { icon: MapPin, field: "location", label: "Ubicación", value: info.location, href: null as string | null },
+    { icon: MessageCircle, field: "availability", label: "Disponibilidad", value: info.availability, href: null as string | null },
   ]
-  const FAQ = [1, 2, 3, 4].map((n) => ({ q: faq[`q${n}`] ?? "", a: faq[`a${n}`] ?? "" }))
+  const FAQ = [1, 2, 3, 4].map((n) => ({ n, q: faq[`q${n}`] ?? "", a: faq[`a${n}`] ?? "" }))
 
   return (
     <>
-      <ContactoHero c={hero} />
+      <ContactoHero c={hero} scales={scales} />
 
       {/* ── Contacto principal ── */}
       <section className="bg-white py-20 lg:py-28">
@@ -138,10 +143,10 @@ export function ContactoContent({
               viewport={viewportOnce}
               className="flex flex-col gap-3"
             >
-              <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.22em] text-terracota" style={{ fontSize: "var(--fs-eyebrow)" }}>
+              <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.22em] text-terracota" {...fsStyle(scales?.["info.eyebrow"], { fontSize: "var(--fs-eyebrow)" }, "info.eyebrow")}>
                 {info.eyebrow}
               </motion.p>
-              <motion.h2 variants={fadeUp} className="font-playfair font-bold text-marino text-[calc(2rem*var(--text-scale))] leading-[1.1]">
+              <motion.h2 variants={fadeUp} className="font-playfair font-bold text-marino text-[calc(2rem*var(--text-scale))] leading-[1.1]" {...fsStyle(scales?.["info.title_pre"], undefined, "info.title_pre")}>
                 {info.title_pre}<br />
                 <em className="italic text-terracota">{info.title_accent}</em>
               </motion.h2>
@@ -154,8 +159,8 @@ export function ContactoContent({
               viewport={viewportOnce}
               className="flex flex-col gap-5"
             >
-              {INFO_ITEMS.map(({ icon: Icon, label, value, href }) => (
-                <motion.div key={label} variants={fadeUp} className="flex items-start gap-4">
+              {INFO_ITEMS.map(({ icon: Icon, field, label, value, href }) => (
+                <motion.div key={field} variants={fadeUp} className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-arena flex items-center justify-center shrink-0">
                     <Icon size={16} className="text-terracota" strokeWidth={1.5} />
                   </div>
@@ -164,11 +169,11 @@ export function ContactoContent({
                       {label}
                     </p>
                     {href ? (
-                      <a href={href} className="font-sans text-marino hover:text-terracota transition-colors" style={{ fontSize: "var(--fs-caption)" }}>
+                      <a href={href} className="font-sans text-marino hover:text-terracota transition-colors" {...fsStyle(scales?.[`info.${field}`], { fontSize: "var(--fs-caption)" }, `info.${field}`)}>
                         {value}
                       </a>
                     ) : (
-                      <p className="font-sans text-marino" style={{ fontSize: "var(--fs-caption)" }}>{value}</p>
+                      <p className="font-sans text-marino" {...fsStyle(scales?.[`info.${field}`], { fontSize: "var(--fs-caption)" }, `info.${field}`)}>{value}</p>
                     )}
                   </div>
                 </motion.div>
@@ -213,10 +218,10 @@ export function ContactoContent({
             viewport={viewportOnce}
             className="bg-arena rounded-2xl p-8 lg:p-10"
           >
-            <p className="font-mono uppercase tracking-[0.2em] text-terracota mb-2" style={{ fontSize: "var(--fs-eyebrow)" }}>
+            <p className="font-mono uppercase tracking-[0.2em] text-terracota mb-2" {...fsStyle(scales?.["info.form_eyebrow"], { fontSize: "var(--fs-eyebrow)" }, "info.form_eyebrow")}>
               {info.form_eyebrow}
             </p>
-            <p className="font-playfair font-bold text-marino mb-8" style={{ fontSize: "var(--fs-lead)" }}>
+            <p className="font-playfair font-bold text-marino mb-8" {...fsStyle(scales?.["info.form_title"], { fontSize: "var(--fs-lead)" }, "info.form_title")}>
               {info.form_title}
             </p>
             <ContactForm />
@@ -240,10 +245,10 @@ export function ContactoContent({
             viewport={viewportOnce}
             className="mb-12"
           >
-            <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.22em] text-terracota mb-5" style={{ fontSize: "var(--fs-eyebrow)" }}>
+            <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.22em] text-terracota mb-5" {...fsStyle(scales?.["faq.eyebrow"], { fontSize: "var(--fs-eyebrow)" }, "faq.eyebrow")}>
               {faq.eyebrow}
             </motion.p>
-            <motion.h2 variants={fadeUp} className="font-playfair font-bold text-white text-[calc(2rem*var(--text-scale))] sm:text-[calc(2.5rem*var(--text-scale))] leading-[1.1]">
+            <motion.h2 variants={fadeUp} className="font-playfair font-bold text-white text-[calc(2rem*var(--text-scale))] sm:text-[calc(2.5rem*var(--text-scale))] leading-[1.1]" {...fsStyle(scales?.["faq.title_pre"], undefined, "faq.title_pre")}>
               {faq.title_pre}<br />
               <em className="italic text-terracota">{faq.title_accent}</em>
             </motion.h2>
@@ -258,14 +263,20 @@ export function ContactoContent({
           >
             {FAQ.map((item) => (
               <motion.div
-                key={item.q}
+                key={item.n}
                 variants={revealCard}
                 className="bg-white/5 border border-white/10 rounded-2xl p-7 flex flex-col gap-3"
               >
-                <h3 className="font-playfair font-bold text-white leading-snug" style={{ fontSize: "var(--fs-body-lg)" }}>
+                <h3 className="font-playfair font-bold text-white leading-snug" {...fsStyle(scales?.[`faq.q${item.n}`], { fontSize: "var(--fs-body-lg)" }, `faq.q${item.n}`)}>
                   {item.q}
                 </h3>
-                <RichText html={item.a} className="rich-inline font-sans text-white/55 leading-relaxed" style={{ fontSize: "var(--fs-caption)" }} />
+                <RichText
+                  html={item.a}
+                  className="rich-inline font-sans text-white/55 leading-relaxed"
+                  style={{ fontSize: "var(--fs-caption)" }}
+                  scale={scales?.[`faq.a${item.n}`]}
+                  fkey={`faq.a${item.n}`}
+                />
               </motion.div>
             ))}
           </motion.div>

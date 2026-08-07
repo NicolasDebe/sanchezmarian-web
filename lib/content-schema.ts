@@ -45,9 +45,25 @@ export interface FieldDef {
   /** Ayuda mostrada bajo el label en el admin. */
   help?: string
   /**
-   * Si true, el campo (un título o párrafo) muestra en el admin un selector de
-   * tamaño (mobile/desktop, tamaños predefinidos) y el sitio público aplica ese
-   * tamaño. Solo cambia el font-size, nunca la fuente. Ver lib/text-size.ts.
+   * Si true, el campo muestra en el admin el panel "Apariencia del texto":
+   * tamaño (mobile/desktop, 8 pasos) + fuente (entre las 3 del sitio).
+   *
+   * CONTRATO DE DOS MITADES — marcar esto NO alcanza. El elemento del sitio
+   * público tiene que emitir `data-fkey="section.field"` vía fsStyle/fsProps
+   * (o `fkey` en <RichText>). Si falta esa mitad, Marian mueve el control,
+   * guarda… y no pasa nada. `node scripts/check-text-sizes.mjs` cruza ambas
+   * mitades y falla si alguna se quedó a medio camino.
+   *
+   * CONVENCIONES:
+   *  - Textos partidos en {x}_pre / {x}_accent: el campo resizable es el `_pre`
+   *    y su fkey va en el elemento que envuelve a los dos (es un solo título en
+   *    pantalla). El `_accent` NO se marca resizable.
+   *  - Listas de un solo campo multilínea (`*_items`): el fkey va en el <ul> y
+   *    los <li> heredan el --text-scale local.
+   *  - Se dejan FIJOS (sin resizable) los textos de UI cuya caja no acompaña al
+   *    texto: botones/CTAs, links del nav, pills, badges y tags.
+   *
+   * Ver lib/text-size.ts y las reglas [data-fscale] de app/globals.css.
    */
   resizable?: boolean
 }

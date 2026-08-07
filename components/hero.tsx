@@ -108,11 +108,11 @@ function HeroMobile({ c, scales }: { c: Record<string, string>; scales?: FieldSc
         <motion.p
           {...satellite(0.08)}
           className="font-mono uppercase text-gris-bordo"
-          style={{
+          {...fsStyle(scales?.["hero.eyebrow"], {
             fontSize: "var(--fs-eyebrow)",
             letterSpacing: "0.16em",
             margin: 0,
-          }}
+          }, "hero.eyebrow")}
         >
           {c.eyebrow}
         </motion.p>
@@ -241,7 +241,7 @@ function HeroDesktop({ c, scales }: { c: Record<string, string>; scales?: FieldS
             {/* EYEBROW */}
             <motion.p
               {...satellite(0.08)}
-              style={{
+              {...fsStyle(scales?.["hero.eyebrow"], {
                 fontFamily: "var(--font-dm-mono), monospace",
                 fontSize: "var(--fs-eyebrow)",
                 letterSpacing: "0.15em",
@@ -251,7 +251,7 @@ function HeroDesktop({ c, scales }: { c: Record<string, string>; scales?: FieldS
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
-              }}
+              }, "hero.eyebrow")}
             >
               {c.eyebrow}
             </motion.p>

@@ -12,8 +12,16 @@ export const MIS_VALORES_SECTIONS: SectionDef[] = [
     legend:
       "El título tiene dos líneas: la segunda (destacada) se muestra grande y en cursiva automáticamente.",
     fields: [
-      { field: "eyebrow", type: "text", label: "Eyebrow (línea superior)", fallback: "Mis valores", maxChars: 30 },
-      { field: "h1_pre", type: "text", label: "Título — primera línea", fallback: "Detrás de la estrategia:", maxChars: 80, resizable: true },
+      { field: "eyebrow", type: "text", label: "Eyebrow (línea superior)", fallback: "Mis valores", maxChars: 30, resizable: true },
+      {
+        field: "h1_pre",
+        type: "text",
+        label: "Título — primera línea",
+        fallback: "Detrás de la estrategia:",
+        maxChars: 80,
+        help: "El tamaño y la fuente que elijas acá se aplican a las dos líneas del título.",
+        resizable: true,
+      },
       { field: "h1_accent", type: "text", label: "Título — segunda línea (destacada, cursiva)", fallback: "mi historia.", maxChars: 60 },
     ],
   },
@@ -59,7 +67,7 @@ export const MIS_VALORES_SECTIONS: SectionDef[] = [
         maxChars: 800,
         resizable: true,
       },
-      { field: "signature", type: "text", label: "Firma", fallback: "— Marian Sánchez", maxChars: 50 },
+      { field: "signature", type: "text", label: "Firma", fallback: "— Marian Sánchez", maxChars: 50, resizable: true },
     ],
   },
   {
@@ -68,8 +76,16 @@ export const MIS_VALORES_SECTIONS: SectionDef[] = [
     legend:
       "En el título, la parte destacada se muestra en cursiva bordó automáticamente.",
     fields: [
-      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Mis valores", maxChars: 30 },
-      { field: "title_pre", type: "text", label: "Título — parte normal", fallback: "Los pilares que", maxChars: 60, resizable: true },
+      { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Mis valores", maxChars: 30, resizable: true },
+      {
+        field: "title_pre",
+        type: "text",
+        label: "Título — parte normal",
+        fallback: "Los pilares que",
+        maxChars: 60,
+        help: "El tamaño y la fuente que elijas acá se aplican al título completo.",
+        resizable: true,
+      },
       { field: "title_accent", type: "text", label: "Título — texto destacado (cursiva bordó)", fallback: "guían mi trabajo.", maxChars: 60 },
       { field: "intro", type: "longtext", label: "Texto introductorio", fallback: "Esta trayectoria es la que hoy me permite dar vida a mis valores en cada consultoría:", maxChars: 300, resizable: true },
       { field: "pilar_1_title", type: "text", label: "Pilar 1 — Título", fallback: "Inteligencia y Oficio", maxChars: 60, resizable: true },

@@ -56,14 +56,14 @@ function HeroEditorial({ c, scales }: { c: Record<string, string>; scales?: Fiel
 
           <motion.p
             {...satellite(0)}
-            style={{
+            {...fsStyle(scales?.["hero.eyebrow"], {
               fontFamily: "DM Mono, monospace",
               fontSize: "var(--fs-eyebrow)",
               letterSpacing: ".15em",
               textTransform: "uppercase",
               color: "rgba(254,252,239,0.65)",
               marginBottom: "14px",
-            }}
+            }, "hero.eyebrow")}
           >
             {c.eyebrow}
           </motion.p>
@@ -142,7 +142,7 @@ function BioSection({ c, scales }: { c: Record<string, string>; scales?: FieldSc
 
           <motion.p
             className="font-mono text-gris-bordo/60 mt-2 text-right"
-            style={{ fontSize: "var(--fs-eyebrow)" }}
+            {...fsStyle(scales?.["bio.signature"], { fontSize: "var(--fs-eyebrow)" }, "bio.signature")}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -178,7 +178,7 @@ function PilaresSection({ c, scales }: { c: Record<string, string>; scales?: Fie
           viewport={viewportOnce}
           className="mb-16"
         >
-          <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.25em] text-bordo mb-4" style={{ fontSize: "var(--fs-micro)" }}>
+          <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.25em] text-bordo mb-4" {...fsStyle(scales?.["pilares.eyebrow"], { fontSize: "var(--fs-micro)" }, "pilares.eyebrow")}>
             {c.eyebrow}
           </motion.p>
           <motion.div variants={fadeUp} className="w-10 h-px bg-dorado mb-6" />

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { fallbacksFor } from "@/lib/home-schema"
+import { fsStyle, type FieldScale, type FieldScaleMap } from "@/lib/text-size"
 
 /** Separa el prefijo numérico del sufijo: "100+" -> { value: "100", suffix: "+" }. */
 function splitNumber(raw: string): { value: string; suffix: string } {
@@ -15,11 +16,20 @@ function StatItem({
   suffix,
   label,
   delay,
+  numberScale,
+  numberFkey,
+  labelScale,
+  labelFkey,
 }: {
   value: string
   suffix: string
   label: string
   delay: number
+  /** Tamaño/fuente del número y del label, ajustables por separado desde /admin. */
+  numberScale?: FieldScale
+  numberFkey: string
+  labelScale?: FieldScale
+  labelFkey: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
@@ -47,22 +57,34 @@ function StatItem({
         transition: `opacity 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}s, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}s`,
       }}
     >
-      <p className="font-playfair font-bold text-negro-bordo leading-none text-[calc(2.75rem*var(--text-scale))] sm:text-[calc(4rem*var(--text-scale))] lg:text-[calc(5rem*var(--text-scale))] tabular-nums">
+      <p
+        className="font-playfair font-bold text-negro-bordo leading-none text-[calc(2.75rem*var(--text-scale))] sm:text-[calc(4rem*var(--text-scale))] lg:text-[calc(5rem*var(--text-scale))] tabular-nums"
+        {...fsStyle(numberScale, undefined, numberFkey)}
+      >
         {value}
         <span className="text-dorado">{suffix}</span>
       </p>
-      <p className="mt-4 font-mono text-[var(--fs-micro)] sm:text-[var(--fs-eyebrow)] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-gris-bordo/60">
+      <p
+        className="mt-4 font-mono text-[var(--fs-micro)] sm:text-[var(--fs-eyebrow)] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-gris-bordo/60"
+        {...fsStyle(labelScale, undefined, labelFkey)}
+      >
         {label}
       </p>
     </div>
   )
 }
 
-export function Stats({ content }: { content?: Record<string, string> }) {
+export function Stats({
+  content,
+  scales,
+}: {
+  content?: Record<string, string>
+  scales?: FieldScaleMap
+}) {
   const c = { ...fallbacksFor("stats"), ...content }
   const stats = [1, 2, 3, 4].map((n) => {
     const { value, suffix } = splitNumber(c[`stat_${n}_number`] ?? "")
-    return { value, suffix, label: c[`stat_${n}_label`] ?? "" }
+    return { n, value, suffix, label: c[`stat_${n}_label`] ?? "" }
   })
 
   return (
@@ -79,6 +101,10 @@ export function Stats({ content }: { content?: Record<string, string> }) {
                 suffix={stat.suffix}
                 label={stat.label}
                 delay={i * 0.1}
+                numberScale={scales?.[`stats.stat_${stat.n}_number`]}
+                numberFkey={`stats.stat_${stat.n}_number`}
+                labelScale={scales?.[`stats.stat_${stat.n}_label`]}
+                labelFkey={`stats.stat_${stat.n}_label`}
               />
             </div>
           ))}

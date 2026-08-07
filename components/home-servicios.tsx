@@ -5,6 +5,7 @@ import Link from "next/link"
 import { EASE_EXPO } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/servicios-schema"
 import { ServiceFeatureCard } from "@/components/servicios/service-feature-card"
+import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 
 /**
  * Vidriera de servicios del HOME — ESPEJO RESUMIDO de /servicios.
@@ -42,19 +43,27 @@ function firstParagraph(raw?: string): string {
   )
 }
 
-type ServicioCard = { anchor: string; eyebrow: string; title: string; desc: string }
+type ServicioCard = { section: string; anchor: string; eyebrow: string; title: string; desc: string }
 
 export function HomeServicios({
   servicios,
   ctaLabel,
+  scales,
 }: {
   servicios?: Record<string, Record<string, string>>
   ctaLabel?: string
+  /**
+   * Tamaños/fuentes de la página «servicios» (no del home): estas cards son un
+   * espejo de /servicios, así que comparten el mismo campo editable y el mismo
+   * ajuste de apariencia. Marian lo toca una vez y se ve igual en los dos lados.
+   */
+  scales?: FieldScaleMap
 }) {
   const cards: ServicioCard[] = [1, 2, 3, 4].map((n) => {
     const key = `servicio_0${n}`
     const c = { ...fallbacksFor(key), ...servicios?.[key] }
     return {
+      section: key,
       anchor: `servicio-${n}`,
       eyebrow: (c.eyebrow ?? "").trim(),
       title: (c.title ?? "").trim(),
@@ -85,20 +94,20 @@ export function HomeServicios({
                     {s.eyebrow && (
                       <p
                         className="font-mono uppercase text-bordo"
-                        style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", marginBottom: 10 }}
+                        {...fsStyle(scales?.[`${s.section}.eyebrow`], { fontSize: "var(--fs-eyebrow)", letterSpacing: "0.2em", marginBottom: 10 }, `${s.section}.eyebrow`)}
                       >
                         {s.eyebrow}
                       </p>
                     )}
                     <h3
                       className="font-playfair font-bold text-negro-bordo"
-                      style={{ fontSize: "var(--fs-lead)", lineHeight: "var(--lh-snug)" }}
+                      {...fsStyle(scales?.[`${s.section}.title`], { fontSize: "var(--fs-lead)", lineHeight: "var(--lh-snug)" }, `${s.section}.title`)}
                     >
                       {s.title}
                     </h3>
                     <p
                       className="font-sans text-gris-bordo"
-                      style={{ fontSize: "var(--fs-body)", lineHeight: "var(--lh-base)", marginTop: 16 }}
+                      {...fsStyle(scales?.[`${s.section}.intro`], { fontSize: "var(--fs-body)", lineHeight: "var(--lh-base)", marginTop: 16 }, `${s.section}.intro`)}
                     >
                       {s.desc}
                     </p>

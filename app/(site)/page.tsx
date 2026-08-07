@@ -44,6 +44,7 @@ export default async function Home() {
     footer,
     connections,
     scales,
+    serviciosScales,
   ] = await Promise.all([
     getContentBatch("home", "hero", fallbacksFor("hero")),
     getContentBatch("home", "stats", fallbacksFor("stats")),
@@ -62,6 +63,9 @@ export default async function Home() {
     getActiveConnections(),
     // Tamaños de texto por campo (títulos/párrafos resizables).
     getTextScales("home"),
+    // La vidriera de servicios espeja /servicios: usa los tamaños de ESA página,
+    // así el ajuste que Marian hace en el editor de servicios vale en los dos lados.
+    getTextScales("servicios"),
   ])
 
   const social = {
@@ -72,7 +76,7 @@ export default async function Home() {
   return (
     <>
       <Hero content={hero} scales={scales} />
-      <Stats content={stats} />
+      <Stats content={stats} scales={scales} />
       <Ideas content={metodo} scales={scales} />
       <Clientes />
       {/* Newsletter + canal de WhatsApp: montado tras el social proof (logos de
@@ -87,6 +91,7 @@ export default async function Home() {
           servicio_04: servicio4,
         }}
         ctaLabel={serviciosHeader.cta_label}
+        scales={serviciosScales}
       />
       <Conexiones connections={connections} />
       <Bio content={bio} social={social} scales={scales} />

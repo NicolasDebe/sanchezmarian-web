@@ -46,8 +46,11 @@ export function CtaFinal({
 
   // Accesos rápidos: solo canal + identificador + link (sin descripciones ni
   // tiempos de respuesta). Editables desde home.contact.
+  // `key` es el prefijo de los campos editables de la card (contact.{key}_label
+  // / _value): con él armamos los data-fkey de tamaño y fuente de cada texto.
   const cards = [
     {
+      key: "whatsapp",
       Icon: MessageCircle,
       label: ct.whatsapp_label,
       value: ct.whatsapp_value,
@@ -56,6 +59,7 @@ export function CtaFinal({
       external: true,
     },
     {
+      key: "email",
       Icon: Mail,
       label: ct.email_label,
       value: ct.email_value,
@@ -64,6 +68,7 @@ export function CtaFinal({
       external: false,
     },
     {
+      key: "form",
       Icon: FileText,
       label: ct.form_label,
       value: ct.form_value,
@@ -129,7 +134,7 @@ export function CtaFinal({
           <motion.p
             variants={fadeUp}
             className="font-mono uppercase tracking-[0.25em] text-hueso/60 mb-7"
-            style={{ fontSize: "var(--fs-eyebrow)" }}
+            {...fsStyle(scales?.["contact.eyebrow"], { fontSize: "var(--fs-eyebrow)" }, "contact.eyebrow")}
           >
             {ct.eyebrow}
           </motion.p>
@@ -137,7 +142,7 @@ export function CtaFinal({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
             {cards.map((card) => (
               <motion.a
-                key={card.label}
+                key={card.key}
                 href={card.href}
                 variants={fadeUp}
                 whileHover={{ y: -3, boxShadow: "0 8px 32px rgba(102,0,31,0.12)" }}
@@ -151,11 +156,14 @@ export function CtaFinal({
                 <card.Icon size={32} strokeWidth={1.5} className="text-bordo" />
                 <span
                   className="font-mono uppercase text-bordo/60"
-                  style={{ fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em" }}
+                  {...fsStyle(scales?.[`contact.${card.key}_label`], { fontSize: "var(--fs-eyebrow)", letterSpacing: "0.12em" }, `contact.${card.key}_label`)}
                 >
                   {card.label}
                 </span>
-                <span className="font-playfair text-negro-bordo" style={{ fontSize: "var(--fs-lead)" }}>
+                <span
+                  className="font-playfair text-negro-bordo"
+                  {...fsStyle(scales?.[`contact.${card.key}_value`], { fontSize: "var(--fs-lead)" }, `contact.${card.key}_value`)}
+                >
                   {card.value}
                 </span>
                 <span className="mt-1 inline-flex items-center gap-1 font-sans font-semibold text-bordo" style={{ fontSize: "var(--fs-eyebrow)" }}>
@@ -186,7 +194,7 @@ export function CtaFinal({
             viewport={viewportOnce}
             className="flex flex-col gap-7"
           >
-            <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.25em] text-hueso/60" style={{ fontSize: "var(--fs-eyebrow)" }}>
+            <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.25em] text-hueso/60" {...fsStyle(scales?.["cta_final.eyebrow"], { fontSize: "var(--fs-eyebrow)" }, "cta_final.eyebrow")}>
               {c.eyebrow}
             </motion.p>
 
@@ -211,11 +219,11 @@ export function CtaFinal({
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">
               <div className="flex items-center gap-3">
                 <Mail size={16} strokeWidth={1.5} className="text-dorado shrink-0" />
-                <span className="font-sans text-hueso/90" style={{ fontSize: "var(--fs-caption)" }}>{c.email}</span>
+                <span className="font-sans text-hueso/90" {...fsStyle(scales?.["cta_final.email"], { fontSize: "var(--fs-caption)" }, "cta_final.email")}>{c.email}</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin size={16} strokeWidth={1.5} className="text-dorado shrink-0" />
-                <span className="font-sans text-hueso/75" style={{ fontSize: "var(--fs-caption)" }}>{c.location}</span>
+                <span className="font-sans text-hueso/75" {...fsStyle(scales?.["cta_final.location"], { fontSize: "var(--fs-caption)" }, "cta_final.location")}>{c.location}</span>
               </div>
             </motion.div>
 

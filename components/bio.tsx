@@ -97,7 +97,7 @@ export function Bio({
             viewport={viewportOnce}
             className="flex flex-col gap-6"
           >
-            <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.25em] text-bordo" style={{ fontSize: "var(--fs-eyebrow)" }}>
+            <motion.p variants={fadeUp} className="font-mono uppercase tracking-[0.25em] text-bordo" {...fsStyle(scales?.["bio.eyebrow"], { fontSize: "var(--fs-eyebrow)" }, "bio.eyebrow")}>
               {c.eyebrow}
             </motion.p>
 

@@ -15,8 +15,18 @@ export const CASOS_SECTIONS: SectionDef[] = [
     legend:
       "La segunda línea del título (destacada) se muestra en cursiva bordó automáticamente.",
     fields: [
-      { field: "eyebrow", type: "text", label: "Eyebrow (línea superior)", fallback: "Casos de éxito", maxChars: 30 },
-      { field: "h1_pre", type: "text", label: "Título — primera línea", fallback: "El impacto de una buena estrategia", maxChars: 80 },
+      { field: "eyebrow", type: "text", label: "Eyebrow (línea superior)", fallback: "Casos de éxito", maxChars: 30, resizable: true },
+      {
+        field: "h1_pre",
+        type: "text",
+        label: "Título — primera línea",
+        fallback: "El impacto de una buena estrategia",
+        maxChars: 80,
+        // El control de apariencia de este campo gobierna el H1 COMPLETO
+        // (primera línea + destacada): las dos son un solo título en pantalla.
+        help: "El tamaño y la fuente que elijas acá se aplican a las dos líneas del título.",
+        resizable: true,
+      },
       { field: "h1_accent", type: "text", label: "Título — segunda línea (destacada, cursiva)", fallback: "se mide en presencia real.", maxChars: 80 },
       {
         field: "description",
@@ -25,6 +35,7 @@ export const CASOS_SECTIONS: SectionDef[] = [
         fallback:
           "Una selección de gestiones de prensa realizadas para marcas, empresas y profesionales que confiaron en la estrategia. Cada caso cuenta una historia.",
         maxChars: 400,
+        resizable: true,
       },
     ],
   },
@@ -32,14 +43,14 @@ export const CASOS_SECTIONS: SectionDef[] = [
     section: "stats",
     title: "Stats (estadísticas)",
     fields: [
-      { field: "stat_1_number", type: "text", label: "Estadística 1 — Número", fallback: "100+", maxChars: 8 },
-      { field: "stat_1_label", type: "text", label: "Estadística 1 — Label", fallback: "coberturas verificadas", maxChars: 36 },
-      { field: "stat_2_number", type: "text", label: "Estadística 2 — Número", fallback: "30+", maxChars: 8 },
-      { field: "stat_2_label", type: "text", label: "Estadística 2 — Label", fallback: "medios distintos", maxChars: 36 },
-      { field: "stat_3_number", type: "text", label: "Estadística 3 — Número", fallback: "5", maxChars: 8 },
-      { field: "stat_3_label", type: "text", label: "Estadística 3 — Label", fallback: "formatos cubiertos", maxChars: 36 },
-      { field: "stat_4_number", type: "text", label: "Estadística 4 — Número", fallback: "15", maxChars: 8 },
-      { field: "stat_4_label", type: "text", label: "Estadística 4 — Label", fallback: "marcas activas", maxChars: 36 },
+      { field: "stat_1_number", type: "text", label: "Estadística 1 — Número", fallback: "100+", maxChars: 8, resizable: true },
+      { field: "stat_1_label", type: "text", label: "Estadística 1 — Label", fallback: "coberturas verificadas", maxChars: 36, resizable: true },
+      { field: "stat_2_number", type: "text", label: "Estadística 2 — Número", fallback: "30+", maxChars: 8, resizable: true },
+      { field: "stat_2_label", type: "text", label: "Estadística 2 — Label", fallback: "medios distintos", maxChars: 36, resizable: true },
+      { field: "stat_3_number", type: "text", label: "Estadística 3 — Número", fallback: "5", maxChars: 8, resizable: true },
+      { field: "stat_3_label", type: "text", label: "Estadística 3 — Label", fallback: "formatos cubiertos", maxChars: 36, resizable: true },
+      { field: "stat_4_number", type: "text", label: "Estadística 4 — Número", fallback: "15", maxChars: 8, resizable: true },
+      { field: "stat_4_label", type: "text", label: "Estadística 4 — Label", fallback: "marcas activas", maxChars: 36, resizable: true },
     ],
   },
 ]

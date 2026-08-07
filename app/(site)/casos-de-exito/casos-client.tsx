@@ -21,6 +21,7 @@ import { RichText } from "@/components/ui/RichText"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { DestacadasRotativo } from "@/components/destacadas-rotativo"
 import { fallbacksFor } from "@/lib/casos-schema"
+import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 
 // 12 apariciones rotativas — 4 grupos × 3 cards
 // Grupo 1: La Nación · Vatican News · Los Andes (Notarial)
@@ -529,9 +530,11 @@ function ToggleAllButton({
 export function CasosClient({
   content,
   clientsData,
+  scales,
 }: {
   content?: { hero?: Record<string, string>; stats?: Record<string, string> }
   clientsData: ClientWithClippings[]
+  scales?: FieldScaleMap
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
   const satellite = useHeroSatellite(heroSatelliteDelay(hero.h1_pre, hero.h1_accent))
@@ -546,7 +549,10 @@ export function CasosClient({
     },
   }
   const statsContent = { ...fallbacksFor("stats"), ...content?.stats }
+  // `idx` viaja con cada stat para armar el data-fkey (stats.stat_N_number/label)
+  // que el admin usa para ajustar tamaño y fuente de cada una por separado.
   const STATS = [1, 2, 3, 4].map((n) => ({
+    idx: n,
     n: statsContent[`stat_${n}_number`] ?? "",
     label: statsContent[`stat_${n}_label`] ?? "",
   }))
@@ -603,7 +609,10 @@ export function CasosClient({
             <motion.p
               {...satellite(0)}
               className="font-mono uppercase tracking-[0.22em]"
-              style={{ color: "var(--color-bordo)", fontSize: "var(--fs-eyebrow)" }}
+              {...fsStyle(scales?.["hero.eyebrow"], {
+                color: "var(--color-bordo)",
+                fontSize: "var(--fs-eyebrow)",
+              }, "hero.eyebrow")}
             >
               {hero.eyebrow}
             </motion.p>
@@ -615,11 +624,11 @@ export function CasosClient({
             <h1
               aria-label={`${hero.h1_pre} ${hero.h1_accent}`}
               className="font-playfair font-bold leading-[1.1]"
-              style={{
+              {...fsStyle(scales?.["hero.h1_pre"], {
                 color: "var(--color-negro-bordo)",
                 fontSize: "var(--fs-h1)",
                 maxWidth: 700,
-              }}
+              }, "hero.h1_pre")}
             >
               <HeroWords text={hero.h1_pre} as="span" ariaHidden style={{ display: "block" }} />
               <HeroWords
@@ -634,7 +643,12 @@ export function CasosClient({
             <motion.div
               {...satellite(0.15)}
               className="font-sans mt-6"
-              style={{ fontSize: "var(--fs-body-lg)", color: "var(--color-gris-bordo)", maxWidth: 560, lineHeight: "var(--lh-relaxed)" }}
+              {...fsStyle(scales?.["hero.description"], {
+                fontSize: "var(--fs-body-lg)",
+                color: "var(--color-gris-bordo)",
+                maxWidth: 560,
+                lineHeight: "var(--lh-relaxed)",
+              }, "hero.description")}
             >
               <RichText html={hero.description} className="rich-inline" />
             </motion.div>
@@ -648,7 +662,7 @@ export function CasosClient({
             className="hidden sm:flex items-center gap-0 mt-[60px]"
           >
             {STATS.map((s, i) => (
-              <motion.div key={s.label} variants={revealCard} className="flex items-center">
+              <motion.div key={s.idx} variants={revealCard} className="flex items-center">
                 {i > 0 && (
                   <div
                     className="self-stretch mx-8"
@@ -656,12 +670,22 @@ export function CasosClient({
                   />
                 )}
                 <div>
-                  <p className="font-playfair leading-none" style={{ fontSize: "calc(48px * var(--text-scale))", color: "var(--color-bordo)" }}>
+                  <p
+                    className="font-playfair leading-none"
+                    {...fsStyle(scales?.[`stats.stat_${s.idx}_number`], {
+                      fontSize: "calc(48px * var(--text-scale))",
+                      color: "var(--color-bordo)",
+                    }, `stats.stat_${s.idx}_number`)}
+                  >
                     {s.n}
                   </p>
                   <p
                     className="font-mono uppercase mt-2"
-                    style={{ color: "var(--color-gris-bordo)", letterSpacing: "0.12em", fontSize: "var(--fs-eyebrow)" }}
+                    {...fsStyle(scales?.[`stats.stat_${s.idx}_label`], {
+                      color: "var(--color-gris-bordo)",
+                      letterSpacing: "0.12em",
+                      fontSize: "var(--fs-eyebrow)",
+                    }, `stats.stat_${s.idx}_label`)}
                   >
                     {s.label}
                   </p>
@@ -678,13 +702,24 @@ export function CasosClient({
             className="grid grid-cols-2 gap-8 mt-[60px] sm:hidden"
           >
             {STATS.map((s) => (
-              <motion.div key={s.label} variants={revealCard}>
-                <p className="font-playfair leading-none" style={{ fontSize: "calc(36px * var(--text-scale))", color: "var(--color-bordo)" }}>
+              <motion.div key={s.idx} variants={revealCard}>
+                <p
+                  className="font-playfair leading-none"
+                  {...fsStyle(scales?.[`stats.stat_${s.idx}_number`], {
+                    fontSize: "calc(36px * var(--text-scale))",
+                    color: "var(--color-bordo)",
+                  }, `stats.stat_${s.idx}_number`)}
+                >
                   {s.n}
                 </p>
                 <p
                   className="font-mono uppercase mt-2"
-                  style={{ color: "var(--color-gris-bordo)", letterSpacing: "0.12em", lineHeight: 1.4, fontSize: "var(--fs-eyebrow)" }}
+                  {...fsStyle(scales?.[`stats.stat_${s.idx}_label`], {
+                    color: "var(--color-gris-bordo)",
+                    letterSpacing: "0.12em",
+                    lineHeight: 1.4,
+                    fontSize: "var(--fs-eyebrow)",
+                  }, `stats.stat_${s.idx}_label`)}
                 >
                   {s.label}
                 </p>
