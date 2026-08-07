@@ -250,7 +250,7 @@ function CierreSection({ c, scales }: { c: Record<string, string>; scales?: Fiel
           <Link
             href="/#contacto"
             className="inline-flex items-center gap-2 bg-bordo text-hueso font-sans font-semibold px-8 py-4 rounded-full hover:bg-bordo/90 active:scale-[0.98] transition-all"
-            style={{ fontSize: "var(--fs-body)" }}
+            {...fsStyle(scales?.["cierre.button_text"], { fontSize: "var(--fs-body)" }, "cierre.button_text")}
           >
             {c.button_text}
           </Link>

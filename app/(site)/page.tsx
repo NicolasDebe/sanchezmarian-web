@@ -91,6 +91,7 @@ export default async function Home() {
           servicio_04: servicio4,
         }}
         ctaLabel={serviciosHeader.cta_label}
+        ctaScale={scales["servicios.cta_label"]}
         scales={serviciosScales}
       />
       <Conexiones connections={connections} />

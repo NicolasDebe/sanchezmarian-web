@@ -113,7 +113,7 @@ export const MIS_VALORES_SECTIONS: SectionDef[] = [
         maxChars: 800,
         resizable: true,
       },
-      { field: "button_text", type: "text", label: "Texto del botón", fallback: "Conversemos →", maxChars: 40 },
+      { field: "button_text", type: "text", label: "Texto del botón", fallback: "Conversemos →", maxChars: 40, resizable: true },
     ],
   },
 ]

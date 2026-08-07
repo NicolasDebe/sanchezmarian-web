@@ -43,6 +43,18 @@ export interface EditorField {
 function isRich(f: { type: FieldType; plain?: boolean }): boolean {
   return f.type === "longtext" && !f.plain
 }
+
+/**
+ * Los textos con acento se parten en {base}_pre + {base}_accent, pero en
+ * pantalla son UN solo título: el ajuste de apariencia vive en el `_pre` y
+ * gobierna los dos. Sin esta nota, el `_accent` parece un campo al que "le
+ * falta" el panel. Devuelve el label del campo que manda, o null.
+ */
+function appearanceOwner(f: EditorField, sec: EditorSection): string | null {
+  if (f.resizable || !f.field.endsWith("_accent")) return null
+  const owner = `${f.field.slice(0, -"_accent".length)}_pre`
+  return sec.fields.find((o) => o.field === owner && o.resizable)?.label ?? null
+}
 export interface EditorSection {
   section: string
   title: string
@@ -521,6 +533,19 @@ export function ContentEditor({
                         >
                           {len}/{max}
                         </span>
+
+                        {(() => {
+                          const owner = appearanceOwner(f, sec)
+                          return owner ? (
+                            <p
+                              className="mt-1 font-sans"
+                              style={{ fontSize: 11, lineHeight: 1.5, color: "rgba(74,48,64,0.6)" }}
+                            >
+                              El tamaño y la fuente de este texto se ajustan desde «{owner}»:
+                              en la página son un mismo título.
+                            </p>
+                          ) : null
+                        })()}
 
                         {f.resizable && (() => {
                           const fkey = `${sec.section}.${f.field}`

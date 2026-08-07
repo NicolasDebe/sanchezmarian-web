@@ -4,13 +4,16 @@ import { Instagram, Linkedin } from "@/components/ui/social-icons"
 import { globalFallbacksFor } from "@/lib/global-schema"
 import { NAV_ITEMS, SOCIAL_LINKS, SITE_EMAIL, SITE_TAGLINE, WHATSAPP_HREF } from "@/lib/constants"
 import { Logo } from "@/components/layout/Logo"
+import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 
 export function Footer({
   content,
   nav,
+  scales,
 }: {
   content?: Record<string, string>
   nav?: Record<string, string>
+  scales?: FieldScaleMap
 }) {
   const c = { ...globalFallbacksFor("footer"), ...content }
   const tagline = c.tagline || SITE_TAGLINE
@@ -22,6 +25,8 @@ export function Footer({
   const NAV_LINKS = NAV_ITEMS.map((item) => ({
     label: nav?.[item.key] ?? item.label,
     href: item.href,
+    // El texto de cada link es editable en global/nav: su fkey lo hace ajustable.
+    fkey: `nav.${item.key}`,
   }))
   const SOCIAL = [
     {
@@ -58,18 +63,19 @@ export function Footer({
             <Logo variant="negative" height={38} />
             <p
               className="font-sans text-hueso/55"
-              style={{
+              {...fsStyle(scales?.["footer.tagline"], {
                 fontSize: "var(--fs-eyebrow)",
                 lineHeight: "var(--lh-relaxed)",
                 maxWidth: 340,
                 marginTop: 4,
-              }}
+              }, "footer.tagline")}
             >
               {tagline}
             </p>
             <a
               href={`mailto:${email}`}
-              className="font-mono text-[var(--fs-eyebrow)] text-hueso/55 hover:text-hueso/80 transition-colors tracking-wide"
+              className="font-mono text-[length:var(--fs-eyebrow)] text-hueso/55 hover:text-hueso/80 transition-colors tracking-wide"
+              {...fsStyle(scales?.["footer.email"], undefined, "footer.email")}
             >
               {email}
             </a>
@@ -78,13 +84,17 @@ export function Footer({
               href={WHATSAPP_HREF}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-1 inline-flex items-center gap-2 font-sans text-[var(--fs-caption)] text-hueso/60 hover:text-hueso transition-colors"
+              className="mt-1 inline-flex items-center gap-2 font-sans text-[length:var(--fs-caption)] text-hueso/60 hover:text-hueso transition-colors"
+              {...fsStyle(scales?.["footer.phone"], undefined, "footer.phone")}
             >
               <MessageCircle size={14} strokeWidth={1.5} className="shrink-0" />
               {phone}
             </a>
 
-            <p className="inline-flex items-center gap-2 font-sans text-[var(--fs-caption)] text-hueso/45">
+            <p
+              className="inline-flex items-center gap-2 font-sans text-[length:var(--fs-caption)] text-hueso/45"
+              {...fsStyle(scales?.["footer.location_tag"], undefined, "footer.location_tag")}
+            >
               <MapPin size={14} strokeWidth={1.5} className="shrink-0" />
               {locationTag}
             </p>
@@ -97,7 +107,8 @@ export function Footer({
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="font-sans text-[var(--fs-caption)] text-hueso/60 hover:text-hueso/90 transition-colors"
+                    className="font-sans text-[length:var(--fs-caption)] text-hueso/60 hover:text-hueso/90 transition-colors"
+                    {...fsStyle(scales?.[link.fkey], undefined, link.fkey)}
                   >
                     {link.label}
                   </Link>
@@ -119,7 +130,7 @@ export function Footer({
                   className="group flex min-h-11 items-center gap-3 transition-colors"
                 >
                   <Icon size={22} strokeWidth={1.5} className="shrink-0 text-hueso/75 transition-colors group-hover:text-hueso" />
-                  <span className="font-sans text-[var(--fs-eyebrow)] text-hueso/60 transition-colors group-hover:text-hueso">
+                  <span className="font-sans text-[length:var(--fs-eyebrow)] text-hueso/60 transition-colors group-hover:text-hueso">
                     {label}
                   </span>
                 </a>
@@ -127,7 +138,8 @@ export function Footer({
             </div>
             <Link
               href="/#contacto"
-              className="inline-flex items-center gap-2 bg-hueso/6 border border-hueso/12 text-hueso/50 px-5 py-2.5 rounded-full font-sans text-[var(--fs-eyebrow)] font-medium hover:bg-hueso hover:text-bordo hover:border-hueso transition-all"
+              className="inline-flex items-center gap-2 bg-hueso/6 border border-hueso/12 text-hueso/50 px-5 py-2.5 rounded-full font-sans text-[length:var(--fs-eyebrow)] font-medium hover:bg-hueso hover:text-bordo hover:border-hueso transition-all"
+              {...fsStyle(scales?.["footer.cta_text"], undefined, "footer.cta_text")}
             >
               {c.cta_text}
             </Link>
@@ -137,7 +149,10 @@ export function Footer({
 
         {/* Bottom row */}
         <div className="pt-7 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="font-mono text-[var(--fs-eyebrow)] text-hueso/40 tracking-wide flex items-center gap-2 flex-wrap">
+          <p
+            className="font-mono text-[length:var(--fs-eyebrow)] text-hueso/40 tracking-wide flex items-center gap-2 flex-wrap"
+            {...fsStyle(scales?.["footer.copyright_name"], undefined, "footer.copyright_name")}
+          >
             © {new Date().getFullYear()} {c.copyright_name}
           </p>
         </div>

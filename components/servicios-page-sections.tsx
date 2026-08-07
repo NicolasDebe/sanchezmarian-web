@@ -416,7 +416,7 @@ function FinalCTA({ c, scales }: { c: Record<string, string>; scales?: FieldScal
         <Link
           href="/#contacto"
           className="group mt-10 inline-flex min-h-[44px] items-center gap-2 rounded-full bg-hueso px-8 py-4 font-sans font-semibold text-bordo transition-all hover:bg-hueso-oscuro active:scale-[0.98]"
-          style={{ fontSize: "var(--fs-body)" }}
+          {...fsStyle(scales?.["cta.button_text"], { fontSize: "var(--fs-body)" }, "cta.button_text")}
         >
           {c.button_text}
           <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>

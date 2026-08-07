@@ -41,6 +41,16 @@ const SCHEMA_IMPORT_TO_PAGE = {
   "@/lib/global-schema": "global",
 }
 
+/**
+ * Componentes que renderizan campos de una página pero NO importan su esquema
+ * (reciben el copy ya resuelto por props), así que la heurística del import no
+ * los alcanza. Se mapean a mano.
+ */
+const EXTRA_FILE_PAGES = {
+  "components/newsletter-card.tsx": "global",
+  "components/layout/Navbar.tsx": "global",
+}
+
 const SOURCE_DIRS = ["components", "app"]
 
 // ─── 1. Campos resizables declarados en los esquemas ─────────────────────────
@@ -153,6 +163,8 @@ function escapeRe(s) {
 }
 
 function pageOf(file) {
+  const rel = file.slice(ROOT.length).replace(/^[\\/]/, "").replace(/\\/g, "/")
+  if (EXTRA_FILE_PAGES[rel]) return EXTRA_FILE_PAGES[rel]
   const src = readFileSync(file, "utf8")
   for (const [imp, page] of Object.entries(SCHEMA_IMPORT_TO_PAGE)) {
     if (src.includes(`"${imp}"`)) return page

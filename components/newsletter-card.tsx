@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { motion, useReducedMotion, AnimatePresence } from "motion/react"
 import { ArrowRight, Lock, AlertCircle } from "lucide-react"
 import { createLead } from "@/app/actions/leads"
+import { fsStyle, type FieldScale, type FieldScaleMap } from "@/lib/text-size"
 
 export type NewsletterCopy = {
   eyebrow: string
@@ -23,7 +24,14 @@ type Status = "idle" | "loading" | "success" | "error"
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
-export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
+export function NewsletterCard({
+  copy,
+  scales,
+}: {
+  copy: NewsletterCopy
+  /** Tamaños/fuentes de page="global" (sección newsletter). */
+  scales?: FieldScaleMap
+}) {
   const reduced = useReducedMotion()
   const [nombre, setNombre] = useState("")
   const [email, setEmail] = useState("")
@@ -130,6 +138,8 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
             key="success"
             title={copy.success_title}
             message={copy.success_message}
+            titleScale={scales?.["newsletter.success_title"]}
+            messageScale={scales?.["newsletter.success_message"]}
             reduced={!!reduced}
           />
         ) : (
@@ -149,13 +159,13 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
             <motion.p
               variants={item}
               className="font-mono uppercase"
-              style={{
+              {...fsStyle(scales?.["newsletter.eyebrow"], {
                 fontSize: "var(--fs-eyebrow)",
                 letterSpacing: "0.16em",
                 color: "var(--color-bordo)",
                 opacity: 0.7,
                 marginBottom: 20,
-              }}
+              }, "newsletter.eyebrow")}
             >
               {copy.eyebrow}
             </motion.p>
@@ -182,13 +192,13 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
             <motion.h2
               variants={item}
               className="font-playfair"
-              style={{
+              {...fsStyle(scales?.["newsletter.title_pre"], {
                 fontSize: "var(--fs-h2)",
                 lineHeight: "var(--lh-tight)",
                 color: "var(--color-negro-bordo)",
                 fontWeight: 700,
                 marginBottom: 16,
-              }}
+              }, "newsletter.title_pre")}
             >
               {copy.title_pre}{" "}
               <em style={{ fontStyle: "italic", color: "var(--color-bordo)" }}>
@@ -201,13 +211,13 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
               <motion.p
                 variants={item}
                 className="font-sans"
-                style={{
+                {...fsStyle(scales?.["newsletter.subtitle"], {
                   fontSize: "var(--fs-body)",
                   lineHeight: "var(--lh-relaxed)",
                   color: "var(--color-gris-bordo)",
                   maxWidth: 480,
                   marginBottom: 36,
-                }}
+                }, "newsletter.subtitle")}
               >
                 {copy.subtitle}
               </motion.p>
@@ -264,7 +274,7 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
                   if (e.key === "Enter") handleSubmit()
                 }}
                 className="newsletter-input font-sans"
-                style={inputStyle}
+                {...fsStyle(scales?.["newsletter.name_label"], inputStyle, "newsletter.name_label")}
               />
 
               {/* Campo email */}
@@ -284,7 +294,11 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
                   if (e.key === "Enter") handleSubmit()
                 }}
                 className="newsletter-input font-sans"
-                style={{ ...inputStyle, marginTop: 14, marginBottom: 24 }}
+                {...fsStyle(
+                  scales?.["newsletter.email_label"],
+                  { ...inputStyle, marginTop: 14, marginBottom: 24 },
+                  "newsletter.email_label",
+                )}
               />
 
               {/* Botón principal */}
@@ -293,7 +307,7 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
                 onClick={handleSubmit}
                 disabled={loading}
                 className="newsletter-btn font-sans"
-                style={{
+                {...fsStyle(scales?.["newsletter.button_label"], {
                   background: "var(--color-bordo)",
                   color: "var(--color-hueso)",
                   borderRadius: 999,
@@ -310,7 +324,7 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
                   justifyContent: "center",
                   gap: 8,
                   transition: "background 0.2s ease, transform 0.2s ease",
-                }}
+                }, "newsletter.button_label")}
               >
                 {loading ? (
                   <>
@@ -350,7 +364,7 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
               {/* Nota de privacidad */}
               <p
                 className="font-mono"
-                style={{
+                {...fsStyle(scales?.["newsletter.privacy_note"], {
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
@@ -358,7 +372,7 @@ export function NewsletterCard({ copy }: { copy: NewsletterCopy }) {
                   color: "var(--color-gris-bordo)",
                   opacity: 0.7,
                   marginTop: 14,
-                }}
+                }, "newsletter.privacy_note")}
               >
                 <Lock size={12} strokeWidth={2} />
                 {copy.privacy_note}
@@ -387,10 +401,14 @@ const inputStyle: React.CSSProperties = {
 function SuccessState({
   title,
   message,
+  titleScale,
+  messageScale,
   reduced,
 }: {
   title: string
   message: string
+  titleScale?: FieldScale
+  messageScale?: FieldScale
   reduced: boolean
 }) {
   return (
@@ -408,12 +426,12 @@ function SuccessState({
         initial={{ opacity: 0, y: reduced ? 0 : 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: EASE, delay: reduced ? 0 : 0.4 }}
-        style={{
+        {...fsStyle(titleScale, {
           fontSize: "calc(32px * var(--text-scale))",
           fontWeight: 700,
           color: "var(--color-negro-bordo)",
           marginTop: 24,
-        }}
+        }, "newsletter.success_title")}
       >
         {title}
       </motion.p>
@@ -423,13 +441,13 @@ function SuccessState({
         initial={{ opacity: 0, y: reduced ? 0 : 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: EASE, delay: reduced ? 0 : 0.6 }}
-        style={{
+        {...fsStyle(messageScale, {
           fontSize: "var(--fs-body)",
           color: "var(--color-gris-bordo)",
           marginTop: 12,
           maxWidth: 360,
           lineHeight: "var(--lh-base)",
-        }}
+        }, "newsletter.success_message")}
       >
         {message}
       </motion.p>

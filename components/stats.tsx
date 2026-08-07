@@ -65,7 +65,7 @@ function StatItem({
         <span className="text-dorado">{suffix}</span>
       </p>
       <p
-        className="mt-4 font-mono text-[var(--fs-micro)] sm:text-[var(--fs-eyebrow)] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-gris-bordo/60"
+        className="mt-4 font-mono text-[length:var(--fs-micro)] sm:text-[length:var(--fs-eyebrow)] uppercase tracking-[0.18em] sm:tracking-[0.22em] text-gris-bordo/60"
         {...fsStyle(labelScale, undefined, labelFkey)}
       >
         {label}

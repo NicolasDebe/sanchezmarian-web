@@ -59,6 +59,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         label: "Pill de ubicación (sobre el título)",
         fallback: "Mendoza, Argentina",
         maxChars: 40,
+        resizable: true,
       },
       {
         field: "cta_primary_label",
@@ -66,6 +67,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         label: "Botón principal — texto",
         fallback: "Conversemos",
         maxChars: 30,
+        resizable: true,
       },
       {
         field: "cta_primary_link",
@@ -80,6 +82,7 @@ export const HOME_SECTIONS: SectionDef[] = [
         label: "Botón secundario — texto",
         fallback: "Mis valores",
         maxChars: 30,
+        resizable: true,
       },
       {
         field: "cta_secondary_link",
@@ -94,83 +97,19 @@ export const HOME_SECTIONS: SectionDef[] = [
     section: "servicios",
     title: "Servicios (vidriera del home)",
     legend:
-      "Cuatro servicios con jerarquía 1+3: uno destacado arriba y tres en grilla. Editá el título y la descripción corta de cada uno; el detalle completo vive en la página «Servicios». El botón del pie lleva a esa página.",
+      "Los cuatro servicios de la vidriera se editan desde la página «Servicios»: el home los espeja, así nunca quedan textos distintos en un lado y en el otro. Acá solo se edita el botón del pie, que lleva a esa página.",
     fields: [
-      {
-        field: "featured_title",
-        type: "text",
-        label: "Servicio destacado — Título",
-        fallback: "Estrategia y consultoría general de comunicación",
-        maxChars: 90,
-        help: "Servicio principal, card grande arriba.",
-      },
-      {
-        field: "featured_desc",
-        type: "longtext",
-        plain: true,
-        label: "Servicio destacado — Descripción",
-        fallback:
-          "Diseñado exclusivamente para empresas y marcas personales que buscan delegar su comunicación con absoluta confianza, liberando tiempo clave de su agenda para enfocarlo en el crecimiento del negocio.",
-        maxChars: 400,
-        help: "~3 líneas. Texto plano, sin negritas ni cursivas.",
-      },
-      {
-        field: "s2_title",
-        type: "text",
-        label: "Servicio 2 — Título",
-        fallback: "Prensa",
-        maxChars: 60,
-      },
-      {
-        field: "s2_desc",
-        type: "longtext",
-        plain: true,
-        label: "Servicio 2 — Descripción",
-        fallback:
-          "Lograr que la empresa y su vocero aparezca en medios de comunicación relevantes para su rubro y audiencia.",
-        maxChars: 320,
-        help: "Texto plano, sin negritas ni cursivas.",
-      },
-      {
-        field: "s3_title",
-        type: "text",
-        label: "Servicio 3 — Título",
-        fallback: "Relaciones públicas y eventos",
-        maxChars: 60,
-      },
-      {
-        field: "s3_desc",
-        type: "longtext",
-        plain: true,
-        label: "Servicio 3 — Descripción",
-        fallback:
-          "El vínculo estratégico entre la empresa o marca personal y sus públicos de interés: clientes, aliados, medios, comunidad y referentes del sector.",
-        maxChars: 320,
-        help: "Texto plano, sin negritas ni cursivas.",
-      },
-      {
-        field: "s4_title",
-        type: "text",
-        label: "Servicio 4 — Título",
-        fallback: "Entrenamiento en oratoria y asesoría de imagen",
-        maxChars: 70,
-      },
-      {
-        field: "s4_desc",
-        type: "longtext",
-        plain: true,
-        label: "Servicio 4 — Descripción",
-        fallback:
-          "Una estrategia de comunicación es tan fuerte como la persona que la transmite. Trabajamos con el vocero o referente para que pueda comunicarse con seguridad, claridad y coherencia en cualquier plataforma o instancia pública.",
-        maxChars: 320,
-        help: "Texto plano, sin negritas ni cursivas.",
-      },
+      // Los campos featured_* y s2_*…s4_* vivían acá pero NO se renderizaban en
+      // ningún lado: el home lee servicio_01…04 de page="servicios" (ver
+      // app/(site)/page.tsx). Eran campos huérfanos — Marian los editaba y no
+      // pasaba nada. Se eliminan; la fuente única es el esquema de servicios.
       {
         field: "cta_label",
         type: "text",
         label: "Botón del pie — texto",
         fallback: "Ver servicios en detalle",
         maxChars: 50,
+        resizable: true,
       },
     ],
   },
@@ -184,13 +123,13 @@ export const HOME_SECTIONS: SectionDef[] = [
       { field: "whatsapp_label", type: "text", label: "WhatsApp — canal", fallback: "WhatsApp", maxChars: 60, resizable: true },
       { field: "whatsapp_value", type: "text", label: "WhatsApp — número", fallback: "+54 261 543 3882", maxChars: 60, resizable: true },
       { field: "whatsapp_link", type: "text", label: "WhatsApp — link", fallback: WHATSAPP_HREF, maxChars: 300 },
-      { field: "whatsapp_cta", type: "text", label: "WhatsApp — texto del link", fallback: "Abrir conversación", maxChars: 60 },
+      { field: "whatsapp_cta", type: "text", label: "WhatsApp — texto del link", fallback: "Abrir conversación", maxChars: 60, resizable: true },
       { field: "email_label", type: "text", label: "Email — canal", fallback: "Email", maxChars: 60, resizable: true },
       { field: "email_value", type: "text", label: "Email — dirección", fallback: SITE_EMAIL, maxChars: 300, resizable: true },
-      { field: "email_cta", type: "text", label: "Email — texto del link", fallback: "Enviar email", maxChars: 60 },
+      { field: "email_cta", type: "text", label: "Email — texto del link", fallback: "Enviar email", maxChars: 60, resizable: true },
       { field: "form_label", type: "text", label: "Formulario — canal", fallback: "Formulario", maxChars: 60, resizable: true },
       { field: "form_value", type: "text", label: "Formulario — identificador", fallback: "Más abajo", maxChars: 60, resizable: true },
-      { field: "form_cta", type: "text", label: "Formulario — texto del link", fallback: "Ir al formulario", maxChars: 60 },
+      { field: "form_cta", type: "text", label: "Formulario — texto del link", fallback: "Ir al formulario", maxChars: 60, resizable: true },
     ],
   },
   {
@@ -242,7 +181,7 @@ export const HOME_SECTIONS: SectionDef[] = [
     legend:
       "Título — la parte destacada (segunda línea) se muestra en cursiva bordó automáticamente.",
     fields: [
-      { field: "badge", type: "text", label: "Badge sobre la foto", fallback: "Más de una década en comunicación", maxChars: 50 },
+      { field: "badge", type: "text", label: "Badge sobre la foto", fallback: "Más de una década en comunicación", maxChars: 50, resizable: true },
       { field: "eyebrow", type: "text", label: "Eyebrow", fallback: "Sobre Marian", maxChars: 30, resizable: true },
       {
         field: "title_pre",
@@ -281,11 +220,11 @@ export const HOME_SECTIONS: SectionDef[] = [
         maxChars: 1000,
         resizable: true,
       },
-      { field: "tag_1", type: "text", label: "Tag 1", fallback: "Comunicación estratégica", maxChars: 40 },
-      { field: "tag_2", type: "text", label: "Tag 2", fallback: "Prensa y medios", maxChars: 40 },
-      { field: "tag_3", type: "text", label: "Tag 3", fallback: "Relaciones Públicas", maxChars: 40 },
-      { field: "tag_4", type: "text", label: "Tag 4", fallback: "Mendoza, Argentina", maxChars: 40 },
-      { field: "link_text", type: "text", label: "Texto del link", fallback: "Conocé mis valores", maxChars: 50 },
+      { field: "tag_1", type: "text", label: "Tag 1", fallback: "Comunicación estratégica", maxChars: 40, resizable: true },
+      { field: "tag_2", type: "text", label: "Tag 2", fallback: "Prensa y medios", maxChars: 40, resizable: true },
+      { field: "tag_3", type: "text", label: "Tag 3", fallback: "Relaciones Públicas", maxChars: 40, resizable: true },
+      { field: "tag_4", type: "text", label: "Tag 4", fallback: "Mendoza, Argentina", maxChars: 40, resizable: true },
+      { field: "link_text", type: "text", label: "Texto del link", fallback: "Conocé mis valores", maxChars: 50, resizable: true },
     ],
   },
   {
@@ -322,7 +261,7 @@ export const HOME_SECTIONS: SectionDef[] = [
       },
       { field: "email", type: "text", label: "Email de contacto", fallback: SITE_EMAIL, maxChars: 300, resizable: true },
       { field: "location", type: "text", label: "Ubicación", fallback: "Mendoza, Argentina", maxChars: 60, resizable: true },
-      { field: "form_button", type: "text", label: "Texto del botón del formulario", fallback: "Escribime", maxChars: 30 },
+      { field: "form_button", type: "text", label: "Texto del botón del formulario", fallback: "Escribime", maxChars: 30, resizable: true },
     ],
   },
 ]

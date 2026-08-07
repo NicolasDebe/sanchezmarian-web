@@ -93,11 +93,11 @@ function HeroMobile({ c, scales }: { c: Record<string, string>; scales?: FieldSc
         <motion.div {...satellite(0)}>
           <span
             className="inline-flex items-center gap-2 rounded-full border border-bordo/20 bg-bordo/5 font-mono uppercase text-bordo"
-            style={{
+            {...fsStyle(scales?.["hero.location_tag"], {
               fontSize: "var(--fs-eyebrow)",
               letterSpacing: "0.14em",
               padding: "8px 14px",
-            }}
+            }, "hero.location_tag")}
           >
             <MapPin size={12} aria-hidden />
             {c.location_tag}
@@ -141,11 +141,11 @@ function HeroMobile({ c, scales }: { c: Record<string, string>; scales?: FieldSc
             href={c.cta_primary_link}
             whileTap={{ scale: 0.98 }}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-bordo font-sans font-semibold text-hueso"
-            style={{
+            {...fsStyle(scales?.["hero.cta_primary_label"], {
               padding: "14px 28px",
               fontSize: "var(--fs-body)",
               letterSpacing: "0.02em",
-            }}
+            }, "hero.cta_primary_label")}
           >
             {c.cta_primary_label}
             <ArrowRight size={16} aria-hidden />
@@ -155,11 +155,11 @@ function HeroMobile({ c, scales }: { c: Record<string, string>; scales?: FieldSc
             href={c.cta_secondary_link}
             whileTap={{ scale: 0.98 }}
             className="inline-flex items-center justify-center gap-2 rounded-full border border-bordo bg-transparent font-sans font-semibold text-bordo"
-            style={{
+            {...fsStyle(scales?.["hero.cta_secondary_label"], {
               padding: "14px 28px",
               fontSize: "var(--fs-body)",
               letterSpacing: "0.02em",
-            }}
+            }, "hero.cta_secondary_label")}
           >
             {c.cta_secondary_label}
             <ArrowRight size={16} aria-hidden />
@@ -226,13 +226,13 @@ function HeroDesktop({ c, scales }: { c: Record<string, string>; scales?: FieldS
             >
               <MapPin size={14} strokeWidth={1.5} style={{ color: "#FEFCEF" }} />
               <span
-                style={{
+                {...fsStyle(scales?.["hero.location_tag"], {
                   fontFamily: "var(--font-dm-mono), monospace",
                   fontSize: "var(--fs-eyebrow)",
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   color: "#FEFCEF",
-                }}
+                }, "hero.location_tag")}
               >
                 {c.location_tag}
               </span>
@@ -298,7 +298,7 @@ function HeroDesktop({ c, scales }: { c: Record<string, string>; scales?: FieldS
                 whileHover={{ scale: 1.02, backgroundColor: "#F0E8D8" }}
                 whileTap={{ scale: 0.98 }}
                 transition={springSnappy}
-                style={{
+                {...fsStyle(scales?.["hero.cta_primary_label"], {
                   backgroundColor: "#FEFCEF",
                   color: "#66001F",
                   padding: "16px 28px",
@@ -312,7 +312,7 @@ function HeroDesktop({ c, scales }: { c: Record<string, string>; scales?: FieldS
                   gap: "8px",
                   letterSpacing: "0.01em",
                   lineHeight: 1.35,
-                }}
+                }, "hero.cta_primary_label")}
               >
                 {c.cta_primary_label}
                 <ArrowRight
@@ -332,7 +332,7 @@ function HeroDesktop({ c, scales }: { c: Record<string, string>; scales?: FieldS
                 }}
                 whileTap={{ scale: 0.98 }}
                 transition={springSnappy}
-                style={{
+                {...fsStyle(scales?.["hero.cta_secondary_label"], {
                   backgroundColor: "transparent",
                   color: "#FEFCEF",
                   padding: "16px 28px",
@@ -347,7 +347,7 @@ function HeroDesktop({ c, scales }: { c: Record<string, string>; scales?: FieldS
                   gap: "6px",
                   letterSpacing: "0.01em",
                   whiteSpace: "nowrap",
-                }}
+                }, "hero.cta_secondary_label")}
               >
                 {c.cta_secondary_label}
               </motion.a>

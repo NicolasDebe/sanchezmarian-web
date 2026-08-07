@@ -28,6 +28,7 @@ export default async function SiteLayout({
       </a>
       <Navbar
         content={global.nav}
+        scales={global.scales}
         social={{
           instagram: global.footer.instagram_url,
           linkedin: global.footer.linkedin_url,
@@ -36,7 +37,7 @@ export default async function SiteLayout({
       <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
         {children}
       </main>
-      <Footer content={global.footer} nav={global.nav} />
+      <Footer content={global.footer} nav={global.nav} scales={global.scales} />
       <WhatsAppFloat />
       <DesignPreviewBridge />
       <TextSizePreviewBridge />

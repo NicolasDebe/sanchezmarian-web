@@ -5,7 +5,7 @@ import Link from "next/link"
 import { EASE_EXPO } from "@/lib/animations"
 import { fallbacksFor } from "@/lib/servicios-schema"
 import { ServiceFeatureCard } from "@/components/servicios/service-feature-card"
-import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
+import { fsStyle, type FieldScale, type FieldScaleMap } from "@/lib/text-size"
 
 /**
  * Vidriera de servicios del HOME — ESPEJO RESUMIDO de /servicios.
@@ -48,10 +48,13 @@ type ServicioCard = { section: string; anchor: string; eyebrow: string; title: s
 export function HomeServicios({
   servicios,
   ctaLabel,
+  ctaScale,
   scales,
 }: {
   servicios?: Record<string, Record<string, string>>
   ctaLabel?: string
+  /** Apariencia del botón del pie — vive en home/servicios.cta_label. */
+  ctaScale?: FieldScale
   /**
    * Tamaños/fuentes de la página «servicios» (no del home): estas cards son un
    * espejo de /servicios, así que comparten el mismo campo editable y el mismo
@@ -129,7 +132,7 @@ export function HomeServicios({
             <Link
               href="/servicios"
               className="group inline-flex items-center gap-2 rounded-full bg-bordo px-8 py-4 font-sans font-semibold text-hueso transition-all hover:bg-bordo/90 active:scale-[0.98]"
-              style={{ fontSize: "var(--fs-body)" }}
+              {...fsStyle(ctaScale, { fontSize: "var(--fs-body)" }, "servicios.cta_label")}
             >
               {cta}
               <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">→</span>

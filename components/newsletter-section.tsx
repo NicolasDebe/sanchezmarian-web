@@ -1,4 +1,4 @@
-import { getNewsletterContent } from "@/lib/global-content"
+import { getNewsletterContent, getGlobalScales } from "@/lib/global-content"
 import { globalFallbacksFor } from "@/lib/global-schema"
 import { WHATSAPP_CHANNEL_URL, WHATSAPP_CHANNEL_PREFIX } from "@/lib/constants"
 import { NewsletterCard, type NewsletterCopy } from "@/components/newsletter-card"
@@ -8,7 +8,7 @@ import { NewsletterCard, type NewsletterCopy } from "@/components/newsletter-car
  * NewsletterCard. Padding vertical generoso (80px mobile → 120px desktop).
  */
 export async function NewsletterSection() {
-  const c = await getNewsletterContent()
+  const [c, scales] = await Promise.all([getNewsletterContent(), getGlobalScales()])
   const fb = globalFallbacksFor("newsletter")
   // Merge defensivo: si faltara algún campo, cae al fallback del esquema.
   const copy = { ...fb, ...c } as NewsletterCopy
@@ -33,7 +33,7 @@ export async function NewsletterSection() {
         padding: "clamp(80px, 12vw, 120px) 24px",
       }}
     >
-      <NewsletterCard copy={copy} />
+      <NewsletterCard copy={copy} scales={scales} />
     </section>
   )
 }
