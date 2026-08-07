@@ -22,7 +22,11 @@ export function Bio({
   scales?: FieldScaleMap
 }) {
   const c = { ...fallbacksFor("bio"), ...content }
-  const TAGS = [c.tag_1, c.tag_2, c.tag_3, c.tag_4].filter(Boolean)
+  // Cada tag conserva su número para armar el fkey (bio.tag_N): así Marian
+  // ajusta el tamaño de uno sin tocar los otros.
+  const TAGS = [1, 2, 3, 4]
+    .map((n) => ({ n, text: c[`tag_${n}`] }))
+    .filter((t) => Boolean(t.text))
   const instagramUrl = social?.instagram || SOCIAL_LINKS.instagram
   const linkedinUrl = social?.linkedin || SOCIAL_LINKS.linkedin
 
@@ -72,7 +76,7 @@ export function Bio({
                 >
                   <p
                     className="font-mono uppercase tracking-widest leading-none"
-                    style={{ color: "#FEFCEF", fontSize: "var(--fs-eyebrow)" }}
+                    {...fsStyle(scales?.["bio.badge"], { color: "#FEFCEF", fontSize: "var(--fs-eyebrow)" }, "bio.badge")}
                   >
                     {c.badge}
                   </p>
@@ -115,20 +119,25 @@ export function Bio({
               <em className="block italic text-bordo">{c.title_accent}</em>
             </motion.h2>
 
+            {/* El fontSize va en CADA párrafo, no solo en el contenedor: los <p>
+                salen de HTML sanitizado y no llevan estilo propio, así que
+                heredarían un tamaño ya resuelto y el ajuste por campo no los
+                movería. Con el token en el wrapper de cada RichText, su
+                --text-scale local sí manda. Visualmente idéntico. */}
             <motion.div variants={fadeUp} className="flex flex-col gap-4 font-sans text-gris-bordo leading-[1.8] max-w-[480px]" style={{ fontSize: "var(--fs-body-lg)" }}>
-              <RichText html={c.paragraph_1} className="rich-inline" scale={scales?.["bio.paragraph_1"]} fkey="bio.paragraph_1" />
-              <RichText html={c.paragraph_2} className="rich-inline" scale={scales?.["bio.paragraph_2"]} fkey="bio.paragraph_2" />
-              <RichText html={c.paragraph_3} className="rich-inline" scale={scales?.["bio.paragraph_3"]} fkey="bio.paragraph_3" />
+              <RichText html={c.paragraph_1} className="rich-inline" style={{ fontSize: "var(--fs-body-lg)" }} scale={scales?.["bio.paragraph_1"]} fkey="bio.paragraph_1" />
+              <RichText html={c.paragraph_2} className="rich-inline" style={{ fontSize: "var(--fs-body-lg)" }} scale={scales?.["bio.paragraph_2"]} fkey="bio.paragraph_2" />
+              <RichText html={c.paragraph_3} className="rich-inline" style={{ fontSize: "var(--fs-body-lg)" }} scale={scales?.["bio.paragraph_3"]} fkey="bio.paragraph_3" />
             </motion.div>
 
             <motion.ul variants={fadeUp} className="flex flex-wrap gap-2">
               {TAGS.map((tag) => (
                 <li
-                  key={tag}
+                  key={tag.n}
                   className="font-sans px-3 py-1.5 rounded-full border border-bordo/40 text-bordo cursor-default transition-colors duration-200 hover:bg-bordo hover:text-hueso hover:border-bordo"
-                  style={{ fontSize: "var(--fs-eyebrow)" }}
+                  {...fsStyle(scales?.[`bio.tag_${tag.n}`], { fontSize: "var(--fs-eyebrow)" }, `bio.tag_${tag.n}`)}
                 >
-                  {tag}
+                  {tag.text}
                 </li>
               ))}
             </motion.ul>
@@ -169,7 +178,7 @@ export function Bio({
               <Link
                 href="/mis-valores"
                 className="group inline-flex items-center gap-2.5 font-sans font-semibold text-bordo border border-bordo/40 px-5 py-2.5 rounded-full w-fit hover:bg-bordo hover:text-hueso hover:border-bordo transition-all duration-300"
-                style={{ fontSize: "var(--fs-caption)" }}
+                {...fsStyle(scales?.["bio.link_text"], { fontSize: "var(--fs-caption)" }, "bio.link_text")}
               >
                 {c.link_text}
                 <ArrowRight

@@ -166,7 +166,10 @@ export function CtaFinal({
                 >
                   {card.value}
                 </span>
-                <span className="mt-1 inline-flex items-center gap-1 font-sans font-semibold text-bordo" style={{ fontSize: "var(--fs-eyebrow)" }}>
+                <span
+                  className="mt-1 inline-flex items-center gap-1 font-sans font-semibold text-bordo"
+                  {...fsStyle(scales?.[`contact.${card.key}_cta`], { fontSize: "var(--fs-eyebrow)" }, `contact.${card.key}_cta`)}
+                >
                   {card.cta}
                   <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
                     →
@@ -213,7 +216,9 @@ export function CtaFinal({
             </motion.h2>
 
             <motion.div variants={fadeUp} className="font-sans text-hueso/65 leading-[1.7] max-w-[420px]" style={{ fontSize: "var(--fs-body)" }}>
-              <RichText html={c.description} className="rich-inline" scale={scales?.["cta_final.description"]} fkey="cta_final.description" />
+              {/* fontSize propio: los <p> del HTML sanitizado no lo traen y
+                  heredarían un valor ya resuelto (ver nota en bio.tsx). */}
+              <RichText html={c.description} className="rich-inline" style={{ fontSize: "var(--fs-body)" }} scale={scales?.["cta_final.description"]} fkey="cta_final.description" />
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 pt-1">
@@ -378,7 +383,7 @@ export function CtaFinal({
                 whileTap={submitting ? undefined : { scale: tapScale }}
                 transition={springSnappy}
                 className="mt-1 w-full flex items-center justify-center gap-2 bg-hueso text-bordo px-6 py-4 rounded-lg font-sans font-semibold hover:bg-arena transition-colors disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
-                style={{ fontSize: "var(--fs-caption)" }}
+                {...fsStyle(scales?.["cta_final.form_button"], { fontSize: "var(--fs-caption)" }, "cta_final.form_button")}
               >
                 <AnimatePresence mode="popLayout" initial={false}>
                   {submitting ? (
