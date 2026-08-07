@@ -64,14 +64,38 @@
 
 /* Tamaño por campo (tabla text_sizes): un título/párrafo con [data-fscale]
    recalcula SOLO su --text-scale local = escala global de la página × factor
-   del campo. Como todos los --fs-* multiplican por --text-scale, esto agranda
-   el texto SIN tocar la fuente ni el tamaño base. Mobile/desktop independientes
-   vía --fs-local-m / --fs-local-d (default 1 = sin cambio). */
+   del campo, SIN tocar la fuente ni el tamaño base. Mobile/desktop
+   independientes vía --fs-local-m / --fs-local-d (default 1 = sin cambio). */
 @media (max-width: 767px) {
   [data-fscale] { --text-scale: calc(var(--text-scale-mobile) * var(--fs-local-m, 1)); }
 }
 @media (min-width: 768px) {
   [data-fscale] { --text-scale: calc(var(--text-scale-desktop) * var(--fs-local-d, 1)); }
+}
+
+/* Los tokens --fs-* se declaran en :root, así que su var(--text-scale) se
+   sustituye ALLÍ: lo que hereda el elemento ya viene con la escala global fija
+   y su --text-scale local nunca entraría. Por eso los redeclaramos acá, sobre
+   el propio elemento escalado: mismas fórmulas, pero resueltas contra el
+   --text-scale local de arriba.
+
+   Sin esto, el control solo funciona en los textos cuyo font-size trae el
+   calc(... * var(--text-scale)) escrito en el elemento, y queda MUERTO en todos
+   los que usan un token (fontSize: "var(--fs-h2)", text-[var(--fs-body)], …).
+   Mantener sincronizada esta lista con la de :root. */
+[data-fscale] {
+  --fs-micro:    calc(10px * var(--text-scale));
+  --fs-eyebrow:  calc(11px * var(--text-scale));
+  --fs-caption:  calc(13px * var(--text-scale));
+  --fs-body:     calc(15px * var(--text-scale));
+  --fs-body-lg:  calc(16px * var(--text-scale));
+  --fs-lead:     calc(20px * var(--text-scale));
+  --fs-h4:       calc(clamp(18px, 2vw, 24px) * var(--text-scale));
+  --fs-h3:       calc(clamp(20px, 2.5vw, 28px) * var(--text-scale));
+  --fs-h2:       calc(clamp(28px, 4vw, 44px) * var(--text-scale));
+  --fs-h1:       calc(clamp(32px, 5vw, 56px) * var(--text-scale));
+  --fs-h1-hero:  calc(clamp(2.2rem, 5.5vw, 4.5rem) * var(--text-scale));
+  --fs-display:  calc(clamp(72px, 18vw, 200px) * var(--text-scale));
 }
 
 html {
