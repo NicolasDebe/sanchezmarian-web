@@ -284,7 +284,11 @@ async function main() {
     check("estrellas con aria-label", (await pendiente.locator('[role="img"]').getAttribute("aria-label")) === "5 de 5 estrellas")
     check("nombre, cargo y marca", texto.includes("Zzz Pendiente") && texto.includes("Editora de Economía"))
     check("cuerpo completo sin truncar", texto.includes("del otro lado del mostrador"))
-    check("mail y verificación", texto.includes(`${E2E_PREFIX}1@example.com`) && texto.includes("verificado el"))
+    check("muestra el mail de contacto", texto.includes(`${E2E_PREFIX}1@example.com`))
+    check(
+      "y NO habla de mail verificado (ya no hay doble opt-in)",
+      !/verificad/i.test(texto),
+    )
     check("fecha de envío", texto.includes("Enviada el"))
     check(
       "el link del perfil abre en pestaña nueva y segura",

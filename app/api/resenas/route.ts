@@ -6,19 +6,24 @@
  *   1. honeypot   → 200 con éxito simulado, no inserta nada
  *   2. rate limit → 3 reseñas por IP cada 24h
  *   3. zod        → errores por campo, los pinta el formulario
- *   4. insert     → status pending_verification
- *   5. mail       → si falla, la reseña YA está guardada y se avisa distinto
+ *   4. insert     → status pending_review, directo a la cola de moderación
+ *   5. aviso      → mail interno al equipo, después de responder
+ *
+ * NO hay confirmación por mail del autor: la reseña entra derecho a moderación.
+ * El filtro real es que Marian aprueba una por una y que cada reseña trae un
+ * link a un perfil público para chequear quién la firma.
  *
  * Nunca devuelve un stack ni un error de Supabase al cliente.
  */
 
+import { after } from "next/server"
 import type { NextRequest } from "next/server"
 import {
   createTestimonial,
   hashTestimonialIp,
   countRecentSubmissionsByIp,
 } from "@/lib/testimonials"
-import { sendVerificationEmail } from "@/lib/testimonials-email"
+import { sendModerationNotice } from "@/lib/testimonials-email"
 import { SITE_EMAIL } from "@/lib/constants"
 import type { TestimonialFieldErrors } from "@/lib/testimonials-schema"
 
@@ -28,10 +33,14 @@ export const dynamic = "force-dynamic"
 const RATE_LIMIT_MAX = 3
 const RATE_LIMIT_HOURS = 24
 
+/**
+ * Lo que se le responde a un envío bueno. Es el MISMO texto que devuelve el
+ * honeypot: si el bot recibiera algo distinto, aprendería que lo detectamos.
+ */
+const SUCCESS_MESSAGE = "Recibimos tu reseña. Marian la revisa antes de publicarla."
+
 export type ResenaApiResponse = {
   ok: boolean
-  /** true = quedó guardada pero el mail no salió; hay que avisar por otro lado. */
-  emailFailed?: boolean
   message?: string
   error?: string
   fieldErrors?: TestimonialFieldErrors
@@ -74,7 +83,7 @@ export async function POST(req: NextRequest) {
   // que lo detectamos, y no insertamos nada.
   if (typeof website === "string" && website.trim() !== "") {
     console.warn("[api/resenas] honeypot activado, descartado")
-    return json({ ok: true, message: "Listo. Revisá tu correo." })
+    return json({ ok: true, message: SUCCESS_MESSAGE })
   }
 
   // 2. Rate limit por IP. El hash es el mismo que se guarda en la fila.
@@ -108,27 +117,11 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // 5. Mail de verificación. El token NO sale en la respuesta: solo viaja al
-  // mail del autor, que es justamente lo que prueba que la casilla es suya.
-  const emailOk = await sendVerificationEmail(
-    result.email,
-    result.name,
-    result.token,
-  )
+  // 5. Aviso al equipo. Va con after(): se manda DESPUÉS de responderle a la
+  // persona, así el formulario no espera a Resend. Si el mail falla no pasa
+  // nada grave —la reseña ya está guardada y el badge del panel la cuenta—,
+  // por eso sendModerationNotice nunca tira.
+  after(() => sendModerationNotice(result.testimonial))
 
-  if (!emailOk) {
-    return json({
-      ok: true,
-      emailFailed: true,
-      message:
-        "Guardamos tu reseña, pero no pudimos mandarte el mail de confirmación. Escribinos a " +
-        SITE_EMAIL +
-        " y la confirmamos a mano.",
-    })
-  }
-
-  return json({
-    ok: true,
-    message: "Te mandamos un mail para confirmar que la reseña es tuya.",
-  })
+  return json({ ok: true, message: SUCCESS_MESSAGE })
 }

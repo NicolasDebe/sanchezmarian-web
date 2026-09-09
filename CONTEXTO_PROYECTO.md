@@ -230,8 +230,8 @@ una sección por página).
   `scripts/audit-campaign-images.ts` imprime schema y positions actuales.
 
 ### Reseñas con moderación (base de datos + capa de datos, 2026-09-08)
-Sistema de reseñas de marcas/clientes y periodistas, con doble opt-in por mail
-y moderación manual. **Este paso es SOLO backend: todavía no hay UI ni rutas.**
+Sistema de reseñas de marcas/clientes y periodistas, con moderación manual.
+(Nació con doble opt-in por mail; se sacó el 2026-09-09, ver más abajo.) **Este paso es SOLO backend: todavía no hay UI ni rutas.**
 
 - Tabla Supabase `testimonials`. SQL en
   `supabase/migrations/20260908_testimonials.sql` (idempotente, se pega en el
@@ -246,27 +246,25 @@ y moderación manual. **Este paso es SOLO backend: todavía no hay UI ni rutas.*
   clave del link de verificación, una colisión verificaría la reseña
   equivocada).
 
-- **Flujo de estados** (no hay atajos: nada se publica sin pasar por los dos
-  filtros):
+- **Flujo de estados** (desde 2026-09-09, sin doble opt-in):
 
   ```
-  [envío del form]
-        ↓
-  pending_verification ──(clic en el link del mail, dentro de 7 días)──→ pending_review
-        │                                                                      │
-        │ (link vencido: queda acá, no se modera)              Marian decide ──┤
-        │                                                                      ├─→ published
-        │                                                                      └─→ rejected
-        │                                                                            ↕
-        └── publishTestimonial la rechaza en este estado          (se puede republicar/bajar)
+  [envío del form] → pending_review ──Marian decide──┬─→ published
+                                                     └─→ rejected
+                                                           ↕
+                                              (se puede republicar/bajar)
   ```
 
-  - `pending_verification` → recién enviada, falta que el autor confirme el mail.
-  - `pending_review` → mail confirmado, esperando moderación. **Verificar NO
-    publica.**
+  - `pending_review` → recién enviada, esperando moderación.
   - `published` → visible en el sitio.
   - `rejected` → descartada; `moderation_note` guarda el motivo (uso interno,
     no se le manda al autor).
+  - `pending_verification` sigue en el CHECK de la tabla y en el tipo, pero
+    NADA lo produce: es del flujo viejo.
+
+  **La moderación es el ÚNICO filtro.** Lo que reemplaza a la confirmación por
+  mail es que Marian conoce a quien la reseña y que cada reseña exige un link a
+  un perfil público, que se abre desde el panel antes de aprobar.
 
 - **RLS**: activado, con UNA sola policy pública — `SELECT` donde
   `status = 'published'`. Ninguna policy de insert ni de update para anon: todas
@@ -342,35 +340,26 @@ sección de reseñas en el sitio.
 - **`POST /api/resenas`**. Filtros en orden: honeypot (`website`, oculto con CSS
   fuera de pantalla — devuelve 200 con éxito simulado y NO inserta) → rate limit
   (3 por `ip_hash` cada 24h, 429 con mensaje amable) → zod (422 con errores por
-  campo) → insert → mail. El token NUNCA sale en la respuesta HTTP: viaja solo
-  al mail del autor, que es lo que prueba que la casilla es suya.
+  campo) → insert en `pending_review` → aviso al equipo con `after()` (después
+  de responder, así el formulario no espera a Resend). El éxito y el honeypot
+  devuelven EL MISMO texto: si el bot recibiera algo distinto, aprendería que
+  lo detectamos.
 
-- **Mails con Resend** (`lib/testimonials-email.ts`). Sale TODO desde
-  `info@sanchezmarian.com` (`SITE_EMAIL` de lib/constants.ts): remitente,
-  reply-to y la casilla que recibe el aviso de moderación. Es la casilla real
-  que alguien lee — con un remitente aparte (resenas@…), el que contesta el
-  mail de confirmación le escribiría a un buzón que nadie mira. En Resend hay
-  que verificar el DOMINIO sanchezmarian.com para poder mandar desde ahí.
-  `MODERATION_NOTIFY_EMAIL` quedó OPCIONAL: sin ella el aviso cae igual en
-  `SITE_EMAIL`; solo sirve para desviarlo mientras se prueba. (1) Verificación al autor, asunto "Confirmá tu
-  reseña", botón bordó al link, aviso de vencimiento a 7 días; si Resend falla
-  la reseña YA quedó guardada y el usuario ve un mensaje pidiendo escribir a
-  info@ (nunca un error crudo). (2) Aviso de moderación al equipo
-  (`MODERATION_NOTIFY_EMAIL`), asunto "Reseña nueva para revisar · [nombre] de
-  [marca]"; si falla, se loguea y no rompe nada. Todo el texto de usuario se
-  escapa antes de entrar al HTML. `npx tsx scripts/preview-emails.ts` los
-  escribe a `.preview-emails/` para revisarlos sin mandar nada.
+- **Mail con Resend** (`lib/testimonials-email.ts`). Queda UNO solo: el aviso
+  al equipo de que hay una reseña para moderar, asunto "Reseña nueva para
+  revisar · [nombre] de [marca]". Sale desde `info@sanchezmarian.com`
+  (`SITE_EMAIL`) y llega a `MODERATION_NOTIFY_EMAIL` o, si no está seteada, a
+  `SITE_EMAIL`. Es best-effort: si falla se loguea y nada se rompe — la reseña
+  ya está guardada y el badge del panel la cuenta. **Sin `RESEND_API_KEY` el
+  sistema entero funciona igual**, solo que nadie recibe el aviso y hay que
+  mirar el panel. Todo el texto de usuario se escapa antes de entrar al HTML.
+  `npx tsx scripts/preview-emails.ts` lo escribe a `.preview-emails/`.
 
-- **`/resenas/verificar/[token]`**. Server component, tres estados (confirmada /
-  vencido / inválido-o-usado). `already_verified`, `not_found` y `error` caen
-  todos en la misma pantalla a propósito: decir cuál es le confirmaría a alguien
-  que prueba tokens que acertó uno. SIN `revalidatePath` (todavía no se publica
-  nada). El aviso de moderación se dispara con `after()` de `next/server`, o sea
-  después de responder, y solo en la transición real (no si el link se reusa).
-
-- Env vars nuevas: `RESEND_API_KEY`, `MODERATION_NOTIFY_EMAIL`. Más
-  `NEXT_PUBLIC_SITE_URL` (opcional: si falta, los links salen al dominio
-  canónico de `lib/seo.ts`).
+- Env vars, TODAS opcionales desde que se sacó el doble opt-in:
+  `RESEND_API_KEY` y `MODERATION_NOTIFY_EMAIL` (sin ellas no llega el aviso de
+  moderación, pero las reseñas entran igual), `TESTIMONIAL_IP_SALT` (sin ella
+  no hay rate limit) y `NEXT_PUBLIC_SITE_URL` (si falta, los links salen al
+  dominio canónico de `lib/seo.ts`).
 
 - Tests: `npx tsx scripts/e2e-resena-form.ts` (Playwright con el Edge del
   sistema; 38 checks de interacción y accesibilidad, NO toca la base porque
@@ -537,14 +526,14 @@ alguien la escribe → confirma su mail → Marian decide → se ve en el sitio.
 - ~~Correr la migración de reseñas~~ → hecha (2026-09-09, verificada contra la
   base).
 - ~~Panel `/admin/resenas`~~ → hecho (2026-09-09, ver arriba).
-- ⚠ BLOQUEANTE en producción (verificado 2026-09-09 con un POST real a
-  /api/resenas: devolvió `emailFailed: true` y la fila quedó con `ip_hash` en
-  null). Faltan en Vercel: `RESEND_API_KEY` y `TESTIMONIAL_IP_SALT`. Sin la
-  primera NADIE puede confirmar su reseña, así que ninguna llega al panel:
-  no hay que mandarle el link a los clientes hasta que esté. `RESEND_API_KEY`
-  tampoco está en `.env.local` (hay que crear la cuenta en resend.com y
-  verificar el dominio sanchezmarian.com para mandar desde info@).
-  `MODERATION_NOTIFY_EMAIL` ya no es obligatoria.
+- ~~BLOQUEANTE: sin RESEND_API_KEY nadie podía confirmar su reseña~~ → ya no
+  aplica: se sacó el paso de confirmación (2026-09-09). El sistema funciona de
+  punta a punta sin ninguna env var; probado contra producción y contra la base.
+- Pendiente NO bloqueante, en Vercel: `TESTIMONIAL_IP_SALT` (sin ella el
+  formulario no tiene rate limit; el valor está en `.env.local`) y, si se
+  quiere el aviso por mail de reseña nueva, `RESEND_API_KEY` (hay que crear la
+  cuenta en resend.com y verificar el dominio sanchezmarian.com). Sin esta
+  última hay que mirar el badge del panel para enterarse.
 - Reseñas, lo único que falta: migrar el copy del formulario de alta
   (`/resenas/nueva`, hoy hardcodeado) al CMS.
 - Correr la migración SQL de clippings en el dashboard + seed (paso manual,

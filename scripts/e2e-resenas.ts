@@ -8,7 +8,7 @@
  * prefijo E2E_PREFIX y se borran al final, pase o falle.
  *
  * Cubre: alta válida, honeypot, validación por campo, rate limit por IP,
- * verificación por token (incluida la reutilización del link) y token inválido.
+ * y que la reseña entra derecho a la cola de moderación.
  */
 
 import { config } from "dotenv"
@@ -90,18 +90,21 @@ async function main() {
     check("ok: true", a.json.ok === true, JSON.stringify(a.json))
     check(
       "no filtra el token en la respuesta",
-      !JSON.stringify(a.json).includes("-4") || !("token" in a.json),
+      !("token" in a.json) && !("verification_token" in a.json),
       JSON.stringify(a.json),
     )
 
     const { data: row } = await admin
       .from("testimonials")
-      .select("id, status, verification_token, ip_hash, rating, body, author_name")
+      .select("id, status, verified_at, ip_hash, rating, body, author_name")
       .eq("author_email", `${E2E_PREFIX}1@example.com`)
       .maybeSingle()
 
     check("quedó la fila en la base", !!row)
-    check("status = pending_verification", row?.status === "pending_verification", row?.status)
+    // Sin doble opt-in: entra directo a la cola, lista para moderar.
+    check("status = pending_review", row?.status === "pending_review", row?.status)
+    check("NO se publicó sola", row?.status !== "published")
+    check("no dice que el mail está verificado", !row?.verified_at)
     check("guardó ip_hash (salt configurado)", !!row?.ip_hash)
     check("guardó el body sin tocar", row?.body === BODY_OK)
 
@@ -169,45 +172,15 @@ async function main() {
       (await post(validPayload(15), "203.0.113.77")).json.ok === true,
     )
 
-    // ── 5. Verificación ─────────────────────────────────────────────────────
-    console.log("\n5. Verificación por token")
-    const token = row?.verification_token as string
-    const v1 = await fetch(`${BASE}/resenas/verificar/${token}`)
-    const v1html = await v1.text()
-    check("la página responde 200", v1.status === 200, `status ${v1.status}`)
-    check("muestra el éxito", v1html.includes("quedó confirmada"))
-    check(
-      "aclara que falta la revisión",
-      v1html.includes("pasa por una revisión"),
-      "falta el aviso de moderación",
-    )
-    check(
-      "NO promete que se publica",
-      !/se va a publicar|se publicará|será publicada/i.test(v1html),
-    )
+    // ── 5. La ruta de verificación ya no existe ─────────────────────────────
+    // El doble opt-in se sacó el 2026-09-09. Si /resenas/verificar volviera a
+    // responder, sería código muerto reintroducido sin querer.
+    console.log("\n5. Sin ruta de verificación")
+    const v = await fetch(`${BASE}/resenas/verificar/8f14e45f-ceea-467a-9a2b-1c3d4e5f6a7b`)
+    check("/resenas/verificar da 404", v.status === 404, `status ${v.status}`)
 
-    const { data: after } = await admin
-      .from("testimonials")
-      .select("status, verified_at")
-      .eq("id", row!.id)
-      .single()
-    check("pasó a pending_review", after?.status === "pending_review", after?.status)
-    check("NO se publicó", after?.status !== "published")
-    check("guardó verified_at", !!after?.verified_at)
-
-    // ── 6. Reuso del link e inválidos ───────────────────────────────────────
-    console.log("\n6. Link reusado / inválido")
-    const v2 = await fetch(`${BASE}/resenas/verificar/${token}`)
-    const v2html = await v2.text()
-    check("el segundo clic no rompe", v2.status === 200)
-    check("muestra 'ya no sirve'", v2html.includes("ya no sirve"))
-
-    const v3 = await fetch(`${BASE}/resenas/verificar/no-es-un-uuid`)
-    check("token basura responde 200", v3.status === 200, `status ${v3.status}`)
-    check("token basura muestra 'ya no sirve'", (await v3.text()).includes("ya no sirve"))
-
-    // ── 7. La página del formulario ─────────────────────────────────────────
-    console.log("\n7. /resenas/nueva")
+    // ── 6. La página del formulario ─────────────────────────────────────────
+    console.log("\n6. /resenas/nueva")
     const page = await fetch(`${BASE}/resenas/nueva`)
     const html = await page.text()
     check("responde 200", page.status === 200, `status ${page.status}`)

@@ -1,6 +1,6 @@
 /**
- * Ciclo completo de una reseña contra la base real: alta → verificación →
- * moderación → publicación → visible en /resenas → rechazo → deja de verse.
+ * Ciclo completo de una reseña contra la base real: alta → moderación →
+ * publicación → visible en /resenas → rechazo → deja de verse.
  *
  *   npx tsx scripts/e2e-resenas-moderacion.ts   (con el dev server corriendo)
  *
@@ -62,20 +62,16 @@ async function main() {
     check("createTestimonial devuelve ok", created.ok, JSON.stringify(created))
     if (!created.ok) throw new Error("no se pudo crear la reseña de prueba")
 
-    // Publicar sin verificar el mail tiene que estar prohibido.
-    const prematuro = await lib.publishTestimonial(created.id, ADMIN_EMAIL)
-    check("NO se puede publicar sin mail confirmado", !prematuro.ok)
-    check(
-      "y el error lo explica",
-      !prematuro.ok && /confirm/i.test(prematuro.error),
-      !prematuro.ok ? prematuro.error : "",
-    )
-
-    const verified = await lib.verifyTestimonial(created.token)
-    check("verifyTestimonial pasa a pending_review", verified.status === "ok", verified.status)
+    // Entra directo a la cola de moderación, sin paso de confirmación.
+    const { data: recien } = await admin
+      .from("testimonials")
+      .select("status")
+      .eq("id", created.id)
+      .single()
+    check("queda en pending_review", recien?.status === "pending_review", recien?.status ?? "")
     check(
       "y trae los datos para el aviso de moderación",
-      verified.status === "ok" && verified.testimonial.author_name === "Zzz Prueba Moderación",
+      created.testimonial.author_name === "Zzz Prueba Moderación",
     )
 
     const pendientes = await lib.getPendingCount()
@@ -127,7 +123,6 @@ async function main() {
     check("aparece la etiqueta Periodista", html.includes(">Periodista<"))
     check("el link del autor abre seguro", html.includes('rel="noopener noreferrer"'))
     check("NO se filtró el email", !html.includes(`${E2E_PREFIX}1@example.com`))
-    check("NO se filtró el token de verificación", !html.includes(created.token))
     check("sigue sin haber AggregateRating", !/AggregateRating/i.test(html))
 
     // ── 4. Rechazo ──────────────────────────────────────────────────────────

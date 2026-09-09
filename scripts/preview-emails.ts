@@ -1,6 +1,6 @@
 /**
- * Escribe los dos mails de reseñas a .preview-emails/ para abrirlos en el
- * navegador. NO manda nada ni toca la base.
+ * Escribe el mail de reseñas a .preview-emails/ para abrirlo en el navegador.
+ * NO manda nada ni toca la base.
  *
  *   npx tsx scripts/preview-emails.ts
  *
@@ -17,17 +17,9 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env.local") })
 const OUT = path.resolve(process.cwd(), ".preview-emails")
 
 async function main() {
-  const { verificationHtml, moderationHtml } = await import("../lib/testimonials-email")
+  const { moderationHtml } = await import("../lib/testimonials-email")
 
   fs.mkdirSync(OUT, { recursive: true })
-
-  const link =
-    "https://www.sanchezmarian.com/resenas/verificar/8f14e45f-ceea-467a-9a2b-1c3d4e5f6a7b"
-
-  fs.writeFileSync(
-    path.join(OUT, "verificacion.html"),
-    verificationHtml("Lucía Fernández", link),
-  )
 
   fs.writeFileSync(
     path.join(OUT, "moderacion.html"),

@@ -12,16 +12,20 @@ import { despublicarResena, publicarResena, rechazarResena } from "./actions"
 /**
  * Panel de moderación de reseñas.
  *
- * Acá es donde una reseña ya verificada por mail pasa (o no) al sitio. Nada se
- * publica solo.
+ * Acá es donde una reseña pasa (o no) al sitio. Nada se publica solo.
+ *
+ * Desde que se sacó la confirmación por mail (2026-09-09), esta pantalla es el
+ * ÚNICO filtro: la reseña entra derecho a la cola. Por eso cada fila trae el
+ * link al perfil público de quien firma — es con lo que se chequea que la
+ * persona sea quien dice ser.
  *
  * Lo que este panel NO hace, a propósito: editar el texto, el puntaje o los
  * datos del autor, y borrar filas. El contenido de una reseña es inmutable —si
  * no va, se rechaza y queda el registro del motivo—, así que no hay ninguna
  * pantalla desde la que se pueda retocar lo que alguien firmó.
  *
- * Las `pending_verification` tampoco se muestran: el autor todavía no confirmó
- * su mail, así que no hay nada para decidir sobre ellas.
+ * Las `pending_verification` no se muestran: son filas viejas del flujo con
+ * doble opt-in, que ya no existe. Nada las produce.
  */
 
 // ─── Pestañas ────────────────────────────────────────────────────────────────
@@ -383,15 +387,13 @@ function ResenaRow({
         </a>
       </div>
 
-      {/* Mail verificado. Nunca sale del admin. */}
+      {/* Mail de contacto. Nunca sale del admin y no está verificado: sirve
+          para poder escribirle a la persona, no como prueba de identidad. */}
       <p
         className="mt-1.5 font-mono"
         style={{ fontSize: 11, color: "var(--color-gris-bordo)", opacity: 0.75 }}
       >
         {resena.author_email}
-        {resena.verified_at
-          ? ` · verificado el ${formatDate(resena.verified_at)}`
-          : " · sin verificar"}
       </p>
 
       {/* El texto completo, sin truncar: es lo que hay que leer para decidir. */}
@@ -574,9 +576,10 @@ export function ResenasManager({
           className="mt-3 font-sans text-sm leading-relaxed"
           style={{ color: "var(--color-gris-bordo)", maxWidth: 620 }}
         >
-          Cada reseña llega con el mail ya confirmado por quien la escribió. Vos
-          decidís cuáles se publican. El texto no se edita ni se borra: si algo
-          no va, se rechaza y queda el motivo registrado.
+          Vos decidís cuáles se publican. Antes de aprobar una, abrí el perfil
+          de quien la firma: es lo que confirma que sea quien dice ser. El
+          texto no se edita ni se borra — si algo no va, se rechaza y queda el
+          motivo registrado.
         </p>
       </div>
 

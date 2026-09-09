@@ -5,10 +5,15 @@
  * desde un componente cliente.
  *
  * FLUJO DE ESTADOS
- *   pending_verification → el autor todavía no confirmó su mail
- *   pending_review       → mail confirmado, esperando moderación de Marian
- *   published            → visible en el sitio
- *   rejected             → descartada (moderation_note = motivo, uso interno)
+ *   pending_review → recién enviada, esperando moderación de Marian
+ *   published      → visible en el sitio
+ *   rejected       → descartada (moderation_note = motivo, uso interno)
+ *
+ * NO hay confirmación por mail (se sacó el 2026-09-09: era el paso donde más
+ * gente abandonaba). La identidad se chequea en la moderación, que es el filtro
+ * que de verdad decide: Marian conoce a quien la reseña y cada reseña trae un
+ * link a un perfil público. `pending_verification` sigue existiendo en el tipo
+ * y en el CHECK de la tabla, pero ya nada lo produce.
  *
  * DOS REGLAS QUE NO SE ROMPEN
  * 1. Las lecturas públicas nunca tiran excepción: si Supabase falla, devuelven
@@ -178,15 +183,11 @@ export type CreateTestimonialResult =
   | {
       ok: true
       id: string
-      /** Token del link de verificación. NO exponerlo en la respuesta HTTP. */
-      token: string
-      /**
-       * Email y nombre YA normalizados por zod (trim, minúsculas). El mail de
-       * confirmación tiene que usar estos, no lo que vino crudo del formulario:
-       * un " Nico@X.com " sin recortar hace que Resend rechace el envío.
-       */
+      /** Email y nombre YA normalizados por zod (trim, minúsculas). */
       email: string
       name: string
+      /** Datos para el aviso de moderación, sin volver a consultar la base. */
+      testimonial: TestimonialModerationNotice
     }
   | { ok: false; error: string; fieldErrors?: TestimonialFieldErrors }
 
@@ -248,11 +249,12 @@ export async function createTestimonial(
       .from("testimonials")
       .insert({
         ...parsed.data,
-        status: "pending_verification",
+        // Directo a la cola de moderación: sin paso de confirmación por mail.
+        status: "pending_review",
         ip_hash: hashTestimonialIp(meta.ip),
         user_agent: meta.userAgent?.slice(0, 500) ?? null,
       })
-      .select("id, verification_token")
+      .select("id, reviewer_type, author_name, author_role, author_brand, rating, body")
       .single()
 
     if (error || !data) {
@@ -266,9 +268,9 @@ export async function createTestimonial(
     return {
       ok: true,
       id: data.id,
-      token: data.verification_token,
       email: parsed.data.author_email,
       name: parsed.data.author_name,
+      testimonial: data as unknown as TestimonialModerationNotice,
     }
   } catch (e) {
     console.error("[testimonials] createTestimonial:", e)
@@ -315,9 +317,12 @@ export async function countRecentSubmissionsByIp(
   }
 }
 
-// ─── Verificación por mail ───────────────────────────────────────────────────
+// ─── Aviso de moderación ─────────────────────────────────────────────────────
 
-/** Datos mínimos para armar el aviso de moderación. Sin email ni ip_hash. */
+/**
+ * Datos mínimos para armar el aviso de reseña nueva. Sin email ni ip_hash: es
+ * un mail interno, pero no hay razón para que lleve más de lo que muestra.
+ */
 export interface TestimonialModerationNotice {
   id: string
   reviewer_type: ReviewerType
@@ -326,86 +331,6 @@ export interface TestimonialModerationNotice {
   author_brand: string
   rating: number
   body: string
-}
-
-export type VerifyTestimonialResult =
-  /**
-   * Recién verificada: pasó a pending_review y espera moderación.
-   * Trae los datos de la reseña para poder avisarle al equipo sin una segunda
-   * consulta. Solo viene en la transición real, no cuando el link se reusa,
-   * así que el aviso se manda una sola vez.
-   */
-  | { status: "ok"; testimonial: TestimonialModerationNotice }
-  /** El link ya se había usado. No se distingue en qué estado quedó después. */
-  | { status: "already_verified" }
-  | { status: "expired" }
-  | { status: "not_found" }
-  | { status: "error" }
-
-/**
- * Confirma el mail de una reseña a partir del token del link.
- *
- * NO PUBLICA: deja la reseña en `pending_review` para que Marian la modere.
- * Devuelve un resultado tipado; nunca lanza excepción.
- */
-export async function verifyTestimonial(
-  token: string,
-): Promise<VerifyTestimonialResult> {
-  // Sin este chequeo un token basura llega a Postgres como uuid inválido
-  // (22P02) y sale por el catch como "error" en vez de "not found".
-  if (!token || !UUID_RE.test(token)) return { status: "not_found" }
-
-  try {
-    const admin = createAdminClient()
-
-    const { data, error } = await admin
-      .from("testimonials")
-      .select("id, status, verification_expires_at")
-      .eq("verification_token", token)
-      .maybeSingle()
-
-    if (error) {
-      console.error("[testimonials] verify (select):", error.message)
-      return { status: "error" }
-    }
-    if (!data) return { status: "not_found" }
-
-    if (data.status !== "pending_verification") {
-      return { status: "already_verified" }
-    }
-
-    if (new Date(data.verification_expires_at).getTime() <= Date.now()) {
-      return { status: "expired" }
-    }
-
-    const now = new Date().toISOString()
-
-    // El .eq de status hace el update idempotente: si entran dos clics al
-    // mismo tiempo, el segundo no matchea ninguna fila y no pisa verified_at.
-    const { data: updated, error: updateError } = await admin
-      .from("testimonials")
-      .update({ status: "pending_review", verified_at: now })
-      .eq("id", data.id)
-      .eq("status", "pending_verification")
-      .select(
-        "id, reviewer_type, author_name, author_role, author_brand, rating, body",
-      )
-      .maybeSingle()
-
-    if (updateError) {
-      console.error("[testimonials] verify (update):", updateError.message)
-      return { status: "error" }
-    }
-    if (!updated) return { status: "already_verified" }
-
-    return {
-      status: "ok",
-      testimonial: updated as unknown as TestimonialModerationNotice,
-    }
-  } catch (e) {
-    console.error("[testimonials] verify:", e)
-    return { status: "error" }
-  }
 }
 
 // ─── Admin: lectura ──────────────────────────────────────────────────────────

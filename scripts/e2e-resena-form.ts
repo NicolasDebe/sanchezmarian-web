@@ -220,10 +220,14 @@ async function main() {
     const panelD = d.getByRole("status")
     await panelD.waitFor({ state: "visible" })
 
-    check("muestra 'Revisá tu correo'", await panelD.getByText("Revisá tu correo.").isVisible())
+    check("confirma que la recibimos", await panelD.getByText("Recibimos tu reseña.").isVisible())
     check(
-      "aclara que hay una revisión",
-      await panelD.getByText(/pasa por una revisión del equipo/).isVisible(),
+      "aclara que Marian la lee antes de publicarla",
+      await panelD.getByText(/Marian la lee antes de publicarla/).isVisible(),
+    )
+    check(
+      "NO habla de confirmar por mail",
+      !/revisá tu correo|confirmá tu reseña|mail de confirmación/i.test(await d.content()),
     )
     check(
       "NO promete que se publica",
@@ -231,24 +235,36 @@ async function main() {
     )
     await ctxD.close()
 
-    // ── 8. Envío con el mail caído ──────────────────────────────────────────
-    console.log("\n8. Resend caído")
+    // ── 8. El servidor falla ────────────────────────────────────────────────
+    // Sin mail de confirmación, el único desenlace malo posible es que el alta
+    // no entre. Tiene que verse un mensaje humano, nunca un error crudo.
+    console.log("\n8. Error del servidor")
     const ctxE = await browser.newContext({ viewport: { width: 1280, height: 900 } })
     const e = await ctxE.newPage()
     e.setDefaultTimeout(20000)
-    await stubApi(e, { ok: true, emailFailed: true, message: "x" })
+    await stubApi(e, {
+      ok: false,
+      error: "No pudimos guardar tu reseña. Probá de nuevo en un momento.",
+    })
     await e.goto(URL, { waitUntil: "networkidle" })
     await e.getByRole("button", { name: /Soy periodista/ }).click()
     await fillAll(e)
     await e.locator('button[type="submit"]').click()
 
-    const panelE = e.getByRole("status")
-    await panelE.waitFor({ state: "visible" })
-
-    check("confirma que la reseña quedó guardada", await panelE.getByText("Recibimos tu reseña.").isVisible())
+    // El banner es un <p role="alert"> DENTRO del form. Hay que apuntarle así y
+    // no con getByRole("alert") a secas: Next deja siempre en el DOM un
+    // #__next-route-announcer__ con ese mismo rol, vacío, que se lleva el match.
+    // Y hay que esperarlo, porque isVisible no espera y el fetch está en vuelo.
+    const alerta = e.locator('form p[role="alert"]')
+    await alerta.waitFor({ state: "visible" })
     check(
-      "pide escribir a info@",
-      await panelE.getByText(/info@sanchezmarian\.com/).isVisible(),
+      "muestra el error en castellano",
+      /No pudimos guardar tu reseña/.test(await alerta.innerText()),
+      await alerta.innerText(),
+    )
+    check(
+      "NO muestra la pantalla de éxito",
+      (await e.getByRole("status").getByText("Recibimos tu reseña.").count()) === 0,
     )
     check("no muestra un error crudo", !/Error:|stack|TypeError/i.test(await e.content()))
     await ctxE.close()

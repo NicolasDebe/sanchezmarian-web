@@ -87,7 +87,7 @@ export function ResenaForm() {
   const [website, setWebsite] = useState("") // honeypot
   const [errors, setErrors] = useState<TestimonialFieldErrors>({})
   const [submitting, setSubmitting] = useState(false)
-  const [done, setDone] = useState<null | { emailFailed: boolean }>(null)
+  const [done, setDone] = useState(false)
   const [serverError, setServerError] = useState("")
 
   const copy = COPY[type ?? "marca"]
@@ -139,7 +139,7 @@ export function ResenaForm() {
       const data: ResenaApiResponse = await res.json()
 
       if (data.ok) {
-        setDone({ emailFailed: !!data.emailFailed })
+        setDone(true)
         return
       }
 
@@ -173,39 +173,29 @@ export function ResenaForm() {
           className="font-playfair text-negro-bordo"
           style={{ fontSize: "var(--fs-h3)" }}
         >
-          {done.emailFailed ? "Recibimos tu reseña." : "Revisá tu correo."}
+          Recibimos tu reseña.
         </h2>
 
         <p
           className={`mx-auto mt-3 max-w-md ${HELP}`}
           style={{ fontSize: "var(--fs-body)" }}
         >
-          {done.emailFailed ? (
-            <>
-              Guardamos lo que escribiste, pero no pudimos mandarte el mail de
-              confirmación. Escribinos a{" "}
-              <a
-                href={`mailto:${SITE_EMAIL}`}
-                className="text-bordo underline underline-offset-2"
-              >
-                {SITE_EMAIL}
-              </a>{" "}
-              y la confirmamos a mano.
-            </>
-          ) : (
-            <>
-              Te mandamos un mail para confirmar que la reseña es tuya. El link
-              vence en 7 días. Si no lo ves, mirá en spam.
-            </>
-          )}
+          Gracias por tomarte el rato de escribirla. Marian la lee antes de
+          publicarla, así que puede tardar unos días en aparecer en la web.
         </p>
 
         <p
           className={`mx-auto mt-4 max-w-md ${HELP}`}
           style={{ fontSize: "var(--fs-caption)" }}
         >
-          Después de que la confirmes pasa por una revisión del equipo. Te
-          avisamos cuando esté en la web.
+          Si querés cambiar algo de lo que escribiste, escribinos a{" "}
+          <a
+            href={`mailto:${SITE_EMAIL}`}
+            className="text-bordo underline underline-offset-2"
+          >
+            {SITE_EMAIL}
+          </a>
+          .
         </p>
       </motion.div>
     )
@@ -405,7 +395,7 @@ export function ResenaForm() {
           autoComplete="email"
           maxLength={254}
           placeholder="tu@email.com"
-          help="No se publica. Solo lo usamos para confirmar que la reseña es tuya."
+          help="No se publica. Es por si necesitamos escribirte por algo de tu reseña."
         />
 
         {/* Honeypot. Oculto con CSS (no type=hidden ni display:none) para que un
