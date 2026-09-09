@@ -18,7 +18,19 @@ import { SITE_EMAIL } from "@/lib/constants"
 import { REVIEWER_TYPE_LABELS } from "@/lib/testimonials-schema"
 import type { TestimonialModerationNotice } from "@/lib/testimonials"
 
-const FROM = "Marian Sánchez <resenas@sanchezmarian.com>"
+/**
+ * Remitente de TODOS los mails de reseñas.
+ *
+ * Sale de SITE_EMAIL (info@sanchezmarian.com), la misma casilla que figura en
+ * el footer, en los formularios y en el "escribinos a…" de los propios mails:
+ * es una casilla real que alguien lee. Si el remitente fuera una dirección
+ * aparte (resenas@…), quien conteste el mail de confirmación —que es lo que
+ * hace la gente— le escribiría a un buzón que nadie mira.
+ *
+ * En Resend hay que verificar el DOMINIO sanchezmarian.com para poder mandar
+ * desde esta dirección.
+ */
+const FROM = `Marian Sánchez <${SITE_EMAIL}>`
 
 /** Días que dura el link de verificación (igual al default de la tabla). */
 const EXPIRY_DAYS = 7
@@ -232,20 +244,18 @@ export function moderationHtml(
  * Le avisa al equipo que hay una reseña esperando moderación.
  *
  * Nunca tira ni devuelve error: es un aviso interno y no puede afectar lo que
- * ve la persona que acaba de confirmar su reseña. Si falta
- * MODERATION_NOTIFY_EMAIL, no manda nada y lo loguea.
+ * ve la persona que acaba de confirmar su reseña. Va a MODERATION_NOTIFY_EMAIL
+ * si está seteada y, si no, a la casilla del sitio.
  */
 export async function sendModerationNotice(
   t: TestimonialModerationNotice,
 ): Promise<void> {
-  const to = process.env.MODERATION_NOTIFY_EMAIL
-  if (!to) {
-    console.warn(
-      "[testimonials-email] Falta MODERATION_NOTIFY_EMAIL: no se avisa de la reseña",
-      t.id,
-    )
-    return
-  }
+  // Sin la env var el aviso igual llega: cae en la casilla del sitio, que es
+  // la que se lee todos los días. MODERATION_NOTIFY_EMAIL solo sirve para
+  // desviarlo a otro lado (por ejemplo, a la casilla de Nico mientras se
+  // prueba). Antes, sin la variable, la reseña quedaba esperando en el panel
+  // sin que nadie se enterara.
+  const to = process.env.MODERATION_NOTIFY_EMAIL?.trim() || SITE_EMAIL
 
   const resend = client()
   if (!resend) return

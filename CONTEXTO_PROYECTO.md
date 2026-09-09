@@ -345,8 +345,14 @@ sección de reseñas en el sitio.
   campo) → insert → mail. El token NUNCA sale en la respuesta HTTP: viaja solo
   al mail del autor, que es lo que prueba que la casilla es suya.
 
-- **Mails con Resend** (`lib/testimonials-email.ts`). From
-  `resenas@sanchezmarian.com`. (1) Verificación al autor, asunto "Confirmá tu
+- **Mails con Resend** (`lib/testimonials-email.ts`). Sale TODO desde
+  `info@sanchezmarian.com` (`SITE_EMAIL` de lib/constants.ts): remitente,
+  reply-to y la casilla que recibe el aviso de moderación. Es la casilla real
+  que alguien lee — con un remitente aparte (resenas@…), el que contesta el
+  mail de confirmación le escribiría a un buzón que nadie mira. En Resend hay
+  que verificar el DOMINIO sanchezmarian.com para poder mandar desde ahí.
+  `MODERATION_NOTIFY_EMAIL` quedó OPCIONAL: sin ella el aviso cae igual en
+  `SITE_EMAIL`; solo sirve para desviarlo mientras se prueba. (1) Verificación al autor, asunto "Confirmá tu
   reseña", botón bordó al link, aviso de vencimiento a 7 días; si Resend falla
   la reseña YA quedó guardada y el usuario ve un mensaje pidiendo escribir a
   info@ (nunca un error crudo). (2) Aviso de moderación al equipo
@@ -531,11 +537,14 @@ alguien la escribe → confirma su mail → Marian decide → se ve en el sitio.
 - ~~Correr la migración de reseñas~~ → hecha (2026-09-09, verificada contra la
   base).
 - ~~Panel `/admin/resenas`~~ → hecho (2026-09-09, ver arriba).
-- ⚠ Env vars de reseñas EN VERCEL, sin esto el sistema no funciona en
-  producción: `TESTIMONIAL_IP_SALT` (sin ella no hay rate limit),
-  `RESEND_API_KEY` y `MODERATION_NOTIFY_EMAIL`. Ojo: `RESEND_API_KEY` tampoco
-  está en `.env.local`, así que en local NO se manda ningún mail (la reseña se
-  guarda igual y el usuario ve el mensaje de "escribinos a info@").
+- ⚠ BLOQUEANTE en producción (verificado 2026-09-09 con un POST real a
+  /api/resenas: devolvió `emailFailed: true` y la fila quedó con `ip_hash` en
+  null). Faltan en Vercel: `RESEND_API_KEY` y `TESTIMONIAL_IP_SALT`. Sin la
+  primera NADIE puede confirmar su reseña, así que ninguna llega al panel:
+  no hay que mandarle el link a los clientes hasta que esté. `RESEND_API_KEY`
+  tampoco está en `.env.local` (hay que crear la cuenta en resend.com y
+  verificar el dominio sanchezmarian.com para mandar desde info@).
+  `MODERATION_NOTIFY_EMAIL` ya no es obligatoria.
 - Reseñas, lo único que falta: migrar el copy del formulario de alta
   (`/resenas/nueva`, hoy hardcodeado) al CMS.
 - Correr la migración SQL de clippings en el dashboard + seed (paso manual,
