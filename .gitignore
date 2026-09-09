@@ -46,3 +46,6 @@ next-env.d.ts
 /shots/
 
 .vercel
+
+# Previews de mails generadas por scripts/preview-emails.ts
+/.preview-emails/

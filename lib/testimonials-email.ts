@@ -1,0 +1,278 @@
+/**
+ * Mails del sistema de reseñas (Resend). SOLO SERVIDOR.
+ *
+ * Son DOS mails distintos y con criterios distintos:
+ *
+ * 1. Verificación (al autor). Es parte del flujo: si falla, el usuario tiene
+ *    que enterarse, porque su reseña queda sin confirmar. Devuelve un booleano
+ *    y el route handler decide qué mostrar.
+ * 2. Aviso de moderación (al equipo). Es interno: si falla, se loguea y listo.
+ *    Nunca puede romper la pantalla de "reseña confirmada" del usuario.
+ *
+ * Ninguna de las dos lanza excepción.
+ */
+
+import { Resend } from "resend"
+import { SITE_URL } from "@/lib/seo"
+import { SITE_EMAIL } from "@/lib/constants"
+import { REVIEWER_TYPE_LABELS } from "@/lib/testimonials-schema"
+import type { TestimonialModerationNotice } from "@/lib/testimonials"
+
+const FROM = "Marian Sánchez <resenas@sanchezmarian.com>"
+
+/** Días que dura el link de verificación (igual al default de la tabla). */
+const EXPIRY_DAYS = 7
+
+/** Paleta de la marca, en hex literal: los mails no leen las CSS vars del sitio. */
+const C = {
+  bordo: "#66001F",
+  bordoOscuro: "#3D000F",
+  hueso: "#FEFCEF",
+  arena: "#F0E8D8",
+  grisBordo: "#4A3040",
+  dorado: "#C9A882",
+  negroBordo: "#1A0008",
+} as const
+
+/**
+ * Base pública del sitio. NEXT_PUBLIC_SITE_URL permite apuntar los links a un
+ * preview; sin ella cae al dominio canónico de lib/seo.ts.
+ */
+function siteUrl(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/+$/, "")
+}
+
+/**
+ * Cliente de Resend. Devuelve null si falta la API key, para que el llamador
+ * trate "sin configurar" igual que "falló el envío" en vez de explotar en el
+ * constructor.
+ */
+function client(): Resend | null {
+  const key = process.env.RESEND_API_KEY
+  if (!key) {
+    console.error("[testimonials-email] Falta RESEND_API_KEY: no se envía nada.")
+    return null
+  }
+  return new Resend(key)
+}
+
+/** Escapa texto de usuario antes de meterlo en el HTML del mail. */
+function esc(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+}
+
+// ─── 1. Verificación (al autor) ──────────────────────────────────────────────
+
+/** Exportada para poder previsualizarla sin mandar nada (scripts/preview-emails.ts). */
+export function verificationHtml(name: string, link: string): string {
+  const firstName = esc(name.split(" ")[0] || name)
+
+  return `<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:${C.arena};">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Confirmá tu reseña con un clic. El link vence en ${EXPIRY_DAYS} días.</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.arena};padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:${C.hueso};border-radius:16px;overflow:hidden;">
+
+        <tr><td style="background:${C.bordo};padding:26px 32px;">
+          <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:20px;color:${C.hueso};letter-spacing:.02em;">Marian Sánchez</p>
+        </td></tr>
+
+        <tr><td style="padding:36px 32px 8px;">
+          <h1 style="margin:0 0 18px;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.25;font-weight:400;color:${C.negroBordo};">
+            Confirmá tu reseña
+          </h1>
+          <p style="margin:0 0 14px;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:${C.grisBordo};">
+            Hola ${firstName}: recibimos la reseña que escribiste. Para confirmar que es tuya, tocá el botón.
+          </p>
+        </td></tr>
+
+        <tr><td align="center" style="padding:14px 32px 26px;">
+          <a href="${link}" style="display:inline-block;background:${C.bordo};color:${C.hueso};font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;text-decoration:none;padding:15px 34px;border-radius:999px;">
+            Confirmar mi reseña
+          </a>
+        </td></tr>
+
+        <tr><td style="padding:0 32px 26px;">
+          <p style="margin:0 0 14px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6;color:${C.grisBordo};">
+            El link vence en ${EXPIRY_DAYS} días. Si no te funciona el botón, copiá y pegá esta dirección en el navegador:
+          </p>
+          <p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;word-break:break-all;">
+            <a href="${link}" style="color:${C.bordo};">${link}</a>
+          </p>
+        </td></tr>
+
+        <tr><td style="padding:0 32px;"><div style="height:1px;background:${C.arena};"></div></td></tr>
+
+        <tr><td style="padding:22px 32px 32px;">
+          <p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.65;color:${C.grisBordo};">
+            Si no pediste esto, podés ignorar el mail: sin la confirmación, la reseña no avanza.
+            Cualquier duda, escribinos a <a href="mailto:${SITE_EMAIL}" style="color:${C.bordo};">${SITE_EMAIL}</a>.
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+}
+
+function verificationText(name: string, link: string): string {
+  const firstName = name.split(" ")[0] || name
+  return [
+    `Hola ${firstName}: recibimos la reseña que escribiste.`,
+    "",
+    "Para confirmar que es tuya, entrá a este link:",
+    link,
+    "",
+    `El link vence en ${EXPIRY_DAYS} días.`,
+    "",
+    "Si no pediste esto, podés ignorar el mail: sin la confirmación, la reseña no avanza.",
+    `Cualquier duda, escribinos a ${SITE_EMAIL}.`,
+  ].join("\n")
+}
+
+/**
+ * Manda el mail de confirmación al autor.
+ * @returns true si Resend lo aceptó. false = el usuario tiene que ver el aviso
+ *          de contacto manual (la reseña YA quedó guardada de todos modos).
+ */
+export async function sendVerificationEmail(
+  to: string,
+  authorName: string,
+  token: string,
+): Promise<boolean> {
+  const resend = client()
+  if (!resend) return false
+
+  const link = `${siteUrl()}/resenas/verificar/${token}`
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM,
+      to,
+      replyTo: SITE_EMAIL,
+      subject: "Confirmá tu reseña",
+      html: verificationHtml(authorName, link),
+      text: verificationText(authorName, link),
+    })
+
+    if (error) {
+      console.error("[testimonials-email] verificación:", error)
+      return false
+    }
+    return true
+  } catch (e) {
+    console.error("[testimonials-email] verificación:", e)
+    return false
+  }
+}
+
+// ─── 2. Aviso de moderación (al equipo) ──────────────────────────────────────
+
+/** Exportada para poder previsualizarla sin mandar nada (scripts/preview-emails.ts). */
+export function moderationHtml(
+  t: TestimonialModerationNotice,
+  adminUrl: string,
+): string {
+  const stars = "★".repeat(t.rating) + "☆".repeat(5 - t.rating)
+  // Los saltos de línea de la reseña se respetan: el texto se muestra tal cual
+  // lo escribieron, que es lo que después se publica.
+  const body = esc(t.body).replace(/\r?\n/g, "<br>")
+
+  return `<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:${C.arena};">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.arena};padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:${C.hueso};border-radius:16px;overflow:hidden;">
+
+        <tr><td style="background:${C.bordoOscuro};padding:22px 32px;">
+          <p style="margin:0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:${C.dorado};">Reseña nueva para revisar</p>
+        </td></tr>
+
+        <tr><td style="padding:30px 32px 6px;">
+          <p style="margin:0 0 4px;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:${C.negroBordo};">${esc(t.author_name)}</p>
+          <p style="margin:0 0 2px;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:${C.grisBordo};">${esc(t.author_role)} · ${esc(t.author_brand)}</p>
+          <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:${C.grisBordo};">${REVIEWER_TYPE_LABELS[t.reviewer_type]}</p>
+          <p style="margin:0 0 20px;font-size:18px;color:${C.dorado};letter-spacing:.12em;">${stars} <span style="font-family:Helvetica,Arial,sans-serif;font-size:13px;color:${C.grisBordo};letter-spacing:0;">${t.rating} de 5</span></p>
+        </td></tr>
+
+        <tr><td style="padding:0 32px 26px;">
+          <div style="border-left:3px solid ${C.dorado};padding:2px 0 2px 16px;">
+            <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.7;color:${C.negroBordo};">${body}</p>
+          </div>
+        </td></tr>
+
+        <tr><td align="center" style="padding:0 32px 32px;">
+          <a href="${adminUrl}" style="display:inline-block;background:${C.bordo};color:${C.hueso};font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;text-decoration:none;padding:14px 30px;border-radius:999px;">
+            Revisar en el panel
+          </a>
+          <p style="margin:16px 0 0;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:${C.grisBordo};">
+            El autor ya confirmó su mail. No se publica hasta que la apruebes.
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+}
+
+/**
+ * Le avisa al equipo que hay una reseña esperando moderación.
+ *
+ * Nunca tira ni devuelve error: es un aviso interno y no puede afectar lo que
+ * ve la persona que acaba de confirmar su reseña. Si falta
+ * MODERATION_NOTIFY_EMAIL, no manda nada y lo loguea.
+ */
+export async function sendModerationNotice(
+  t: TestimonialModerationNotice,
+): Promise<void> {
+  const to = process.env.MODERATION_NOTIFY_EMAIL
+  if (!to) {
+    console.warn(
+      "[testimonials-email] Falta MODERATION_NOTIFY_EMAIL: no se avisa de la reseña",
+      t.id,
+    )
+    return
+  }
+
+  const resend = client()
+  if (!resend) return
+
+  const adminUrl = `${siteUrl()}/admin/resenas`
+  const stars = "★".repeat(t.rating) + "☆".repeat(5 - t.rating)
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM,
+      to,
+      subject: `Reseña nueva para revisar · ${t.author_name} de ${t.author_brand}`,
+      html: moderationHtml(t, adminUrl),
+      text: [
+        `${t.author_name} — ${t.author_role} · ${t.author_brand}`,
+        `${REVIEWER_TYPE_LABELS[t.reviewer_type]}`,
+        `${stars} (${t.rating} de 5)`,
+        "",
+        t.body,
+        "",
+        `Revisar en el panel: ${adminUrl}`,
+        "El autor ya confirmó su mail. No se publica hasta que la apruebes.",
+      ].join("\n"),
+    })
+
+    if (error) console.error("[testimonials-email] aviso moderación:", error)
+  } catch (e) {
+    console.error("[testimonials-email] aviso moderación:", e)
+  }
+}

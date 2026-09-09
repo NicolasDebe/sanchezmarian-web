@@ -29,6 +29,7 @@ const SCHEMAS = {
   casos_de_exito: "lib/casos-schema.ts",
   contacto: "lib/contacto-schema.ts",
   global: "lib/global-schema.ts",
+  resenas: "lib/resenas-schema.ts",
 }
 
 /** Import de esquema dentro de un componente → página a la que pertenecen sus fkeys. */
@@ -39,6 +40,7 @@ const SCHEMA_IMPORT_TO_PAGE = {
   "@/lib/casos-schema": "casos_de_exito",
   "@/lib/contacto-schema": "contacto",
   "@/lib/global-schema": "global",
+  "@/lib/resenas-schema": "resenas",
 }
 
 /**

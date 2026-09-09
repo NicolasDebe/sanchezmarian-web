@@ -41,6 +41,7 @@ export const NAV_ITEMS = [
   { key: "link_valores", label: "Mis valores", href: "/mis-valores" },
   { key: "link_casos", label: "Casos de éxito", href: "/casos-de-exito" },
   { key: "link_campanas", label: "Campañas", href: "/campanas" },
+  { key: "link_resenas", label: "Reseñas", href: "/resenas" },
 ] as const
 
 export const SITE_TAGLINE = "Comunicación con propósito · Mendoza, Argentina."

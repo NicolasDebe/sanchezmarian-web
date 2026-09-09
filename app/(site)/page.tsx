@@ -5,10 +5,13 @@ import { Clientes } from "@/components/clientes"
 import { HomeServicios } from "@/components/home-servicios"
 import { NewsletterSection } from "@/components/newsletter-section"
 import { Conexiones } from "@/components/conexiones"
+import { ResenasPreview } from "@/components/resenas-preview"
 import { Bio } from "@/components/bio"
 import { CtaFinal } from "@/components/cta-final"
 import { getContentBatch, getTextScales } from "@/lib/content"
 import { getActiveConnections } from "@/lib/connections"
+import { getPublishedTestimonials } from "@/lib/testimonials"
+import { fallbacksFor as resenasFallbacksFor, RESENAS_PAGE } from "@/lib/resenas-schema"
 import { fallbacksFor } from "@/lib/home-schema"
 import { fallbacksFor as serviciosFallbacksFor } from "@/lib/servicios-schema"
 import { globalFallbacksFor } from "@/lib/global-schema"
@@ -43,6 +46,9 @@ export default async function Home() {
     contact,
     footer,
     connections,
+    resenas,
+    resenasPreviewCopy,
+    resenasScales,
     scales,
     serviciosScales,
   ] = await Promise.all([
@@ -61,6 +67,12 @@ export default async function Home() {
     getContentBatch("global", "footer", globalFallbacksFor("footer")),
     // Conexiones (alianzas): CRUD propio, lectura resiliente con fallback.
     getActiveConnections(),
+    // Reseñas publicadas. Se leen TODAS, no solo 3: la regla del adelanto
+    // necesita saber si hay alguna de periodista fuera de las 3 más recientes.
+    // Nunca tira excepción; si falla, el bloque simplemente no se renderiza.
+    getPublishedTestimonials(),
+    getContentBatch(RESENAS_PAGE, "preview", resenasFallbacksFor("preview")),
+    getTextScales(RESENAS_PAGE),
     // Tamaños de texto por campo (títulos/párrafos resizables).
     getTextScales("home"),
     // La vidriera de servicios espeja /servicios: usa los tamaños de ESA página,
@@ -95,6 +107,14 @@ export default async function Home() {
         scales={serviciosScales}
       />
       <Conexiones connections={connections} />
+      {/* Reseñas: fondo hueso para mantener la alternancia entre Conexiones
+          (arena) y Bio (hueso-oscuro). */}
+      <ResenasPreview
+        resenas={resenas}
+        content={resenasPreviewCopy}
+        scales={resenasScales}
+        bg="bg-hueso"
+      />
       <Bio content={bio} social={social} scales={scales} />
       <CtaFinal content={ctaFinal} contact={contact} social={social} scales={scales} />
     </>

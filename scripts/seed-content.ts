@@ -16,6 +16,7 @@ import { SERVICIOS_SECTIONS } from "../lib/servicios-schema"
 import { MIS_VALORES_SECTIONS } from "../lib/mis-valores-schema"
 import { CASOS_SECTIONS } from "../lib/casos-schema"
 import { CONTACTO_SECTIONS } from "../lib/contacto-schema"
+import { RESENAS_SECTIONS, RESENAS_PAGE } from "../lib/resenas-schema"
 import { GLOBAL_SECTIONS, GLOBAL_PAGE } from "../lib/global-schema"
 import { SEO_SECTIONS, SEO_PAGE } from "../lib/seo-schema"
 
@@ -33,6 +34,7 @@ const PAGES: { page: string; sections: SectionDef[] }[] = [
   { page: "mis_valores", sections: MIS_VALORES_SECTIONS },
   { page: "casos_de_exito", sections: CASOS_SECTIONS },
   { page: "contacto", sections: CONTACTO_SECTIONS },
+  { page: RESENAS_PAGE, sections: RESENAS_SECTIONS },
   { page: GLOBAL_PAGE, sections: GLOBAL_SECTIONS },
   { page: SEO_PAGE, sections: SEO_SECTIONS },
 ]

@@ -18,6 +18,7 @@ export const GLOBAL_SECTIONS: SectionDef[] = [
       { field: "link_valores", type: "text", label: "Link — Mis valores", fallback: "Mis valores", maxChars: 40, resizable: true },
       { field: "link_casos", type: "text", label: "Link — Casos de éxito", fallback: "Casos de éxito", maxChars: 40, resizable: true },
       { field: "link_campanas", type: "text", label: "Link — Campañas", fallback: "Campañas", maxChars: 40, resizable: true },
+      { field: "link_resenas", type: "text", label: "Link — Reseñas", fallback: "Reseñas", maxChars: 40, resizable: true },
     ],
   },
   {

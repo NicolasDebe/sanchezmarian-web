@@ -10,6 +10,8 @@ import { IsotipoInfinito } from "@/components/ui/isotipo-infinito"
 import { DrawnLine } from "@/components/ui/drawn-line"
 import { ServiceFeatureCard } from "@/components/servicios/service-feature-card"
 import { Conexiones } from "@/components/conexiones"
+import { ResenasPreview } from "@/components/resenas-preview"
+import type { PublicTestimonial } from "@/lib/testimonials"
 import type { Connection } from "@/lib/connections"
 import { fsStyle, type FieldScale, type FieldScaleMap } from "@/lib/text-size"
 import { EASE } from "@/components/servicios/types"
@@ -433,6 +435,9 @@ function FinalCTA({ c, scales }: { c: Record<string, string>; scales?: FieldScal
 export function ServiciosPageSections({
   content,
   connections = [],
+  resenas = [],
+  resenasCopy,
+  resenasScales,
   scales,
 }: {
   content?: {
@@ -445,6 +450,12 @@ export function ServiciosPageSections({
     cta?: Record<string, string>
   }
   connections?: Pick<Connection, "id" | "label">[]
+  /** Reseñas publicadas (published_at desc). Las lee el server component. */
+  resenas?: PublicTestimonial[]
+  /** Copy del bloque de reseñas (page="resenas", section="preview"). */
+  resenasCopy?: Record<string, string>
+  /** Tamaños/fuentes por campo de la página "resenas". */
+  resenasScales?: FieldScaleMap
   scales?: FieldScaleMap
 }) {
   const hero = { ...fallbacksFor("hero"), ...content?.hero }
@@ -465,6 +476,14 @@ export function ServiciosPageSections({
       <Bloque04 c={s4} scales={scales} />
       {/* Conexiones al fondo (fondo hueso: Bloque04 arena → hueso → CTA bordó). */}
       <Conexiones connections={connections} bg="bg-hueso" />
+      {/* Reseñas: hueso-oscuro para no repetir el hueso de Conexiones antes
+          del CTA bordó. */}
+      <ResenasPreview
+        resenas={resenas}
+        content={resenasCopy}
+        scales={resenasScales}
+        bg="bg-hueso-oscuro"
+      />
       <FinalCTA c={cta} scales={scales} />
     </>
   )

@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { Mail } from "lucide-react"
+import { Mail, MessageSquareQuote } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { getPendingCount } from "@/lib/testimonials"
 import { signOut } from "@/app/admin/actions"
 
 export const dynamic = "force-dynamic"
@@ -13,6 +14,7 @@ const SECTIONS = [
   { label: "Casos de éxito", href: "/admin/edit/casos-de-exito", enabled: true },
   { label: "Tipografía", href: "/admin/tipografia", enabled: true },
   { label: "Clippings", href: "/admin/clippings", enabled: true },
+  { label: "Reseñas", href: "/admin/resenas", enabled: true, icon: MessageSquareQuote },
   { label: "Campañas", href: "/admin/campanas", enabled: true },
   { label: "Suscriptores", href: "/admin/suscriptores", enabled: true, icon: Mail },
   { label: "Contacto", href: "/admin/edit/contacto", enabled: true },
@@ -35,6 +37,11 @@ export default async function PanelLayout({
   } catch {
     email = ""
   }
+
+  // Reseñas esperando moderación: el punto del badge es que se vean desde
+  // cualquier pantalla del panel, sin tener que entrar a buscarlas.
+  // getPendingCount nunca tira excepción (devuelve 0 si Supabase falla).
+  const pendingResenas = await getPendingCount()
 
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: "var(--color-hueso)" }}>
@@ -84,6 +91,20 @@ export default async function PanelLayout({
                   >
                     {s.icon && <s.icon size={15} strokeWidth={1.75} style={{ color: "var(--color-bordo)" }} />}
                     {s.label}
+                    {s.href === "/admin/resenas" && pendingResenas > 0 && (
+                      <span
+                        className="ml-auto rounded-full font-mono"
+                        style={{
+                          fontSize: 10,
+                          padding: "2px 7px",
+                          backgroundColor: "var(--color-bordo)",
+                          color: "var(--color-hueso)",
+                        }}
+                        aria-label={`${pendingResenas} reseña${pendingResenas === 1 ? "" : "s"} para moderar`}
+                      >
+                        {pendingResenas}
+                      </span>
+                    )}
                   </Link>
                 </li>
               ) : (

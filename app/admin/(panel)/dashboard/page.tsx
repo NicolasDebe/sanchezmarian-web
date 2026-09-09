@@ -2,6 +2,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase"
 import { normalizeStatus } from "@/lib/types/campaign"
+import { getAllTestimonials } from "@/lib/testimonials"
 
 export const dynamic = "force-dynamic"
 
@@ -38,9 +39,23 @@ export default async function DashboardPage() {
     // se queda el texto genérico
   }
 
-  const cards = EDITABLES.map((card) =>
-    card.href === "/admin/campanas" ? { ...card, desc: campaignsDesc } : card,
-  )
+  // Reseñas: lo primero que Marian tiene que ver es si hay algo esperándola.
+  let resenasDesc = "Revisar las reseñas que llegan y decidir cuáles se publican."
+  const { rows: resenas, ok: resenasOk } = await getAllTestimonials()
+  if (resenasOk) {
+    const pendientes = resenas.filter((r) => r.status === "pending_review").length
+    const publicadas = resenas.filter((r) => r.status === "published").length
+    resenasDesc =
+      pendientes > 0
+        ? `${pendientes} para moderar · ${publicadas} publicada${publicadas === 1 ? "" : "s"}.`
+        : `Ninguna esperando · ${publicadas} publicada${publicadas === 1 ? "" : "s"}.`
+  }
+
+  const cards = EDITABLES.map((card) => {
+    if (card.href === "/admin/campanas") return { ...card, desc: campaignsDesc }
+    if (card.href === "/admin/resenas") return { ...card, desc: resenasDesc }
+    return card
+  })
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -107,6 +122,8 @@ const EDITABLES = [
   { title: "Casos de éxito / Clippings", href: "/admin/clippings", desc: "Apariciones en medios por cliente: cargar, editar y eliminar." },
   { title: "Campañas", href: "/admin/campanas", desc: "Crear, editar y publicar campañas de prensa con fotos." },
   { title: "Contacto", href: "/admin/edit/contacto", desc: "Hero, datos de contacto y preguntas frecuentes." },
+  { title: "Reseñas recibidas", href: "/admin/resenas", desc: "Revisar las reseñas que llegan y decidir cuáles se publican." },
+  { title: "Reseñas / Textos", href: "/admin/edit/resenas", desc: "Textos de la página de reseñas y del bloque del home." },
   { title: "Menú y footer", href: "/admin/edit/global", desc: "Textos que aparecen en todas las páginas." },
   { title: "SEO", href: "/admin/edit/seo", desc: "Títulos y descripciones para Google de cada página." },
 ]

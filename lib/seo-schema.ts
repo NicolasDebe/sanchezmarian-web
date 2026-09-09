@@ -71,6 +71,14 @@ export const SEO_SECTIONS: SectionDef[] = [
       "Campañas de prensa en curso. Estrategias de comunicación activas para marcas y proyectos en Mendoza.",
     ),
   },
+  {
+    section: "resenas",
+    title: "Reseñas",
+    fields: seoFields(
+      "Reseñas — Marian Sánchez",
+      "Lo que dicen las marcas que trabajaron con Marian y los periodistas que la tratan desde la redacción. Cada reseña firmada y con perfil público verificable.",
+    ),
+  },
 ]
 
 export function seoFallbacksFor(section: string): Record<string, string> {

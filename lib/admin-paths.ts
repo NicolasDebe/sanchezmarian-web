@@ -12,6 +12,7 @@ export const PAGE_PATHS: Record<string, string> = {
   mis_valores: "/mis-valores",
   casos_de_exito: "/casos-de-exito",
   contacto: "/contacto",
+  resenas: "/resenas",
   global: "/",
   seo: "/",
 }

@@ -229,7 +229,315 @@ una sección por página).
   `scripts/` en el build — si se quita, Vercel rompe con TS2307).
   `scripts/audit-campaign-images.ts` imprime schema y positions actuales.
 
+### Reseñas con moderación (base de datos + capa de datos, 2026-09-08)
+Sistema de reseñas de marcas/clientes y periodistas, con doble opt-in por mail
+y moderación manual. **Este paso es SOLO backend: todavía no hay UI ni rutas.**
+
+- Tabla Supabase `testimonials`. SQL en
+  `supabase/migrations/20260908_testimonials.sql` (idempotente, se pega en el
+  SQL Editor del dashboard). Columnas: `reviewer_type` ('marca' | 'periodista'),
+  datos del autor (`author_name`, `author_role`, `author_brand`, `author_url`),
+  `rating` (1-5), `body`, `author_email` (NUNCA se muestra en público),
+  `status`, campos de moderación (`moderation_note`, `moderated_at`,
+  `moderated_by`), de verificación (`verification_token`,
+  `verification_expires_at` = 7 días, `verified_at`), `published_at`,
+  `created_at` y antiabuso (`ip_hash`, `user_agent`).
+  Índices: `status`, `published_at DESC` y `verification_token` (UNIQUE: es la
+  clave del link de verificación, una colisión verificaría la reseña
+  equivocada).
+
+- **Flujo de estados** (no hay atajos: nada se publica sin pasar por los dos
+  filtros):
+
+  ```
+  [envío del form]
+        ↓
+  pending_verification ──(clic en el link del mail, dentro de 7 días)──→ pending_review
+        │                                                                      │
+        │ (link vencido: queda acá, no se modera)              Marian decide ──┤
+        │                                                                      ├─→ published
+        │                                                                      └─→ rejected
+        │                                                                            ↕
+        └── publishTestimonial la rechaza en este estado          (se puede republicar/bajar)
+  ```
+
+  - `pending_verification` → recién enviada, falta que el autor confirme el mail.
+  - `pending_review` → mail confirmado, esperando moderación. **Verificar NO
+    publica.**
+  - `published` → visible en el sitio.
+  - `rejected` → descartada; `moderation_note` guarda el motivo (uso interno,
+    no se le manda al autor).
+
+- **RLS**: activado, con UNA sola policy pública — `SELECT` donde
+  `status = 'published'`. Ninguna policy de insert ni de update para anon: todas
+  las escrituras pasan por `createAdminClient()` con `SUPABASE_SERVICE_ROLE_KEY`.
+  Además hay `GRANT SELECT` **por columna** para anon/authenticated: la policy
+  deja pasar la fila entera y la anon key es pública, así que sin los grants
+  cualquiera podría leer `author_email`, `ip_hash` o `verification_token` de las
+  reseñas publicadas.
+
+- `lib/testimonials.ts` (SOLO servidor). Lectura pública con la anon key,
+  escritura y lectura de admin con el service role. Las lecturas nunca tiran
+  excepción (devuelven `[]` / resumen vacío), igual que `getContent`:
+  - `getPublishedTestimonials(limit?, reviewerType?)` — publicadas, orden
+    `published_at DESC`, con filtro opcional por tipo de reseñador.
+  - `getRatingSummary()` — `{ average, count, countMarcas, countPeriodistas }`.
+    El promedio va sobre TODAS las publicadas juntas, sin distinguir tipo,
+    redondeado a un decimal.
+  - `createTestimonial(input, meta?)` — valida con zod, hashea el IP con
+    `sha256(ip + TESTIMONIAL_IP_SALT)`, inserta en `pending_verification` y
+    devuelve el token del link de confirmación (⚠ el token NO va en la
+    respuesta HTTP: es solo para armar el mail).
+  - `verifyTestimonial(token)` — resultado tipado
+    (`ok | already_verified | expired | not_found | error`), nunca lanza.
+  - `getAllTestimonials()` / `getPendingCount()` — para el panel y el badge.
+  - `publishTestimonial(id, adminEmail)` / `rejectTestimonial(id, note, adminEmail)`.
+  - **El contenido de una reseña es inmutable**: ninguna función actualiza
+    `body`, `rating` ni los datos del autor. Solo status, moderación y
+    verificación.
+
+- `lib/testimonials-schema.ts` — validación con zod (fuente única de los
+  límites, la comparten cliente y servidor). `author_name` 3-80, `author_role`
+  3-80, `author_brand` 2-80, `author_url` obligatoria y restringida a
+  `http(s)` (así no entra un `javascript:` a un href del sitio), `rating`
+  entero 1-5, `body` 80-1200, `author_email` válido. Mensajes en castellano
+  rioplatense. `toFieldErrors()` aplana los issues a `{ campo: mensaje }`.
+  Ojo con el orden: el `.trim()` va antes del formato (vía `.pipe()`), porque
+  la gente pega mails y enlaces con espacios al final.
+
+- `zod` pasó a ser dependencia directa (`package.json`). Antes estaba en
+  `node_modules` solo como dependencia transitiva de `eslint-config-next`.
+
+- Env var nueva: `TESTIMONIAL_IP_SALT` (cualquier string aleatorio largo). Sin
+  ella `ip_hash` se guarda en `null` y queda un warning en los logs — el alta
+  funciona igual, pero se pierde la señal antiabuso **y con ella el rate limit
+  del formulario, que se apoya en el hash**.
+
+### Reseñas — formulario público (2026-09-08)
+Segundo paso: la parte que ve la gente. Sigue sin haber panel de moderación ni
+sección de reseñas en el sitio.
+
+- **`/resenas/nueva`** (`app/resenas/nueva/page.tsx` + `components/resena-nueva-content.tsx`).
+  Vive FUERA del grupo `(site)` a propósito: es una página autónoma para
+  compartir por WhatsApp, sin Navbar ni Footer (solo un wordmark que linkea al
+  home). Mobile-first, ancho máximo 680px. Copy hardcodeado por ahora, con el
+  patrón pre/accent en el H1 ("Contá cómo fue" / *"trabajar con Marian."*) y la
+  animación de `hero-reveal` como el resto de los heros.
+
+- **`components/resena-form.tsx`**. El primer campo es "¿Desde dónde escribís?"
+  (dos botones grandes tipo toggle, sin default). La elección cambia las
+  etiquetas de cargo / marca-medio / link, y hasta que no está elegida el resto
+  va dentro de un `<fieldset disabled>` atenuado — deshabilitado de verdad, no
+  solo en apariencia. Valida con el MISMO esquema zod que el servidor, así los
+  mensajes son idénticos de los dos lados.
+
+- **`components/star-input.tsx`**. Radiogroup REAL: `<fieldset>` + cinco
+  `<input type="radio">` en `sr-only` (NO `display:none`, que los sacaría del
+  orden de tabulación). Las flechas navegan porque lo hace el navegador, no
+  porque haya código para eso; cada opción tiene `aria-label="N de 5"`. Sin
+  valor por defecto. Dorado `#C9A882` las activas, gris-bordo al 20% las
+  inactivas. Ojo en los tests: al radio hay que llegarle por el `<label>`, un
+  click directo al input lo intercepta el span.
+
+- **`POST /api/resenas`**. Filtros en orden: honeypot (`website`, oculto con CSS
+  fuera de pantalla — devuelve 200 con éxito simulado y NO inserta) → rate limit
+  (3 por `ip_hash` cada 24h, 429 con mensaje amable) → zod (422 con errores por
+  campo) → insert → mail. El token NUNCA sale en la respuesta HTTP: viaja solo
+  al mail del autor, que es lo que prueba que la casilla es suya.
+
+- **Mails con Resend** (`lib/testimonials-email.ts`). From
+  `resenas@sanchezmarian.com`. (1) Verificación al autor, asunto "Confirmá tu
+  reseña", botón bordó al link, aviso de vencimiento a 7 días; si Resend falla
+  la reseña YA quedó guardada y el usuario ve un mensaje pidiendo escribir a
+  info@ (nunca un error crudo). (2) Aviso de moderación al equipo
+  (`MODERATION_NOTIFY_EMAIL`), asunto "Reseña nueva para revisar · [nombre] de
+  [marca]"; si falla, se loguea y no rompe nada. Todo el texto de usuario se
+  escapa antes de entrar al HTML. `npx tsx scripts/preview-emails.ts` los
+  escribe a `.preview-emails/` para revisarlos sin mandar nada.
+
+- **`/resenas/verificar/[token]`**. Server component, tres estados (confirmada /
+  vencido / inválido-o-usado). `already_verified`, `not_found` y `error` caen
+  todos en la misma pantalla a propósito: decir cuál es le confirmaría a alguien
+  que prueba tokens que acertó uno. SIN `revalidatePath` (todavía no se publica
+  nada). El aviso de moderación se dispara con `after()` de `next/server`, o sea
+  después de responder, y solo en la transición real (no si el link se reusa).
+
+- Env vars nuevas: `RESEND_API_KEY`, `MODERATION_NOTIFY_EMAIL`. Más
+  `NEXT_PUBLIC_SITE_URL` (opcional: si falta, los links salen al dominio
+  canónico de `lib/seo.ts`).
+
+- Tests: `npx tsx scripts/e2e-resena-form.ts` (Playwright con el Edge del
+  sistema; 38 checks de interacción y accesibilidad, NO toca la base porque
+  intercepta el POST) y `npx tsx scripts/e2e-resenas.ts` (API + base, requiere
+  la migración corrida; auto-limpiante por prefijo de email).
+
+### Reseñas — página pública y bloque del home (2026-09-08)
+Tercer paso: mostrar las reseñas publicadas. Sigue faltando el panel de
+moderación.
+
+- **`/resenas`** (`app/(site)/resenas/page.tsx`). DENTRO del grupo `(site)`, a
+  diferencia de `/resenas/nueva`: está en el menú, así que necesita Navbar y
+  Footer. `revalidate = 60`. Todo el fetch vive en el server component
+  (`getPublishedTestimonials` + `getRatingSummary` + contenido + escalas) y baja
+  por props; los componentes client no leen datos.
+
+- **Reglas duras** (están en el código con su porqué, no las bajes sin pensar):
+  · el promedio solo se muestra con **5 reseñas o más** (con menos no significa
+    nada); · los chips de filtro (Todas / Marcas / Periodistas, con contador,
+    client-side sin recargar) solo con **8 o más Y al menos 2 de cada tipo**;
+  · el bloque de adelanto devuelve `null` con **menos de 2** publicadas.
+
+- **Una sola lista mezclada** por `published_at desc`, dos columnas en desktop.
+  No se parte en dos bloques por tipo: con pocas reseñas quedarían dos secciones
+  casi vacías. Nada de carrusel.
+
+- **SIN `AggregateRating` de schema.org**, a propósito: Google no muestra
+  estrellas para reseñas que una organización aloja sobre sí misma, así que no
+  aporta SEO y puede leerse como marcado engañoso. No agregarlo "por las dudas".
+
+- `components/star-rating.tsx` (solo lectura, `role="img"` con
+  aria-label "4 de 5 estrellas") y `components/resena-card.tsx` (fondo arena,
+  sin sombra; etiqueta de tipo arriba a la derecha: PERIODISTA en bordó con
+  borde, MARCA en gris discreto — la distinción es deliberada, una reseña de
+  periodista respalda algo distinto que la de un cliente). La fecha se formatea
+  parseando el string ISO, NO con `new Date()`: así el mes es idéntico en server
+  y cliente y no hay error de hidratación por huso horario.
+
+- **`components/resenas-preview.tsx`**, reutilizable, insertado en el home
+  (entre Conexiones y Bio, `bg-hueso`) y al final de `/servicios` (después de
+  Conexiones, `bg-hueso-oscuro`) para respetar la alternancia de fondos de cada
+  página. Orden siempre `published_at desc`; ÚNICA excepción: si hay alguna
+  reseña de periodista publicada y ninguna entra en las 3 más recientes, la de
+  periodista más reciente ocupa el tercer lugar (respalda la promesa de
+  "relaciones reales con periodistas" del hero). Por eso las dos páginas leen
+  TODAS las publicadas, no solo 3.
+
+- Copy editable en `content_blocks` con `page='resenas'`
+  (`lib/resenas-schema.ts`, tres secciones: `hero`, `preview`, `empty`), editor
+  en `/admin/edit/resenas`. El texto del pie tiene una redacción fija que NO hay
+  que aflojar: "Cada reseña la escribe la persona que la firma y se publica sin
+  editar el texto. Podés verificar quién es cada una desde su perfil público."
+  Nunca decir que se publican todas las recibidas: hay aprobación interna.
+
+- "Reseñas" agregado a `NAV_ITEMS` (`lib/constants.ts`), que alimenta Navbar y
+  Footer a la vez, más `link_resenas` en `global/nav` y la sección `resenas` en
+  el esquema de SEO.
+
+- `/dev/resenas-harness` es un banco de pruebas con datos falsos que da **404 en
+  producción**; existe para poder verificar la UI mientras no haya reseñas
+  reales. Lo usa `npx tsx scripts/e2e-resenas-publicas.ts` (33 checks de las
+  reglas duras + `pickPreview`).
+
+### Reseñas — panel de moderación (2026-09-09)
+Cuarto y último paso del sistema de reseñas. Con esto el circuito está completo:
+alguien la escribe → confirma su mail → Marian decide → se ve en el sitio.
+
+- La migración `20260908_testimonials.sql` YA ESTÁ CORRIDA en Supabase
+  (verificado: la tabla existe y la RLS bloquea a anon en `author_email`,
+  `verification_token` y en cualquier insert).
+
+- **`/admin/resenas`** (`app/admin/(panel)/resenas/`): `page.tsx` (server,
+  `force-dynamic`, hace TODO el fetch), `resenas-manager.tsx` (client, solo
+  recibe props: el service role nunca se acerca al browser) y `actions.ts`.
+  Sigue el patrón visual de `/admin/clippings`: ancho 960, eyebrow mono +
+  H1 Playfair `clamp(40px,5vw,56px)`, contenedores sobre hueso-oscuro con borde
+  `rgba(201,168,130,0.3)`.
+
+- **Tres pestañas** (`role="tablist"` con roving tabindex y flechas), en el
+  orden en que se trabajan: **Para revisar** (abierta por defecto), Publicadas,
+  Rechazadas. Cada una con su contador, y adentro el desglose por tipo
+  ("3 reseñas · 2 de marcas · 1 de periodista").
+  Las `pending_verification` NO se muestran en ninguna pestaña: el autor
+  todavía no confirmó el mail, no hay nada para decidir sobre ellas.
+
+- **Cada fila** muestra todo lo necesario para decidir sin abrir nada: etiqueta
+  de tipo, estrellas, nombre, cargo, marca/medio, link al perfil (target blank +
+  rel noopener), el cuerpo COMPLETO sin truncar, el mail con la fecha en que se
+  verificó, la fecha de envío, y —si ya pasó por moderación— `moderated_by`,
+  `moderated_at` y el `moderation_note`.
+
+- **Acciones por estado**:
+  · Para revisar → **Publicar** (confirmación simple, sin motivo) y **Rechazar**.
+  · Publicadas → Ver en el sitio y **Despublicar**.
+  · Rechazadas → **Publicar** (moderar mal no es irreversible).
+
+- **Despublicar ≠ rechazar.** Rechazar es una decisión tomada; despublicar baja
+  la reseña del sitio y la devuelve a `pending_review`, o sea a la cola, y por
+  eso vuelve a contar en el badge de pendientes: queda una decisión abierta.
+  Lo hace `unpublishTestimonial` (lib/testimonials.ts), con `.eq("status",
+  "published")` para no pisar una decisión más nueva tomada en otra pestaña.
+  `published_at` no se borra (registro de que estuvo online; nadie lo lee salvo
+  con status publicado).
+
+- **Las dos acciones que piden motivo** (rechazar y despublicar) comparten un
+  diálogo con textarea, tan accesible como `ConfirmDialog` (foco al abrir,
+  Escape, click afuera). El motivo es OBLIGATORIO y de mínimo
+  `MODERATION_NOTE_MIN` = 10 caracteres, constante de lib/testimonials.ts que
+  valida el SERVIDOR; el diálogo solo adelanta el aviso ("escribí N caracteres
+  más"). Es el único registro de por qué se bajó algo, y un "no" suelto no le
+  sirve a nadie dentro de seis meses. Es interno: no se le manda al autor.
+  El diálogo se monta con `key` por reseña para que cada apertura arranque
+  vacío sin un setState en un efecto (lo prohíbe `react-hooks/set-state-in-effect`).
+
+- **Aviso fijo arriba de todo**, con redacción acordada: "Rechazar deja registro
+  del motivo. Tené presente que la persona que escribió la reseña sabe que la
+  mandó: si se rechaza una crítica honesta, el costo es con esa marca."
+
+- **NO se puede editar el texto, el puntaje ni los datos del autor, ni borrar
+  filas.** No existe la acción; no es que esté escondida en la UI. El contenido
+  de una reseña es inmutable: si no va, se rechaza y queda el registro.
+
+- **`actions.ts` chequea la sesión SIEMPRE antes de tocar la base**, con
+  `getUser()` (valida el token contra Supabase), nunca `getSession()`. Las
+  funciones del lib escriben con el service role, que se saltea la RLS;
+  `proxy.ts` protege las páginas de `/admin/*`, pero un server action se puede
+  invocar por POST directo sin pasar por la página, así que la barrera tiene que
+  estar en la acción. El `adminEmail` que queda en `moderated_by` sale de esa
+  sesión y NUNCA de un parámetro del cliente: si viniera del browser,
+  cualquiera podría firmar una moderación con el mail de otra persona.
+
+- Toda acción revalida **tres** rutas: `/resenas`, `/` y `/servicios` (las dos
+  últimas por el bloque de adelanto).
+
+- **Badge de pendientes en el sidebar** (`app/admin/(panel)/layout.tsx`, vía
+  `getPendingCount`), en la entrada "Reseñas" ubicada justo debajo de
+  Clippings. Sin pendientes no se dibuja el badge. Más una tarjeta "Reseñas
+  recibidas" en el dashboard con el resumen (N para moderar · N publicadas).
+
+- **Link para pedir reseñas** con botón de copiar: es el que Marian manda por
+  WhatsApp. La URL absoluta la arma el server desde el host de la request (no
+  `window.location` en un efecto, no una env var), así sale bien en localhost,
+  en el preview de Vercel y en producción.
+
+- `getAllTestimonials()` devuelve `{ rows, ok }`. A diferencia de las lecturas
+  públicas, en el panel NO da lo mismo "no llegó ninguna reseña" que "no pude
+  leer la base": con el estado vacío Marian creería que nadie le escribió
+  mientras hay reseñas esperando.
+
+- Las fechas se formatean parseando el string ISO (nunca `new Date()`), igual
+  que en `resena-card`: el manager se renderiza en server y en cliente, y el
+  huso horario cambiaría el día (error de hidratación).
+
+- Tests: `npx tsx scripts/e2e-resenas-panel.ts` con el dev server corriendo
+  (51 checks: login, badge, posición en el sidebar, las tres pestañas y sus
+  contadores, que las sin verificar no se muestren, el contenido de la fila,
+  que no haya editar ni borrar, publicar con confirmación, Escape sin publicar,
+  el mínimo de 10 caracteres del motivo, despublicar → vuelve a Para revisar y
+  desaparece del sitio, rechazar y republicar. Playwright con el Edge del
+  sistema; auto-limpiante por prefijo de email).
+
+
 ### Pendiente (próxima iteración)
+- ~~Correr la migración de reseñas~~ → hecha (2026-09-09, verificada contra la
+  base).
+- ~~Panel `/admin/resenas`~~ → hecho (2026-09-09, ver arriba).
+- ⚠ Env vars de reseñas EN VERCEL, sin esto el sistema no funciona en
+  producción: `TESTIMONIAL_IP_SALT` (sin ella no hay rate limit),
+  `RESEND_API_KEY` y `MODERATION_NOTIFY_EMAIL`. Ojo: `RESEND_API_KEY` tampoco
+  está en `.env.local`, así que en local NO se manda ningún mail (la reseña se
+  guarda igual y el usuario ve el mensaje de "escribinos a info@").
+- Reseñas, lo único que falta: migrar el copy del formulario de alta
+  (`/resenas/nueva`, hoy hardcodeado) al CMS.
 - Correr la migración SQL de clippings en el dashboard + seed (paso manual,
   ver arriba). Hasta entonces el admin de clippings muestra el aviso de setup
   y la página pública usa el fallback.
