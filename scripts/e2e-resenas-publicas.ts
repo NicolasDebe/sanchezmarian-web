@@ -192,20 +192,49 @@ async function main() {
   check("el nombre abre en pestaña nueva y segura", /target="_blank"[^>]*rel="noopener noreferrer"|rel="noopener noreferrer"[^>]*target="_blank"/.test(cardHtml))
   check("hay etiqueta de tipo Marca y Periodista", cardHtml.includes(">Marca<") && cardHtml.includes(">Periodista<"))
 
-  // Adelanto (home / servicios)
-  console.log("\n7. Bloque de adelanto")
-  for (const n of [0, 1]) {
-    await page.goto(`${BASE}/dev/resenas-harness?view=preview&n=${n}`, { waitUntil: "networkidle" })
-    check(`con ${n} reseña(s) NO se renderiza`, (await page.locator("article").count()) === 0)
-  }
-  await page.goto(`${BASE}/dev/resenas-harness?view=preview&n=2`, { waitUntil: "networkidle" })
-  check("con 2 SÍ se renderiza", (await page.locator("article").count()) === 2)
-  await page.goto(`${BASE}/dev/resenas-harness?view=preview&n=9`, { waitUntil: "networkidle" })
+  // Adelanto (home / servicios) — carrusel: una reseña por vez, pero TODAS las
+  // diapositivas están en el DOM (apiladas en la misma celda del grid), así que
+  // se cuentan los <article> y se chequea cuál está visible por el aria-hidden.
+  console.log("\n7. Bloque de adelanto (carrusel)")
+  const preview = (n: number) =>
+    page.goto(`${BASE}/dev/resenas-harness?view=preview&n=${n}`, { waitUntil: "networkidle" })
+
+  await preview(0)
+  check("sin reseñas NO se renderiza", (await page.locator("article").count()) === 0)
+
+  await preview(1)
+  check("con 1 SÍ se renderiza", (await page.locator("article").count()) === 1)
+  check(
+    "con 1 no hay flechas ni puntos",
+    (await page.locator('button[aria-label="Reseña siguiente"]').count()) === 0 &&
+      (await page.locator('button[aria-label^="Ver la reseña"]').count()) === 0,
+  )
+
+  await preview(2)
+  check("con 2 hay dos diapositivas", (await page.locator("article").count()) === 2)
+  check(
+    "con 2 aparecen los controles",
+    (await page.locator('button[aria-label="Reseña siguiente"]').count()) > 0 &&
+      (await page.locator('button[aria-label^="Ver la reseña"]').count()) === 2,
+  )
+
+  await preview(9)
   check("nunca muestra más de 3", (await page.locator("article").count()) === 3)
   check(
-    "linkea a /resenas",
-    (await page.content()).includes('href="/resenas"'),
+    "solo una diapositiva está expuesta a la vez",
+    (await page.locator('[aria-roledescription="reseña"]:not([aria-hidden="true"])').count()) === 1,
   )
+
+  // Pasar de reseña con la flecha cambia cuál se ve.
+  const primera = await page.locator('[aria-roledescription="reseña"]:not([aria-hidden="true"])').getAttribute("aria-label")
+  await page.locator('button[aria-label="Reseña siguiente"]').first().click()
+  await page.waitForTimeout(700)
+  const segunda = await page.locator('[aria-roledescription="reseña"]:not([aria-hidden="true"])').getAttribute("aria-label")
+  check(`la flecha avanza (${primera} → ${segunda})`, primera === "1 de 3" && segunda === "2 de 3")
+
+  const previewHtml = await page.content()
+  check("linkea a /resenas", previewHtml.includes('href="/resenas"'))
+  check("linkea al formulario", previewHtml.includes('href="/resenas/nueva"'))
 
   await browser.close()
   console.log(`\n${pass} ok · ${fail} fallidos`)

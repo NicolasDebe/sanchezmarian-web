@@ -58,15 +58,17 @@ export const RESENAS_SECTIONS: SectionDef[] = [
         field: "title_post",
         type: "text",
         label: "Título — cierre",
-        fallback: "con Marian.",
+        fallback: "conmigo.",
         maxChars: 60,
       },
       {
         field: "subtitle",
         type: "longtext",
         label: "Bajada",
+        // En primera persona, igual que el título ("trabajaron conmigo"): la
+        // página la firma Marian, no habla de ella en tercera.
         fallback:
-          "Marcas que la contrataron y periodistas que trabajan con ella del otro lado del mostrador.",
+          "Marcas que me eligieron para contar su historia y periodistas con los que trabajo todos los días.",
         maxChars: 400,
         help: "Una o dos oraciones debajo del título.",
         resizable: true,
@@ -87,7 +89,7 @@ export const RESENAS_SECTIONS: SectionDef[] = [
     section: "preview",
     title: "Bloque del home y de Servicios",
     legend:
-      "El adelanto de reseñas que aparece en el home y en Servicios. Muestra las 3 más recientes.",
+      "El adelanto de reseñas que aparece en el home y en Servicios, como un carrusel: se ve una reseña por vez y se pasa con las flechas o los puntos. Muestra las 3 más recientes.",
     fields: [
       {
         field: "eyebrow",
@@ -126,6 +128,14 @@ export const RESENAS_SECTIONS: SectionDef[] = [
         label: "Texto del link al final",
         fallback: "Ver todas las reseñas",
         maxChars: 40,
+      },
+      {
+        field: "cta_secondary_label",
+        type: "text",
+        label: "Texto del segundo link (dejar una reseña)",
+        fallback: "Dejá la tuya",
+        maxChars: 40,
+        help: "Link discreto al lado del anterior. Lleva al formulario para dejar una reseña nueva.",
       },
     ],
   },

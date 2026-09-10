@@ -176,26 +176,16 @@ export function ResenaForm() {
           Recibimos tu reseña.
         </h2>
 
+        {/* Solo agradecimiento, a pedido de Marian (2026-09-10). Antes acá se
+            aclaraba que la reseña se modera y que podía tardar días en salir;
+            se sacó a propósito, junto con el mail de contacto para correcciones.
+            No volver a agregarlos sin preguntar. */}
         <p
           className={`mx-auto mt-3 max-w-md ${HELP}`}
           style={{ fontSize: "var(--fs-body)" }}
         >
-          Gracias por tomarte el rato de escribirla. Marian la lee antes de
-          publicarla, así que puede tardar unos días en aparecer en la web.
-        </p>
-
-        <p
-          className={`mx-auto mt-4 max-w-md ${HELP}`}
-          style={{ fontSize: "var(--fs-caption)" }}
-        >
-          Si querés cambiar algo de lo que escribiste, escribinos a{" "}
-          <a
-            href={`mailto:${SITE_EMAIL}`}
-            className="text-bordo underline underline-offset-2"
-          >
-            {SITE_EMAIL}
-          </a>
-          .
+          Gracias por tomarte unos minutos para dejar tu opinión y por
+          recomendar mi trabajo a otras personas. Significa mucho.
         </p>
       </motion.div>
     )

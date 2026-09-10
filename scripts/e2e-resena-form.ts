@@ -222,8 +222,15 @@ async function main() {
 
     check("confirma que la recibimos", await panelD.getByText("Recibimos tu reseña.").isVisible())
     check(
-      "aclara que Marian la lee antes de publicarla",
-      await panelD.getByText(/Marian la lee antes de publicarla/).isVisible(),
+      "agradece por dejar la opinión",
+      await panelD.getByText(/Gracias por tomarte unos minutos/).isVisible(),
+    )
+    // Marian pidió sacar de acá la aclaración de que la reseña se modera y el
+    // mail para pedir correcciones (2026-09-10). Si vuelven a aparecer, es una
+    // regresión, no una mejora.
+    check(
+      "NO menciona la moderación ni el tiempo de espera",
+      !/la lee antes de publicarla|puede tardar|unos días en aparecer/i.test(await d.content()),
     )
     check(
       "NO habla de confirmar por mail",
