@@ -36,8 +36,16 @@ const MIN_PARA_MOSTRAR = 1
 /** Cuántas entran en el adelanto (el resto se ve en /resenas). */
 const MAX_EN_ADELANTO = 3
 
-/** Auto-avance. Pausa con hover, foco, drag y prefers-reduced-motion. */
-const AUTOPLAY_MS = 8000
+/**
+ * Auto-avance. Pausa con hover, foco, drag y prefers-reduced-motion.
+ *
+ * 1,5 s es un pedido explícito de Marian (2026-09-10). Es MUY rápido: no
+ * alcanza para leer una reseña entera, así que el bloque funciona más como una
+ * vidriera en movimiento que como algo que se lee de corrido — quien quiera
+ * leerlas se detiene con el mouse (pausa) o va a /resenas. No subirlo sin
+ * preguntar.
+ */
+const AUTOPLAY_MS = 1500
 
 /** Píxeles de arrastre a partir de los cuales el swipe cambia de reseña. */
 const SWIPE_MIN_PX = 60
@@ -228,10 +236,12 @@ export function ResenasPreview({
                       opacity: activa ? 1 : 0,
                       x: activa ? 0 : dir * 48,
                     }}
+                    // 0,35 s: con un ciclo de 1,5 s, medio segundo de cruce
+                    // dejaba el bloque animando un tercio del tiempo.
                     transition={
                       reduced
                         ? { duration: 0.2 }
-                        : { duration: 0.5, ease: EASE_EXPO }
+                        : { duration: 0.35, ease: EASE_EXPO }
                     }
                   >
                     <ResenaQuote resena={r} />

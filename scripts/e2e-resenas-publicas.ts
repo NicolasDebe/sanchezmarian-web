@@ -225,16 +225,55 @@ async function main() {
     (await page.locator('[aria-roledescription="reseña"]:not([aria-hidden="true"])').count()) === 1,
   )
 
-  // Pasar de reseña con la flecha cambia cuál se ve.
-  const primera = await page.locator('[aria-roledescription="reseña"]:not([aria-hidden="true"])').getAttribute("aria-label")
-  await page.locator('button[aria-label="Reseña siguiente"]').first().click()
-  await page.waitForTimeout(700)
-  const segunda = await page.locator('[aria-roledescription="reseña"]:not([aria-hidden="true"])').getAttribute("aria-label")
-  check(`la flecha avanza (${primera} → ${segunda})`, primera === "1 de 3" && segunda === "2 de 3")
-
   const previewHtml = await page.content()
   check("linkea a /resenas", previewHtml.includes('href="/resenas"'))
   check("linkea al formulario", previewHtml.includes('href="/resenas/nueva"'))
+
+  // El auto-avance corre solo, sin tocar nada. Con el ciclo en 1,5 s, esperar
+  // 2,6 s alcanza para ver al menos un cambio aunque la carga se demore.
+  const expuesta = () =>
+    page
+      .locator('[aria-roledescription="reseña"]:not([aria-hidden="true"])')
+      .getAttribute("aria-label")
+
+  const antesDeEsperar = await expuesta()
+  await page.waitForTimeout(2600)
+  const despuesDeEsperar = await expuesta()
+  check(
+    `el auto-avance cambia de reseña solo (${antesDeEsperar} → ${despuesDeEsperar})`,
+    antesDeEsperar !== despuesDeEsperar,
+  )
+
+  // La flecha, en una pestaña aparte con prefers-reduced-motion: ahí el
+  // auto-avance no corre, así que el índice solo cambia por el clic y la
+  // comprobación no depende de llegar antes que el timer.
+  const ctxQuieto = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    reducedMotion: "reduce",
+  })
+  const pageQuieta = await ctxQuieto.newPage()
+  pageQuieta.setDefaultTimeout(20000)
+  await pageQuieta.goto(`${BASE}/dev/resenas-harness?view=preview&n=9`, {
+    waitUntil: "networkidle",
+  })
+
+  const expuestaQuieta = () =>
+    pageQuieta
+      .locator('[aria-roledescription="reseña"]:not([aria-hidden="true"])')
+      .getAttribute("aria-label")
+
+  const primera = await expuestaQuieta()
+  await pageQuieta.waitForTimeout(1200)
+  check(
+    "con prefers-reduced-motion NO se auto-avanza",
+    (await expuestaQuieta()) === primera,
+    `quedó en ${await expuestaQuieta()}`,
+  )
+
+  await pageQuieta.locator('button[aria-label="Reseña siguiente"]').first().click()
+  await pageQuieta.waitForTimeout(500)
+  const segunda = await expuestaQuieta()
+  check(`la flecha avanza (${primera} → ${segunda})`, primera === "1 de 3" && segunda === "2 de 3")
 
   await browser.close()
   console.log(`\n${pass} ok · ${fail} fallidos`)
