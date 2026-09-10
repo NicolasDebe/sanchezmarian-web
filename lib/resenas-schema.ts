@@ -74,6 +74,14 @@ export const RESENAS_SECTIONS: SectionDef[] = [
         resizable: true,
       },
       {
+        field: "cta_label",
+        type: "text",
+        label: "Texto del botón para dejar una reseña",
+        fallback: "Dejar mi reseña",
+        maxChars: 40,
+        help: "El botón bordó del encabezado. Es por donde reseña quien abre el link, así que siempre se muestra.",
+      },
+      {
         field: "footer_note",
         type: "longtext",
         label: "Texto del recuadro al pie",
@@ -160,13 +168,8 @@ export const RESENAS_SECTIONS: SectionDef[] = [
         fallback: "Si trabajaste con Marian, podés ser la primera persona en contarlo.",
         maxChars: 300,
       },
-      {
-        field: "cta_label",
-        type: "text",
-        label: "Texto del botón",
-        fallback: "Dejar mi reseña",
-        maxChars: 40,
-      },
+      // Sin campo de botón: el botón para reseñar vive en el encabezado
+      // (hero/cta_label) y se muestra siempre, con reseñas o sin ellas.
     ],
   },
 ]

@@ -128,6 +128,22 @@ export function ResenasContent({
               />
             </motion.div>
           )}
+
+          {/* Botón para dejar una reseña. SIEMPRE visible, haya o no reseñas
+              publicadas: /resenas es el link que Marian le pasa a un cliente
+              para que reseñe, así que quien lo abre tiene que encontrar por
+              dónde hacerlo sin buscar. Antes solo existía dentro del estado
+              vacío y desaparecía apenas se publicaba la primera. */}
+          <motion.div variants={fadeUp}>
+            <Link
+              href="/resenas/nueva"
+              className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-bordo px-7 py-3.5 font-sans font-semibold text-hueso transition-colors hover:bg-bordo-oscuro focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordo"
+              style={{ fontSize: "var(--fs-body)" }}
+            >
+              {c.cta_label}
+              <ArrowRight size={16} strokeWidth={2.5} />
+            </Link>
+          </motion.div>
         </motion.header>
 
         {/* ── Promedio (solo con 5 o más) ── */}
@@ -263,14 +279,9 @@ function EmptyState({ copy }: { copy: Record<string, string> }) {
         {copy.body}
       </p>
 
-      <Link
-        href="/resenas/nueva"
-        className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-bordo px-7 py-3.5 font-sans font-semibold text-hueso transition-colors hover:bg-bordo-oscuro focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordo"
-        style={{ fontSize: "var(--fs-body)" }}
-      >
-        {copy.cta_label}
-        <ArrowRight size={16} strokeWidth={2.5} />
-      </Link>
+      {/* Sin botón propio a propósito: el del encabezado está unos píxeles más
+          arriba y siempre visible, así que acá serían dos botones bordó
+          idénticos apilados. */}
     </motion.div>
   )
 }

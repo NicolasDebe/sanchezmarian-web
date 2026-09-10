@@ -166,6 +166,25 @@ async function main() {
   check("linkea a /resenas/nueva", html0.includes('href="/resenas/nueva"'))
   check("no muestra promedio ni chips", !html0.includes("Promedio sobre") && !html0.includes("Filtrar reseñas"))
 
+  // El botón para dejar una reseña, en el encabezado. /resenas es el link que
+  // se le pasa a un cliente para que reseñe: si el botón desaparece al
+  // publicarse la primera reseña, la página deja de servir para lo que se usa.
+  // Pasó exactamente eso hasta el 2026-09-10 (solo existía en el estado vacío).
+  console.log("\n4b. Botón para dejar una reseña")
+  for (const n of [0, 1, 3, 9]) {
+    await go(`n=${n}`)
+    const boton = page.getByRole("link", { name: /Dejar mi reseña/ })
+    check(
+      `con ${n} reseña(s) el botón está visible`,
+      (await boton.count()) === 1 && (await boton.first().isVisible()),
+    )
+  }
+  check(
+    "el botón lleva al formulario",
+    (await page.getByRole("link", { name: /Dejar mi reseña/ }).first().getAttribute("href")) ===
+      "/resenas/nueva",
+  )
+
   // Texto del pie: la redacción exacta, y nada que prometa de más
   console.log("\n5. Texto del pie")
   const html3 = await go("n=3")
