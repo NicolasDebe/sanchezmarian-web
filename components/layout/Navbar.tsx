@@ -212,7 +212,7 @@ export function Navbar({
                   className="flex min-h-11 items-center gap-3 font-sans text-[length:var(--fs-caption)] text-hueso/80 transition-colors hover:text-hueso"
                 >
                   <Instagram size={18} strokeWidth={1.5} className="shrink-0" />
-                  Instagram @marian15s
+                  Instagram @mariansanchezs
                 </a>
                 <a
                   href={linkedinUrl}

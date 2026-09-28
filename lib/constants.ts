@@ -28,7 +28,7 @@ export const WHATSAPP_CHANNEL_PREFIX = "https://whatsapp.com/"
 
 export const SOCIAL_LINKS = {
   linkedin: "https://www.linkedin.com/in/marians%C3%A1nchez/",
-  instagram: "https://www.instagram.com/marian15s/",
+  instagram: "https://www.instagram.com/mariansanchezs/",
 } as const
 
 /**

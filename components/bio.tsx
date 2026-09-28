@@ -158,7 +158,7 @@ export function Bio({
                   style={{ fontSize: "var(--fs-caption)" }}
                 >
                   <Instagram size={16} strokeWidth={1.75} className="shrink-0" />
-                  @marian15s
+                  @mariansanchezs
                 </a>
                 <a
                   href={linkedinUrl}

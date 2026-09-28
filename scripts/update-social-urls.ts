@@ -3,7 +3,7 @@
  * canónicas aprobadas. Ejecutar con: npx tsx scripts/update-social-urls.ts
  *
  * - LinkedIn: https://www.linkedin.com/in/marians%C3%A1nchez/
- * - Instagram: https://www.instagram.com/marian15s/
+ * - Instagram: https://www.instagram.com/mariansanchezs/
  *
  * Actualiza TODA fila cuyo field contenga "linkedin" o "instagram" (no solo
  * las dos conocidas). Lista las filas afectadas y reporta valores viejos.
@@ -16,7 +16,7 @@ import path from "path"
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") })
 
 const LINKEDIN = "https://www.linkedin.com/in/marians%C3%A1nchez/"
-const INSTAGRAM = "https://www.instagram.com/marian15s/"
+const INSTAGRAM = "https://www.instagram.com/mariansanchezs/"
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -6,7 +6,7 @@ import fs from "fs"
 const BASE = process.env.SHOTS_BASE ?? "http://localhost:3000"
 const OUT = path.join(process.cwd(), "shots")
 const LINKEDIN = "https://www.linkedin.com/in/marians%C3%A1nchez/"
-const INSTAGRAM = "https://www.instagram.com/marian15s/"
+const INSTAGRAM = "https://www.instagram.com/mariansanchezs/"
 
 async function ready(browser: Browser) {
   const p = await browser.newPage()
@@ -34,7 +34,7 @@ async function checkLinks(page: Page, label: string) {
   for (const l of links) {
     const okSize = l.h >= 44
     const okHref =
-      (l.href.includes("instagram.com/marian15s") && l.href === INSTAGRAM) ||
+      (l.href.includes("instagram.com/mariansanchezs") && l.href === INSTAGRAM) ||
       (l.href === LINKEDIN)
     const okTab = l.target === "_blank" && l.rel.includes("noopener")
     console.log(

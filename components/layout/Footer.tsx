@@ -30,7 +30,7 @@ export function Footer({
   }))
   const SOCIAL = [
     {
-      label: "@marian15s",
+      label: "@mariansanchezs",
       aria: "Instagram de Marian Sánchez",
       href: c.instagram_url || SOCIAL_LINKS.instagram,
       Icon: Instagram,

@@ -247,7 +247,7 @@ export function CtaFinal({
                 >
                   <Instagram size={16} strokeWidth={1.5} className="shrink-0 text-hueso/75 transition-opacity duration-200 group-hover:opacity-100" />
                   <span className="relative font-sans text-hueso/85 transition-colors duration-200 group-hover:text-hueso" style={{ fontSize: "var(--fs-caption)" }}>
-                    @marian15s
+                    @mariansanchezs
                     <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-hueso/70 transition-transform duration-300 group-hover:scale-x-100" />
                   </span>
                   <span aria-hidden="true" className="font-sans text-hueso/40 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-hueso">
