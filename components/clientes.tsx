@@ -18,6 +18,7 @@ const LOGOS = [
   { src: "/images/logos/logo-fuerza-silenciosa.jpg", alt: "Fuerza Silenciosa" },
   { src: "/images/logos/logo-meneo.png",             alt: "Dra. María Elina Meneo" },
   { src: "/images/logos/logo-mfmc.png",              alt: "María Florencia Mouradian" },
+  { src: "/images/logos/logo-noche-chefs.webp",      alt: "La Noche de los Chefs" },
 ]
 
 function RotatingCard({ initialIndex, delay }: { initialIndex: number; delay: number }) {

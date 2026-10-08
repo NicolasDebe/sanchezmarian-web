@@ -106,6 +106,7 @@ export const CLIENT_SEED: ClientSeed[] = [
   { slug: "fuerza-silenciosa", name: "Fuerza Silenciosa",         key: "Fuerza Silenciosa",            logo: "/images/logos/logo-fuerza-silenciosa.jpg" },
   { slug: "mendoza-regenera",  name: "Mendoza Regenera",          key: "Mendoza Regenera",             logo: "/images/logos/logo-mendoza-regenera.png" },
   { slug: "flor-mouradian",    name: "Flor Mouradian",            key: "Flor Mouradian",               logo: "/images/logos/logo-mfmc.png" },
+  { slug: "noche-de-los-chefs", name: "La Noche de los Chefs",    key: "La Noche de los Chefs",        logo: "/images/logos/logo-noche-chefs.webp" },
 ]
 
 // ─── Fallback desde data/clippings.ts ─────────────────────────────────────────

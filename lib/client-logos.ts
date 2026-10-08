@@ -31,6 +31,7 @@ export const CLIENT_LOGOS: ClientLogo[] = [
   { name: "Fuerza Silenciosa",             logo: "/images/logos/logo-fuerza-silenciosa.jpg" },
   { name: "Mendoza Regenera",              logo: "/images/logos/logo-mendoza-regenera.png",   aliases: ["cluster mendoza regenera"] },
   { name: "Flor Mouradian",                logo: "/images/logos/logo-mfmc.png",               aliases: ["florencia mouradian", "maria florencia mouradian", "mfmc"] },
+  { name: "La Noche de los Chefs",         logo: "/images/logos/logo-noche-chefs.webp",       aliases: ["noche de los chefs", "la noche de los chef"] },
 ]
 
 /** minúsculas, sin acentos, espacios y puntuación colapsados. */
