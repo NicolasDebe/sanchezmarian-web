@@ -1,15 +1,16 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { Menu, X, Mail, MapPin } from "lucide-react"
+import { Menu, X, Mail, MapPin, Search } from "lucide-react"
 import { Instagram, Linkedin } from "@/components/ui/social-icons"
 import { cn } from "@/lib/utils"
 import { NAV_ITEMS, WHATSAPP_HREF, SITE_EMAIL, SOCIAL_LINKS } from "@/lib/constants"
 import { Logo } from "@/components/layout/Logo"
 import { IconWhatsApp } from "@/components/ui/icon-whatsapp"
+import { SearchPanel } from "@/components/ui/search-panel"
 import { fsStyle, type FieldScaleMap } from "@/lib/text-size"
 
 export function Navbar({
@@ -34,6 +35,10 @@ export function Navbar({
     fkey: `nav.${item.key}`,
   }))
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  // Para devolverle el foco a la lupa al cerrar el panel (requisito de
+  // teclado: el foco no puede quedar perdido en el body).
+  const searchButtonRef = useRef<HTMLButtonElement>(null)
   const pathname = usePathname()
   const reduced = useReducedMotion()
 
@@ -41,6 +46,25 @@ export function Navbar({
   useEffect(() => {
     setIsMenuOpen(false)
   }, [pathname])
+
+  // Ctrl/Cmd + K abre el buscador desde cualquier página. El panel maneja su
+  // propio Esc; acá solo se escucha la apertura.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault()
+        setIsMenuOpen(false)
+        setIsSearchOpen(true)
+      }
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [])
+
+  const closeSearch = useCallback(() => {
+    setIsSearchOpen(false)
+    searchButtonRef.current?.focus()
+  }, [])
 
   // Esc cierra el menú; bloquea el scroll del body mientras está abierto.
   useEffect(() => {
@@ -88,6 +112,17 @@ export function Navbar({
           {/* CTA desktop. El header siempre tiene fondo --bordo, así que el botón
               va en variante --hueso/--bordo (consistente con el resto del nav). */}
           <div className="hidden md:flex items-center gap-3">
+            <button
+              ref={searchButtonRef}
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+              aria-label="Buscar en el sitio"
+              title="Buscar (Ctrl + K)"
+              className="flex items-center justify-center text-hueso/70 transition-all duration-200 hover:text-hueso hover:scale-110"
+            >
+              <Search size={18} strokeWidth={1.75} />
+            </button>
+
             {/* Presencia social mínima permanente. El nav siempre es fondo bordo,
                 así que los íconos van en --hueso/70 → opacidad plena + scale al hover. */}
             <div className="flex items-center gap-3">
@@ -117,6 +152,17 @@ export function Navbar({
               Conversemos
             </Link>
           </div>
+
+          <button
+            onClick={() => {
+              setIsMenuOpen(false)
+              setIsSearchOpen(true)
+            }}
+            className="md:hidden flex items-center justify-center min-h-11 min-w-11 text-hueso/70 hover:text-hueso transition-colors"
+            aria-label="Buscar en el sitio"
+          >
+            <Search size={22} strokeWidth={1.5} />
+          </button>
 
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -230,6 +276,8 @@ export function Navbar({
           </>
         )}
       </AnimatePresence>
+
+      <SearchPanel open={isSearchOpen} onClose={closeSearch} />
     </header>
   )
 }
