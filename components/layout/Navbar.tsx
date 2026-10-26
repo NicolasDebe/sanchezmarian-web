@@ -112,15 +112,36 @@ export function Navbar({
           {/* CTA desktop. El header siempre tiene fondo --bordo, así que el botón
               va en variante --hueso/--bordo (consistente con el resto del nav). */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Buscador. NO va con el tratamiento de los íconos sociales
+                (--hueso/70 suelto): al lado de Instagram y LinkedIn se leía
+                como un ícono más y pasaba desapercibido. Va como control
+                propio —borde, fondo y la palabra "Buscar"— para que se
+                entienda que es una acción. El label aparece desde lg y el
+                atajo desde xl, así no aprieta el nav en pantallas medianas. */}
             <button
               ref={searchButtonRef}
               type="button"
               onClick={() => setIsSearchOpen(true)}
               aria-label="Buscar en el sitio"
               title="Buscar (Ctrl + K)"
-              className="flex items-center justify-center text-hueso/70 transition-all duration-200 hover:text-hueso hover:scale-110"
+              className="group ml-2 flex w-9 items-center justify-center gap-2 rounded-full border border-hueso/35 bg-hueso/10 text-hueso transition-colors duration-200 hover:border-dorado hover:bg-hueso/20 lg:ml-0 lg:w-auto lg:justify-start lg:px-3.5"
+              style={{ minHeight: 36 }}
             >
-              <Search size={18} strokeWidth={1.75} />
+              <Search size={17} strokeWidth={2} className="shrink-0" />
+              <span className="hidden font-sans lg:inline" style={{ fontSize: "var(--fs-caption)" }}>
+                Buscar
+              </span>
+              <kbd
+                className="hidden font-mono text-hueso/55 transition-colors group-hover:text-hueso/80 xl:inline"
+                style={{
+                  fontSize: "var(--fs-micro)",
+                  padding: "1px 5px",
+                  borderRadius: 3,
+                  border: "1px solid rgba(254,252,239,0.3)",
+                }}
+              >
+                Ctrl K
+              </kbd>
             </button>
 
             {/* Presencia social mínima permanente. El nav siempre es fondo bordo,
@@ -158,10 +179,10 @@ export function Navbar({
               setIsMenuOpen(false)
               setIsSearchOpen(true)
             }}
-            className="md:hidden flex items-center justify-center min-h-11 min-w-11 text-hueso/70 hover:text-hueso transition-colors"
+            className="md:hidden flex items-center justify-center min-h-11 min-w-11 text-hueso transition-colors"
             aria-label="Buscar en el sitio"
           >
-            <Search size={22} strokeWidth={1.5} />
+            <Search size={23} strokeWidth={2} />
           </button>
 
           <button
