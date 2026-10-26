@@ -1,13 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "motion/react"
 import { ArrowRight } from "lucide-react"
 import {
-  fadeUp, fadeUpStagger, revealCard, viewportOnce,
+  fadeUp, fadeUpStagger, revealCard, springSnappy, tapScale, viewportOnce,
 } from "@/lib/animations"
+import {
+  campaignClientKey, groupCampaignsByClient, type CampaignClientGroup,
+} from "@/lib/campaign-clients"
 import { HeroWords, heroSatelliteDelay, useHeroSatellite } from "@/components/ui/hero-reveal"
 import { TextureOverlay } from "@/components/ui/texture-overlay"
 import { STATUS_LABELS, type Campaign, type CampaignStatus } from "@/lib/types/campaign"
@@ -463,9 +466,94 @@ function CampanaCard({
   )
 }
 
+// ─── Chips de clientes ────────────────────────────────────────────────────────
+
+/**
+ * Con un solo cliente distinto una fila de un chip es ruido: no filtra nada.
+ * (Mismo criterio que MIN_PARA_CHIPS en components/resenas-content.tsx.)
+ */
+const MIN_CLIENTES_PARA_CHIPS = 2
+
+function ClientChips({
+  grupos,
+  total,
+  activo,
+  onChange,
+}: {
+  grupos: CampaignClientGroup[]
+  total: number
+  activo: string | null
+  onChange: (key: string | null) => void
+}) {
+  // En mobile la fila scrollea horizontal dentro del gutter de la página: 12
+  // chips apilados serían 6 líneas, y hacer crecer el contenedor rompería el
+  // overflow-x: clip de html+body.
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4, delay: 0.2 }}
+      role="group"
+      aria-label="Filtrar campañas por cliente"
+      className="no-scrollbar flex flex-nowrap gap-2.5 overflow-x-auto md:flex-wrap md:overflow-visible"
+      style={{ marginBottom: 40 }}
+    >
+      {[null, ...grupos.map(g => g.key)].map((key) => {
+        const grupo   = key === null ? null : grupos.find(g => g.key === key)!
+        const label   = grupo?.name ?? "Todas"
+        const count   = grupo?.count ?? total
+        const esActivo = activo === key
+
+        return (
+          <motion.button
+            key={key ?? "todas"}
+            type="button"
+            onClick={() => onChange(key)}
+            aria-pressed={esActivo}
+            whileTap={{ scale: tapScale }}
+            transition={springSnappy}
+            className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 font-sans transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordo ${
+              esActivo
+                ? "border-bordo bg-bordo text-hueso"
+                : "border-dorado/40 text-bordo hover:bg-bordo/8"
+            }`}
+            style={{ fontSize: "var(--fs-caption)", minHeight: 44 }}
+          >
+            {grupo?.logo && (
+              <Image
+                src={grupo.logo}
+                alt=""
+                width={20}
+                height={20}
+                style={{ width: 20, height: 20, objectFit: "contain" }}
+              />
+            )}
+            {label}
+            <span
+              className={`font-mono tabular-nums ${esActivo ? "text-hueso/65" : "text-bordo/55"}`}
+              style={{ fontSize: "var(--fs-micro)" }}
+            >
+              {count}
+            </span>
+          </motion.button>
+        )
+      })}
+    </motion.div>
+  )
+}
+
 // ─── Grid de campañas ─────────────────────────────────────────────────────────
 
 function CampanaGrid({ campaigns }: { campaigns: Campaign[] }) {
+  const [activeClient, setActiveClient] = useState<string | null>(null)
+
+  const grupos = useMemo(() => groupCampaignsByClient(campaigns), [campaigns])
+
+  const visibles = useMemo(
+    () => campaigns.filter(c => !activeClient || campaignClientKey(c) === activeClient),
+    [campaigns, activeClient],
+  )
+
   return (
     <section className="bg-hueso-oscuro" style={{ paddingTop: 100, paddingBottom: 100 }}>
       <div className="max-w-7xl mx-auto" style={{ padding: "0 clamp(20px, 5vw, 64px)" }}>
@@ -497,7 +585,27 @@ function CampanaGrid({ campaigns }: { campaigns: Campaign[] }) {
           </motion.h2>
         </motion.div>
 
+        {grupos.length >= MIN_CLIENTES_PARA_CHIPS && (
+          <ClientChips
+            grupos={grupos}
+            total={campaigns.length}
+            activo={activeClient}
+            onChange={setActiveClient}
+          />
+        )}
+
+        {visibles.length === 0 ? (
+          <p
+            className="font-mono"
+            style={{ fontSize: "var(--fs-caption)", color: "var(--color-gris-bordo)" }}
+          >
+            No hay campañas de este cliente.
+          </p>
+        ) : (
         <motion.div
+          // key por cliente: al cambiar de chip la lista se remonta y las cards
+          // vuelven a entrar escalonadas, en vez de reordenarse sin transición.
+          key={activeClient ?? "todas"}
           variants={fadeUpStagger}
           initial="hidden"
           whileInView="visible"
@@ -505,7 +613,7 @@ function CampanaGrid({ campaigns }: { campaigns: Campaign[] }) {
           className="flex flex-col"
           style={{ gap: 24 }}
         >
-          {campaigns.map((c, i) => {
+          {visibles.map((c, i) => {
             // images viene ya ordenado por position ASC desde lib/campaigns.ts.
             // La foto destacada es siempre la primera (menor position).
             const first = c.images?.[0]
@@ -527,6 +635,7 @@ function CampanaGrid({ campaigns }: { campaigns: Campaign[] }) {
             )
           })}
         </motion.div>
+        )}
 
       </div>
     </section>
