@@ -86,16 +86,16 @@ export function Navbar({
       className="sticky top-0 z-50 h-[72px] flex items-center"
       style={{ background: "var(--color-bordo)" }}
     >
-      <nav className="w-full max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
+      <nav className="w-full max-w-7xl mx-auto px-6 xl:px-12 flex items-center justify-between">
         <Logo variant="negative" height={40} priority />
 
-        <ul className="hidden md:flex items-center gap-8">
+        <ul className="hidden xl:flex items-center gap-8">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
                 className={cn(
-                  "font-sans text-[length:var(--fs-caption)] font-medium transition-colors tracking-wide",
+                  "font-sans text-[length:var(--fs-caption)] font-medium transition-colors tracking-wide whitespace-nowrap",
                   pathname === link.href
                     ? "text-hueso"
                     : "text-hueso/60 hover:text-hueso"
@@ -111,42 +111,33 @@ export function Navbar({
         <div className="flex items-center gap-3">
           {/* CTA desktop. El header siempre tiene fondo --bordo, así que el botón
               va en variante --hueso/--bordo (consistente con el resto del nav). */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-3">
             {/* Buscador. NO va con el tratamiento de los íconos sociales
                 (--hueso/70 suelto): al lado de Instagram y LinkedIn se leía
                 como un ícono más y pasaba desapercibido. Va como control
                 propio —borde, fondo y la palabra "Buscar"— para que se
-                entienda que es una acción. El label aparece desde lg y el
-                atajo desde xl, así no aprieta el nav en pantallas medianas. */}
+                entienda que es una acción. El atajo Ctrl/Cmd+K sigue
+                andando, pero no se muestra como leyenda: quedaba cargado. */}
             <button
               ref={searchButtonRef}
               type="button"
               onClick={() => setIsSearchOpen(true)}
               aria-label="Buscar en el sitio"
               title="Buscar (Ctrl + K)"
-              className="group ml-2 flex w-9 items-center justify-center gap-2 rounded-full border border-hueso/35 bg-hueso/10 text-hueso transition-colors duration-200 hover:border-dorado hover:bg-hueso/20 lg:ml-0 lg:w-auto lg:justify-start lg:px-3.5"
+              className="group flex items-center gap-2 rounded-full border border-hueso/35 bg-hueso/10 px-3.5 text-hueso transition-colors duration-200 hover:border-dorado hover:bg-hueso/20"
               style={{ minHeight: 36 }}
             >
               <Search size={17} strokeWidth={2} className="shrink-0" />
-              <span className="hidden font-sans lg:inline" style={{ fontSize: "var(--fs-caption)" }}>
+              <span className="font-sans" style={{ fontSize: "var(--fs-caption)" }}>
                 Buscar
               </span>
-              <kbd
-                className="hidden font-mono text-hueso/55 transition-colors group-hover:text-hueso/80 xl:inline"
-                style={{
-                  fontSize: "var(--fs-micro)",
-                  padding: "1px 5px",
-                  borderRadius: 3,
-                  border: "1px solid rgba(254,252,239,0.3)",
-                }}
-              >
-                Ctrl K
-              </kbd>
             </button>
 
-            {/* Presencia social mínima permanente. El nav siempre es fondo bordo,
-                así que los íconos van en --hueso/70 → opacidad plena + scale al hover. */}
-            <div className="flex items-center gap-3">
+            {/* Presencia social (--hueso/70 → opacidad plena + scale al hover):
+                secundaria frente al buscador y al CTA, y
+                lo primero que sobra cuando el nav se aprieta. Solo desde 2xl;
+                abajo siguen en el menú desplegable y en el footer. */}
+            <div className="hidden items-center gap-3 2xl:flex">
               <a
                 href={instagramUrl}
                 target="_blank"
@@ -179,7 +170,7 @@ export function Navbar({
               setIsMenuOpen(false)
               setIsSearchOpen(true)
             }}
-            className="md:hidden flex items-center justify-center min-h-11 min-w-11 text-hueso transition-colors"
+            className="xl:hidden flex items-center justify-center min-h-11 min-w-11 text-hueso transition-colors"
             aria-label="Buscar en el sitio"
           >
             <Search size={23} strokeWidth={2} />
@@ -187,7 +178,7 @@ export function Navbar({
 
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden flex items-center justify-center min-h-11 min-w-11 -mr-2 text-hueso/70 hover:text-hueso transition-colors"
+            className="xl:hidden flex items-center justify-center min-h-11 min-w-11 -mr-2 text-hueso/70 hover:text-hueso transition-colors"
             aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
@@ -211,7 +202,7 @@ export function Navbar({
               exit={{ opacity: 0, transition: { duration: reduced ? 0 : 0.13 } }}
               transition={{ duration: reduced ? 0 : 0.22 }}
               onClick={() => setIsMenuOpen(false)}
-              className="md:hidden fixed inset-0 top-[72px] z-40 cursor-default bg-black/30"
+              className="xl:hidden fixed inset-0 top-[72px] z-40 cursor-default bg-black/30"
             />
             <motion.div
               id="mobile-menu"
@@ -220,7 +211,7 @@ export function Navbar({
               // Salida ~60% de la entrada (criterio exit-faster-than-enter).
               exit={{ opacity: 0, y: reduced ? 0 : -8, transition: { duration: reduced ? 0 : 0.13 } }}
               transition={{ type: "spring", stiffness: 380, damping: 32, mass: 0.7 }}
-              className="md:hidden absolute top-full inset-x-0 z-50 border-t border-hueso/10 px-6 pb-6 pt-2 shadow-xl shadow-black/20"
+              className="xl:hidden absolute top-full inset-x-0 z-50 border-t border-hueso/10 px-6 pb-6 pt-2 shadow-xl shadow-black/20"
               style={{ background: "var(--color-bordo)" }}
             >
               <ul className="flex flex-col">
