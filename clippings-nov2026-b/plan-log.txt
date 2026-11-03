@@ -1,0 +1,33 @@
+◇ injected env (7) from .env.local // tip: ◈ secrets for agents [www.dotenvx.com]
+🖼 [colegio-notarial] Prensa Gobierno de Mendoza — Seguridad y Justicia fortalece la capacitación para detectar documenta
+🖼 [colegio-notarial] Sitio Andino — Mendoza refuerza la capacitación para detectar documentación notarial 
+🖼 [colegio-notarial] Sitio Andino — El Departamento General de Irrigación renovó su oficina virtual para e
+🖼 [chakaymanta] 261 Noticias — La Escuela Chakaymanta busca ayuda para competir en el Pre Cosquín y L
+   [chakaymanta] El Sol — Una escuela de danza mendocina pide ayuda para viajar a competir a niv (solo link)
+🖼 [chakaymanta] Diario UNO — Sueñan con el Pre Cosquín: la escuela de folclore mendocina que pide u
+🖼 [chakaymanta] ADN País — La Escuela Chakaymanta impulsa una colecta solidaria para competir en 
+🖼 [chakaymanta] Los Andes — Quieren representar a Mendoza en el Pre Cosquín y otros festivales, pe
+🖼 [chakaymanta] Diario NDI — Escuela de Malambo: cultura, clases y salida laboral
+🖼 [chakaymanta] 261 Noticias — Abre en Mendoza la primera escuela de Malambo Fantasía
+🖼 [chakaymanta] Los Andes — Gran gesto: donaron su salón de eventos para que chicos aprendan una d
+   [chakaymanta] Mendovoz — Abrio en las heras la primera escuela de malambo fantasia de mendoza (solo link)
+   [chakaymanta] El Sol — La escuela de vendimia chakaymanta inauguro su sede propia en las hera (solo link)
+🖼 [chakaymanta] Mendoza 24 — Abre en Mendoza la primera escuela de Malambo Fantasía
+🖼 [chakaymanta] Lv10 — Sergio Magallanes- Director de la Escuela de Vendimia Chacaymanta
+
+cliente               a insertar duplicadas fallidas sin imagen fecha estimada
+colegio-notarial               3          0        0          0              0
+chakaymanta                   12          0        0          3              2
+
+DUPLICADAS (0):
+
+FALLIDAS (0):
+
+SIN IMAGEN (3):
+ - [chakaymanta] https://www.elsol.com.ar/cultura/una-escuela-de-danza-mendocina-pide-ayuda-para-viajar-a-competir-a-nivel-nacional/
+ - [chakaymanta] https://www.mendovoz.com/las-heras/vecinos/2026/7/28/abrio-en-las-heras-la-primera-escuela-de-malambo-fantasia-de-mendoza-174539.html
+ - [chakaymanta] https://www.elsol.com.ar/cultura/la-escuela-de-vendimia-chakaymanta-inauguro-su-sede-propia-en-las-heras/
+
+FECHA ESTIMADA (2):
+ - [chakaymanta] https://www.elsol.com.ar/cultura/una-escuela-de-danza-mendocina-pide-ayuda-para-viajar-a-competir-a-nivel-nacional/  → 2026-10-28 (campaña)
+ - [chakaymanta] https://www.elsol.com.ar/cultura/la-escuela-de-vendimia-chakaymanta-inauguro-su-sede-propia-en-las-heras/  → 2026-08-04 (campaña)

@@ -84,6 +84,15 @@ export async function fetchUrlMetadata(url: string): Promise<UrlMetadata> {
       clearTimeout(timer)
     }
 
+    return parseMetadata(html, url)
+  } catch {
+    return EMPTY_METADATA
+  }
+}
+
+/** Extrae la metadata de un HTML ya descargado. `url` resuelve imágenes relativas. */
+export function parseMetadata(html: string, url: string): UrlMetadata {
+  try {
     const $ = cheerio.load(html)
     const meta = (selector: string) => $(selector).first().attr("content")?.trim() || null
 
