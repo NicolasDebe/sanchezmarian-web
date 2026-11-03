@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { SITE_EMAIL } from "@/lib/constants"
 
 export const metadata: Metadata = {
   title: "Términos y Condiciones — Marian Sánchez",
@@ -25,7 +26,7 @@ const SECTIONS = [
   },
   {
     title: "Contacto",
-    body: "Para cualquier consulta sobre estos términos, escribinos a info@sanchezmarian.com.",
+    body: `Para cualquier consulta sobre estos términos, escribinos a ${SITE_EMAIL}.`,
   },
 ]
 

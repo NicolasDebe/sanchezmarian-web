@@ -15,23 +15,22 @@
 
 import { Resend } from "resend"
 import { SITE_URL } from "@/lib/seo"
-import { SITE_EMAIL } from "@/lib/constants"
+import { MAIL_SENDER, SITE_EMAIL } from "@/lib/constants"
 import { REVIEWER_TYPE_LABELS } from "@/lib/testimonials-schema"
 import type { TestimonialModerationNotice } from "@/lib/testimonials"
 
 /**
  * Remitente de TODOS los mails de reseñas.
  *
- * Sale de SITE_EMAIL (info@sanchezmarian.com), la misma casilla que figura en
- * el footer, en los formularios y en el "escribinos a…" de los propios mails:
- * es una casilla real que alguien lee. Si el remitente fuera una dirección
- * aparte (resenas@…), quien conteste el mail de confirmación —que es lo que
- * hace la gente— le escribiría a un buzón que nadie mira.
+ * Sale de MAIL_SENDER (info@sanchezmarian.com) y NO de SITE_EMAIL: la casilla
+ * pública es ahora un Gmail, y Resend solo deja mandar desde el dominio
+ * verificado. Hoy el único mail que sale es el aviso interno de moderación
+ * (va a SITE_EMAIL), así que nadie necesita contestarle al remitente.
  *
  * En Resend hay que verificar el DOMINIO sanchezmarian.com para poder mandar
  * desde esta dirección.
  */
-const FROM = `Marian Sánchez <${SITE_EMAIL}>`
+const FROM = `Marian Sánchez <${MAIL_SENDER}>`
 
 /** Paleta de la marca, en hex literal: los mails no leen las CSS vars del sitio. */
 const C = {

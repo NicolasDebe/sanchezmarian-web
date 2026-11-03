@@ -5,7 +5,19 @@
  * sobrescribirlos desde el admin sin que dejen de existir defaults consistentes.
  */
 
-export const SITE_EMAIL = "info@sanchezmarian.com"
+/**
+ * Casilla de contacto PÚBLICA y destino de los avisos internos. Es la que se
+ * muestra en nav/footer/formularios y la que llega al mail que Marian realmente
+ * lee. NO usar como remitente de Resend: ver MAIL_SENDER.
+ */
+export const SITE_EMAIL = "sanchezmariana15@gmail.com"
+
+/**
+ * Remitente de los mails que manda el sitio (Resend). Tiene que ser del dominio
+ * verificado en Resend: con una dirección @gmail.com Resend rechaza el envío.
+ * Nadie lee esta casilla, por eso nunca se muestra al público.
+ */
+export const MAIL_SENDER = "info@sanchezmarian.com"
 
 export const WHATSAPP_NUMBER = "542615433882"
 export const WHATSAPP_MESSAGE =

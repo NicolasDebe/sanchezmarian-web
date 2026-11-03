@@ -348,8 +348,14 @@ sección de reseñas en el sitio.
 - **Mail con Resend** (`lib/testimonials-email.ts`). Queda UNO solo: el aviso
   al equipo de que hay una reseña para moderar, asunto "Reseña nueva para
   revisar · [nombre] de [marca]". Sale desde `info@sanchezmarian.com`
-  (`SITE_EMAIL`) y llega a `MODERATION_NOTIFY_EMAIL` o, si no está seteada, a
-  `SITE_EMAIL`. Es best-effort: si falla se loguea y nada se rompe — la reseña
+  (`MAIL_SENDER`, dominio verificado en Resend) y llega a
+  `MODERATION_NOTIFY_EMAIL` o, si no está seteada, a `SITE_EMAIL` (hoy el Gmail
+  de Marian, `sanchezmariana15@gmail.com`; desde 2026-11-03 el correo público
+  ya no es `info@`, que nadie leía). `SITE_EMAIL` y `MAIL_SENDER` son
+  constantes DISTINTAS a propósito: Resend no deja mandar desde @gmail.com.
+  Si el email vuelve a cambiar, además de la constante hay que actualizar las
+  4 filas del CMS que lo guardan (`npx tsx scripts/set-contact-email.ts`; el
+  CMS le gana al fallback). Es best-effort: si falla se loguea y nada se rompe — la reseña
   ya está guardada y el badge del panel la cuenta. **Sin `RESEND_API_KEY` el
   sistema entero funciona igual**, solo que nadie recibe el aviso y hay que
   mirar el panel. Todo el texto de usuario se escapa antes de entrar al HTML.

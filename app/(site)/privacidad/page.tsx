@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { SITE_EMAIL } from "@/lib/constants"
 
 export const metadata: Metadata = {
   title: "Política de Privacidad — Marian Sánchez",
@@ -21,11 +22,11 @@ const SECTIONS = [
   },
   {
     title: "Tus derechos",
-    body: "Tenés derecho a acceder, corregir o solicitar la eliminación de tus datos personales. Para ejercer estos derechos, escribinos a info@sanchezmarian.com.",
+    body: `Tenés derecho a acceder, corregir o solicitar la eliminación de tus datos personales. Para ejercer estos derechos, escribinos a ${SITE_EMAIL}.`,
   },
   {
     title: "Contacto",
-    body: "Ante cualquier consulta sobre esta política de privacidad, podés contactarnos en info@sanchezmarian.com.",
+    body: `Ante cualquier consulta sobre esta política de privacidad, podés contactarnos en ${SITE_EMAIL}.`,
   },
 ]
 
